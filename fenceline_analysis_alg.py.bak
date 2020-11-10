@@ -67,7 +67,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterVectorDestination (
                 self.MinMax,
-                'Fenceline Minimum & Maximum Elevation Coordinates'
+                'Pipeline Minimum & Maximum Elevation Coordinates'
             )
         )
          
@@ -111,7 +111,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['ReprojectLayer'] = processing.run('native:reprojectlayer', alg_params, context=context, is_child_algorithm=True)
+        outputs['ReprojectLayer'] = processing.run('native:reprojectlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(2)
         if feedback.isCanceled():
@@ -122,7 +122,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'INPUT': outputs['ReprojectLayer']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['ExplodeLines'] = processing.run('native:explodelines', alg_params, context=context, is_child_algorithm=True)
+        outputs['ExplodeLines'] = processing.run('native:explodelines', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(3)
         if feedback.isCanceled():
@@ -141,7 +141,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'INPUT': outputs['ExplodeLines']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['RefactorFields'] = processing.run('qgis:refactorfields', alg_params, context=context, is_child_algorithm=True)
+        outputs['RefactorFields'] = processing.run('qgis:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(4)
         if feedback.isCanceled():
@@ -153,7 +153,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'INTERVAL': 30,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['SplittingFenceline'] = processing.run('native:densifygeometriesgivenaninterval', alg_params, context=context, is_child_algorithm=True)
+        outputs['SplittingFenceline'] = processing.run('native:densifygeometriesgivenaninterval', alg_params, context=context,  feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(5)
         if feedback.isCanceled():
@@ -168,7 +168,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'SCALE': 1,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['ExtractElevation'] = processing.run('native:setzfromraster', alg_params, context=context, is_child_algorithm=True)
+        outputs['ExtractElevation'] = processing.run('native:setzfromraster', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(6)
         if feedback.isCanceled():
@@ -179,7 +179,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'INPUT': outputs['ExtractElevation']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['ExplodeLines'] = processing.run('native:explodelines', alg_params, context=context,  is_child_algorithm=True)
+        outputs['ExplodeLines'] = processing.run('native:explodelines', alg_params, context=context,  feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(7)
         if feedback.isCanceled():
@@ -197,7 +197,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'NEW_FIELD': True,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['Calculate3dLines'] = processing.run('qgis:fieldcalculator', alg_params, context=context, is_child_algorithm=True)
+        outputs['Calculate3dLines'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(8)
         if feedback.isCanceled():
@@ -205,7 +205,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             
         # Calculate Minimum Elevation
         alg_params = {
-            'FIELD_LENGTH': 0,
+            'FIELD_LENGTH': 10,
             'FIELD_NAME': 'MinimumElev',
             'FIELD_PRECISION': 1,
             'FIELD_TYPE': 1,
@@ -214,15 +214,15 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'NEW_FIELD': True,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['MinElev'] = processing.run('qgis:fieldcalculator', alg_params, context=context, is_child_algorithm=True)
+        outputs['MinElev'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(9)
+        feedback.setCurrentStep(8)
         if feedback.isCanceled():
             return {}
 
         # Calculate Maximum Elevation
         alg_params = {
-            'FIELD_LENGTH': 0,
+            'FIELD_LENGTH': 10,
             'FIELD_NAME': 'MaximumElev',
             'FIELD_PRECISION': 1,
             'FIELD_TYPE': 1,
@@ -231,12 +231,12 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'NEW_FIELD': True,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['MaxElev'] = processing.run('qgis:fieldcalculator', alg_params, context=context, is_child_algorithm=True)
+        outputs['MaxElev'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(10)
+        feedback.setCurrentStep(8)
         if feedback.isCanceled():
             return {}
-
+            
         # Sum Distance
         alg_params = {
             'FIELD_LENGTH': 0,
@@ -254,7 +254,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-
+           
         # Joining Lines
         alg_params = {
             'FIELD': ['ID'],
@@ -263,7 +263,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         }
         outputs['JoiningLines'] = processing.run('native:dissolve', alg_params, context=context, is_child_algorithm=True)
 
-        feedback.setCurrentStep(12)
+        feedback.setCurrentStep(16)
         if feedback.isCanceled():
             return {}
             
@@ -279,7 +279,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
           
         outputs['SortFields'] = processing.run("native:orderbyexpression", alg_params, context=context, is_child_algorithm=True)
         
-        feedback.setCurrentStep(13)
+        feedback.setCurrentStep(17)
         if feedback.isCanceled():
             return {}
             
@@ -303,10 +303,6 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'OUTPUT': outputFile
         }
         fenceline_analysis = processing.run('qgis:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        
-        feedback.setCurrentStep(14)
-        if feedback.isCanceled():
-            return {}
           
 #------------------------------------------------------------------------------------------------------------------------------------
 # Extract minimum and maximum elevations from proposed line
@@ -320,7 +316,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         }
         outputs['ExtractVertices'] = processing.run('native:extractvertices', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
         
-        feedback.setCurrentStep(15)
+        feedback.setCurrentStep(8)
         if feedback.isCanceled():
             return {}
         
@@ -331,7 +327,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         }
         outputs['DeleteDuplicateVertices'] = processing.run('qgis:deleteduplicategeometries', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
         
-        feedback.setCurrentStep(16)
+        feedback.setCurrentStep(8)
         if feedback.isCanceled():
             return {}
             
@@ -343,7 +339,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         }
         outputs['AddGeometryAtt'] = processing.run('qgis:exportaddgeometrycolumns', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
         
-        feedback.setCurrentStep(17)
+        feedback.setCurrentStep(8)
         if feedback.isCanceled():
             return {}
             
@@ -355,7 +351,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         }
         outputs['ExtractMinimumElevation'] = processing.run('native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(18)
+        feedback.setCurrentStep(9)
         if feedback.isCanceled():
             return {}
             
@@ -367,7 +363,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         }
         outputs['ExtractMaximumElevation'] = processing.run('native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(19)
+        feedback.setCurrentStep(9)
         if feedback.isCanceled():
             return {}            
         
@@ -379,15 +375,15 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         outputs['MergeMinMax'] = processing.run('native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
         
 
-        feedback.setCurrentStep(20)
+        feedback.setCurrentStep(9)
         if feedback.isCanceled():
             return {} 
             
         # Refactor fields
         alg_params = {
              'FIELDS_MAPPING': [{'expression': 'ID', 'length': 0, 'name': 'Line ID', 'precision': 0, 'type': 2},
-             {'expression':  'round(x( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)', 'length' : 0, 'name': 'Longitude', 'precision': 0, 'type': 6},
-             {'expression':  'round(y( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)', 'length' : 0, 'name': 'Latitude', 'precision': 0, 'type': 6},
+             {'expression':  'x( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') )', 'length' : 0, 'name': 'Longitude', 'precision': 0, 'type': 6},
+             {'expression':  'y( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') )', 'length' : 0, 'name': 'Latitude', 'precision': 0, 'type': 6},
              {'expression':  'zcoord', 'length' : 0, 'name': 'Elevation (m)', 'precision': 0, 'type': 6},
              {'expression':  'if (z($geometry) = minimum( "zcoord" , "ID" ), \'Minimum Elevation\', \'Maximum Elevation\')', 'length' : 0, 'name': 'Min/Max', 'precision': 0, 'type': 10}],
              'INPUT': outputs['MergeMinMax']['OUTPUT'],

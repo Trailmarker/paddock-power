@@ -1,95 +1,348 @@
+#
+#   To do:
+#   
+#   Output into groups
+#   Add to existing datasets
+#   Run on selected paddocks automatically and check if no paddocks selected
+#   Check if layers are in correct CRS and if not then reproject
+
 import os
 import inspect
-from qgis.core import(QgsProcessing,
-                      QgsProcessingParameterBoolean,
-                      QgsProcessingAlgorithm,
-                      QgsProcessingMultiStepFeedback,
-                      QgsProcessingParameterFeatureSource,
-                      QgsProcessingParameterFeatureSink,
-                      QgsCoordinateReferenceSystem)
+from qgis.core import   (QgsProcessing,
+                        QgsProcessingAlgorithm, 
+                        QgsProcessingParameterFeatureSource, 
+                        QgsProcessingParameterVectorDestination,
+                        QgsProcessingMultiStepFeedback,
+                        QgsProcessingParameterNumber,
+                        QgsCoordinateReferenceSystem,
+                        QgsExpression)
 from PyQt5.QtGui import QIcon
 import processing
 
 
 class WaterpointBuffers(QgsProcessingAlgorithm):
-
-
+    BUFFERDISTANCE = 'BUFFERDISTANCE'
+    CURRENTWATER = 'CURRENTWATER'
+    NEWWATER = 'NEWWATER'
+    LANDUNIT = 'LANDUNIT'
+    PADDOCK = 'PADDOCK'
+    CWAREA = 'CWAREA'
+    NWAREA = 'NWAREA'
+    CWLAREA = 'CWLAREA'
+    NWLAREA = 'NWLAREA'
+    OUTPUT = 'OUTPUT'
+ 
+    def __init__(self):
+        super().__init__()
+ 
+    def name(self):
+        return "Waterpoint Buffers"
+ 
+    def displayName(self):
+        return "Waterpoint Buffers"
+        
+    def icon(self):
+        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
+        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icons/buffer.png'))) # icon for the Paddock Power Tools Group in Toolbox
+        return icon
+        
+    def group(self):
+        return 'Waterpoint Tools'
+    
+    def groupId(self):
+        return 'Waterpoint Tools'
+ 
+    def createInstance(self):
+        return type(self)()
+   
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource('currentwaters', 'Current Waters', types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
-        self.addParameter(QgsProcessingParameterBoolean('buffer_2km','2km Buffer', defaultValue=False))
-        self.addParameter(QgsProcessingParameterBoolean('buffer_3km','3km Buffer', defaultValue=True))
-        self.addParameter(QgsProcessingParameterBoolean('buffer_5km', '5km Buffer', defaultValue=True))
-        self.addParameter(QgsProcessingParameterBoolean('buffer_8km', '8km Buffer', defaultValue=False))
-        self.addParameter(QgsProcessingParameterFeatureSource('landunits', 'Land Units', types=[QgsProcessing.TypeVectorPolygon], defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSource('newwaters', 'New Waters', types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSource('paddocks', 'Paddocks', types=[QgsProcessing.TypeVectorPolygon], defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSink('NewWateredAreas', 'New Watered Areas', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSink('CurrentWateredAreas', 'Current Watered Areas', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSink('CurrentLandUnitWateredAreas', 'Current Land Unit Watered Areas', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSink('NewLandUnitWateredAreas', 'New Land Unit Watered Areas', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, defaultValue=None))
+        
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.BUFFERDISTANCE,
+                'Buffer Distance (km)',
+                type=QgsProcessingParameterNumber.Integer,
+                minValue=0,
+                maxValue=10,
+                defaultValue=3
+            )
+        )    
+        
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.PADDOCK,
+                'Selected Paddock',
+                [QgsProcessing.TypeVectorPolygon]
+            )
+        )
+        
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.CURRENTWATER,
+                'Current Waterpoints',
+                [QgsProcessing.TypeVectorPoint]
+            )
+        )
+        
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.NEWWATER,
+                'Proposed Waters',
+                [QgsProcessing.TypeVectorPoint]
+            )
+        )
+        
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.LANDUNIT,
+                'Land Unit/Systems Mapping',
+                [QgsProcessing.TypeVectorPolygon]
+            )
+        )
+        
+        self.addParameter(
+            QgsProcessingParameterVectorDestination (
+                self.CWAREA,
+                'Current Watered Area Buffers'
+            )
+        )
+    
+        self.addParameter(
+            QgsProcessingParameterVectorDestination (
+                self.NWAREA,
+                'Proposed Watered Area Buffers'
+            )
+        )
+      
+        self.addParameter(
+            QgsProcessingParameterVectorDestination (
+                self.CWLAREA,
+                'Current Land Unit/System Watered Areas'
+            )
+        ) 
+        
+        self.addParameter(
+            QgsProcessingParameterVectorDestination (
+                self.NWLAREA,
+                'Proposed Land Unit/System Watered Areas'
+            )
+        )
+    
 
     def processAlgorithm(self, parameters, context, model_feedback):
         # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
         # overall progress through the model
-        feedback = QgsProcessingMultiStepFeedback(62, model_feedback)
+        feedback = QgsProcessingMultiStepFeedback(26, model_feedback)
+        buffer_distance_km = (self.parameterAsInt(parameters, self.BUFFERDISTANCE, context))
+        buffer_distance = (self.parameterAsInt(parameters, self.BUFFERDISTANCE, context)) * 1000 # convert entered value to metres
+        current_buffer = self.parameterAsOutputLayer(parameters, self.CWAREA, context)
+        new_buffer = self.parameterAsOutputLayer(parameters, self.NWAREA, context)
+        current_land_buffer = self.parameterAsOutputLayer(parameters, self.CWLAREA, context)
+        new_land_buffer = self.parameterAsOutputLayer(parameters, self.NWLAREA, context)
         results = {}
         outputs = {}
-        buffers = []
         
-        if buffer_2km == True:
-            buffers.append(2000)
-        if buffer_3km == True:
-            buffers.append(3000)
-        if buffer_5km == True:
-            buffers.append(5000)
-        if buffers_8km == True:
-            buffers.append(8000)
-            
-        # Reproject New Waters
+        # Reproject Current Waters. Shouldn't be needed if already in correct projection, maybe check projection first?
         alg_params = {
-            'INPUT': parameters['newwaters'],
-            'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['ReprojectNewWaters'] = processing.run('native:reprojectlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(1)
-        if feedback.isCanceled():
-            return {}
-
-        # Extract by expression New Waters
-        alg_params = {
-            'EXPRESSION': ' \"Type\"  =  \'Trough\' OR  \"Type\" = \'Waterhole\' OR  \"Type\" = \'Turkey Nest\'',
-            'INPUT': outputs['ReprojectNewWaters']['OUTPUT'],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['ExtractByExpressionNewWaters'] = processing.run('native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(2)
-        if feedback.isCanceled():
-            return {}
-
-        # Reproject Paddocks
-        alg_params = {
-            'INPUT': parameters['paddocks'],
-            'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['ReprojectPaddocks'] = processing.run('native:reprojectlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(3)
-        if feedback.isCanceled():
-            return {}
-
-        # Reproject Current Waters
-        alg_params = {
-            'INPUT': parameters['currentwaters'],
+            'INPUT': parameters['CURRENTWATER'],
             'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
         outputs['ReprojectCurrentWaters'] = processing.run('native:reprojectlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
+        feedback.setCurrentStep(1)
+        if feedback.isCanceled():
+            return {}
+            
+        # Delete unneeded fields
+        alg_params = {
+            'INPUT': outputs['ReprojectCurrentWaters']['OUTPUT'],
+            'COLUMN': ['fid',
+            'Waterpoint Reference',
+            'Waterpoint Bore Yield (l/sec)',
+            'Waterpoint Date Commisioned',
+            'Waterpoint Date Decommisioned',
+            'Waterpoint Active?',
+            'Waterpoint Start Month',
+            'Waterpoint End Month',
+            'Waterpoint Proposed?',
+            'Waterpoint Longitude',
+            'Waterpoint Latitude',
+            'Waterpoint Elevation',
+            'Waterpoint Bore Report'],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['DeletedCurrentWaters'] = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            
+        feedback.setCurrentStep(2)
+        if feedback.isCanceled():
+            return {}
+            
+        # Reproject Paddocks. Shouldn't be needed if already in correct projection, maybe check projection first?
+        alg_params = {
+            'INPUT': parameters['PADDOCK'],
+            'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['ReprojectPaddocks'] = processing.run('native:reprojectlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        
+        feedback.setCurrentStep(3)
+        if feedback.isCanceled():
+            return {}
+        
+          
+        # Extract by expression for Current Waters
+        alg_params = {
+            'EXPRESSION': ' \"Waterpoint Type\"  =  \'Trough\' OR  \"Waterpoint Type\" = \'Waterhole\' OR  \"Waterpoint Type\" = \'Turkey Nest\'',
+            'INPUT': outputs['DeletedCurrentWaters']['OUTPUT'],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['ExtractByExpressionCurrentWaters'] = processing.run('native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
         feedback.setCurrentStep(4)
+        if feedback.isCanceled():
+            return {}
+
+        # Extract by location using selected paddock for current waters
+        alg_params = {
+            'INPUT': outputs['ExtractByExpressionCurrentWaters']['OUTPUT'],
+            'INTERSECT': outputs['ReprojectPaddocks']['OUTPUT'],
+            'PREDICATE': [0],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['ExtractByLocationCurrentWaters'] = processing.run('native:extractbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(5)
+        if feedback.isCanceled():
+            return {}
+
+        # Create buffer for current waters
+        alg_params = {
+            'DISSOLVE': True,
+            'DISTANCE': buffer_distance,
+            'END_CAP_STYLE': 0,
+            'INPUT': outputs['ExtractByLocationCurrentWaters']['OUTPUT'],
+            'JOIN_STYLE': 0,
+            'MITER_LIMIT': 2,
+            'SEGMENTS': 25,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CurrentBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(6)
+        if feedback.isCanceled():
+            return {}
+
+        # Intersection Current
+        alg_params = {
+            'INPUT': outputs['CurrentBuffer']['OUTPUT'],
+            'INPUT_FIELDS': None,
+            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
+            'OVERLAY_FIELDS': None,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['IntersectionCurrent'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(7)
+        if feedback.isCanceled():
+            return {}
+            
+        # Add WA_DIST Current
+        alg_params = {
+            'FIELD_LENGTH': 10,
+            'FIELD_NAME': 'Buffer Distance (km)',
+            'FIELD_PRECISION': 3,
+            'FIELD_TYPE': 1,
+            'FORMULA': buffer_distance_km,
+            'INPUT': outputs['IntersectionCurrent']['OUTPUT'],
+            'NEW_FIELD': True,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['AddWa_dist'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(8)
+        if feedback.isCanceled():
+            return {}
+            
+        # Calc CURR_WAREA
+        alg_params = {
+            'FIELD_LENGTH': 10,
+            'FIELD_NAME': 'Current Watered Area (km²)',
+            'FIELD_PRECISION': 3,
+            'FIELD_TYPE': 0,
+            'FORMULA': 'round(area($geometry) * 0.000001,4)',
+            'INPUT': outputs['AddWa_dist']['OUTPUT'],
+            'NEW_FIELD': True,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CalcCurrentArea'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(9)
+        if feedback.isCanceled():
+            return {}
+
+        # Delete unneeded fields
+        alg_params = {
+            'INPUT': outputs['CalcCurrentArea']['OUTPUT'],
+            'COLUMN': ['Waterpoint Type','Date Commisioned','Date Decommisioned','Paddock Active?','Paddock Proposed?', 'Paddock Perimeter (km)'],
+            'OUTPUT': current_buffer
+        }
+        current_buffers = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+      
+        feedback.setCurrentStep(10)
+        if feedback.isCanceled():
+            return {}
+
+
+
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        # Reproject Proposed Waters. Shouldn't be needed if already in correct projection, maybe check projection first?
+        alg_params = {
+            'INPUT': parameters['NEWWATER'],
+            'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['ReprojectNewWaters'] = processing.run('native:reprojectlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(11)
+        if feedback.isCanceled():
+            return {}
+            
+        # Delete unneeded fields
+        alg_params = {
+            'INPUT': outputs['ReprojectNewWaters']['OUTPUT'],
+            'COLUMN': ['fid',
+            'Waterpoint Reference',
+            'Waterpoint Bore Yield (l/sec)',
+            'Waterpoint Date Commisioned',
+            'Waterpoint Date Decommisioned',
+            'Waterpoint Active?',
+            'Waterpoint Start Month',
+            'Waterpoint End Month',
+            'Waterpoint Proposed?',
+            'Waterpoint Longitude',
+            'Waterpoint Latitude',
+            'Waterpoint Elevation',
+            'Waterpoint Bore Report'],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['DeletedNewWaters'] = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            
+        feedback.setCurrentStep(12)
+        if feedback.isCanceled():
+            return {}
+           
+        # Extract by expression New Waters
+        alg_params = {
+            'EXPRESSION': ' \"Waterpoint Type\"  =  \'Trough\' OR  \"Waterpoint Type\" = \'Waterhole\' OR  \"Waterpoint Type\" = \'Turkey Nest\'',
+            'INPUT': outputs['DeletedNewWaters']['OUTPUT'],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['ExtractByExpressionNewWaters'] = processing.run('native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(13)
         if feedback.isCanceled():
             return {}
 
@@ -102,883 +355,312 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         }
         outputs['ExtractByLocationNewWaters'] = processing.run('native:extractbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(5)
+        feedback.setCurrentStep(14)
         if feedback.isCanceled():
             return {}
-
-        # Extract by expression Current Waters
-        alg_params = {
-            'EXPRESSION': ' \"Type\"  =  \'Trough\' OR  \"Type\" = \'Waterhole\' OR  \"Type\" = \'Turkey Nest\'',
-            'INPUT': outputs['ReprojectCurrentWaters']['OUTPUT'],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['ExtractByExpressionCurrentWaters'] = processing.run('native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(6)
-        if feedback.isCanceled():
-            return {}
-
-        # Extract by location Current Waters
-        alg_params = {
-            'INPUT': outputs['ExtractByExpressionCurrentWaters']['OUTPUT'],
-            'INTERSECT': outputs['ReprojectPaddocks']['OUTPUT'],
-            'PREDICATE': [0],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['ExtractByLocationCurrentWaters'] = processing.run('native:extractbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(7)
-        if feedback.isCanceled():
-            return {}
-
-        # Current 2km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 2000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['ExtractByLocationCurrentWaters']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Current2kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(8)
-        if feedback.isCanceled():
-            return {}
-
-        # Current 3km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 3000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['ExtractByLocationCurrentWaters']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Current3kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(9)
-        if feedback.isCanceled():
-            return {}
-
-        # Merge Current and New WP
+            
+        # Merge Current Watered Areas
         alg_params = {
             'CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
             'LAYERS': [outputs['ExtractByLocationNewWaters']['OUTPUT'],outputs['ExtractByLocationCurrentWaters']['OUTPUT']],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['MergeCurrentAndNewWp'] = processing.run('native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(10)
-        if feedback.isCanceled():
-            return {}
-
-        # Current 8km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 8000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['ExtractByLocationCurrentWaters']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Current8kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(11)
-        if feedback.isCanceled():
-            return {}
-
-        # Current 5km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 5000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['ExtractByLocationCurrentWaters']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Current5kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(12)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection 2km Current
-        alg_params = {
-            'INPUT': outputs['Current2kmBuffer']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Intersection2kmCurrent'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(13)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection 8km Current
-        alg_params = {
-            'INPUT': outputs['Current8kmBuffer']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Intersection8kmCurrent'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(14)
-        if feedback.isCanceled():
-            return {}
-
-        # Add WA_DIST 8km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 1,
-            'FORMULA': '8',
-            'INPUT': outputs['Intersection8kmCurrent']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['AddWa_dist8km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(15)
-        if feedback.isCanceled():
-            return {}
-
-        # New 2km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 2000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['MergeCurrentAndNewWp']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['New2kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(16)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection 2km New
-        alg_params = {
-            'INPUT': outputs['New2kmBuffer']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Intersection2kmNew'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(17)
-        if feedback.isCanceled():
-            return {}
-
-        # New 3km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 3000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['MergeCurrentAndNewWp']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['New3kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(18)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection 5km Current
-        alg_params = {
-            'INPUT': outputs['Current5kmBuffer']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Intersection5kmCurrent'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(19)
-        if feedback.isCanceled():
-            return {}
-
-        # New 5km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 5000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['MergeCurrentAndNewWp']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['New5kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(20)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection 3km Current
-        alg_params = {
-            'INPUT': outputs['Current3kmBuffer']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Intersection3kmCurrent'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(21)
-        if feedback.isCanceled():
-            return {}
-
-        # Add WA_DIST 2km New
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 1,
-            'FORMULA': '2',
-            'INPUT': outputs['Intersection2kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['AddWa_dist2kmNew'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(22)
-        if feedback.isCanceled():
-            return {}
-
-        # Add WA_DIST 2km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 1,
-            'FORMULA': '2',
-            'INPUT': outputs['Intersection2kmCurrent']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['AddWa_dist2km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(23)
-        if feedback.isCanceled():
-            return {}
-
-        # New 8km Buffer
-        alg_params = {
-            'DISSOLVE': True,
-            'DISTANCE': 8000,
-            'END_CAP_STYLE': 0,
-            'INPUT': outputs['MergeCurrentAndNewWp']['OUTPUT'],
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 2,
-            'SEGMENTS': 25,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['New8kmBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(24)
-        if feedback.isCanceled():
-            return {}
-
-        # Calc CURR_WAREA 8km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'CURR_WAREA',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist8km']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CalcCurr_warea8km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(25)
-        if feedback.isCanceled():
-            return {}
-
-        # Add WA_DIST 3km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 1,
-            'FORMULA': '3',
-            'INPUT': outputs['Intersection3kmCurrent']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['AddWa_dist3km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(26)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection 3km New
-        alg_params = {
-            'INPUT': outputs['New3kmBuffer']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Intersection3kmNew'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['MergeWaters'] = processing.run('native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
         feedback.setCurrentStep(27)
         if feedback.isCanceled():
             return {}
 
-        # Intersection 5km New
+        # New Buffer
         alg_params = {
-            'INPUT': outputs['New5kmBuffer']['OUTPUT'],
+            'DISSOLVE': True,
+            'DISTANCE': buffer_distance,
+            'END_CAP_STYLE': 0,
+            'INPUT': outputs['MergeWaters']['OUTPUT'],
+            'JOIN_STYLE': 0,
+            'MITER_LIMIT': 2,
+            'SEGMENTS': 25,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['NewBuffer'] = processing.run('native:buffer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(15)
+        if feedback.isCanceled():
+            return {}
+
+        # Intersection Current
+        alg_params = {
+            'INPUT': outputs['NewBuffer']['OUTPUT'],
             'INPUT_FIELDS': None,
             'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
             'OVERLAY_FIELDS': None,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['Intersection5kmNew'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['IntersectionNew'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(28)
+        feedback.setCurrentStep(16)
         if feedback.isCanceled():
             return {}
-
-        # Calc CURR_WAREA 2km
+            
+        # Add WA_DIST Current
         alg_params = {
             'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'CURR_WAREA',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist2km']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CalcCurr_warea2km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(29)
-        if feedback.isCanceled():
-            return {}
-
-        # Add WA_DIST 5km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
+            'FIELD_NAME': 'Buffer Distance (km)',
             'FIELD_PRECISION': 3,
             'FIELD_TYPE': 1,
-            'FORMULA': '5',
-            'INPUT': outputs['Intersection5kmCurrent']['OUTPUT'],
+            'FORMULA': buffer_distance_km,
+            'INPUT': outputs['IntersectionNew']['OUTPUT'],
             'NEW_FIELD': True,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['AddWa_dist5km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['AddWa_dist_New'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(30)
+        feedback.setCurrentStep(17)
         if feedback.isCanceled():
             return {}
-
-        # Calc CURR_WAREA 3km
+            
+        # Calc CURR_WAREA
         alg_params = {
             'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'CURR_WAREA',
+            'FIELD_NAME': 'Proposed Watered Area (km²)',
             'FIELD_PRECISION': 3,
             'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist3km']['OUTPUT'],
+            'FORMULA': 'round(area($geometry) * 0.000001,4)',
+            'INPUT': outputs['AddWa_dist_New']['OUTPUT'],
             'NEW_FIELD': True,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CalcCurr_warea3km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CalcNewArea'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(31)
+        feedback.setCurrentStep(18)
         if feedback.isCanceled():
             return {}
 
-        # Add WA_DIST 3km New
+        # Delete unneeded fields
         alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 1,
-            'FORMULA': '3',
-            'INPUT': outputs['Intersection3kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
+            'INPUT': outputs['CalcNewArea']['OUTPUT'],
+            'COLUMN': ['Waterpoint Type','Date Commisioned','Date Decommisioned','Paddock Active?','Paddock Proposed?', 'Paddock Perimeter (km)'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['AddWa_dist3kmNew'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(32)
+        outputs['DeletedWatersNew'] = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+      
+        feedback.setCurrentStep(19)
         if feedback.isCanceled():
             return {}
-
-        # Calc NEW_WAREA 2km
+            
+        # Join current watered area attribute to proposed watered area buffer
+        
         alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'NEW_WAREA',
-            'FIELD_PRECISION': 1,
-            'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist2kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CalcNew_warea2km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(33)
-        if feedback.isCanceled():
-            return {}
-
-        # Add WA_DIST 5km New
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 1,
-            'FORMULA': '5',
-            'INPUT': outputs['Intersection5kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['AddWa_dist5kmNew'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(34)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection New 2km LU
-        alg_params = {
-            'INPUT': outputs['CalcNew_warea2km']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionNew2kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(35)
-        if feedback.isCanceled():
-            return {}
-
-        # Calc NEW_WAREA 5km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'NEW_WAREA',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist5kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CalcNew_warea5km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(36)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection Current 2km LU
-        alg_params = {
-            'INPUT': outputs['CalcCurr_warea2km']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionCurrent2kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(37)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection 8km New
-        alg_params = {
-            'INPUT': outputs['New8kmBuffer']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': outputs['ReprojectPaddocks']['OUTPUT'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['Intersection8kmNew'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(38)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection Current 8km LU
-        alg_params = {
-            'INPUT': outputs['CalcCurr_warea8km']['OUTPUT'],
-            'INPUT_FIELDS': '',
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionCurrent8kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(39)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection Current 3km LU
-        alg_params = {
-            'INPUT': outputs['CalcCurr_warea3km']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionCurrent3kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(40)
-        if feedback.isCanceled():
-            return {}
-
-        # Calc NEW_WAREA 3km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'NEW_WAREA',
-            'FIELD_PRECISION': 1,
-            'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist3kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CalcNew_warea3km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(41)
-        if feedback.isCanceled():
-            return {}
-
-        # Calc CURR_WAREA 5km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'CURR_WAREA',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist5km']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CalcCurr_warea5km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(42)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection Current 5km LU
-        alg_params = {
-            'INPUT': outputs['CalcCurr_warea5km']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionCurrent5kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(43)
-        if feedback.isCanceled():
-            return {}
-
-        # Add WA_DIST 8km New
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WA_DIST',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 1,
-            'FORMULA': '8',
-            'INPUT': outputs['Intersection8kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['AddWa_dist8kmNew'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(44)
-        if feedback.isCanceled():
-            return {}
-
-        # Merge vector layers
-        alg_params = {
-            'CRS': None,
-            'LAYERS': [outputs['IntersectionCurrent2kmLu']['OUTPUT'],outputs['IntersectionCurrent3kmLu']['OUTPUT'],outputs['IntersectionCurrent5kmLu']['OUTPUT'],outputs['IntersectionCurrent8kmLu']['OUTPUT']],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['MergeVectorLayers'] = processing.run('native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(45)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection New 5km LU
-        alg_params = {
-            'INPUT': outputs['CalcNew_warea5km']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionNew5kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(46)
-        if feedback.isCanceled():
-            return {}
-
-        # Calc NEW_WAREA 8km
-        alg_params = {
-            'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'NEW_WAREA',
-            'FIELD_PRECISION': 3,
-            'FIELD_TYPE': 0,
-            'FORMULA': 'area($geometry) * 0.000001',
-            'INPUT': outputs['AddWa_dist8kmNew']['OUTPUT'],
-            'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CalcNew_warea8km'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(47)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection New 3km LU
-        alg_params = {
-            'INPUT': outputs['CalcNew_warea3km']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionNew3kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(48)
-        if feedback.isCanceled():
-            return {}
-
-        # Merge Current
-        alg_params = {
-            'CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
-            'LAYERS': [outputs['CalcCurr_warea2km']['OUTPUT'],outputs['CalcCurr_warea3km']['OUTPUT'],outputs['CalcCurr_warea5km']['OUTPUT'],outputs['CalcCurr_warea8km']['OUTPUT']],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['MergeCurrent'] = processing.run('native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(49)
-        if feedback.isCanceled():
-            return {}
-
-        # Order by expression
-        alg_params = {
-            'ASCENDING': False,
-            'EXPRESSION': 'WA_DIST',
-            'INPUT': outputs['MergeVectorLayers']['OUTPUT'],
-            'NULLS_FIRST': False,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['OrderByExpression'] = processing.run('native:orderbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(50)
-        if feedback.isCanceled():
-            return {}
-
-        # Refactor fields
-        alg_params = {
-            'FIELDS_MAPPING': [{'expression': '"NAME_2"', 'length': 17, 'name': 'NAME', 'precision': 0, 'type': 10}, {'expression': '"PROPERTY"', 'length': 50, 'name': 'PROPERTY', 'precision': 0, 'type': 10}, {'expression': '"PDKAREAKM2"', 'length': 0, 'name': 'PDKAREAKM2', 'precision': 0, 'type': 6}, {'expression': '"WA_DIST"', 'length': 10, 'name': 'WA_DIST', 'precision': 3, 'type': 2}, {'expression': '"CURR_WAREA"', 'length': 10, 'name': 'CURR_WAREA', 'precision': 1, 'type': 6}, {'expression': '"SURVEY_NME"', 'length': 254, 'name': 'SURVEY_NME', 'precision': 0, 'type': 10}, {'expression': '"SURVEY_ID"', 'length': 5, 'name': 'SURVEY_ID', 'precision': 0, 'type': 10}, {'expression': '"LAND_UNIT"', 'length': 10, 'name': 'LAND_UNIT', 'precision': 0, 'type': 10}, {'expression': '"LF_CLASS"', 'length': 50, 'name': 'LF_CLASS', 'precision': 0, 'type': 10}, {'expression': '"SOIL_SYS"', 'length': 10, 'name': 'SOIL_SYS', 'precision': 0, 'type': 10}, {'expression': '"SOIL"', 'length': 50, 'name': 'SOIL', 'precision': 0, 'type': 10}, {'expression': '"VEG_SYS"', 'length': 15, 'name': 'VEG_SYS', 'precision': 0, 'type': 10}, {'expression': '"VEG_STRUC"', 'length': 50, 'name': 'VEG_STRUC', 'precision': 0, 'type': 10}, {'expression': '"SPECIES_1"', 'length': 50, 'name': 'SPECIES_1', 'precision': 0, 'type': 10}, {'expression': '"SPECIES_2"', 'length': 50, 'name': 'SPECIES_2', 'precision': 0, 'type': 10}, {'expression': '"SPECIES_3"', 'length': 50, 'name': 'SPECIES_3', 'precision': 0, 'type': 10}, {'expression': '"LF_DESC"', 'length': 254, 'name': 'LF_DESC', 'precision': 0, 'type': 10}, {'expression': '"SOIL_DESC"', 'length': 254, 'name': 'SOIL_DESC', 'precision': 0, 'type': 10}, {'expression': '"VEG_DESC"', 'length': 254, 'name': 'VEG_DESC', 'precision': 0, 'type': 10}, {'expression': 'area($geometry) * 0.000001', 'length': 0, 'name': 'LUAREAKM2', 'precision': 0, 'type': 6}],
-            'INPUT': outputs['OrderByExpression']['OUTPUT'],
-            'OUTPUT': parameters['CurrentLandUnitWateredAreas']
-        }
-        outputs['RefactorFields'] = processing.run('qgis:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['CurrentLandUnitWateredAreas'] = outputs['RefactorFields']['OUTPUT']
-
-        feedback.setCurrentStep(51)
-        if feedback.isCanceled():
-            return {}
-
-        # Merge New
-        alg_params = {
-            'CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
-            'LAYERS': [outputs['CalcNew_warea2km']['OUTPUT'],outputs['CalcNew_warea3km']['OUTPUT'],outputs['CalcNew_warea5km']['OUTPUT'],outputs['CalcNew_warea8km']['OUTPUT']],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['MergeNew'] = processing.run('native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(52)
-        if feedback.isCanceled():
-            return {}
-
-        # Order by expression New
-        alg_params = {
-            'ASCENDING': False,
-            'EXPRESSION': 'WA_DIST',
-            'INPUT': outputs['MergeNew']['OUTPUT'],
-            'NULLS_FIRST': False,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['OrderByExpressionNew'] = processing.run('native:orderbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(53)
-        if feedback.isCanceled():
-            return {}
-
-        # Intersection New 8km LU
-        alg_params = {
-            'INPUT': outputs['CalcNew_warea8km']['OUTPUT'],
-            'INPUT_FIELDS': None,
-            'OVERLAY': parameters['landunits'],
-            'OVERLAY_FIELDS': None,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['IntersectionNew8kmLu'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(54)
-        if feedback.isCanceled():
-            return {}
-
-        # Merge vector layers
-        alg_params = {
-            'CRS': None,
-            'LAYERS': [outputs['IntersectionNew2kmLu']['OUTPUT'],outputs['IntersectionNew5kmLu']['OUTPUT'],outputs['IntersectionNew3kmLu']['OUTPUT'],outputs['IntersectionNew8kmLu']['OUTPUT']],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['MergeVectorLayers'] = processing.run('native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(55)
-        if feedback.isCanceled():
-            return {}
-
-        # Order by expression Current
-        alg_params = {
-            'ASCENDING': False,
-            'EXPRESSION': 'WA_DIST',
-            'INPUT': outputs['MergeCurrent']['OUTPUT'],
-            'NULLS_FIRST': False,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['OrderByExpressionCurrent'] = processing.run('native:orderbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(56)
-        if feedback.isCanceled():
-            return {}
-
-        # Refactor fields New
-        alg_params = {
-            'FIELDS_MAPPING': [{'expression': '"Name_2"', 'length': 80, 'name': 'PADDOCK', 'precision': 0, 'type': 10}, {'expression': '"PDKAREAKM2"', 'length': 0, 'name': 'PDKAREAKM2', 'precision': 1, 'type': 6}, {'expression': '"WA_DIST"', 'length': 10, 'name': 'WA_DISTKM', 'precision': 3, 'type': 2}, {'expression': '"NEW_WAREA"', 'length': 10, 'name': 'NEW_WAREAKM2', 'precision': 3, 'type': 6}],
-            'INPUT': outputs['OrderByExpressionNew']['OUTPUT'],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['RefactorFieldsNew'] = processing.run('qgis:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(57)
-        if feedback.isCanceled():
-            return {}
-
-        # Refactor fields Current
-        alg_params = {
-            'FIELDS_MAPPING': [{'expression': '"Name_2"', 'length': 80, 'name': 'PADDOCK', 'precision': 0, 'type': 10}, {'expression': '"PDKAREAKM2"', 'length': 0, 'name': 'PDKAREAKM2', 'precision': 1, 'type': 6}, {'expression': '"WA_DIST"', 'length': 10, 'name': 'WA_DISTKM', 'precision': 3, 'type': 2}, {'expression': '"CURR_WAREA"', 'length': 10, 'name': 'CURR_WAREAKM2', 'precision': 1, 'type': 6}],
-            'INPUT': outputs['OrderByExpressionCurrent']['OUTPUT'],
-            'OUTPUT': parameters['CurrentWateredAreas']
-        }
-        outputs['RefactorFieldsCurrent'] = processing.run('qgis:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['CurrentWateredAreas'] = outputs['RefactorFieldsCurrent']['OUTPUT']
-
-        feedback.setCurrentStep(58)
-        if feedback.isCanceled():
-            return {}
-
-        # Order by expression
-        alg_params = {
-            'ASCENDING': False,
-            'EXPRESSION': 'WA_DIST',
-            'INPUT': outputs['MergeVectorLayers']['OUTPUT'],
-            'NULLS_FIRST': False,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['OrderByExpression'] = processing.run('native:orderbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(59)
-        if feedback.isCanceled():
-            return {}
-
-        # Join attributes by field value
-        alg_params = {
-            'DISCARD_NONMATCHING': False,
-            'FIELD': 'WA_DISTKM',
-            'FIELDS_TO_COPY': 'CURR_WAREAKM2',
-            'FIELD_2': 'WA_DISTKM',
-            'INPUT': outputs['RefactorFieldsNew']['OUTPUT'],
-            'INPUT_2': outputs['RefactorFieldsCurrent']['OUTPUT'],
+            'INPUT': outputs['DeletedWatersNew']['OUTPUT'],
+            'FIELD': 'Buffer Distance (km)',
+            'INPUT_2': current_buffer,
+            'FIELD_2': 'Buffer Distance (km)',
+            'FIELDS_TO_COPY': ['Current Watered Area (km²)'],
             'METHOD': 1,
+            'DISCARD_NONMATCHING': False,
             'PREFIX': '',
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['JoinAttributesByFieldValue'] = processing.run('native:joinattributestable', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(60)
+        outputs['JoinedWaters'] = processing.run("native:joinattributestable", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        
+        feedback.setCurrentStep(20)
         if feedback.isCanceled():
             return {}
-
+        
         # Field calculator
         alg_params = {
             'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'WAREA_DIFFKM2',
+            'FIELD_NAME': 'Watered Area Difference',
             'FIELD_PRECISION': 1,
             'FIELD_TYPE': 0,
-            'FORMULA': 'round( \"NEW_WAREAKM2\" - \"CURR_WAREAKM2\" ,1)',
-            'INPUT': outputs['JoinAttributesByFieldValue']['OUTPUT'],
+            'FORMULA': 'round( \"Proposed Watered Area (km²)\" - \"Current Watered Area (km²)\" ,4)',
+            'INPUT': outputs['JoinedWaters']['OUTPUT'],
             'NEW_FIELD': True,
-            'OUTPUT': parameters['NewWateredAreas']
+            'OUTPUT': new_buffer
         }
-        outputs['FieldCalculator'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['NewWateredAreas'] = outputs['FieldCalculator']['OUTPUT']
+        new_buffers = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(61)
+        feedback.setCurrentStep(21)
+        if feedback.isCanceled():
+            return {}
+            
+            
+            
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        # Reproject Land Units / Systems. Shouldn't be needed if already in correct projection, maybe check projection first?
+        alg_params = {
+            'INPUT': parameters['LANDUNIT'],
+            'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['ReprojectLandUnit'] = processing.run('native:reprojectlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        
+        feedback.setCurrentStep(22)
+        if feedback.isCanceled():
+            return {}
+            
+                
+        # Intersection Current
+        alg_params = {
+            'INPUT': current_buffer,
+            'INPUT_FIELDS': None,
+            'OVERLAY': outputs['ReprojectLandUnit']['OUTPUT'],
+            'OVERLAY_FIELDS': None,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CurrentLandInt'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        #current_land_buffers = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        
+        feedback.setCurrentStep(23)
+        if feedback.isCanceled():
+            return {}
+            
+        # Calculate LU/LS Area
+        alg_params = {
+            'INPUT': outputs['CurrentLandInt']['OUTPUT'],
+            'FIELD_NAME':'Current Land Unit/Land System Area (km²)',
+            'FIELD_TYPE':0,
+            'FIELD_LENGTH':10,
+            'FIELD_PRECISION':3,
+            'NEW_FIELD': True,
+            'FORMULA':'round(area( $geometry ) * 0.000001,3)',
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CalculateLSLU'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+                
+        feedback.setCurrentStep(24)
+        if feedback.isCanceled():
+            return {}
+        
+        # Delete unneeded fields
+        alg_params = {
+            'INPUT': outputs['CalculateLSLU']['OUTPUT'],
+            'COLUMN': ['fid',
+            'Waterpoint Reference',
+            'Waterpoint Bore Yield (l/sec)',
+            'Waterpoint Date Commisioned',
+            'Waterpoint Date Decommisioned',
+            'Waterpoint Active?',
+            'Waterpoint Start Month',
+            'Waterpoint End Month',
+            'Waterpoint Proposed?',
+            'Waterpoint Longitude',
+            'Waterpoint Latitude',
+            'Waterpoint Elevation',
+            'Waterpoint Bore Report',
+            'Waterpoint Name'],
+            'OUTPUT': current_land_buffer
+        }
+        current_land_buffers = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+      
+        feedback.setCurrentStep(25)
         if feedback.isCanceled():
             return {}
 
-        # Refactor fields
+        # Intersection Proposed
         alg_params = {
-            'FIELDS_MAPPING': [{'expression': '"NAME_2"', 'length': 17, 'name': 'NAME', 'precision': 0, 'type': 10}, {'expression': '"LAYER"', 'length': 7, 'name': 'LAYER', 'precision': 0, 'type': 10}, {'expression': '"PROPERTY"', 'length': 50, 'name': 'PROPERTY', 'precision': 0, 'type': 10}, {'expression': '"PDKAREAKM2"', 'length': 0, 'name': 'PDKAREAKM2', 'precision': 0, 'type': 6}, {'expression': '"WA_DIST"', 'length': 10, 'name': 'WA_DIST', 'precision': 3, 'type': 2}, {'expression': '"CURR_WAREA"', 'length': 10, 'name': 'CURR_WAREA', 'precision': 1, 'type': 6}, {'expression': '"SURVEY_NME"', 'length': 254, 'name': 'SURVEY_NME', 'precision': 0, 'type': 10}, {'expression': '"SURVEY_ID"', 'length': 5, 'name': 'SURVEY_ID', 'precision': 0, 'type': 10}, {'expression': '"LAND_UNIT"', 'length': 10, 'name': 'LAND_UNIT', 'precision': 0, 'type': 10}, {'expression': '"LF_CLASS"', 'length': 50, 'name': 'LF_CLASS', 'precision': 0, 'type': 10}, {'expression': '"SOIL_SYS"', 'length': 10, 'name': 'SOIL_SYS', 'precision': 0, 'type': 10}, {'expression': '"SOIL"', 'length': 50, 'name': 'SOIL', 'precision': 0, 'type': 10}, {'expression': '"VEG_SYS"', 'length': 15, 'name': 'VEG_SYS', 'precision': 0, 'type': 10}, {'expression': '"VEG_STRUC"', 'length': 50, 'name': 'VEG_STRUC', 'precision': 0, 'type': 10}, {'expression': '"SPECIES_1"', 'length': 50, 'name': 'SPECIES_1', 'precision': 0, 'type': 10}, {'expression': '"SPECIES_2"', 'length': 50, 'name': 'SPECIES_2', 'precision': 0, 'type': 10}, {'expression': '"SPECIES_3"', 'length': 50, 'name': 'SPECIES_3', 'precision': 0, 'type': 10}, {'expression': '"LF_DESC"', 'length': 254, 'name': 'LF_DESC', 'precision': 0, 'type': 10}, {'expression': '"SOIL_DESC"', 'length': 254, 'name': 'SOIL_DESC', 'precision': 0, 'type': 10}, {'expression': '"VEG_DESC"', 'length': 254, 'name': 'VEG_DESC', 'precision': 0, 'type': 10}, {'expression': 'round( area($geometry) * 0.000001,1)', 'length': 0, 'name': 'LUAREAKM2', 'precision': 0, 'type': 6}],
-            'INPUT': outputs['OrderByExpression']['OUTPUT'],
-            'OUTPUT': parameters['NewLandUnitWateredAreas']
+            'INPUT':new_buffer,
+            'INPUT_FIELDS': None,
+            'OVERLAY': outputs['ReprojectLandUnit']['OUTPUT'],
+            'OVERLAY_FIELDS': None,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['RefactorFields'] = processing.run('qgis:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['NewLandUnitWateredAreas'] = outputs['RefactorFields']['OUTPUT']
-        return results
-
-    def name(self):
-        return 'Waterpoint Buffers'
-
-    def displayName(self):
-        return 'Waterpoint Buffers'
+        outputs['NewLandInt'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+                
+        feedback.setCurrentStep(26)
+        if feedback.isCanceled():
+            return {}
+            
+        # Calculate LU/LS Area
+        alg_params = {
+            'INPUT': outputs['NewLandInt']['OUTPUT'],
+            'FIELD_NAME':'Proposed Land Unit/Land System Area (km²)',
+            'FIELD_TYPE':0,
+            'FIELD_LENGTH':10,
+            'FIELD_PRECISION':3,
+            'NEW_FIELD': True,
+            'FORMULA':'round(area( $geometry ) * 0.000001,3)',
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CalculateLSLUNew'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+                
+        feedback.setCurrentStep(27)
+        if feedback.isCanceled():
+            return {}
         
-    def icon(self):
-        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icons/buffer.png'))) # icon for the Paddock Power Tools Group in Toolbox
-        return icon
-
-    def group(self):
-        return 'Waterpoint Tools'
-
-    def groupId(self):
-        return 'Waterpoint Tools'
-
-    def createInstance(self):
-        return WaterpointBuffers()
+        # Delete unneeded fields
+        alg_params = {
+            'INPUT': outputs['CalculateLSLUNew']['OUTPUT'],
+            'COLUMN': ['fid',
+            'Waterpoint Reference',
+            'Waterpoint Bore Yield (l/sec)',
+            'Waterpoint Date Commisioned',
+            'Waterpoint Date Decommisioned',
+            'Waterpoint Active?',
+            'Waterpoint Start Month',
+            'Waterpoint End Month',
+            'Waterpoint Proposed?',
+            'Waterpoint Longitude',
+            'Waterpoint Latitude',
+            'Waterpoint Elevation',
+            'Waterpoint Bore Report',
+            'Waterpoint Name',
+            'layer',
+            'path',
+            'fid_2'],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['DeletedWatersNewLULS'] = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+      
+        feedback.setCurrentStep(28)
+        if feedback.isCanceled():
+            return {}
+            
+        # Join current watered area attribute to proposed watered area buffer
+        
+        alg_params = {
+            'INPUT': outputs['DeletedWatersNewLULS']['OUTPUT'],
+            'FIELD': 'Land Unit/Land System Area (km²)',
+            'INPUT_2': current_land_buffer,
+            'FIELD_2': 'Land Unit/Land System Area (km²)',
+            'FIELDS_TO_COPY': ['Current Land Unit/Land System Area (km²)'],
+            'METHOD': 1,
+            'DISCARD_NONMATCHING': False,
+            'PREFIX': '',
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['JoinedLandUnits'] = processing.run("native:joinattributestable", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        
+        feedback.setCurrentStep(29)
+        if feedback.isCanceled():
+            return {}
+            
+         # Field calculator
+        alg_params = {
+            'FIELD_LENGTH': 10,
+            'FIELD_NAME': 'Current Land Unit/Land System Area (km²)',
+            'FIELD_PRECISION': 1,
+            'FIELD_TYPE': 0,
+            'FORMULA': 'if( \"Current Land Unit/Land System Area (km²)\" IS NULL, 0,\"Current Land Unit/Land System Area (km²)\" )',
+            'INPUT': outputs['JoinedLandUnits']['OUTPUT'],
+            'NEW_FIELD': False,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['FieldCalculatorCurrentLU'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)    
+            
+        # Field calculator
+        alg_params = {
+            'FIELD_LENGTH': 10,
+            'FIELD_NAME': 'Land Unit Difference',
+            'FIELD_PRECISION': 1,
+            'FIELD_TYPE': 0,
+            'FORMULA': 'round( \"Proposed Land Unit/Land System Area (km²)\" - \"Current Land Unit/Land System Area (km²)\" ,3)',
+            'INPUT': outputs['FieldCalculatorCurrentLU']['OUTPUT'],
+            'NEW_FIELD': True,
+            'OUTPUT': new_land_buffer
+        }
+        new_land_buffers = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            
+        return {self.NWAREA : new_buffers, self.CWAREA : current_buffers, self.CWLAREA: current_land_buffers, self.NWLAREA : new_land_buffers}
+        

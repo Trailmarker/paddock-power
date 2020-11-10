@@ -32,6 +32,7 @@ Ui_SplitPaddockDialogBase = uic.loadUiType(os.path.join(os.path.dirname(__file__
 Ui_WPAnalysisDialogBase = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'WPAnalysis_dialog_base.ui'))[0]
 Ui_FenceAnalysisDialogBase = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'FenceAnalysis_dialog_base.ui'))[0]
 Ui_PipelineAnalysisDialogBase = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'PipelineAnalysis_dialog_base.ui'))[0]
+Ui_AddPaddockLayerDialogBase = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'AddPaddock_dialog_base.ui'))[0]
 
 
 class SplitPaddockDialog(QtWidgets.QDialog, Ui_SplitPaddockDialogBase):
@@ -72,6 +73,17 @@ class PipelineAnalysisDialog(QtWidgets.QDialog, Ui_PipelineAnalysisDialogBase):
     def __init__(self, parent=None):
         """Constructor."""
         super(PipelineAnalysisDialog, self).__init__(parent)
+        # Set up the user interface from Designer through FORM_CLASS.
+        # After self.setupUi() you can access any designer object by doing
+        # self.<objectname>, and you can use autoconnect slots - see
+        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
+        # #widgets-and-dialogs-with-auto-connect
+        self.setupUi(self)
+        
+class AddPaddockLayerDialog(QtWidgets.QDialog, Ui_AddPaddockLayerDialogBase):
+    def __init__(self, parent=None):
+        """Constructor."""
+        super(AddPaddockLayerDialog, self).__init__(parent)
         # Set up the user interface from Designer through FORM_CLASS.
         # After self.setupUi() you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

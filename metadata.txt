@@ -4,7 +4,7 @@
 
 [general]
 name=Paddock Power
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.6
 description=Tools for Paddock Power Project
 version=0.1
 author=Northern Territory Government
