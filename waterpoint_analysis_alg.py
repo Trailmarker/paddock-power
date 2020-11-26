@@ -470,7 +470,7 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         # Field calculator
         alg_params = {
             'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'Watered Area Difference',
+            'FIELD_NAME': 'Watered Area Difference (km²)',
             'FIELD_PRECISION': 1,
             'FIELD_TYPE': 0,
             'FORMULA': 'round( \"Proposed Watered Area (km²)\" - \"Current Watered Area (km²)\" ,4)',
@@ -652,7 +652,7 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         # Field calculator
         alg_params = {
             'FIELD_LENGTH': 10,
-            'FIELD_NAME': 'Land Unit Difference',
+            'FIELD_NAME': 'Land Unit/Land System Difference (km²)',
             'FIELD_PRECISION': 1,
             'FIELD_TYPE': 0,
             'FORMULA': 'round( \"Proposed Land Unit/Land System Area (km²)\" - \"Current Land Unit/Land System Area (km²)\" ,3)',

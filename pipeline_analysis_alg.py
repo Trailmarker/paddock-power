@@ -296,9 +296,9 @@ class PipelineAnalysis(QgsProcessingAlgorithm):
             #{'expression': '"Distance"', 'length': 10, 'name': 'Distance', 'precision': 2, 'type': 6}, 
             {'expression': 'round(TotalDistanceM,2)', 'length': 10, 'name': 'Distance inc. terrain (m)', 'precision': 2, 'type': 6}, 
             {'expression': 'round(TotalDistanceM / 1000,2)', 'length': 10, 'name': 'Distance inc. terrain (km)', 'precision': 2, 'type': 6}, 
-            {'expression': 'abs(round( "TotalDistanceM" -  "LengthM" ,2))', 'length': 10, 'name': 'DifferenceM', 'precision': 2, 'type': 6}, 
-            {'expression': 'MinimumElev', 'length': 0, 'name': 'Minimum Elevation', 'precision': 0, 'type': 6},
-            {'expression': 'MaximumElev', 'length': 0, 'name': 'Maximum Elevation', 'precision': 0, 'type': 6}],
+            {'expression': 'abs(round( "TotalDistanceM" -  "LengthM" ,2))', 'length': 10, 'name': 'Difference (m)', 'precision': 2, 'type': 6}, 
+            {'expression': 'round(MinimumElev,1)', 'length': 0, 'name': 'Minimum Elevation', 'precision': 0, 'type': 6},
+            {'expression': 'round(MaximumElev,1)', 'length': 0, 'name': 'Maximum Elevation', 'precision': 0, 'type': 6}],
             'INPUT': outputs['SortFields']['OUTPUT'],
             'OUTPUT': outputFile
         }
@@ -388,8 +388,8 @@ class PipelineAnalysis(QgsProcessingAlgorithm):
              'FIELDS_MAPPING': [{'expression': 'ID', 'length': 0, 'name': 'Line ID', 'precision': 0, 'type': 2},
              {'expression':  'round(x( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)', 'length' : 0, 'name': 'Longitude', 'precision': 0, 'type': 6},
              {'expression':  'round(y( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)', 'length' : 0, 'name': 'Latitude', 'precision': 0, 'type': 6},
-             {'expression':  'zcoord', 'length' : 0, 'name': 'Elevation (m)', 'precision': 0, 'type': 6},
-             {'expression':  'if (z($geometry) = minimum( "zcoord" , "ID" ), \'Minimum Elevation\', \'Maximum Elevation\')', 'length' : 0, 'name': 'Min/Max', 'precision': 0, 'type': 10}],
+             {'expression':  'round(zcoord,1)', 'length' : 0, 'name': 'Elevation (m)', 'precision': 0, 'type': 6},
+             {'expression':  'if (z($geometry) = minimum( "zcoord" , "ID" ), \'Minimum Elevation\', \'Maximum Elevation\')', 'length' : 0, 'name': 'Minimum or Maximum', 'precision': 0, 'type': 10}],
              'INPUT': outputs['MergeMinMax']['OUTPUT'],
              'OUTPUT': minMaxFile
         }
