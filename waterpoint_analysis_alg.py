@@ -158,18 +158,19 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['ReprojectCurrentWaters']['OUTPUT'],
             'COLUMN': ['fid',
+            'Waterpoint Name', 
             'Waterpoint Reference',
             'Waterpoint Bore Yield (l/sec)',
             'Waterpoint Date Commisioned',
             'Waterpoint Date Decommisioned',
-            'Waterpoint Active?',
+            'Waterpoint Status',
             'Waterpoint Start Month',
             'Waterpoint End Month',
-            'Waterpoint Proposed?',
             'Waterpoint Longitude',
             'Waterpoint Latitude',
             'Waterpoint Elevation',
-            'Waterpoint Bore Report'],
+            'Waterpoint Bore Report',
+            'Date Edited'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
         outputs['DeletedCurrentWaters'] = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
@@ -280,11 +281,28 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         feedback.setCurrentStep(9)
         if feedback.isCanceled():
             return {}
+            
+        # Calc Percent Watered
+        alg_params = {
+            'FIELD_LENGTH': 10,
+            'FIELD_NAME': 'Current Paddock Percent Watered',
+            'FIELD_PRECISION': 3,
+            'FIELD_TYPE': 0,
+            'FORMULA': 'round(\"Current Watered Area (km²)\" / \"Paddock Area (km²)\" * 100, 2)',
+            'INPUT': outputs['CalcCurrentArea']['OUTPUT'],
+            'NEW_FIELD': True,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CalcPercentageCurrent'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(9)
+        if feedback.isCanceled():
+            return {}
 
         # Delete unneeded fields
         alg_params = {
-            'INPUT': outputs['CalcCurrentArea']['OUTPUT'],
-            'COLUMN': ['Waterpoint Type','Date Commisioned','Date Decommisioned','Paddock Active?','Paddock Proposed?', 'Paddock Perimeter (km)'],
+            'INPUT': outputs['CalcPercentageCurrent']['OUTPUT'],
+            'COLUMN': ['Waterpoint Type','Paddock Date Commisioned','Paddock Date Decommisioned','Paddock Status','Date Edited', 'Paddock Perimeter (km)'],
             'OUTPUT': current_buffer
         }
         current_buffers = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
@@ -314,14 +332,15 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['ReprojectNewWaters']['OUTPUT'],
             'COLUMN': ['fid',
+            'Waterpoint Name',
             'Waterpoint Reference',
             'Waterpoint Bore Yield (l/sec)',
             'Waterpoint Date Commisioned',
             'Waterpoint Date Decommisioned',
-            'Waterpoint Active?',
+            'Waterpoint Status',
             'Waterpoint Start Month',
             'Waterpoint End Month',
-            'Waterpoint Proposed?',
+            'Date Edited',
             'Waterpoint Longitude',
             'Waterpoint Latitude',
             'Waterpoint Elevation',
@@ -436,10 +455,27 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
+         # Calc Percent Watered
+        alg_params = {
+            'FIELD_LENGTH': 10,
+            'FIELD_NAME': 'Proposed Paddock Percent Watered',
+            'FIELD_PRECISION': 3,
+            'FIELD_TYPE': 0,
+            'FORMULA': 'round(\"Proposed Watered Area (km²)\" / \"Paddock Area (km²)\" * 100, 2)',
+            'INPUT': outputs['CalcNewArea']['OUTPUT'],
+            'NEW_FIELD': True,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CalcPercentageProposed'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(19)
+        if feedback.isCanceled():
+            return {}
+        
         # Delete unneeded fields
         alg_params = {
-            'INPUT': outputs['CalcNewArea']['OUTPUT'],
-            'COLUMN': ['Waterpoint Type','Date Commisioned','Date Decommisioned','Paddock Active?','Paddock Proposed?', 'Paddock Perimeter (km)'],
+            'INPUT': outputs['CalcPercentageProposed']['OUTPUT'],
+            'COLUMN': ['Waterpoint Type','Paddock Date Commisioned','Paddock Date Decommisioned','Paddock Status','Date Edited', 'Paddock Perimeter (km)', 'layer', 'path'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
         outputs['DeletedWatersNew'] = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
@@ -533,23 +569,28 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
         
-        # Delete unneeded fields
+        # Calculate LU/LS Percentage
         alg_params = {
             'INPUT': outputs['CalculateLSLU']['OUTPUT'],
+            'FIELD_NAME':'Percentage of Current Land Unit/Land System',
+            'FIELD_TYPE':0,
+            'FIELD_LENGTH':10,
+            'FIELD_PRECISION':3,
+            'NEW_FIELD': True,
+            'FORMULA':'round(\"Current Land Unit/Land System Area (km²)\" / \"Current Watered Area (km²)\" * 100, 2)',
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['CalculateLSLUPCNT'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+                
+        feedback.setCurrentStep(24)
+        if feedback.isCanceled():
+            return {}
+            
+        # Delete unneeded fields
+        alg_params = {
+            'INPUT': outputs['CalculateLSLUPCNT']['OUTPUT'],
             'COLUMN': ['fid',
-            'Waterpoint Reference',
-            'Waterpoint Bore Yield (l/sec)',
-            'Waterpoint Date Commisioned',
-            'Waterpoint Date Decommisioned',
-            'Waterpoint Active?',
-            'Waterpoint Start Month',
-            'Waterpoint End Month',
-            'Waterpoint Proposed?',
-            'Waterpoint Longitude',
-            'Waterpoint Latitude',
-            'Waterpoint Elevation',
-            'Waterpoint Bore Report',
-            'Waterpoint Name'],
+            'fid_2'],
             'OUTPUT': current_land_buffer
         }
         current_land_buffers = processing.run("qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
@@ -593,19 +634,6 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['CalculateLSLUNew']['OUTPUT'],
             'COLUMN': ['fid',
-            'Waterpoint Reference',
-            'Waterpoint Bore Yield (l/sec)',
-            'Waterpoint Date Commisioned',
-            'Waterpoint Date Decommisioned',
-            'Waterpoint Active?',
-            'Waterpoint Start Month',
-            'Waterpoint End Month',
-            'Waterpoint Proposed?',
-            'Waterpoint Longitude',
-            'Waterpoint Latitude',
-            'Waterpoint Elevation',
-            'Waterpoint Bore Report',
-            'Waterpoint Name',
             'layer',
             'path',
             'fid_2'],
@@ -656,6 +684,19 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
             'FIELD_PRECISION': 1,
             'FIELD_TYPE': 0,
             'FORMULA': 'round( \"Proposed Land Unit/Land System Area (km²)\" - \"Current Land Unit/Land System Area (km²)\" ,3)',
+            'INPUT': outputs['FieldCalculatorCurrentLU']['OUTPUT'],
+            'NEW_FIELD': False,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['FieldCalculatorCurrentLUDiff'] = processing.run('qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True) 
+        
+        # Field calculator
+        alg_params = {
+            'FIELD_LENGTH': 10,
+            'FIELD_NAME': 'Proposed Land Unit/Land System Percentage',
+            'FIELD_PRECISION': 1,
+            'FIELD_TYPE': 0,
+            'FORMULA': 'round( \"Proposed Land Unit/Land System Area (km²)\" / \"Proposed Watered Area (km²)\" *100 ,2)',
             'INPUT': outputs['FieldCalculatorCurrentLU']['OUTPUT'],
             'NEW_FIELD': True,
             'OUTPUT': new_land_buffer
