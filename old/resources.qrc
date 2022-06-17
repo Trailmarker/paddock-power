@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/PaddockPower" >
+        <file>ntg-primary-cmyk.png</file>
+    </qresource>
+</RCC>
