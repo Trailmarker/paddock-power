@@ -97,7 +97,7 @@ class Algorithm(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'Split Paddock'
+        return 'Sample Algorithm'
 
     def displayName(self):
         """
@@ -121,7 +121,7 @@ class Algorithm(QgsProcessingAlgorithm):
         contain lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'Paddock Power'
+        return 'Paddock Tools'
 
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)

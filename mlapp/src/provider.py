@@ -1,44 +1,29 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProcessingProvider
-from ..algorithm import Algorithm
+from .processing.algorithm import Algorithm
+from .processing.fenceline_analysis import FencelineAnalysis
+from .processing.pipeline_analysis import PipelineAnalysis
+from .processing.split_paddock import SplitPaddock
+from .processing.waterpoint_buffers import WaterpointBuffers
 
 class Provider(QgsProcessingProvider):
     def __init__(self):
-        """
-        Default constructor.
-        """
         QgsProcessingProvider.__init__(self)
 
     def unload(self):
-        """
-        Unloads the provider. Any tear-down steps required by the provider
-        should be implemented here.
-        """
         pass
 
     def loadAlgorithms(self):
-        """
-        Loads all algorithms belonging to this provider.
-        """
         self.addAlgorithm(Algorithm())
-        # add additional algorithms here
-        # self.addAlgorithm(MyOtherAlgorithm())
+        self.addAlgorithm(FencelineAnalysis())
+        self.addAlgorithm(PipelineAnalysis())
+        self.addAlgorithm(SplitPaddock())
+        self.addAlgorithm(WaterpointBuffers())
 
     def id(self):
-        """
-        Returns the unique provider id, used for identifying the provider. This
-        string should be a unique, short, character only string, eg "qgis" or
-        "gdal". This string should not be localised.
-        """
         return 'Paddock Power'
 
     def name(self):
-        """
-        Returns the provider name, which is used to describe the provider
-        within the GUI.
-
-        This string should be short (e.g. "Lastools") and localised.
-        """
         return self.tr('Paddock Power')
 
     def icon(self):
@@ -49,10 +34,4 @@ class Provider(QgsProcessingProvider):
         return QgsProcessingProvider.icon(self)
 
     def longName(self):
-        """
-        Returns the a longer version of the provider name, which can include
-        extra details such as version numbers. E.g. "Lastools LIDAR tools
-        (version 2.2.1)". This string should be localised. The default
-        implementation returns the same string as name().
-        """
         return self.name()
