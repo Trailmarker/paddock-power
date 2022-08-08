@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/mlapp" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
