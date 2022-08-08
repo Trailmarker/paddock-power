@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DockWidgetBase</class>
- <widget class="QDockWidget" name="DockWidgetBase">
+ <class>PaddockViewDockWidgetBase</class>
+ <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Paddock Power</string>
+   <string>Paddock View</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">

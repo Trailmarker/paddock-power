@@ -5,15 +5,15 @@ from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), '..', 'ui', 'dockwidget_base.ui')))
+    os.path.dirname(__file__), '..', 'ui', 'paddock_view_dock_widget_base.ui')))
 
-class DockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(DockWidget, self).__init__(parent)
+        super(PaddockViewDockWidget, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

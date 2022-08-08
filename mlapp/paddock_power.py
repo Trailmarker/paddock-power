@@ -8,7 +8,7 @@ from .resources import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.dialog import Dialog
-from .src.dockwidget import DockWidget
+from .src.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 import os.path
 
@@ -158,11 +158,11 @@ class PaddockPower:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        self.add_action(
-            icon_path,
-            text=self.tr(u'Paddock Power Dialog'),
-            callback=self.runDialog,
-            parent=self.iface.mainWindow())
+        # self.add_action(
+        #     icon_path,
+        #     text=self.tr(u'Paddock Power Dialog'),
+        #     callback=self.runDialog,
+        #     parent=self.iface.mainWindow())
 
         # will be set False in run()
         self.first_start = True
@@ -221,7 +221,7 @@ class PaddockPower:
             #    removed on close (see self.onClosePlugin method)
             if self.dockwidget == None:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = DockWidget()
+                self.dockwidget = PaddockViewDockWidget()
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
