@@ -9,6 +9,7 @@ from .resources import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.dialog import Dialog
+from .src.rectangle_tool import RectangleTool
 from .src.sketch_line_tool import SketchLineTool
 from .src.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
@@ -162,8 +163,14 @@ class PaddockPower:
 
         self.add_action(
             icon_path,
-            text=self.tr(u'Paddock Power Dialog'),
+            text=self.tr(u'Sketch Line Tool'),
             callback=self.runSketchLineTool,
+            parent=self.iface.mainWindow())
+
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Rectangle Tool'),
+            callback=self.runRectangleTool,
             parent=self.iface.mainWindow())
 
         # will be set False in run()
@@ -233,12 +240,16 @@ class PaddockPower:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
+    def runRectangleTool(self):
+        """Set RectangleTool as a custom map tool."""
+        canvas = iface.mapCanvas()
+        rectangleTool = RectangleTool(canvas)
+        canvas.setMapTool(rectangleTool)
 
     def runSketchLineTool(self):
         """Set SketchLineTool as a custom map tool."""
         layer = iface.activeLayer()
         canvas = iface.mapCanvas()
-
         sketchLineTool = SketchLineTool(canvas, layer)
         canvas.setMapTool(sketchLineTool)
 
