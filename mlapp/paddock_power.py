@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication
+from qgis.utils import iface
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -8,6 +9,7 @@ from .resources import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.dialog import Dialog
+from .src.sketch_line_tool import SketchLineTool
 from .src.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 import os.path
@@ -158,11 +160,11 @@ class PaddockPower:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        # self.add_action(
-        #     icon_path,
-        #     text=self.tr(u'Paddock Power Dialog'),
-        #     callback=self.runDialog,
-        #     parent=self.iface.mainWindow())
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Paddock Power Dialog'),
+            callback=self.runSketchLineTool,
+            parent=self.iface.mainWindow())
 
         # will be set False in run()
         self.first_start = True
@@ -230,6 +232,15 @@ class PaddockPower:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+
+
+    def runSketchLineTool(self):
+        """Set SketchLineTool as a custom map tool."""
+        layer = iface.activeLayer()
+        canvas = iface.mapCanvas()
+
+        sketchLineTool = SketchLineTool(canvas, layer)
+        canvas.setMapTool(sketchLineTool)
 
 
     def runDialog(self):
