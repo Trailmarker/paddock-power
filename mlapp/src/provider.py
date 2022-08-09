@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProcessingProvider
+from PyQt5.QtGui import QIcon
 from .processing.algorithm import Algorithm
 from .processing.fenceline_analysis import FencelineAnalysis
 from .processing.pipeline_analysis import PipelineAnalysis
@@ -27,11 +28,7 @@ class Provider(QgsProcessingProvider):
         return self.tr('Paddock Power')
 
     def icon(self):
-        """
-        Should return a QIcon which is used for your provider inside
-        the Processing toolbox.
-        """
-        return QgsProcessingProvider.icon(self)
+        return QIcon(":/plugins/mlapp/images/ntg-primary-cmyk.png")
 
     def longName(self):
         return self.name()

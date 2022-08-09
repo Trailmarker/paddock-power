@@ -25,16 +25,8 @@ class SplitPaddock(QgsProcessingAlgorithm):
         return "Split paddocks with new fence"
         
     def icon(self):
-        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icons/split.png'))) # icon for the Paddock Power Tools Group in Toolbox
-        return icon
+        return QIcon(":/plugins/mlapp/images/split.png")
         
-    def group(self):
-        return 'Paddock Tools'
-    
-    def groupId(self):
-        return 'Paddock Tools'
- 
     def createInstance(self):
         return type(self)()
    

@@ -1,20 +1,20 @@
 [general]
-name=MLA Paddock Power
-qgisMinimumVersion=3.18
+name=mlapp
+qgisMinimumVersion=3.0
 description=Meat & Livestock Australia tool for cattle farm planning and financial modelling.
-version=0.2
+version=0.3
 author=Trailmarker
 email=tom@trailmarker.io
 
 about=Paddock Power is a farm planning tool developed by Trailmarker and RangeIQ with funding from Meat & Livestock Australia, features include farm mapping, carrying capacity modelling, etc.
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/Trailmarker
+repository=https://github.com/Trailmarker
 # End of mandatory metadata
 
 # Recommended items:
 
-hasProcessingProvider=yes
+hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
 # changelog=
 
@@ -34,9 +34,6 @@ deprecated=False
 # (or upgraded) can be specified.
 # Check the documentation for more information.
 # plugin_dependencies=
-
-# Category of the plugin: Raster, Vector, Database or Web
-category=Vector
 
 # If the plugin can run on QGIS Server.
 server=False

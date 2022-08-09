@@ -26,15 +26,13 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
         return "Fenceline Analysis"
         
     def icon(self):
-        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icons/fenceline.png'))) # icon for the Paddock Power Tools Group in Toolbox
-        return icon
+        return QIcon(":/plugins/mlapp/images/fenceline.png")
         
-    def group(self):
-        return 'Line Tools'
+    # def group(self):
+    #     return 'Line Tools'
     
-    def groupId(self):
-        return 'Line Tools'
+    # def groupId(self):
+    #     return 'Line Tools'
  
     def createInstance(self):
         return type(self)()

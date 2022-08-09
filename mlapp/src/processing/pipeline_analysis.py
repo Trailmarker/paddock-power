@@ -27,15 +27,7 @@ class PipelineAnalysis(QgsProcessingAlgorithm):
         return "Pipeline Analysis"
         
     def icon(self):
-        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icons/pipeline.png'))) # icon for the Paddock Power Tools Group in Toolbox
-        return icon
-        
-    def group(self):
-        return 'Line Tools'
-    
-    def groupId(self):
-        return 'Line Tools'
+        return QIcon(":/plugins/mlapp/images/pipeline.png")
  
     def createInstance(self):
         return type(self)()

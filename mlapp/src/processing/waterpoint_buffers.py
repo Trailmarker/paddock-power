@@ -42,15 +42,13 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         return "Waterpoint Buffers"
         
     def icon(self):
-        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icons/buffer.png'))) # icon for the Paddock Power Tools Group in Toolbox
-        return icon
+        return QIcon(":/plugins/mlapp/images/buffer.png")
         
-    def group(self):
-        return 'Waterpoint Tools'
+    # def group(self):
+    #     return 'Waterpoint Tools'
     
-    def groupId(self):
-        return 'Waterpoint Tools'
+    # def groupId(self):
+    #     return 'Waterpoint Tools'
  
     def createInstance(self):
         return type(self)()
