@@ -15,6 +15,7 @@ from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 import os.path
 
+
 class PaddockPower:
     """QGIS Plugin Implementation."""
 
@@ -51,7 +52,7 @@ class PaddockPower:
         self.toolbar = self.iface.addToolBar(u'PaddockPower')
         self.toolbar.setObjectName(u'PaddockPower')
 
-        #print "** INITIALIZING PaddockPower"
+        # print "** INITIALIZING PaddockPower"
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -60,8 +61,8 @@ class PaddockPower:
         self.pluginIsActive = False
         self.dockwidget = None
 
-
     # noinspection PyMethodMayBeStatic
+
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
@@ -76,18 +77,17 @@ class PaddockPower:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('PaddockPower', message)
 
-
     def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
+            self,
+            icon_path,
+            text,
+            callback,
+            enabled_flag=True,
+            add_to_menu=True,
+            add_to_toolbar=True,
+            status_tip=None,
+            whats_this=None,
+            parent=None):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -150,7 +150,6 @@ class PaddockPower:
 
         return action
 
-
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -187,7 +186,7 @@ class PaddockPower:
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
 
-        #print "** CLOSING PaddockPower"
+        # print "** CLOSING PaddockPower"
 
         # disconnects
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
@@ -200,11 +199,10 @@ class PaddockPower:
 
         self.pluginIsActive = False
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
 
-        #print "** UNLOAD PaddockPower"
+        # print "** UNLOAD PaddockPower"
 
         for action in self.actions:
             self.iface.removePluginMenu(
@@ -223,7 +221,7 @@ class PaddockPower:
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
-            #print "** STARTING PaddockPower"
+            # print "** STARTING PaddockPower"
 
             # dockwidget may not exist if:
             #    first run of plugin
@@ -252,7 +250,6 @@ class PaddockPower:
         canvas = iface.mapCanvas()
         sketchLineTool = SketchLineTool(canvas, layer)
         canvas.setMapTool(sketchLineTool)
-
 
     def runDialog(self):
         """Run method that performs all the real work"""

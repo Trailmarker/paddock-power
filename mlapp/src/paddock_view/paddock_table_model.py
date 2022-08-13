@@ -4,6 +4,7 @@ from qgis.PyQt.QtGui import QColor
 
 from ..utils import qgsDebug
 
+
 class PaddockTableModel(QAbstractTableModel):
 
     ATTRIBUTES = ["Paddock Name", "Paddock Area (km²)", "Perimeter (km)"]

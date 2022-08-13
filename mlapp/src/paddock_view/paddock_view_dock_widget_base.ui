@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PaddockViewDockWidgetBase</class>
- <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>444</width>
-    <height>374</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Paddock View</string>
-  </property>
-  <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QGridLayout">
-    <item row="0" column="0">
-     <widget class="QComboBox" name="milestoneComboBox">
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="editable">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QTableView" name="tableView">
-      <property name="font">
-       <font>
-        <family>MS Shell Dlg 2</family>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
- </widget>
- <resources/>
- <connections/>
+    <class>PaddockViewDockWidgetBase</class>
+    <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>444</width>
+                <height>374</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Paddock View</string>
+        </property>
+        <widget class="QWidget" name="dockWidgetContents">
+            <layout class="QGridLayout">
+                <item row="0" column="0">
+                    <widget class="QComboBox" name="milestoneComboBox">
+                        <property name="font">
+                            <font>
+                                <pointsize>8</pointsize>
+                                <weight>75</weight>
+                                <bold>true</bold>
+                            </font>
+                        </property>
+                        <property name="editable">
+                            <bool>false</bool>
+                        </property>
+                    </widget>
+                </item>
+                <item row="1" column="0">
+                    <widget class="QTableView" name="tableView">
+                        <property name="font">
+                            <font>
+                                <family>MS Shell Dlg 2</family>
+                                <pointsize>8</pointsize>
+                            </font>
+                        </property>
+                    </widget>
+                </item>
+            </layout>
+        </widget>
+    </widget>
+    <resources/>
+    <connections/>
 </ui>

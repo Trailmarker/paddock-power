@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from .paddock_table_model import PaddockTableModel
 
 from qgis.core import QgsVectorLayerCache, QgsMessageLog
 from qgis.gui import QgsAttributeTableFilterModel, QgsAttributeTableModel, QgsAttributeTableView
@@ -16,6 +15,7 @@ from ..models.state import State
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_view_dock_widget_base.ui')))
+
 
 class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
@@ -33,7 +33,8 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         # self.verticalLayout = QVBoxLayout()
         self.renderMilestoneComboBox()
-        self.milestoneComboBox.currentIndexChanged.connect(self.milestoneComboBoxChanged)
+        self.milestoneComboBox.currentIndexChanged.connect(
+            self.milestoneComboBoxChanged)
         self.state.currentMilestoneChanged.connect(self.renderPaddockTable)
 
     def renderPaddockTable(self):
@@ -55,7 +56,8 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     def renderMilestoneComboBox(self):
         """Re-fill milestone combobox based on the state."""
-        milestoneNames = [milestoneName for milestoneName in self.state.milestones.keys()]
+        milestoneNames = [
+            milestoneName for milestoneName in self.state.milestones.keys()]
         milestoneNames.sort()
         self.milestoneComboBox.addItems(milestoneNames)
         # self.milestoneComboBox.setCurrentText(self.state.currentMilestone.milestoneName)

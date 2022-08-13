@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal, QObject 
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsProject
 
 from .milestone import Milestone
 from ..utils import qgsDebug
+
 
 class State(QObject):
     # emit this signal when paddocks are updated
@@ -27,7 +28,8 @@ class State(QObject):
         root = QgsProject.instance().layerTreeRoot()
 
         # Each milestone is a layer group with (for now) the word 'Infrastructure' in the name
-        self.milestones = dict([(g.name(), Milestone(g)) for g in root.findGroups() if 'Infrastructure' in g.name()])
+        self.milestones = dict([(g.name(), Milestone(g))
+                               for g in root.findGroups() if 'Infrastructure' in g.name()])
         self.milestonesUpdated.emit()
 
 #        if len(self.milestones) > 1:
@@ -35,9 +37,8 @@ class State(QObject):
 
     def dump(self, tag=""):
         """Print to the QGIS message log."""
-        
+
         qgsDebug("State", tag=tag)
-        
+
         for m in self.milestones:
             m.dump()
-

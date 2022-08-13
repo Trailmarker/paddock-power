@@ -3,6 +3,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from ..utils import qgsDebug
 
+
 class Milestone(QObject):
     # emit this signal when paddocks are updated
     paddocksUpdated = pyqtSignal()
@@ -20,7 +21,8 @@ class Milestone(QObject):
     def loadPaddocks(self):
         """Load the milestone paddocks from a detected paddock layer."""
         self.paddockFeatures = []
-        paddockLayers = [l for l in self.milestoneGroup.findLayers() if 'Paddocks' in l.name()]
+        paddockLayers = [
+            l for l in self.milestoneGroup.findLayers() if 'Paddocks' in l.name()]
         if len(paddockLayers) == 0:
             print("No paddock layer found for milestone " + self.milestoneName)
         elif len(paddockLayers) > 1:
@@ -32,8 +34,8 @@ class Milestone(QObject):
     def loadMilestoneName(self):
         """Refresh the milestone name from the group."""
         self.milestoneName = self.milestoneGroup.name()
-        
-    def dump(self,tag=""):
+
+    def dump(self, tag=""):
         qgsDebug(self.milestoneName, tag=tag)
 
         for f in self.paddockFeatures:

@@ -3,6 +3,7 @@ from qgis.core import QgsPoint, QgsRectangle
 from qgis.gui import QgsMapTool, QgsMapToolEmitPoint, QgsRubberBand
 from PyQt5.QtCore import Qt
 
+
 class RectangleTool(QgsMapToolEmitPoint):
     def __init__(self, canvas):
         self.canvas = canvas
@@ -30,8 +31,8 @@ class RectangleTool(QgsMapToolEmitPoint):
         r = self.rectangle()
         if r is not None:
             print("Rectangle:", r.xMinimum(),
-                    r.yMinimum(), r.xMaximum(), r.yMaximum()
-                )
+                  r.yMinimum(), r.xMaximum(), r.yMaximum()
+                  )
 
     def canvasMoveEvent(self, e):
         print("canvasMoveEvent")
@@ -60,7 +61,7 @@ class RectangleTool(QgsMapToolEmitPoint):
     def rectangle(self):
         if self.startPoint is None or self.endPoint is None:
             return None
-        elif (self.startPoint.x() == self.endPoint.x() or \
+        elif (self.startPoint.x() == self.endPoint.x() or
               self.startPoint.y() == self.endPoint.y()):
             return None
         return QgsRectangle(self.startPoint, self.endPoint)

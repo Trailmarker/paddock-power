@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # from qgis.core import QgsField
 
 # PADDOCKS_SCHEMA = [

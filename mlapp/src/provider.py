@@ -7,6 +7,7 @@ from .processing.pipeline_analysis import PipelineAnalysis
 from .processing.split_paddock import SplitPaddock
 from .processing.waterpoint_buffers import WaterpointBuffers
 
+
 class Provider(QgsProcessingProvider):
     def __init__(self):
         QgsProcessingProvider.__init__(self)

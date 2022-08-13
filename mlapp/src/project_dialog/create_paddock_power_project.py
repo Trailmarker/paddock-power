@@ -8,13 +8,17 @@ from qgis.core import QgsProcessingParameterDefinition
 from PyQt5.QtGui import QIcon
 import processing
 
+
 class CreatePaddockPowerProject(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
-        param = QgsProcessingParameterMultipleLayers('Layers', 'Layers', layerType=QgsProcessing.TypeMapLayer, defaultValue=None)
-        param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        param = QgsProcessingParameterMultipleLayers(
+            'Layers', 'Layers', layerType=QgsProcessing.TypeMapLayer, defaultValue=None)
+        param.setFlags(
+            param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
-        self.addParameter(QgsProcessingParameterString('ProjectName', 'Project Name', multiLine=False, defaultValue='My Farm'))
+        self.addParameter(QgsProcessingParameterString(
+            'ProjectName', 'Project Name', multiLine=False, defaultValue='My Farm'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
@@ -31,7 +35,8 @@ class CreatePaddockPowerProject(QgsProcessingAlgorithm):
             'SAVE_STYLES': True,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CreatePaddockPowerProject'] = processing.run('native:package', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CreatePaddockPowerProject'] = processing.run(
+            'native:package', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
         return results
 
     def name(self):
