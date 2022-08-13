@@ -2,6 +2,7 @@
 from qgis.core import QgsGeometry, QgsPoint
 from qgis.gui import QgsMapTool, QgsRubberBand
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 
 class SketchLineTool(QgsMapTool):
     def __init__(self, canvas, layer):
@@ -10,6 +11,10 @@ class SketchLineTool(QgsMapTool):
         self.layer = layer
 
         self.rubber = QgsRubberBand(self.canvas, False)
+        self.rubber.setColor(QColor(255, 0, 0, 200))
+        self.rubber.setFillColor(QColor(255, 0, 0, 40))
+        self.rubber.setWidth(3)
+        
         self.points = []
 
         self.setCursor(Qt.CrossCursor)

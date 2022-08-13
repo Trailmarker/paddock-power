@@ -9,9 +9,9 @@ from .resources import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.dialog import Dialog
-from .src.rectangle_tool import RectangleTool
-from .src.sketch_line_tool import SketchLineTool
-from .src.paddock_view_dock_widget import PaddockViewDockWidget
+from .src.tools.rectangle_tool import RectangleTool
+from .src.tools.sketch_line_tool import SketchLineTool
+from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 import os.path
 
@@ -157,7 +157,7 @@ class PaddockPower:
         icon_path = ':/plugins/mlapp/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Paddock Power Dock Widget'),
+            text=self.tr(u'Paddock View'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -167,11 +167,11 @@ class PaddockPower:
             callback=self.runSketchLineTool,
             parent=self.iface.mainWindow())
 
-        self.add_action(
-            icon_path,
-            text=self.tr(u'Rectangle Tool'),
-            callback=self.runRectangleTool,
-            parent=self.iface.mainWindow())
+        # self.add_action(
+        #     icon_path,
+        #     text=self.tr(u'Rectangle Tool'),
+        #     callback=self.runRectangleTool,
+        #     parent=self.iface.mainWindow())
 
         # will be set False in run()
         self.first_start = True
