@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProcessingProvider
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
+
 from .processing.algorithm import Algorithm
 from .processing.fenceline_analysis import FencelineAnalysis
 from .processing.pipeline_analysis import PipelineAnalysis
 from .processing.split_paddock import SplitPaddock
 from .processing.waterpoint_buffers import WaterpointBuffers
 
+from .data.create_project import CreateProject
+from .data.add_milestone import AddMilestone
 
 class Provider(QgsProcessingProvider):
     def __init__(self):
@@ -21,6 +24,8 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(PipelineAnalysis())
         self.addAlgorithm(SplitPaddock())
         self.addAlgorithm(WaterpointBuffers())
+        self.addAlgorithm(CreateProject())
+        self.addAlgorithm(AddMilestone())
 
     def id(self):
         return 'Paddock Power'

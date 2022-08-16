@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (QgsCoordinateReferenceSystem, QgsProcessing,
                        QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback,
                        QgsProcessingParameterFeatureSource,

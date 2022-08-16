@@ -6,7 +6,7 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterRasterLayer,
                        QgsCoordinateReferenceSystem,
                        QgsProcessingMultiStepFeedback)
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 import processing
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsRectangle
 from qgis.gui import QgsMapTool, QgsMapToolEmitPoint, QgsRubberBand
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 
 
 class RectangleTool(QgsMapToolEmitPoint):

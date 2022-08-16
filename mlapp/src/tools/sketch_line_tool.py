@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsGeometry, QgsPoint
 from qgis.gui import QgsMapTool, QgsRubberBand
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
 
 
 class SketchLineTool(QgsMapTool):

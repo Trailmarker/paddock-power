@@ -14,7 +14,7 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterNumber,
                        QgsCoordinateReferenceSystem,
                        QgsExpression)
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 import processing
 
 

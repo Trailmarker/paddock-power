@@ -1,0 +1,33 @@
+# -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsField, QgsWkbTypes
+
+from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerVectorLayerSourceType, PaddockPowerVectorLayerType
+
+
+class BoundaryLayer(PaddockPowerVectorLayer):
+
+    SCHEMA = [
+        QgsField(name="fid", type=QVariant.LongLong, typeName="Integer64",
+                 len=0, prec=0, comment="", subType=QVariant.Invalid),
+        QgsField(name="Property Name", type=QVariant.String, typeName="String",
+                 len=50, prec=0, comment="", subType=QVariant.Invalid),
+        QgsField(name="Property Area (km²)", type=QVariant.Double,
+                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
+        QgsField(name="Date Edited", type=QVariant.Date, typeName="Date",
+                 len=0, prec=0, comment="", subType=QVariant.Invalid)
+    ]
+
+    STYLE = "boundary"
+
+    TYPE = PaddockPowerVectorLayerType.Boundary
+
+    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgUrl=None):
+        """Create or open a Boundary layer."""
+
+        super(BoundaryLayer, self).__init__(sourceType,
+                                            layerName,
+                                            QgsWkbTypes.MultiPolygon,
+                                            self.SCHEMA,
+                                            gpkgUrl,
+                                            styleName=self.STYLE)
