@@ -51,7 +51,7 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
             assert(wkbType is not None)
             assert(schema is not None)
 
-            layerDefinition = f"{QGSWKB_TYPES[wkbType]}?crs={PADDOCK_POWER_EPSG}"
+            layerDefinition = f"{QGSWKB_TYPES[wkbType]}?crs=epsg:{PADDOCK_POWER_EPSG}"
 
             super(PaddockPowerVectorLayer, self).__init__(
                 path=layerDefinition, baseName=layerName, providerLib="memory")

@@ -33,7 +33,7 @@ class AddMilestone(QgsProcessingAlgorithm):
 
         milestoneName = parameters['MilestoneName']
 
-        gpkgName = f"{path.splitext(parameters['PaddockPowerProjectFile'])}.gpkg"
+        gpkgName = f"{path.splitext(parameters['PaddockPowerProjectFile'])[0]}.gpkg"
 
         qgsDebug(f"gpkgName: {gpkgName}")
         qgsDebug(f"milestoneName: {milestoneName}")

@@ -9,8 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableView, QVBoxLayout
 
 from .paddock_table_model import PaddockTableModel
-from ..models.state import State
-# from ..utils import qgsDebug
+from ..models.project import Project
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -27,7 +26,7 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.state = State()
+        self.state = Project()
 
         # self.state.milestonesUpdated.connect(self.renderMilestoneComboBox)
 

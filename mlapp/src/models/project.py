@@ -6,13 +6,13 @@ from .milestone import Milestone
 from ..utils import qgsDebug
 
 
-class State(QObject):
+class Project(QObject):
     # emit this signal when paddocks are updated
     milestonesUpdated = pyqtSignal()
     currentMilestoneChanged = pyqtSignal()
 
     def __init__(self):
-        super(State, self).__init__()
+        super(Project, self).__init__()
 
         self.milestones = []
         self.currentMilestone = None
