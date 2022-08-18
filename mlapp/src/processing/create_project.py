@@ -2,7 +2,6 @@
 import processing
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (QgsProcessing, QgsProcessingAlgorithm,
-                       QgsProcessingMultiStepFeedback,
                        QgsProcessingParameterFile,
                        QgsProcessingParameterString)
 
@@ -25,9 +24,6 @@ class CreateProject(QgsProcessingAlgorithm):
             self.MILESTONE_NAME_PARAM, 'Milestone Name', multiLine=False, defaultValue='New Milestone'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
-        # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
-        # overall progress through the model
-        feedback = QgsProcessingMultiStepFeedback(1, model_feedback)
         results = {}
         outputs = {}
 

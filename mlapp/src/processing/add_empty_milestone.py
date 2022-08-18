@@ -12,7 +12,7 @@ from ..models.project import Project
 from ..utils import resolveGeoPackageFile
 
 
-class AddMilestone(QgsProcessingAlgorithm):
+class AddEmptyMilestone(QgsProcessingAlgorithm):
     NAME = 'AddMilestone'
     PROJECT_FILE_PARAM = 'ProjectFile'
     MILESTONE_NAME_PARAM = 'MilestoneName'
@@ -52,10 +52,10 @@ class AddMilestone(QgsProcessingAlgorithm):
         return self.NAME
 
     def displayName(self):
-        return 'Add Milestone to Paddock Power Project'
+        return 'Add Empty Milestone'
 
     def icon(self):
         return QIcon(":/plugins/mlapp/images/fenceline.png")
 
     def createInstance(self):
-        return AddMilestone()
+        return AddEmptyMilestone()

@@ -9,7 +9,7 @@ from .processing.split_paddock import SplitPaddock
 from .processing.waterpoint_buffers import WaterpointBuffers
 
 from .processing.create_project import CreateProject
-from .processing.add_milestone import AddMilestone
+from .processing.add_empty_milestone import AddEmptyMilestone
 
 
 class Provider(QgsProcessingProvider):
@@ -26,7 +26,7 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(SplitPaddock())
         self.addAlgorithm(WaterpointBuffers())
         self.addAlgorithm(CreateProject())
-        self.addAlgorithm(AddMilestone())
+        self.addAlgorithm(AddEmptyMilestone())
 
     def id(self):
         return 'Paddock Power'
