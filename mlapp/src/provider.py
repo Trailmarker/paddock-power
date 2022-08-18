@@ -11,6 +11,7 @@ from .processing.waterpoint_buffers import WaterpointBuffers
 from .processing.create_project import CreateProject
 from .processing.add_milestone import AddMilestone
 
+
 class Provider(QgsProcessingProvider):
     def __init__(self):
         QgsProcessingProvider.__init__(self)

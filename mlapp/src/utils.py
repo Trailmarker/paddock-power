@@ -5,6 +5,7 @@ from os import path
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsMessageLog, QgsProject
 
+
 def guiInformation(message):
     """Show an info message box."""
     QMessageBox.information(None, "NAFI Burnt Areas Mapping", message)
@@ -19,10 +20,12 @@ def guiWarning(message):
     """Show a warning message box."""
     QMessageBox.warning(None, "NAFI Burnt Areas Mapping", message)
 
+
 def qgsDebug(message, tag="", level=Qgis.Info):
     """Print a debug message."""
     QgsMessageLog.logMessage(
         message, tag=tag, level=level)
+
 
 def resolvePluginPath(relative, base=None):
     """Resolve a relative path in the plug-in deployment directory."""
@@ -32,14 +35,17 @@ def resolvePluginPath(relative, base=None):
         base = path.normpath(path.join(base, os.pardir))
     return path.normpath(path.join(base, relative))
 
+
 def resolveProjectFile():
     """Get the current QGS project file path."""
     project = QgsProject.instance()
     projectFilePath = project.fileName()
     if projectFilePath is None or projectFilePath == '':
-        guiError("Save the current QGIS session as your Paddock Power project before continuing.")
+        guiError(
+            "Save the current QGIS session as your Paddock Power project before continuing.")
         return None
     return projectFilePath
+
 
 def resolveGeoPackageFile(projectFilePath=None):
     """Get where the current Paddock Power GeoPackage should be."""
@@ -55,5 +61,3 @@ def resolveStylePath(styleName):
     """Resolve the path of a style file packaged with the plugin."""
     relative = f"styles\\{styleName}.qml"
     return resolvePluginPath(relative)
-
-

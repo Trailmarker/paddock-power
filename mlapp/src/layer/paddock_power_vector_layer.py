@@ -76,7 +76,6 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
             self.loadNamedStyle(stylePath)
 
 
-
 # Helper functions - used to convert QgsField objects to code in the console as below
 def dumpQgsFieldConstructorStatement(field):
     """Print a QgsField constructor statement for the given QgsField object."""

@@ -26,13 +26,13 @@ class Milestone(QObject):
         self.milestoneName = milestoneName
         self.gpkgFile = gpkgFile
         self.isLoaded = False
-    
 
     def create(self):
         """Create this milestone in its GeoPackage."""
         # Create paddocks, pipeline, fence, waterpoints, boundary layers
         boundary = BoundaryLayer(layerName=f"{self.milestoneName} Boundary")
-        waterpoint = WaterpointLayer(layerName=f"{self.milestoneName} Waterpoints")
+        waterpoint = WaterpointLayer(
+            layerName=f"{self.milestoneName} Waterpoints")
         pipeline = PipelineLayer(layerName=f"{self.milestoneName} Pipeline")
         fence = FenceLayer(layerName=f"{self.milestoneName} Fence")
         paddock = PaddockLayer(layerName=f"{self.milestoneName} Paddocks")
@@ -47,7 +47,7 @@ class Milestone(QObject):
         # Add milestone to GeoPackage using the Package Layers tool
         params = {
             'LAYERS': layers,
-            #'OUTPUT': parameters['ProjectName'],
+            # 'OUTPUT': parameters['ProjectName'],
             'OVERWRITE': not path.exists(self.gpkgFile),
             'SAVE_STYLES': False,
             'OUTPUT': self.gpkgFile
@@ -58,7 +58,6 @@ class Milestone(QObject):
 
         # Load the required layers for this milestone from the source
         self.load()
-
 
     def load(self):
         """Load this milestone its GeoPackage."""
@@ -73,20 +72,19 @@ class Milestone(QObject):
                                            layerName=pipelineLayerName, gpkgFile=self.gpkgFile)
         fenceLayerName = f"{self.milestoneName} Fence"
         self.fenceLayer = FenceLayer(sourceType=PaddockPowerVectorLayerSourceType.File,
-                                    layerName=fenceLayerName, gpkgFile=self.gpkgFile)
+                                     layerName=fenceLayerName, gpkgFile=self.gpkgFile)
         paddockLayerName = f"{self.milestoneName} Paddocks"
         self.paddockLayer = PaddockLayer(sourceType=PaddockPowerVectorLayerSourceType.File,
                                          layerName=paddockLayerName, gpkgFile=self.gpkgFile)
 
         self.isLoaded = True
 
-
     def addToMap(self):
         """Add this milestone to the current map view."""
-        self.milestoneGroup = QgsProject.instance().layerTreeRoot().addGroup(self.milestoneName)
+        self.milestoneGroup = QgsProject.instance(
+        ).layerTreeRoot().addGroup(self.milestoneName)
         self.milestoneGroup.addLayer(self.waterpointLayer)
         self.milestoneGroup.addLayer(self.boundaryLayer)
         self.milestoneGroup.addLayer(self.pipelineLayer)
         self.milestoneGroup.addLayer(self.fenceLayer)
         self.milestoneGroup.addLayer(self.paddockLayer)
-
