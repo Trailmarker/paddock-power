@@ -49,7 +49,7 @@ class Milestone(QObject):
             'LAYERS': layers,
             #'OUTPUT': parameters['ProjectName'],
             'OVERWRITE': not path.exists(self.gpkgFile),
-            'SAVE_STYLES': True,
+            'SAVE_STYLES': False,
             'OUTPUT': self.gpkgFile
         }
 
@@ -84,38 +84,9 @@ class Milestone(QObject):
     def addToMap(self):
         """Add this milestone to the current map view."""
         self.milestoneGroup = QgsProject.instance().layerTreeRoot().addGroup(self.milestoneName)
-        self.milestoneGroup.addLayer(self.boundaryLayer)
         self.milestoneGroup.addLayer(self.waterpointLayer)
+        self.milestoneGroup.addLayer(self.boundaryLayer)
         self.milestoneGroup.addLayer(self.pipelineLayer)
         self.milestoneGroup.addLayer(self.fenceLayer)
         self.milestoneGroup.addLayer(self.paddockLayer)
 
-
-    # def guessLayerType(cls, layerName):
-    #     """Guess the type of a Paddock Power vector layer based on the layerName."""
-    #     layerTypeNames = [e.name for e in PaddockPowerVectorLayerType]
-    #     return next(t for t in layerTypeNames if t in layerName)
-
-
-    # def loadPaddocks(self):
-    #     """Load the milestone paddocks from a detected paddock layer."""
-    #     self.paddockFeatures = []
-    #     paddockLayers = [
-    #         l for l in self.milestoneGroup.findLayers() if 'Paddocks' in l.name()]
-    #     if len(paddockLayers) == 0:
-    #         print("No paddock layer found for milestone " + self.milestoneName)
-    #     elif len(paddockLayers) > 1:
-    #         print("Multiple paddock layers found for milestone " + self.milestoneName)
-    #     else:
-    #         self.paddockLayer = paddockLayers[0].layer()
-    #         self.paddockFeatures = [f for f in self.paddockLayer.getFeatures()]
-
-    # def loadMilestoneName(self):
-    #     """Refresh the milestone name from the group."""
-    #     self.milestoneName = self.milestoneGroup.name()
-
-    # def dump(self, tag=""):
-    #     qgsDebug(self.milestoneName, tag=tag)
-
-    #     for f in self.paddockFeatures:
-    #         qgsDebug(str(f['Paddock Name']), tag=tag)
