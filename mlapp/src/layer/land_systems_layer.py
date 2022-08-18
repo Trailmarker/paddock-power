@@ -31,8 +31,6 @@ class LandSystemsLayer(PaddockPowerVectorLayer):
     # TODO - add a style for this layer type
     STYLE = None
 
-    TYPE = PaddockPowerVectorLayerType.LandSystems
-
     def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Pipeline layer."""
 
@@ -42,3 +40,7 @@ class LandSystemsLayer(PaddockPowerVectorLayer):
                                                self.SCHEMA,
                                                gpkgFile,
                                                styleName=self.STYLE)
+
+    def getLayerType(self):
+        """Return the Paddock Power layer type."""
+        return PaddockPowerVectorLayerType.LandSystems

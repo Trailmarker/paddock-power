@@ -13,8 +13,6 @@ from ..layer.pipeline_layer import PipelineLayer
 from ..layer.fence_layer import FenceLayer
 from ..layer.paddock_layer import PaddockLayer
 
-from ..utils import qgsDebug
-
 
 class Milestone(QObject):
     # emit this signal when paddocks are updated
@@ -40,9 +38,6 @@ class Milestone(QObject):
         # The 'Layers' parameter of the Package Layers tool ('native:package')
         # Note this is sensitive to order
         layers = [boundary, waterpoint, pipeline, fence, paddock]
-
-        qgsDebug(f"layers: {str(layers)}")
-        qgsDebug(f"gpkgName: {self.gpkgFile}")
 
         # Add milestone to GeoPackage using the Package Layers tool
         params = {
@@ -79,12 +74,25 @@ class Milestone(QObject):
 
         self.isLoaded = True
 
+    def findGroup(self):
+        """Find this milestone's group in the Layers panel."""
+        return QgsProject.instance().layerTreeRoot().findGroup(self.milestoneName)
+
     def addToMap(self):
         """Add this milestone to the current map view."""
-        self.milestoneGroup = QgsProject.instance(
-        ).layerTreeRoot().addGroup(self.milestoneName)
-        self.milestoneGroup.addLayer(self.waterpointLayer)
-        self.milestoneGroup.addLayer(self.boundaryLayer)
-        self.milestoneGroup.addLayer(self.pipelineLayer)
-        self.milestoneGroup.addLayer(self.fenceLayer)
-        self.milestoneGroup.addLayer(self.paddockLayer)
+        group = self.findGroup()
+        if group is None:
+            group = QgsProject.instance().layerTreeRoot().insertGroup(0, self.milestoneName)
+            group.addLayer(self.waterpointLayer)
+            group.addLayer(self.boundaryLayer)
+            group.addLayer(self.pipelineLayer)
+            group.addLayer(self.fenceLayer)
+            group.addLayer(self.paddockLayer)
+
+    def copyTo(self, otherMilestone):
+        """Copy all features in this milestone to the target milestone."""
+        self.boundaryLayer.copyTo(otherMilestone.boundaryLayer)
+        self.waterpointLayer.copyTo(otherMilestone.waterpointLayer)
+        self.pipelineLayer.copyTo(otherMilestone.pipelineLayer)
+        self.fenceLayer.copyTo(otherMilestone.fenceLayer)
+        self.paddockLayer.copyTo(otherMilestone.paddockLayer)

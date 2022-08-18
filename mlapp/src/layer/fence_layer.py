@@ -14,8 +14,6 @@ class FenceLayer(PaddockPowerVectorLayer):
 
     STYLE = "fence"
 
-    TYPE = PaddockPowerVectorLayerType.Fence
-
     def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Fence layer."""
 
@@ -25,3 +23,7 @@ class FenceLayer(PaddockPowerVectorLayer):
                                          self.SCHEMA,
                                          gpkgFile,
                                          styleName=self.STYLE)
+
+    def getLayerType(self):
+        """Return the Paddock Power layer type."""
+        return PaddockPowerVectorLayerType.Fence

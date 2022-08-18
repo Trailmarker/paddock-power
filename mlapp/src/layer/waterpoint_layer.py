@@ -31,7 +31,6 @@ class WaterpointLayer(PaddockPowerVectorLayer):
     ]
 
     STYLE = "waterpoint"
-    TYPE = PaddockPowerVectorLayerType.Waterpoint
 
     def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Waterpoint layer."""
@@ -42,3 +41,7 @@ class WaterpointLayer(PaddockPowerVectorLayer):
                                               self.SCHEMA,
                                               gpkgFile,
                                               styleName=self.STYLE)
+
+    def getLayerType(self):
+        """Return the Paddock Power layer type."""
+        return PaddockPowerVectorLayerType.Waterpoint

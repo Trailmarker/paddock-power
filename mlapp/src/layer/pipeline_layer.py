@@ -15,8 +15,6 @@ class PipelineLayer(PaddockPowerVectorLayer):
     ]
     STYLE = "pipeline"
 
-    TYPE = PaddockPowerVectorLayerType.Pipeline
-
     def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Pipeline layer."""
 
@@ -26,3 +24,7 @@ class PipelineLayer(PaddockPowerVectorLayer):
                                             self.SCHEMA,
                                             gpkgFile,
                                             styleName=self.STYLE)
+
+    def getLayerType(self):
+        """Return the Paddock Power layer type."""
+        return PaddockPowerVectorLayerType.Pipeline

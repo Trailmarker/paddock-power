@@ -10,7 +10,7 @@ from .processing.waterpoint_buffers import WaterpointBuffers
 
 from .processing.create_project import CreateProject
 from .processing.add_empty_milestone import AddEmptyMilestone
-
+from .processing.add_milestone_from_existing import AddMilestoneFromExisting
 
 class Provider(QgsProcessingProvider):
     def __init__(self):
@@ -27,6 +27,7 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(WaterpointBuffers())
         self.addAlgorithm(CreateProject())
         self.addAlgorithm(AddEmptyMilestone())
+        self.addAlgorithm(AddMilestoneFromExisting())
 
     def id(self):
         return 'Paddock Power'

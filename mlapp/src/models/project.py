@@ -27,10 +27,23 @@ class Project(QObject):
 
         self.isLoaded = False
 
-    def setMilestoneByName(self, milestoneName):
-        """Set the current milestone."""
+    def getMilestone(self, milestoneName):
+        """Get a milestone by name."""
+        if not milestoneName:
+            raise PaddockPowerError("Project.getMilestone: milestone name is empty.") 
+
         if milestoneName not in self.milestones:
-            raise PaddockPowerError(f"Milestone '{milestoneName}' does not exist.")
+            raise PaddockPowerError(f"Project.getMilestone: milestone '{milestoneName}' does not exist.")
+
+        return self.milestones[milestoneName]
+
+    def setMilestone(self, milestoneName):
+        """Set the current milestone."""
+        if not milestoneName:
+            raise PaddockPowerError("Project.setMilestone: milestone name is empty.") 
+
+        if milestoneName not in self.milestones:
+            raise PaddockPowerError(f"Project.setMilestone: milestone '{milestoneName}' does not exist.")
 
         self.currentMilestone = self.milestones[milestoneName]
         self.currentMilestoneChanged.emit()
@@ -38,8 +51,11 @@ class Project(QObject):
 
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
+        if not milestoneName:
+            raise PaddockPowerError("Project.addMilestone: milestone name is empty.") 
+        
         if milestoneName in self.milestones:
-            raise PaddockPowerError(f"Milestone '{milestoneName}' already exists.")
+            raise PaddockPowerError(f"Project.addMilestone: milestone '{milestoneName}' already exists.")
 
         milestone = Milestone(milestoneName, self.gpkgFile)
         milestone.create()
@@ -62,20 +78,22 @@ class Project(QObject):
 
     def addToMap(self):
         """Add the project to the map."""
-        for milestone in self.milestones.values():
-            milestone.addToMap()
+        milestoneNames = sorted(self.milestones.keys())
+
+        for milestoneName in milestoneNames:
+            self.milestones[milestoneName].addToMap()
 
     @classmethod
-    def findMilestones(cls, gpkgName):
+    def findMilestones(cls, gpkgFile):
         """Find the milestones in a project GeoPackage."""
         def rchop(s, suffix):
             if suffix and s.endswith(suffix):
                 return s[:-len(suffix)]
             return s
 
-        layers = QgsVectorLayer(path=gpkgName, providerLib="ogr")
+        layers = QgsVectorLayer(path=gpkgFile, providerLib="ogr")
         if not layers.isValid():
-            raise PaddockPowerError(f"Error loading Paddock Power GeoPackage at {gpkgName}")
+            raise PaddockPowerError(f"Project.findMilestones: error loading Paddock Power GeoPackage at {gpkgFile}")
 
         layerNames = [l.split('!!::!!')[1]
                       for l in layers.dataProvider().subLayers()]

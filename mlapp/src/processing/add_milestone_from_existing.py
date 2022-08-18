@@ -1,25 +1,29 @@
 # -*- coding: utf-8 -*-
+from os import path
+from ..models.paddock_power_error import PaddockPowerError
+
 import processing
-from qgis.PyQt.QtGui import QIcon
-from qgis.core import (QgsProcessing, QgsProcessingAlgorithm,
+from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterFile,
                        QgsProcessingParameterString)
+from qgis.PyQt.QtGui import QIcon
 
-from ..models.paddock_power_error import PaddockPowerError
 from ..models.project import Project
-from ..utils import qgsDebug, resolveGeoPackageFile
+from ..utils import resolveGeoPackageFile
 
 
-class CreateProject(QgsProcessingAlgorithm):
-
-    NAME = 'CreateProject'
-    PROJECT_FILE_PARAM = 'QgisProjectFile'
+class AddMilestoneFromExisting(QgsProcessingAlgorithm):
+    NAME = 'AddMilestoneFromExisting'
+    PROJECT_FILE_PARAM = 'ProjectFile'
+    EXISTING_MILESTONE_NAME_PARAM = 'ExistingMilestoneName'
     MILESTONE_NAME_PARAM = 'MilestoneName'
     NEW_MILESTONE_OUTPUT = 'NewMilestone'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFile(
-            self.PROJECT_FILE_PARAM, 'QGIS Project File', fileFilter="QGS Project Files (*.qgz *.qgs)", optional=True))
+            self.PROJECT_FILE_PARAM, 'Paddock Power Project File', fileFilter="QGS Project Files (*.qgz *.qgs)", optional=True))
+        self.addParameter(QgsProcessingParameterString(
+            self.EXISTING_MILESTONE_NAME_PARAM, 'Existing Milestone Name', multiLine=False, defaultValue=None))
         self.addParameter(QgsProcessingParameterString(
             self.MILESTONE_NAME_PARAM, 'Milestone Name', multiLine=False, defaultValue='New Milestone'))
 
@@ -27,6 +31,7 @@ class CreateProject(QgsProcessingAlgorithm):
         results = {}
         outputs = {}
 
+        existingMilestoneName = parameters[self.EXISTING_MILESTONE_NAME_PARAM]
         milestoneName = parameters[self.MILESTONE_NAME_PARAM]
         projectFilePath = parameters[self.PROJECT_FILE_PARAM]
 
@@ -37,7 +42,10 @@ class CreateProject(QgsProcessingAlgorithm):
             if gpkgFile is not None:
                 project = Project(gpkgFile)
                 project.load()
+
+                existingMilestone = project.getMilestone(existingMilestoneName)
                 milestone = project.addMilestone(milestoneName)
+                existingMilestone.copyTo(milestone)
                 # project.addToMap()
 
             outputs[self.NEW_MILESTONE_OUTPUT] = milestone
@@ -52,10 +60,10 @@ class CreateProject(QgsProcessingAlgorithm):
         return self.NAME
 
     def displayName(self):
-        return 'Create Paddock Power Project'
+        return 'Add Milestone From Existing Milestone'
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/icon.png")
+        return QIcon(":/plugins/mlapp/images/fenceline.png")
 
     def createInstance(self):
-        return CreateProject()
+        return AddMilestoneFromExisting()

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from enum import Enum
-from pathlib import Path
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
+from ..models.paddock_power_error import PaddockPowerError
 from ..utils import resolveStylePath
 
 # Couple of lookup dictionaries (locally useful only)
@@ -74,6 +74,32 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
         if styleName is not None:
             stylePath = resolveStylePath(styleName)
             self.loadNamedStyle(stylePath)
+
+    def getLayerType(self):
+        """Get the Paddock Power layer type."""
+        pass
+
+    def copyTo(self, otherLayer):
+        """Copy all features in this layer to another layer."""
+        if otherLayer is None:
+            raise PaddockPowerError("PaddockPowerVectorLayer.copyTo: the target layer is not present")
+
+        if self.getLayerType() != otherLayer.getLayerType():
+            raise PaddockPowerError(
+                f"Cannot copy features from {self.getLayerType().name} to {otherLayer.getLayerType().name}")
+
+        otherLayer.startEditing()
+        otherLayer.dataProvider().addFeatures(self.getFeatures())
+        otherLayer.commitChanges()
+
+    def addToMap(self, group):
+        """Ensure the layer is in the map in the target group, adding it if necessary."""
+        if group is None:
+            raise PaddockPowerError("PaddockPowerVectorLayer.ensureInMap: the layer group is not present")
+
+        node = group.findLayer(self.id())
+        if node is None:
+            group.addLayer(self)
 
 
 # Helper functions - used to convert QgsField objects to code in the console as below

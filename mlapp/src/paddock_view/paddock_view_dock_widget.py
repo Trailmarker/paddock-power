@@ -64,7 +64,7 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def milestoneComboBoxChanged(self, index):
         """Switch the active milestone."""
         milestoneName = self.milestoneComboBox.itemText(index)
-        self.state.setMilestoneByName(milestoneName)
+        self.state.setMilestone(milestoneName)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

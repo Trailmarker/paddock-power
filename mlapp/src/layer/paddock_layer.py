@@ -20,8 +20,6 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
     STYLE = "paddock"
 
-    TYPE = PaddockPowerVectorLayerType.Paddock
-
     def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Paddock layer."""
 
@@ -31,3 +29,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
                                            self.SCHEMA,
                                            gpkgFile,
                                            styleName=self.STYLE)
+
+    def getLayerType(self):
+        """Return the Paddock Power layer type."""
+        return PaddockPowerVectorLayerType.Paddock

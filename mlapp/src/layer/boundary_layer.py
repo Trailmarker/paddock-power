@@ -16,8 +16,6 @@ class BoundaryLayer(PaddockPowerVectorLayer):
 
     STYLE = "boundary"
 
-    TYPE = PaddockPowerVectorLayerType.Boundary
-
     def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Boundary layer."""
 
@@ -27,3 +25,7 @@ class BoundaryLayer(PaddockPowerVectorLayer):
                                             self.SCHEMA,
                                             gpkgFile,
                                             styleName=self.STYLE)
+
+    def getLayerType(self):
+        """Return the Paddock Power layer type."""
+        return PaddockPowerVectorLayerType.Boundary
