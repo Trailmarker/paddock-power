@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, QObject
-from qgis.core import QgsProject, QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerType
 from .milestone import Milestone
-from ..utils import guiError, resolveGeoPackageFile, qgsDebug
+from .paddock_power_error import PaddockPowerError
+from ..utils import resolveGeoPackageFile
 
 
 class Project(QObject):
@@ -29,8 +30,7 @@ class Project(QObject):
     def setMilestoneByName(self, milestoneName):
         """Set the current milestone."""
         if milestoneName not in self.milestones:
-            guiError(f"Milestone '{milestoneName}' does not exist.")
-            return None
+            raise PaddockPowerError(f"Milestone '{milestoneName}' does not exist.")
 
         self.currentMilestone = self.milestones[milestoneName]
         self.currentMilestoneChanged.emit()
@@ -39,8 +39,7 @@ class Project(QObject):
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
         if milestoneName in self.milestones:
-            guiError(f"Milestone '{milestoneName}' already exists.")
-            return None
+            raise PaddockPowerError(f"Milestone '{milestoneName}' already exists.")
 
         milestone = Milestone(milestoneName, self.gpkgFile)
         milestone.create()
@@ -76,7 +75,7 @@ class Project(QObject):
 
         layers = QgsVectorLayer(path=gpkgName, providerLib="ogr")
         if not layers.isValid():
-            guiError(f"Error loading Paddock Power GeoPackage at {gpkgName}")
+            raise PaddockPowerError(f"Error loading Paddock Power GeoPackage at {gpkgName}")
 
         layerNames = [l.split('!!::!!')[1]
                       for l in layers.dataProvider().subLayers()]

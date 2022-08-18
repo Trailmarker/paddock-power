@@ -41,7 +41,7 @@ def resolveProjectFile():
     project = QgsProject.instance()
     projectFilePath = project.fileName()
     if projectFilePath is None or projectFilePath == '':
-        guiError(
+        raise Exception(
             "Save the current QGIS session as your Paddock Power project before continuing.")
         return None
     return projectFilePath

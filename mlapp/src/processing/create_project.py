@@ -6,6 +6,7 @@ from qgis.core import (QgsProcessing, QgsProcessingAlgorithm,
                        QgsProcessingParameterFile,
                        QgsProcessingParameterString)
 
+from ..models.paddock_power_error import PaddockPowerError
 from ..models.project import Project
 from ..utils import qgsDebug, resolveGeoPackageFile
 
@@ -33,16 +34,20 @@ class CreateProject(QgsProcessingAlgorithm):
         milestoneName = parameters[self.MILESTONE_NAME_PARAM]
         projectFilePath = parameters[self.PROJECT_FILE_PARAM]
 
-        gpkgFile = resolveGeoPackageFile(projectFilePath)
+        try:
+            gpkgFile = resolveGeoPackageFile(projectFilePath)
 
-        milestone = None
-        if gpkgFile is not None:
-            project = Project(gpkgFile)
-            project.load()
-            milestone = project.addMilestone(milestoneName)
+            milestone = None
+            if gpkgFile is not None:
+                project = Project(gpkgFile)
+                project.load()
+                milestone = project.addMilestone(milestoneName)
 
-        outputs[self.NEW_MILESTONE_OUTPUT] = milestone
-        results[self.NEW_MILESTONE_OUTPUT] = milestone
+            outputs[self.NEW_MILESTONE_OUTPUT] = milestone
+            results[self.NEW_MILESTONE_OUTPUT] = milestone
+
+        except PaddockPowerError as ppe:
+            model_feedback.reportError(str(ppe))
 
         return results
 

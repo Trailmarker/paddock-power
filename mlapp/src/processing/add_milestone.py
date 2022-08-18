@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import path
+from ..models.paddock_power_error import PaddockPowerError
 
 import processing
 from qgis.core import (QgsProcessingAlgorithm,
@@ -30,16 +31,20 @@ class AddMilestone(QgsProcessingAlgorithm):
         milestoneName = parameters[self.MILESTONE_NAME_PARAM]
         projectFilePath = parameters[self.PROJECT_FILE_PARAM]
 
-        gpkgFile = resolveGeoPackageFile(projectFilePath)
+        try:
+            gpkgFile = resolveGeoPackageFile(projectFilePath)
 
-        milestone = None
-        if gpkgFile is not None:
-            project = Project(gpkgFile)
-            project.load()
-            milestone = project.addMilestone(milestoneName)
+            milestone = None
+            if gpkgFile is not None:
+                project = Project(gpkgFile)
+                project.load()
+                milestone = project.addMilestone(milestoneName)
 
-        outputs[self.NEW_MILESTONE_OUTPUT] = milestone
-        results[self.NEW_MILESTONE_OUTPUT] = milestone
+            outputs[self.NEW_MILESTONE_OUTPUT] = milestone
+            results[self.NEW_MILESTONE_OUTPUT] = milestone
+
+        except PaddockPowerError as ppe:
+            model_feedback.reportError(str(ppe))
 
         return results
 
