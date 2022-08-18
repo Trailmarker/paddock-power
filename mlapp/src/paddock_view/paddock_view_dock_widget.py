@@ -9,8 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableView, QVBoxLayout
 
 from .paddock_table_model import PaddockTableModel
-from ..models.project import Project
-
+from ..models.state import getState
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_view_dock_widget_base.ui')))
@@ -26,45 +25,45 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.state = Project()
-
-        # self.state.milestonesUpdated.connect(self.renderMilestoneComboBox)
-
-        # self.verticalLayout = QVBoxLayout()
-        self.renderMilestoneComboBox()
+        getState().projectChanged.connect(self.setup)
+        getState().projectChanged.connect(self.render)
         self.milestoneComboBox.currentIndexChanged.connect(
             self.milestoneComboBoxChanged)
-        self.state.currentMilestoneChanged.connect(self.renderPaddockTable)
 
-    def renderPaddockTable(self):
-        """Show the paddocks of the current milestone."""
+    def setup(self):
+        """Reconnect things as necessary."""
+        project = getState().project
+        if project is not None:        
+            project.currentMilestoneChanged.connect(self.render)
 
-        tableModel = PaddockTableModel(self.state.currentMilestone)
-        self.tableView.setModel(tableModel)
+    def render(self):
+        """Show the Paddock View."""
 
-        # layer = self.milestone.paddockLayer
-        # canvas = iface.mapCanvas()
+        project = getState().project
 
-        # self.layerCache = QgsVectorLayerCache(layer, layer.featureCount())
-        # self.tableModel = QgsAttributeTableModel(self.layerCache)
-        # self.tableModel.loadLayer()
+        
+        if project is None:
+            self.milestoneComboBox.clear()
+            self.tableView.setModel(PaddockTableModel(None))
+            return
 
-        # self.tableFilterModel = QgsAttributeTableFilterModel(canvas, self.tableModel, parent=self.tableModel)
-        # self.tableFilterModel.setFilterMode(QgsAttributeTableFilterModel.ShowAll)
-        # self.tableView.setModel(self.tableFilterModel)
-
-    def renderMilestoneComboBox(self):
-        """Re-fill milestone combobox based on the state."""
-        milestoneNames = [
-            milestoneName for milestoneName in self.state.milestones.keys()]
+        self.milestoneComboBox.clear()
+        milestoneNames = [milestoneName for milestoneName in project.milestones.keys()]
         milestoneNames.sort()
+        milestoneNames.insert(0,'')
         self.milestoneComboBox.addItems(milestoneNames)
-        # self.milestoneComboBox.setCurrentText(self.state.currentMilestone.milestoneName)
+
+        if project.currentMilestone is not None:
+            tableModel = PaddockTableModel(project.currentMilestone.paddockLayer)
+            self.tableView.setModel(tableModel)
+
 
     def milestoneComboBoxChanged(self, index):
         """Switch the active milestone."""
         milestoneName = self.milestoneComboBox.itemText(index)
-        self.state.setMilestone(milestoneName)
+        if milestoneName:
+            getState().project.setMilestone(milestoneName)
+
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

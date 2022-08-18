@@ -82,11 +82,23 @@ class Project(QObject):
         milestone.removeFromMap()
         milestone.deleteFromGeoPackage()
 
-    def load(self):
+        if self.currentMilestone is not None and self.currentMilestone.milestoneName == milestoneName:
+            self.currentMilestone = None
+            self.currentMilestoneChanged.emit()
+
+        self.milestonesUpdated.emit()
+
+    def load(self, forceLoad=False):
         """Load this project from its GeoPackage."""
         assert(self.gpkgFile is not None)
 
+        if self.isLoaded and not forceLoad:
+            return
+
         milestoneNames = Project.findMilestones(self.gpkgFile)
+
+        self.milestones = {}
+        self.currentMilestone = None
 
         for milestoneName in milestoneNames:
             milestone = Milestone(milestoneName, self.gpkgFile)
@@ -94,14 +106,24 @@ class Project(QObject):
             milestone.load()
 
         self.isLoaded = True
+        self.milestonesUpdated.emit()
 
     def addToMap(self):
         """Add the project to the map."""
+        # Remove first to keep order sane
+        self.removeFromMap()
+
+        milestoneNames = sorted(self.milestones.keys())
+
+        for milestoneName in milestoneNames:
+            self.milestones[milestoneName].addToMap()
+
+    def removeFromMap(self):
+        """Remove the project from the map."""
         milestoneNames = sorted(self.milestones.keys())
 
         for milestoneName in milestoneNames:
             self.milestones[milestoneName].removeFromMap()
-            self.milestones[milestoneName].addToMap()
 
     @classmethod
     def findMilestones(cls, gpkgFile):

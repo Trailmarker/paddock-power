@@ -11,10 +11,13 @@ from .resources import *
 from .src.dialog import Dialog
 from .src.tools.rectangle_tool import RectangleTool
 from .src.tools.sketch_line_tool import SketchLineTool
+from .src.tools.sketch_line_string import SplitPaddock
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 import os.path
 
+
+from .src.utils import qgsDebug
 
 class PaddockPower:
     """QGIS Plugin Implementation."""
@@ -163,7 +166,7 @@ class PaddockPower:
         self.add_action(
             icon_path,
             text=self.tr(u'Sketch Line Tool'),
-            callback=self.runSketchLineTool,
+            callback=self.runStraightLine,
             parent=self.iface.mainWindow())
 
         # self.add_action(
@@ -250,6 +253,14 @@ class PaddockPower:
         canvas = iface.mapCanvas()
         sketchLineTool = SketchLineTool(canvas, layer)
         canvas.setMapTool(sketchLineTool)
+
+    def runStraightLine(self):
+        """Set StraightLine as a custom map tool."""
+        canvas = iface.mapCanvas()
+        layer = iface.activeLayer()
+        straightLine = SplitPaddock(canvas, layer)
+        canvas.setMapTool(straightLine)
+
 
     def runDialog(self):
         """Run method that performs all the real work"""
