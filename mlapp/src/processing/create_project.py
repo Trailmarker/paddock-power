@@ -38,7 +38,6 @@ class CreateProject(QgsProcessingAlgorithm):
                 project = Project(gpkgFile)
                 project.load()
                 milestone = project.addMilestone(milestoneName)
-                # project.addToMap()
 
             outputs[self.NEW_MILESTONE_OUTPUT] = milestone
             results[self.NEW_MILESTONE_OUTPUT] = milestone

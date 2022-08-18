@@ -12,11 +12,10 @@ from ..models.project import Project
 from ..utils import resolveGeoPackageFile
 
 
-class AddEmptyMilestone(QgsProcessingAlgorithm):
-    NAME = 'AddMilestone'
+class DeleteMilestone(QgsProcessingAlgorithm):
+    NAME = 'DeleteMilestone'
     PROJECT_FILE_PARAM = 'ProjectFile'
     MILESTONE_NAME_PARAM = 'MilestoneName'
-    NEW_MILESTONE_OUTPUT = 'NewMilestone'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFile(
@@ -26,7 +25,6 @@ class AddEmptyMilestone(QgsProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, model_feedback):
         results = {}
-        outputs = {}
 
         milestoneName = parameters[self.MILESTONE_NAME_PARAM]
         projectFilePath = parameters[self.PROJECT_FILE_PARAM]
@@ -34,14 +32,10 @@ class AddEmptyMilestone(QgsProcessingAlgorithm):
         try:
             gpkgFile = resolveGeoPackageFile(projectFilePath)
 
-            milestone = None
             if gpkgFile is not None:
                 project = Project(gpkgFile)
                 project.load()
-                milestone = project.addMilestone(milestoneName)
-
-            outputs[self.NEW_MILESTONE_OUTPUT] = milestone
-            results[self.NEW_MILESTONE_OUTPUT] = milestone
+                project.deleteMilestone(milestoneName)
 
         except PaddockPowerError as ppe:
             model_feedback.reportError(str(ppe))
@@ -52,10 +46,10 @@ class AddEmptyMilestone(QgsProcessingAlgorithm):
         return self.NAME
 
     def displayName(self):
-        return 'Add Empty Milestone'
+        return 'Delete Milestone'
 
     def icon(self):
         return QIcon(":/plugins/mlapp/images/fenceline.png")
 
     def createInstance(self):
-        return AddEmptyMilestone()
+        return DeleteMilestone()

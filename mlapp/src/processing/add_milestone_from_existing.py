@@ -46,7 +46,6 @@ class AddMilestoneFromExisting(QgsProcessingAlgorithm):
                 existingMilestone = project.getMilestone(existingMilestoneName)
                 milestone = project.addMilestone(milestoneName)
                 existingMilestone.copyTo(milestone)
-                # project.addToMap()
 
             outputs[self.NEW_MILESTONE_OUTPUT] = milestone
             results[self.NEW_MILESTONE_OUTPUT] = milestone

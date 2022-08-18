@@ -13,6 +13,8 @@ from ..layer.pipeline_layer import PipelineLayer
 from ..layer.fence_layer import FenceLayer
 from ..layer.paddock_layer import PaddockLayer
 
+from .paddock_power_error import PaddockPowerError
+
 
 class Milestone(QObject):
     # emit this signal when paddocks are updated
@@ -89,6 +91,12 @@ class Milestone(QObject):
             group.addLayer(self.fenceLayer)
             group.addLayer(self.paddockLayer)
 
+    def removeFromMap(self):
+        """Remove this milestone from the current map view."""
+        group = self.findGroup()
+        if group is not None:
+            QgsProject.instance().layerTreeRoot().removeChildNode(group)
+
     def copyTo(self, otherMilestone):
         """Copy all features in this milestone to the target milestone."""
         self.boundaryLayer.copyTo(otherMilestone.boundaryLayer)
@@ -96,3 +104,23 @@ class Milestone(QObject):
         self.pipelineLayer.copyTo(otherMilestone.pipelineLayer)
         self.fenceLayer.copyTo(otherMilestone.fenceLayer)
         self.paddockLayer.copyTo(otherMilestone.paddockLayer)
+
+    def deleteFromGeoPackage(self):
+        """Delete this milestone from the GeoPackage file."""
+        if not self.isLoaded:
+            raise PaddockPowerError(
+                "Milestone.deleteFromGeoPackage: cannot delete a milestone that is not loaded")
+
+        def deleteLayerFromGeoPackage(layer):
+            gpkgUrl = f"{self.gpkgFile}|layername={layer.name()}"
+
+            processing.run("native:spatialiteexecutesql", {
+                'DATABASE': gpkgUrl,
+                'SQL': 'drop table {0}'.format(layer.name())
+            })
+
+        deleteLayerFromGeoPackage(self.boundaryLayer)
+        deleteLayerFromGeoPackage(self.waterpointLayer)
+        deleteLayerFromGeoPackage(self.pipelineLayer)
+        deleteLayerFromGeoPackage(self.fenceLayer)
+        deleteLayerFromGeoPackage(self.paddockLayer)
