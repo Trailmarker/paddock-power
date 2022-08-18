@@ -33,3 +33,17 @@ __STATE__ = State()
 def getState():
     """Get the current state."""
     return __STATE__
+
+def getProject():
+    """Get the current project."""
+    return __STATE__.project
+
+def getMilestone():
+    """Get the current milestone."""
+    project = getProject()
+    if project is not None:
+        return project.currentMilestone
+
+def setProject(project):
+    """Set the current project."""
+    __STATE__.setProject(project)

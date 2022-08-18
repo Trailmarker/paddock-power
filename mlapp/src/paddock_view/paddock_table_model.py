@@ -18,7 +18,10 @@ class PaddockTableModel(QAbstractTableModel):
             raise TypeError("paddockLayer must be a PaddockLayer")
 
         self.paddockLayer = paddockLayer
-        self.features = [f for f in self.paddockLayer.getFeatures()]
+        self.features = []
+
+        if self.paddockLayer is not None:
+            self.features = [f for f in self.paddockLayer.getFeatures()]
 
     def rowCount(self, parent=QModelIndex()):
         if self.paddockLayer is None:

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from re import I
+from ..models.paddock_power_error import PaddockPowerError
 from qgis.core import QgsGeometry, QgsFeature, QgsPoint, QgsWkbTypes
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
@@ -6,16 +8,20 @@ from qgis.utils import iface
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 
+from ..models.milestone import Milestone
 from ..utils import qgsDebug
 
 class SplitPaddock(QgsMapTool):
     points = []
 
     def __init__(self, canvas, milestone):
-        
+        if not isinstance(milestone, Milestone):
+            raise PaddockPowerError("SplitPaddock: milestone is not a Milestone object.")
+
         QgsMapTool.__init__(self, canvas)
         
         self.canvas = canvas
+        self.milestone = milestone
         self.layer = milestone.paddockLayer
 
         # flag to know whether the tool is capturing a drawing 

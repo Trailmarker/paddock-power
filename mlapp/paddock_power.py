@@ -9,6 +9,8 @@ from .resources import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.dialog import Dialog
+
+from .src.models.state import getState, getMilestone
 from .src.tools.rectangle_tool import RectangleTool
 from .src.tools.sketch_line_tool import SketchLineTool
 from .src.tools.sketch_line_string import SplitPaddock
@@ -257,9 +259,11 @@ class PaddockPower:
     def runStraightLine(self):
         """Set StraightLine as a custom map tool."""
         canvas = iface.mapCanvas()
-        layer = iface.activeLayer()
-        straightLine = SplitPaddock(canvas, layer)
-        canvas.setMapTool(straightLine)
+        milestone = getMilestone()
+
+        if milestone is not None:
+            straightLine = SplitPaddock(canvas, milestone)
+            canvas.setMapTool(straightLine)
 
 
     def runDialog(self):
