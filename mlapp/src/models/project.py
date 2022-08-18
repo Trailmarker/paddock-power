@@ -2,7 +2,7 @@
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsProject, QgsVectorLayer
 
-from ..data.paddock_power_vector_layer import PaddockPowerVectorLayerType
+from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerType
 from .milestone import Milestone
 from ..utils import guiError, resolveGeoPackageFile, qgsDebug
 

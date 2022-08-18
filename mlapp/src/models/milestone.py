@@ -6,12 +6,12 @@ import processing
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsProject
 
-from ..data.paddock_power_vector_layer import PaddockPowerVectorLayerSourceType, PaddockPowerVectorLayerType
-from ..data.boundary_layer import BoundaryLayer
-from ..data.waterpoint_layer import WaterpointLayer
-from ..data.pipeline_layer import PipelineLayer
-from ..data.fence_layer import FenceLayer
-from ..data.paddock_layer import PaddockLayer
+from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerSourceType, PaddockPowerVectorLayerType
+from ..layer.boundary_layer import BoundaryLayer
+from ..layer.waterpoint_layer import WaterpointLayer
+from ..layer.pipeline_layer import PipelineLayer
+from ..layer.fence_layer import FenceLayer
+from ..layer.paddock_layer import PaddockLayer
 
 from ..utils import qgsDebug
 

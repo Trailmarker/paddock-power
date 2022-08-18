@@ -7,7 +7,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterString)
 from qgis.PyQt.QtGui import QIcon
 
-from ..models.milestone import Milestone
+from ..models.project import Project
 from ..utils import resolveGeoPackageFile
 
 
@@ -30,13 +30,16 @@ class AddMilestone(QgsProcessingAlgorithm):
         milestoneName = parameters[self.MILESTONE_NAME_PARAM]
         projectFilePath = parameters[self.PROJECT_FILE_PARAM]
 
-        gpkgName = resolveGeoPackageFile(projectFilePath)
+        gpkgFile = resolveGeoPackageFile(projectFilePath)
 
-        if gpkgName is not None:
-            milestone = Milestone(milestoneName, gpkgName)
-            milestone.create()
-            outputs[self.NEW_MILESTONE_OUTPUT] = milestone
-            results[self.NEW_MILESTONE_OUTPUT] = milestone
+        milestone = None
+        if gpkgFile is not None:
+            project = Project(gpkgFile)
+            project.load()
+            milestone = project.addMilestone(milestoneName)
+
+        outputs[self.NEW_MILESTONE_OUTPUT] = milestone
+        results[self.NEW_MILESTONE_OUTPUT] = milestone
 
         return results
 

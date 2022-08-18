@@ -8,8 +8,8 @@ from .processing.pipeline_analysis import PipelineAnalysis
 from .processing.split_paddock import SplitPaddock
 from .processing.waterpoint_buffers import WaterpointBuffers
 
-from .data.create_project import CreateProject
-from .data.add_milestone import AddMilestone
+from .processing.create_project import CreateProject
+from .processing.add_milestone import AddMilestone
 
 class Provider(QgsProcessingProvider):
     def __init__(self):
