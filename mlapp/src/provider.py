@@ -34,7 +34,7 @@ class Provider(QgsProcessingProvider):
         return self.tr('Paddock Power')
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/ntg-primary-cmyk.png")
+        return QIcon(":/plugins/mlapp/images/icon.png")
 
     def longName(self):
         return self.name()

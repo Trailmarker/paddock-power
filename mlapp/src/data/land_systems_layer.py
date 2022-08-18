@@ -8,8 +8,6 @@ from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerVec
 class LandSystemsLayer(PaddockPowerVectorLayer):
 
     SCHEMA = [
-        QgsField(name="fid", type=QVariant.LongLong, typeName="Integer64",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Land System", type=QVariant.String, typeName="String",
                  len=50, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Map Unit", type=QVariant.String, typeName="String",
@@ -35,12 +33,12 @@ class LandSystemsLayer(PaddockPowerVectorLayer):
 
     TYPE = PaddockPowerVectorLayerType.LandSystems
 
-    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgUrl=None):
+    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Pipeline layer."""
 
         super(LandSystemsLayer, self).__init__(sourceType,
                                                layerName,
                                                QgsWkbTypes.LineString,
                                                self.SCHEMA,
-                                               gpkgUrl,
+                                               gpkgFile,
                                                styleName=self.STYLE)

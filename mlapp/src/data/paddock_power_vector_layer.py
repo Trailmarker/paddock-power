@@ -27,11 +27,11 @@ class PaddockPowerVectorLayerSourceType(Enum):
 class PaddockPowerVectorLayerType(Enum):
     """Enumeration of the types of Paddock Power vector layers."""
     # Note the order of this enumeration can be used to sort map layers for display purposes
-    Boundary = 1,
-    Waterpoint = 2,
-    Pipeline = 3,
-    Fence = 4,
-    Paddock = 5,
+    Boundary = 1
+    Waterpoint = 2
+    Pipeline = 3
+    Fence = 4
+    Paddock = 5
     LandSystems = 6
 
     @classmethod
@@ -43,7 +43,7 @@ class PaddockPowerVectorLayerType(Enum):
 
 class PaddockPowerVectorLayer(QgsVectorLayer):
     def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None,
-                 wkbType=None, schema=None, gpkgUrl=None, styleName=None):
+                 wkbType=None, schema=None, gpkgFile=None, styleName=None):
         """Create a new Paddock Power vector layer."""
 
         if sourceType == PaddockPowerVectorLayerSourceType.Memory:
@@ -62,10 +62,13 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
             self.commitChanges()
 
         elif sourceType == PaddockPowerVectorLayerSourceType.File:
-            assert(gpkgUrl is not None)
+            assert(layerName is not None)
+            assert(gpkgFile is not None)
+
+            gpkgUrl = f"{gpkgFile}|layername={layerName}"
 
             super(PaddockPowerVectorLayer, self).__init__(
-                path=gpkgUrl, baseName=None, providerLib="ogr")
+                path=gpkgUrl, baseName=layerName, providerLib="ogr")
 
         # Optionally apply a style to the layer
         if styleName is not None:

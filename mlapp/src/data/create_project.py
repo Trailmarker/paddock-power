@@ -3,22 +3,25 @@ import processing
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (QgsProcessing, QgsProcessingAlgorithm,
                        QgsProcessingMultiStepFeedback,
+                       QgsProcessingParameterFile,
                        QgsProcessingParameterString)
 
-from ..utils import qgsDebug
-from .boundary_layer import BoundaryLayer
-from .fence_layer import FenceLayer
-from .paddock_layer import PaddockLayer
-from .pipeline_layer import PipelineLayer
-from .waterpoint_layer import WaterpointLayer
+from ..models.milestone import Milestone
+from ..utils import qgsDebug, resolveGeoPackageFile
+
 
 class CreateProject(QgsProcessingAlgorithm):
 
+    NAME = 'CreateProject'
+    PROJECT_FILE_PARAM = 'QgisProjectFile'
+    MILESTONE_NAME_PARAM = 'MilestoneName'
+    NEW_MILESTONE_OUTPUT = 'NewMilestone'
+
     def initAlgorithm(self, config=None):
+        self.addParameter(QgsProcessingParameterFile(
+            self.PROJECT_FILE_PARAM, 'QGIS Project File', fileFilter="QGS Project Files (*.qgz *.qgs)", optional=True))
         self.addParameter(QgsProcessingParameterString(
-            'ProjectName', 'Project Name', multiLine=False, defaultValue='My Farm'))
-        self.addParameter(QgsProcessingParameterString(
-            'FirstMilestoneName', 'First Milestone Name', multiLine=False, defaultValue='Current'))
+            self.MILESTONE_NAME_PARAM, 'Milestone Name', multiLine=False, defaultValue='New Milestone'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
@@ -27,45 +30,27 @@ class CreateProject(QgsProcessingAlgorithm):
         results = {}
         outputs = {}
 
-        milestoneName = parameters['FirstMilestoneName']
+        milestoneName = parameters[self.MILESTONE_NAME_PARAM]
+        projectFilePath = parameters[self.PROJECT_FILE_PARAM]
 
-        # Create paddocks, pipeline, fence, waterpoints, boundary layers
-        boundary = BoundaryLayer(layerName=f"{milestoneName} Boundary")
-        waterpoint = WaterpointLayer(layerName=f"{milestoneName} Waterpoints")
-        pipeline = PipelineLayer(layerName=f"{milestoneName} Pipeline")
-        fence = FenceLayer(layerName=f"{milestoneName} Fence")
-        paddock = PaddockLayer(layerName=f"{milestoneName} Paddocks")
-        
-        # The 'Layers' parameter of the Package Layers tool ('native:package')
-        # Note this is sensitive to order
-        layers = [boundary, waterpoint, pipeline, fence, paddock]
+        gpkgName = resolveGeoPackageFile(projectFilePath)
 
-        # Create Paddock Power Project
-        alg_params = {
-            'LAYERS': layers,
-            #'OUTPUT': parameters['ProjectName'],
-            'OVERWRITE': True,
-            'SAVE_STYLES': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
-        outputs['CreatePaddockPowerProject'] = processing.run(
-            'native:package', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        if gpkgName is not None:
+            milestone = Milestone(milestoneName, gpkgName)
+            milestone.create()
+            outputs[self.NEW_MILESTONE_OUTPUT] = milestone
+            results[self.NEW_MILESTONE_OUTPUT] = milestone
+
         return results
 
     def name(self):
-        return 'Create Paddock Power Project'
+        return self.NAME
 
     def displayName(self):
         return 'Create Paddock Power Project'
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/fenceline.png")
-
-    # def group(self):
-    #     return ''
-
-    # def groupId(self):
-    #     return ''
+        return QIcon(":/plugins/mlapp/images/icon.png")
 
     def createInstance(self):
         return CreateProject()

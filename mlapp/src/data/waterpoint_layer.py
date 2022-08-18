@@ -8,8 +8,6 @@ from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerVec
 class WaterpointLayer(PaddockPowerVectorLayer):
 
     SCHEMA = [
-        QgsField(name="fid", type=QVariant.LongLong, typeName="Integer64",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Waterpoint Type", type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Waterpoint Name", type=QVariant.String, typeName="String",
@@ -20,12 +18,6 @@ class WaterpointLayer(PaddockPowerVectorLayer):
                  typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Waterpoint Bore Report", type=QVariant.String,
                  typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Status", type=QVariant.String,
-                 typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Date Commisioned", type=QVariant.Date,
-                 typeName="Date", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Date Decommisioned", type=QVariant.Date,
-                 typeName="Date", len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Waterpoint Start Month", type=QVariant.String,
                  typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Waterpoint End Month", type=QVariant.String,
@@ -35,20 +27,18 @@ class WaterpointLayer(PaddockPowerVectorLayer):
         QgsField(name="Waterpoint Latitude", type=QVariant.Double,
                  typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name="Waterpoint Elevation", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Date Edited", type=QVariant.Date, typeName="Date",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid)
+                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid)
     ]
 
     STYLE = "waterpoint"
     TYPE = PaddockPowerVectorLayerType.Waterpoint
 
-    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgUrl=None):
+    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Waterpoint layer."""
 
         super(WaterpointLayer, self).__init__(sourceType,
                                               layerName,
                                               QgsWkbTypes.Point,
                                               self.SCHEMA,
-                                              gpkgUrl,
+                                              gpkgFile,
                                               styleName=self.STYLE)

@@ -32,16 +32,28 @@ def resolvePluginPath(relative, base=None):
         base = path.normpath(path.join(base, os.pardir))
     return path.normpath(path.join(base, relative))
 
-def resolveStylePath(styleName):
-    """Resolve the path of a style file packaged with the plugin."""
-    relative = f"styles\\{styleName}.qml"
-    return resolvePluginPath(relative)
-
-def deriveWorkingDirectory():
-    """Derive the working folder from the current QGS project file."""
+def resolveProjectFile():
+    """Get the current QGS project file path."""
     project = QgsProject.instance()
     projectFilePath = project.fileName()
     if projectFilePath is None or projectFilePath == '':
         guiError("Save the current QGIS session as your Paddock Power project before continuing.")
         return None
-    return path.dirname(projectFilePath)
+    return projectFilePath
+
+def resolveGeoPackageFile(projectFilePath=None):
+    """Get where the current Paddock Power GeoPackage should be."""
+    if projectFilePath is None:
+        projectFilePath = resolveProjectFile()
+    if projectFilePath is None:
+        return None
+    else:
+        return f"{path.splitext(projectFilePath)[0]}.gpkg"
+
+
+def resolveStylePath(styleName):
+    """Resolve the path of a style file packaged with the plugin."""
+    relative = f"styles\\{styleName}.qml"
+    return resolvePluginPath(relative)
+
+
