@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
 import os
 
-from qgis.core import QgsVectorLayerCache, QgsMessageLog
-from qgis.gui import QgsAttributeTableFilterModel, QgsAttributeTableModel, QgsAttributeTableView
-from qgis.utils import iface
-from qgis.PyQt import QtGui, QtWidgets, uic
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableView, QVBoxLayout
+from qgis.PyQt.QtWidgets import QDockWidget
 
 from .paddock_table_model import PaddockTableModel
 from ..models.state import getState, getProject
-from ..utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_view_dock_widget_base.ui')))
 
 
-class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
     renderNeeded = pyqtSignal()

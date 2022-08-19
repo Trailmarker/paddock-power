@@ -5,9 +5,10 @@ from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 
-from ..models.milestone import Milestone, PaddockPowerError
-from .paddock_power_map_tool import PaddockPowerMapTool
-from ..utils import qgsDebug
+from .split_paddock_dialog import SplitPaddockDialog
+from ...models.milestone import Milestone, PaddockPowerError
+from ..paddock_power_map_tool import PaddockPowerMapTool
+from ...utils import qgsDebug
 
 class SplitPaddockTool(PaddockPowerMapTool):
     points = []
@@ -48,12 +49,21 @@ class SplitPaddockTool(PaddockPowerMapTool):
         self.paddockFeatures.setFillColor(paddockColour)
         self.paddockFeatures.show()
 
+        self.showDialog()
+
+    def showDialog(self):
+        """Show the Split Paddock dialog."""
+        self.dialog = SplitPaddockDialog(self)
+        self.dialog.setWindowFlags(Qt.WindowStaysOnTopHint) # | Qt.FramelessWindowHint)
+        self.dialog.show()
+
     def clear(self):
         self.sketch.reset()
         self.guide.reset()
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 
     def dispose(self):
+        """Completely delete or destroy all graphics objects or other state associated with the tool."""
         self.canvas.scene().removeItem(self.sketch)
         self.canvas.scene().removeItem(self.guide)
         self.canvas.scene().removeItem(self.paddockFeatures)
@@ -87,20 +97,27 @@ class SplitPaddockTool(PaddockPowerMapTool):
 
             self.updatePaddockFeatures()
 
-        if e.button() == Qt.RightButton:
-            self.capturing = False
-            self.milestone.unsetTool()
+        # if e.button() == Qt.RightButton:
+        #     self.capturing = False
+        #     self.milestone.unsetTool()
 
-            self.milestone.paddockLayer.splitPaddocks(self.splitLine())
+    def finishSplitPaddocks(self):
+        """Finish splitting paddocks."""
+        self.milestone.unsetTool()
 
-    def splitLine(self):
+    def splitPaddocks(self):
+        """Split the currently crossed paddocks."""
+        self.milestone.paddockLayer.splitPaddocks(self.getSplitLine())
+        self.finishSplitPaddocks()
+
+    def getSplitLine(self):
         """Return the current split line."""
         return QgsGeometry.fromPolyline(self.points)
 
     def updatePaddockFeatures(self):
         """Update the currently crossed paddock features."""
 
-        crossedPaddocks = self.milestone.paddockLayer.crossedPaddocks(self.splitLine())
+        crossedPaddocks = self.milestone.paddockLayer.crossedPaddocks(self.getSplitLine())
 
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 

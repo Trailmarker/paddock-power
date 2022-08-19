@@ -20,7 +20,7 @@ rem @ECHO ON
 ::call pyuic5 ui\ntrrp_about_dialog_base.ui -o src\ntrrp_about_dialog_base.py
 
 ::Resources
-call pyrcc5 resources.qrc -o resources.py
+call pyrcc5 resources.qrc -o resources_rc.py
 
 rem @ECHO OFF
 GOTO END

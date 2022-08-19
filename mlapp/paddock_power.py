@@ -7,14 +7,14 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.dialog import Dialog
 from .src.models.state import detectProject, getMilestone
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
-from .src.tools.split_paddock_tool import SplitPaddockTool
+from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
 from .src.utils import qgsDebug
 
 

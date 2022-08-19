@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeature, QgsField, QgsFields, QgsGeometry, QgsLineString, QgsWkbTypes
+from qgis.core import QgsFeature, QgsField, QgsFields, QgsGeometry, QgsLineString, QgsPoint, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
 from .paddock_power_vector_layer import (PaddockPowerVectorLayer,
@@ -57,7 +57,9 @@ class PaddockLayer(PaddockPowerVectorLayer):
         crossedPaddockNames = [crossedPaddock['Paddock Name'] for crossedPaddock in crossedPaddocks]
 
         # Split all the relevant features—this should split every element in crossed
-        self.splitFeatures(QgsLineString(splitLine.asPolyline()), False, False)
+        fixedSplitLine = QgsLineString([QgsPoint(p.x(),p.y()) for p in splitLine.asPolyline()])
+
+        self.splitFeatures(fixedSplitLine, False, False)
 
         for crossedPaddockName in crossedPaddockNames:
             splitPaddocks = [p for p in self.getFeatures() if p['Paddock Name'] == crossedPaddockName]
