@@ -53,10 +53,11 @@ class SplitPaddockTool(PaddockPowerMapTool):
         self.guide.reset()
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 
-    def destroy(self):
+    def dispose(self):
         self.canvas.scene().removeItem(self.sketch)
         self.canvas.scene().removeItem(self.guide)
         self.canvas.scene().removeItem(self.paddockFeatures)
+        super(SplitPaddockTool, self).dispose()
 
     def canvasMoveEvent(self, event):
         """Handle the canvas move event."""

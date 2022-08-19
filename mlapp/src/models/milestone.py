@@ -148,5 +148,5 @@ class Milestone(QObject):
     def unsetTool(self):
         if self.currentTool is not None:
             self.currentTool.clear()
-            self.currentTool.destroy()
+            self.currentTool.dispose()
             iface.mapCanvas().unsetMapTool(self.currentTool)
