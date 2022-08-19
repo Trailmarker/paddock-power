@@ -19,6 +19,9 @@ class SplitPaddockDialog(QDialog, FORM_CLASS):
         self.cancelSplitButton.clicked.connect(self.reject)
         self.confirmSplitButton.clicked.connect(self.accept)
 
+    def setFenceLength(self, length):
+        """Set the fence length."""
+        self.fenceLengthText.setText(f"{length:,.0f}")
 
     def reject(self):
         """Reject the dialog."""

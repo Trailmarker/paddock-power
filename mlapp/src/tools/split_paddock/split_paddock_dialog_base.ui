@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>408</width>
+    <width>308</width>
     <height>76</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
     <rect>
      <x>10</x>
      <y>0</y>
-     <width>391</width>
+     <width>291</width>
      <height>71</height>
     </rect>
    </property>
@@ -93,5 +93,6 @@
    </layout>
   </widget>
  </widget>
+ <resources/>
  <connections/>
 </ui>

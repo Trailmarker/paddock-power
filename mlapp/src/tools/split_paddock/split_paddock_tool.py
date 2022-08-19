@@ -141,5 +141,6 @@ class SplitPaddockTool(PaddockPowerMapTool):
         for paddock in crossedPaddocks:
             self.paddockFeatures.addGeometry(paddock.geometry(), None)
 
+        self.dialog.setFenceLength(croppedSplitLine.length())
         self.sketch.setToGeometry(croppedSplitLine)
 
