@@ -91,11 +91,16 @@ class SplitPaddockTool(PaddockPowerMapTool):
             self.capturing = False
             self.milestone.unsetTool()
 
+            self.milestone.paddockLayer.splitPaddocks(self.splitLine())
+
+    def splitLine(self):
+        """Return the current split line."""
+        return QgsGeometry.fromPolyline(self.points)
+
     def updatePaddockFeatures(self):
         """Update the currently crossed paddock features."""
 
-        splitLine = QgsGeometry.fromPolyline(self.points)
-        crossedPaddocks = self.milestone.paddockLayer.crossedPaddocks(splitLine)
+        crossedPaddocks = self.milestone.paddockLayer.crossedPaddocks(self.splitLine())
 
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 

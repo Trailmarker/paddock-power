@@ -150,3 +150,4 @@ class Milestone(QObject):
             self.currentTool.clear()
             self.currentTool.dispose()
             iface.mapCanvas().unsetMapTool(self.currentTool)
+            self.currentTool = None

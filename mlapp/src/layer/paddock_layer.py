@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeature, QgsField, QgsFields, QgsGeometry, QgsWkbTypes
+from qgis.core import QgsFeature, QgsField, QgsFields, QgsGeometry, QgsLineString, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
 from .paddock_power_vector_layer import (PaddockPowerVectorLayer,
@@ -48,29 +48,49 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         return crossed
 
-
     def splitPaddocks(self, splitLine):
-        """Split paddocks 'fully crossed' by a line and update the layer."""
-        crossed = self.crossedPaddocks(splitLine)
+        """Split paddocks by a line and update the layer."""
+        crossedPaddocks = self.crossedPaddocks(splitLine)
 
         self.startEditing()
 
-        for paddock in crossed:
-            paddockName = paddock.attribute("Paddock Name")
+        crossedPaddockNames = [crossedPaddock['Paddock Name'] for crossedPaddock in crossedPaddocks]
 
-            # TODO splitGeometry is not working as expected / is deprecated
-            result, splitGeometries, _ = paddock.geometry().splitGeometry(splitLine.asPolyline(), False)
+        # Split all the relevant features—this should split every element in crossed
+        self.splitFeatures(QgsLineString(splitLine.asPolyline()), False, False)
 
-            if result == QgsGeometry.OperationResult.Success:
-                for i, geometry in enumerate(splitGeometries):
-                    feature = QgsFeature(self.fields())
-                    feature.setAttributes(paddock.attributes())
-                    feature.setAttribute("Paddock Name", paddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
-                    feature.setAttribute("fid", 0)
-                    feature.setGeometry(geometry)
+        for crossedPaddockName in crossedPaddockNames:
+            splitPaddocks = [p for p in self.getFeatures() if p['Paddock Name'] == crossedPaddockName]
 
-                    self.addFeature(feature)
-
-                self.deleteFeature(paddock.id())
+            for i, splitPaddock in enumerate(splitPaddocks):
+                splitPaddock.setAttribute("Paddock Name", crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
+                self.updateFeature(splitPaddock)
 
         self.commitChanges()
+
+
+    # def splitPaddocks(self, splitLine):
+    #     """Split paddocks 'fully crossed' by a line and update the layer."""
+    #     crossed = self.crossedPaddocks(splitLine)
+
+    #     self.startEditing()
+
+    #     for paddock in crossed:
+    #         paddockName = paddock.attribute("Paddock Name")
+
+    #         # TODO splitGeometry is not working as expected / is deprecated
+    #         result, splitGeometries, _ = paddock.geometry().splitGeometry(splitLine.asPolyline(), False)
+
+    #         if result == QgsGeometry.OperationResult.Success:
+    #             for i, geometry in enumerate(splitGeometries):
+    #                 feature = QgsFeature(self.fields())
+    #                 feature.setAttributes(paddock.attributes())
+    #                 feature.setAttribute("Paddock Name", paddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
+    #                 feature.setAttribute("fid", 0)
+    #                 feature.setGeometry(geometry)
+
+    #                 self.addFeature(feature)
+
+    #             self.deleteFeature(paddock.id())
+
+    #     self.commitChanges()
