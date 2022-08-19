@@ -10,7 +10,6 @@ from qgis.PyQt.QtWidgets import QAction
 from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
-from .src.dialog import Dialog
 from .src.models.state import detectProject, getMilestone
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
@@ -164,20 +163,3 @@ class PaddockPower:
         if milestone is not None:
             milestone.setTool(SplitPaddockTool(milestone))
 
-    def runDialog(self):
-        """Run method that performs all the real work"""
-
-        # Create the dialog with elements (after translation) and keep reference
-        # Only create the dialog once in callback, so that it will only load when the plugin is started
-        if self.firstStart == True:
-            self.firstStart = False
-            self.dlg = Dialog()
-
-        # Show the dialog
-        self.dlg.show()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here
-            pass
