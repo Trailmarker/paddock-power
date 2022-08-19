@@ -42,7 +42,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         """Show the Paddock View."""
 
         project = getState().project
-        
+
         self.milestoneComboBox.blockSignals(True)
 
         if project is None:
@@ -51,18 +51,20 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
             return
 
         self.milestoneComboBox.clear()
-        milestoneNames = [milestoneName for milestoneName in project.milestones.keys()]
+        milestoneNames = [
+            milestoneName for milestoneName in project.milestones.keys()]
         milestoneNames.sort()
-        milestoneNames.insert(0,'')
+        milestoneNames.insert(0, '')
         self.milestoneComboBox.addItems(milestoneNames)
 
         if project.currentMilestone is not None:
-            self.milestoneComboBox.setCurrentText(project.currentMilestone.milestoneName)
-            tableModel = PaddockTableModel(project.currentMilestone.paddockLayer)
+            self.milestoneComboBox.setCurrentText(
+                project.currentMilestone.milestoneName)
+            tableModel = PaddockTableModel(
+                project.currentMilestone.paddockLayer)
             self.tableView.setModel(tableModel)
 
         self.milestoneComboBox.blockSignals(False)
-
 
     def milestoneComboBoxChanged(self, index):
         """Switch the active milestone."""
@@ -70,7 +72,6 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         if milestoneName:
             getState().project.setMilestone(milestoneName)
         self.renderNeeded.emit()
-
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

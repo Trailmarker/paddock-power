@@ -11,6 +11,7 @@ from ...models.milestone import Milestone, PaddockPowerError
 from ..paddock_power_map_tool import PaddockPowerMapTool
 from ...utils import qgsDebug
 
+
 class SplitPaddockTool(PaddockPowerMapTool):
     points = []
 
@@ -19,7 +20,8 @@ class SplitPaddockTool(PaddockPowerMapTool):
         super(SplitPaddockTool, self).__init__()
 
         if not isinstance(milestone, Milestone):
-            raise PaddockPowerError("SplitPaddockTool.__init__: milestone is not a Milestone.")
+            raise PaddockPowerError(
+                "SplitPaddockTool.__init__: milestone is not a Milestone.")
 
         self.milestone = milestone
 
@@ -65,13 +67,14 @@ class SplitPaddockTool(PaddockPowerMapTool):
     def showDialog(self):
         """Show the Split Paddock dialog."""
         self.dialog = SplitPaddockDialog(self)
-        self.dialog.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.dialog.setWindowFlags(
+            Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
 
         # Move to top left corner of map
         # See https://gis.stackexchange.com/questions/342728/getting-screen-coordinates-from-canvas-coordinate-using-pyqgis
-        point = self.canvas.mapToGlobal(QPoint(0,0))
+        point = self.canvas.mapToGlobal(QPoint(0, 0))
         self.dialog.move(point.x() + 10, point.y() + 10)
-        
+
         self.dialog.show()
 
     def clear(self):
@@ -134,7 +137,8 @@ class SplitPaddockTool(PaddockPowerMapTool):
     def updatePaddockFeatures(self):
         """Update the currently crossed paddock features."""
 
-        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.crossedPaddocks(self.getSplitLine())
+        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.crossedPaddocks(
+            self.getSplitLine())
 
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 
@@ -143,4 +147,3 @@ class SplitPaddockTool(PaddockPowerMapTool):
 
         self.dialog.setFenceLength(croppedSplitLine.length())
         self.sketch.setToGeometry(croppedSplitLine)
-

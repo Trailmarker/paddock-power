@@ -8,7 +8,8 @@ from ..utils import qgsDebug
 
 class PaddockTableModel(QAbstractTableModel):
 
-    ATTRIBUTES = ["Paddock Name", "Paddock Area (km²)", "Paddock Perimeter (km)"]
+    ATTRIBUTES = ["Paddock Name",
+                  "Paddock Area (km²)", "Paddock Perimeter (km)"]
     HEADERS = ["Name", "Area (km²)", "Perimeter (km)"]
 
     def __init__(self, paddockLayer):

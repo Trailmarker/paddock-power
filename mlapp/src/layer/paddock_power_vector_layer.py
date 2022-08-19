@@ -82,7 +82,8 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
     def copyTo(self, otherLayer):
         """Copy all features in this layer to another layer."""
         if otherLayer is None:
-            raise PaddockPowerError("PaddockPowerVectorLayer.copyTo: the target layer is not present")
+            raise PaddockPowerError(
+                "PaddockPowerVectorLayer.copyTo: the target layer is not present")
 
         if self.getLayerType() != otherLayer.getLayerType():
             raise PaddockPowerError(
@@ -95,7 +96,8 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
     def addToMap(self, group):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
         if group is None:
-            raise PaddockPowerError("PaddockPowerVectorLayer.ensureInMap: the layer group is not present")
+            raise PaddockPowerError(
+                "PaddockPowerVectorLayer.ensureInMap: the layer group is not present")
 
         node = group.findLayer(self.id())
         if node is None:

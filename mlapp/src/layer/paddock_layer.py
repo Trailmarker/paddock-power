@@ -34,11 +34,11 @@ class PaddockLayer(PaddockPowerVectorLayer):
         """Return the Paddock Power layer type."""
         return PaddockPowerVectorLayerType.Paddock
 
-
     def crossedPaddocks(self, splitLine):
         """Return a tuple, a list of paddocks 'fully crossed' by a splitting line and a crop of the
            splitting line to the crossed paddocks."""
-        intersects = [p for p in self.getFeatures() if splitLine.intersects(p.geometry())]
+        intersects = [p for p in self.getFeatures(
+        ) if splitLine.intersects(p.geometry())]
         crossed = []
         for paddock in intersects:
             polygon = paddock.geometry().asMultiPolygon()
@@ -58,22 +58,25 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         self.startEditing()
 
-        crossedPaddockNames = [crossedPaddock['Paddock Name'] for crossedPaddock in crossedPaddocks]
+        crossedPaddockNames = [crossedPaddock['Paddock Name']
+                               for crossedPaddock in crossedPaddocks]
 
         # Split all the relevant features—this should split every element in crossed
-        fixedSplitLine = QgsLineString([QgsPoint(p.x(),p.y()) for p in splitLine.asPolyline()])
+        fixedSplitLine = QgsLineString(
+            [QgsPoint(p.x(), p.y()) for p in splitLine.asPolyline()])
 
         self.splitFeatures(fixedSplitLine, False, False)
 
         for crossedPaddockName in crossedPaddockNames:
-            splitPaddocks = [p for p in self.getFeatures() if p['Paddock Name'] == crossedPaddockName]
+            splitPaddocks = [p for p in self.getFeatures(
+            ) if p['Paddock Name'] == crossedPaddockName]
 
             for i, splitPaddock in enumerate(splitPaddocks):
-                splitPaddock.setAttribute("Paddock Name", crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
+                splitPaddock.setAttribute(
+                    "Paddock Name", crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
                 self.updateFeature(splitPaddock)
 
         self.commitChanges()
-
 
     # def splitPaddocks(self, splitLine):
     #     """Split paddocks 'fully crossed' by a line and update the layer."""

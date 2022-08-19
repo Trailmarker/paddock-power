@@ -4,6 +4,7 @@ from qgis.utils import iface
 
 from qgis.PyQt.QtGui import QIcon
 
+
 class PaddockPowerMapTool(QgsMapTool):
 
     def __init__(self):
@@ -18,5 +19,3 @@ class PaddockPowerMapTool(QgsMapTool):
     def dispose(self):
         """Completely delete or destroy all graphics objects or other state associated with the tool."""
         self.deactivate()
-
-

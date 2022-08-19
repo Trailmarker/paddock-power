@@ -7,6 +7,7 @@ from qgis.PyQt.QtWidgets import QDialog
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'split_paddock_dialog_base.ui')))
 
+
 class SplitPaddockDialog(QDialog, FORM_CLASS):
     def __init__(self, splitPaddockTool, parent=None):
         """Constructor."""

@@ -162,4 +162,3 @@ class PaddockPower:
 
         if milestone is not None:
             milestone.setTool(SplitPaddockTool(milestone))
-
