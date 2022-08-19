@@ -36,7 +36,8 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
 
     def crossedPaddocks(self, splitLine):
-        """Return a list of paddocks 'fully crossed' by a splitting line."""
+        """Return a tuple, a list of paddocks 'fully crossed' by a splitting line and a crop of the
+           splitting line to the crossed paddocks."""
         intersects = [p for p in self.getFeatures() if splitLine.intersects(p.geometry())]
         crossed = []
         for paddock in intersects:
@@ -46,11 +47,14 @@ class PaddockLayer(PaddockPowerVectorLayer):
             if intersection.isMultipart():
                 crossed.append(paddock)
 
-        return crossed
+        allCrossed = QgsGeometry.unaryUnion(f.geometry() for f in crossed)
+        cropped = splitLine.intersection(allCrossed)
+
+        return (crossed, cropped)
 
     def splitPaddocks(self, splitLine):
         """Split paddocks by a line and update the layer."""
-        crossedPaddocks = self.crossedPaddocks(splitLine)
+        crossedPaddocks, _ = self.crossedPaddocks(splitLine)
 
         self.startEditing()
 

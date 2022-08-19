@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsGeometry, QgsPoint, QgsWkbTypes
+from qgis.core import QgsApplication, QgsGeometry, QgsPoint, QgsWkbTypes
 from qgis.gui import QgsRubberBand
+from qgis.utils import iface
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QColor
 
 from .split_paddock_dialog import SplitPaddockDialog
@@ -25,6 +26,15 @@ class SplitPaddockTool(PaddockPowerMapTool):
         # flag to know whether the tool is capturing a drawing
         self.capturing = False
 
+        paddockColour = QColor("green")
+        paddockColour.setAlphaF(0.8)
+        self.paddockFeatures = QgsRubberBand(
+            self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.paddockFeatures.setWidth(2)
+        self.paddockFeatures.setColor(paddockColour)
+        self.paddockFeatures.setFillColor(paddockColour)
+        self.paddockFeatures.show()
+
         sketchColour = QColor("red")
         sketchColour.setAlphaF(0.8)
         self.sketch = QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
@@ -40,21 +50,28 @@ class SplitPaddockTool(PaddockPowerMapTool):
         self.guide.setLineStyle(Qt.DashLine)
         self.guide.show()
 
-        paddockColour = QColor("green")
-        paddockColour.setAlphaF(0.8)
-        self.paddockFeatures = QgsRubberBand(
-            self.canvas, QgsWkbTypes.PolygonGeometry)
-        self.paddockFeatures.setWidth(2)
-        self.paddockFeatures.setColor(paddockColour)
-        self.paddockFeatures.setFillColor(paddockColour)
-        self.paddockFeatures.show()
+        # QgsApplication.instance().focusChanged.connect(self.showDialogIfMainWindowActive)
 
         self.showDialog()
+
+    # def showDialogIfMainWindowActive(self):
+    #     """Show the Split Paddock dialog when the QGIS main window gets focus."""
+    #     if iface.mainWindow().isActiveWindow():
+    #         self.showDialog()
+    #     elif self.dialog is not None:
+    #         self.dialog.reject()
+    #         self.dialog = None
 
     def showDialog(self):
         """Show the Split Paddock dialog."""
         self.dialog = SplitPaddockDialog(self)
-        self.dialog.setWindowFlags(Qt.WindowStaysOnTopHint) # | Qt.FramelessWindowHint)
+        self.dialog.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+
+        # Move to top left corner of map
+        # See https://gis.stackexchange.com/questions/342728/getting-screen-coordinates-from-canvas-coordinate-using-pyqgis
+        point = self.canvas.mapToGlobal(QPoint(0,0))
+        self.dialog.move(point.x() + 10, point.y() + 10)
+        
         self.dialog.show()
 
     def clear(self):
@@ -117,10 +134,12 @@ class SplitPaddockTool(PaddockPowerMapTool):
     def updatePaddockFeatures(self):
         """Update the currently crossed paddock features."""
 
-        crossedPaddocks = self.milestone.paddockLayer.crossedPaddocks(self.getSplitLine())
+        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.crossedPaddocks(self.getSplitLine())
 
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 
         for paddock in crossedPaddocks:
             self.paddockFeatures.addGeometry(paddock.geometry(), None)
+
+        self.sketch.setToGeometry(croppedSplitLine)
 

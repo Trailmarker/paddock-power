@@ -13,6 +13,12 @@
   <property name="windowTitle">
    <string>Split Paddock</string>
   </property>
+  <property name="windowOpacity">
+   <double>0.800000000000000</double>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
+  </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
@@ -67,6 +73,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="cancelSplitButton">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <property name="text">
          <string>Cancel Split</string>
         </property>
