@@ -5,7 +5,7 @@ from qgis.core import QgsProject
 
 from .project import Project
 from .paddock_power_error import PaddockPowerError
-from ..utils import resolveGeoPackageFile
+from ..utils import resolveGeoPackageFile, qgsDebug
 
 class State(QObject):
     # emit this signal when paddocks are updated
@@ -24,10 +24,21 @@ class State(QObject):
                 if gpkgFile is not None:
                     milestones = Project.findMilestones(gpkgFile)
                     if milestones:
+                        qgsDebug(f"State.detectProject: detected project with {len(milestones)} milestones in {gpkgFile}")
                         project = Project(gpkgFile)
                         self.setProject(project)
+                        return
             except Exception:
-                pass            
+                pass
+            qgsDebug("State.detectProject: no project detected.")  
+        else:
+            self.refreshProject()
+
+    def refreshProject(self):
+        """Refresh the current project."""
+        if self.project is not None:
+            self.project.load()
+            self.project.addToMap()
 
     def setProject(self, project):
         """Set the current milestone."""
@@ -38,9 +49,9 @@ class State(QObject):
             self.project.removeFromMap()
 
         self.project = project
-        self.project.load()
-        self.project.addToMap()
+        self.refreshProject()
 
+        qgsDebug("State.setProject: Setting project and emitting projectChanged signal.")
         self.projectChanged.emit()
 
 # Singleton behaviour

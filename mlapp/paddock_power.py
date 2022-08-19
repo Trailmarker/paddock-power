@@ -56,7 +56,7 @@ class PaddockPower:
         self.toolbar.setObjectName(u'PaddockPower')
 
         detectProject()
-        QgsProject.instance().fileNameChanged.connect(detectProject)
+        QgsProject.instance().readProject.connect(detectProject)
 
         # print "** INITIALIZING PaddockPower"
 
@@ -159,17 +159,17 @@ class PaddockPower:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/mlapp/images/ntg-primary-cmyk.png'
+        icon_path = ':/plugins/mlapp/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Paddock View'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        icon_path = ':/plugins/mlapp/images/split.png'
+        icon_path = ':/plugins/mlapp/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Sketch Line Tool'),
+            text=self.tr(u'Split Paddock Tool'),
             callback=self.runSplitPaddock,
             parent=self.iface.mainWindow())
 

@@ -19,6 +19,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
+    renderNeeded = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -31,12 +32,14 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.milestoneComboBox.currentIndexChanged.connect(
             self.milestoneComboBoxChanged)
 
+        self.renderNeeded.connect(self.render)
+
         self.render()
 
     def setup(self):
         """Reconnect things as necessary."""
         project = getProject()
-        if project is not None:        
+        if project is not None:
             project.currentMilestoneChanged.connect(self.render)
 
     def render(self):
@@ -58,7 +61,6 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.milestoneComboBox.addItems(milestoneNames)
 
         if project.currentMilestone is not None:
-            qgsDebug("Setting table view model")
             self.milestoneComboBox.setCurrentText(project.currentMilestone.milestoneName)
             tableModel = PaddockTableModel(project.currentMilestone.paddockLayer)
             self.tableView.setModel(tableModel)
@@ -71,6 +73,7 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         milestoneName = self.milestoneComboBox.itemText(index)
         if milestoneName:
             getState().project.setMilestone(milestoneName)
+        self.renderNeeded.emit()
 
 
     def closeEvent(self, event):
