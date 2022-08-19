@@ -49,6 +49,11 @@ class Project(QObject):
                 f"Project.setMilestone: milestone '{milestoneName}' does not exist.")
 
         self.currentMilestone = self.milestones[milestoneName]
+
+        # Set the current milestone's layer group visible, and hide others
+        for milestone in self.milestones.values():
+            milestone.setVisible(milestone.milestoneName == milestoneName)
+
         self.currentMilestoneChanged.emit()
         return self.currentMilestone
 

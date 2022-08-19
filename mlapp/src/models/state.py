@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from pydoc import resolve
 from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.core import QgsProject
 
 from .project import Project
 from .paddock_power_error import PaddockPowerError
+from ..utils import resolveGeoPackageFile
 
 class State(QObject):
     # emit this signal when paddocks are updated
@@ -12,6 +15,19 @@ class State(QObject):
         super(State, self).__init__()
 
         self.project = None
+
+    def detectProject(self):
+        """Detect a Paddock Power project in the current QGIS project."""
+        if self.project is None:
+            try:
+                gpkgFile = resolveGeoPackageFile()
+                if gpkgFile is not None:
+                    milestones = Project.findMilestones(gpkgFile)
+                    if milestones:
+                        project = Project(gpkgFile)
+                        self.setProject(project)
+            except Exception:
+                pass            
 
     def setProject(self, project):
         """Set the current milestone."""
@@ -43,6 +59,10 @@ def getMilestone():
     project = getProject()
     if project is not None:
         return project.currentMilestone
+
+def detectProject():
+    """Detect and load any current project."""
+    __STATE__.detectProject()
 
 def setProject(project):
     """Set the current project."""

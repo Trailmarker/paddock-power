@@ -91,6 +91,12 @@ class Milestone(QObject):
             group.addLayer(self.fenceLayer)
             group.addLayer(self.paddockLayer)
 
+    def setVisible(self, visible):
+        """Set the visibility of this milestone's layers."""
+        group = self.findGroup()
+        if group is not None:
+            group.setItemVisibilityChecked(visible)
+
     def removeFromMap(self):
         """Remove this milestone from the current map view."""
         group = self.findGroup()

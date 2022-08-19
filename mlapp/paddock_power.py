@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsProject
 from qgis.utils import iface
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
@@ -10,10 +10,10 @@ from .resources import *
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.dialog import Dialog
 
-from .src.models.state import getState, getMilestone
+from .src.models.state import detectProject, getMilestone
 from .src.tools.rectangle_tool import RectangleTool
 from .src.tools.sketch_line_tool import SketchLineTool
-from .src.tools.sketch_line_string import SplitPaddock
+from .src.tools.split_paddock import SplitPaddock
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 import os.path
@@ -56,6 +56,9 @@ class PaddockPower:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'PaddockPower')
         self.toolbar.setObjectName(u'PaddockPower')
+
+        detectProject()
+        QgsProject.instance().fileNameChanged.connect(detectProject)
 
         # print "** INITIALIZING PaddockPower"
 
