@@ -1,8 +1,12 @@
 <RCC>
     <qresource prefix="/plugins/mlapp" >
-        <file>icon.png</file>
         <file>images/buffer.png</file>
         <file>images/fenceline.png</file>
+        <file>images/icon.png</file>
+        <file>images/logo.png</file>
+        <file>images/milestone.png</file>
+        <file>images/logo.png</file>
+        <file>images/ntg-primary-cmyk.png</file>
         <file>images/pipeline.png</file>
         <file>images/split.png</file>
     </qresource>

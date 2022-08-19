@@ -49,7 +49,7 @@ class DeleteMilestone(QgsProcessingAlgorithm):
         return 'Delete Milestone'
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/fenceline.png")
+        return QIcon(":/plugins/mlapp/images/milestone.png")
 
     def createInstance(self):
         return DeleteMilestone()

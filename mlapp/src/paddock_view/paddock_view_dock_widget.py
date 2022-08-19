@@ -10,6 +10,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableView, QVBoxLayout
 
 from .paddock_table_model import PaddockTableModel
 from ..models.state import getState, getProject
+from ..utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_view_dock_widget_base.ui')))
@@ -57,6 +58,7 @@ class PaddockViewDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.milestoneComboBox.addItems(milestoneNames)
 
         if project.currentMilestone is not None:
+            qgsDebug("Setting table view model")
             self.milestoneComboBox.setCurrentText(project.currentMilestone.milestoneName)
             tableModel = PaddockTableModel(project.currentMilestone.paddockLayer)
             self.tableView.setModel(tableModel)

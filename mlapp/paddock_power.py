@@ -11,8 +11,6 @@ from .resources import *
 from .src.dialog import Dialog
 
 from .src.models.state import detectProject, getMilestone
-from .src.tools.rectangle_tool import RectangleTool
-from .src.tools.sketch_line_tool import SketchLineTool
 from .src.tools.split_paddock import SplitPaddock
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
@@ -161,24 +159,19 @@ class PaddockPower:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/mlapp/icon.png'
+        icon_path = ':/plugins/mlapp/images/ntg-primary-cmyk.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Paddock View'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
+        icon_path = ':/plugins/mlapp/images/split.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Sketch Line Tool'),
-            callback=self.runStraightLine,
+            callback=self.runSplitPaddock,
             parent=self.iface.mainWindow())
-
-        # self.add_action(
-        #     icon_path,
-        #     text=self.tr(u'Rectangle Tool'),
-        #     callback=self.runRectangleTool,
-        #     parent=self.iface.mainWindow())
 
         # will be set False in run()
         self.first_start = True
@@ -246,20 +239,7 @@ class PaddockPower:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-    def runRectangleTool(self):
-        """Set RectangleTool as a custom map tool."""
-        canvas = iface.mapCanvas()
-        rectangleTool = RectangleTool(canvas)
-        canvas.setMapTool(rectangleTool)
-
-    def runSketchLineTool(self):
-        """Set SketchLineTool as a custom map tool."""
-        layer = iface.activeLayer()
-        canvas = iface.mapCanvas()
-        sketchLineTool = SketchLineTool(canvas, layer)
-        canvas.setMapTool(sketchLineTool)
-
-    def runStraightLine(self):
+    def runSplitPaddock(self):
         """Set StraightLine as a custom map tool."""
         canvas = iface.mapCanvas()
         milestone = getMilestone()
