@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from .src.tools.split_paddock_tool import SplitPaddockTool
 from qgis.core import QgsApplication, QgsProject
-from qgis.utils import iface
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -11,7 +11,6 @@ from .resources import *
 from .src.dialog import Dialog
 
 from .src.models.state import detectProject, getMilestone
-from .src.tools.split_paddock import SplitPaddock
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 import os.path
@@ -241,12 +240,10 @@ class PaddockPower:
 
     def runSplitPaddock(self):
         """Set StraightLine as a custom map tool."""
-        canvas = iface.mapCanvas()
         milestone = getMilestone()
 
         if milestone is not None:
-            straightLine = SplitPaddock(canvas, milestone)
-            canvas.setMapTool(straightLine)
+            milestone.setTool(SplitPaddockTool(milestone))
 
 
     def runDialog(self):

@@ -1,30 +1,25 @@
 # -*- coding: utf-8 -*-
-from re import I
-from ..models.paddock_power_error import PaddockPowerError
 from qgis.core import QgsGeometry, QgsPoint, QgsWkbTypes
-from qgis.gui import QgsMapTool, QgsRubberBand
-from qgis.utils import iface
+from qgis.gui import QgsRubberBand
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 
-from ..models.milestone import Milestone
+from ..models.milestone import Milestone, PaddockPowerError
+from .paddock_power_map_tool import PaddockPowerMapTool
 from ..utils import qgsDebug
 
-
-class SplitPaddock(QgsMapTool):
+class SplitPaddockTool(PaddockPowerMapTool):
     points = []
 
-    def __init__(self, canvas, milestone):
+    def __init__(self, milestone):
+
+        super(SplitPaddockTool, self).__init__()
+
         if not isinstance(milestone, Milestone):
-            raise PaddockPowerError(
-                "SplitPaddock: milestone is not a Milestone object.")
+            raise PaddockPowerError("SplitPaddockTool.__init__: milestone is not a Milestone.")
 
-        QgsMapTool.__init__(self, canvas)
-
-        self.canvas = canvas
         self.milestone = milestone
-        self.layer = milestone.paddockLayer
 
         # flag to know whether the tool is capturing a drawing
         self.capturing = False
@@ -58,11 +53,13 @@ class SplitPaddock(QgsMapTool):
         self.guide.reset()
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 
-    # def delete(self):
-    #     self.canvas.scene().removeItem(self.sketch)
-    #     self.canvas.scene().removeItem(self.guide)
+    def destroy(self):
+        self.canvas.scene().removeItem(self.sketch)
+        self.canvas.scene().removeItem(self.guide)
+        self.canvas.scene().removeItem(self.paddockFeatures)
 
     def canvasMoveEvent(self, event):
+        """Handle the canvas move event."""
         if self.guide is not None and self.capturing and self.points:
             l = self.points[-1]
             g = self.toMapCoordinates(event.pos())
@@ -71,7 +68,7 @@ class SplitPaddock(QgsMapTool):
             self.guide.setToGeometry(guideLine, None)
 
     def canvasPressEvent(self, e):
-        # which the mouse button?
+        """Handle the canvas press event."""
         if e.button() == Qt.LeftButton:
             # clear the rubber band when we start
             if not self.capturing:
@@ -91,13 +88,13 @@ class SplitPaddock(QgsMapTool):
 
         if e.button() == Qt.RightButton:
             self.capturing = False
-            self.clear()
+            self.milestone.unsetTool()
 
     def updatePaddockFeatures(self):
         """Update the currently crossed paddock features."""
 
         splitLine = QgsGeometry.fromPolyline(self.points)
-        crossedPaddocks = self.layer.crossedPaddocks(splitLine)
+        crossedPaddocks = self.milestone.paddockLayer.crossedPaddocks(splitLine)
 
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 

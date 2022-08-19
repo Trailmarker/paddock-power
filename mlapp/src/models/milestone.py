@@ -5,6 +5,7 @@ import processing
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsProject
+from qgis.utils import iface
 
 from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerSourceType, PaddockPowerVectorLayerType
 from ..layer.boundary_layer import BoundaryLayer
@@ -12,6 +13,8 @@ from ..layer.waterpoint_layer import WaterpointLayer
 from ..layer.pipeline_layer import PipelineLayer
 from ..layer.fence_layer import FenceLayer
 from ..layer.paddock_layer import PaddockLayer
+
+from ..tools.paddock_power_map_tool import PaddockPowerMapTool
 
 from .paddock_power_error import PaddockPowerError
 
@@ -25,6 +28,7 @@ class Milestone(QObject):
 
         self.milestoneName = milestoneName
         self.gpkgFile = gpkgFile
+        self.currentTool = None
         self.isLoaded = False
 
     def create(self):
@@ -130,3 +134,19 @@ class Milestone(QObject):
         deleteLayerFromGeoPackage(self.pipelineLayer)
         deleteLayerFromGeoPackage(self.fenceLayer)
         deleteLayerFromGeoPackage(self.paddockLayer)
+
+    def setTool(self, tool):
+        """Set the current tool for this milestone."""
+        if not isinstance(tool, PaddockPowerMapTool):
+            raise PaddockPowerError(
+                "Milestone.setTool: tool must be a MilestoneMapTool")
+
+        self.unsetTool()
+        self.currentTool = tool
+        iface.mapCanvas().setMapTool(self.currentTool)
+
+    def unsetTool(self):
+        if self.currentTool is not None:
+            self.currentTool.clear()
+            self.currentTool.destroy()
+            iface.mapCanvas().unsetMapTool(self.currentTool)
