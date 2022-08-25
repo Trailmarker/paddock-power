@@ -56,14 +56,6 @@ class SplitPaddockTool(PaddockPowerMapTool):
 
         self.showDialog()
 
-    # def showDialogIfMainWindowActive(self):
-    #     """Show the Split Paddock dialog when the QGIS main window gets focus."""
-    #     if iface.mainWindow().isActiveWindow():
-    #         self.showDialog()
-    #     elif self.dialog is not None:
-    #         self.dialog.reject()
-    #         self.dialog = None
-
     def showDialog(self):
         """Show the Split Paddock dialog."""
         self.dialog = SplitPaddockDialog(self)

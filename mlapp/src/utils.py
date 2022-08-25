@@ -21,6 +21,13 @@ def guiWarning(message):
     QMessageBox.warning(None, "NAFI Burnt Areas Mapping", message)
 
 
+def guiConfirm(question="Are you sure?", title=None):
+    """Show a confirmation dialog."""
+    if title is None:
+        title = "MLA Paddock Power"
+    return QMessageBox.question(None, title, question, QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
+
+
 def qgsDebug(message, tag="", level=Qgis.Info):
     """Print a debug message."""
     QgsMessageLog.logMessage(

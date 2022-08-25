@@ -100,6 +100,7 @@ class Milestone(QObject):
         group = self.findGroup()
         if group is not None:
             group.setItemVisibilityChecked(visible)
+            group.setExpanded(visible)
 
     def removeFromMap(self):
         """Remove this milestone from the current map view."""
