@@ -59,8 +59,6 @@ class State(QObject):
         self.projectChanged.emit()
 
 
-qgsDebug("Initialising state …")
-
 # Singleton behaviour
 __STATE__ = State()
 

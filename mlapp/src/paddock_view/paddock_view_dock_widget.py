@@ -52,10 +52,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
             project.currentMilestoneChanged.connect(self.render)
 
     def showEvent(self, event):
-        qgsDebug("Show Event")
         detectProject()
-
-        # self.render()
 
     def render(self):
         """Show the Paddock View."""
