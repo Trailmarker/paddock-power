@@ -99,6 +99,7 @@ class Milestone(QObject):
         """Set the visibility of this milestone's layers."""
         group = self.findGroup()
         if group is not None:
+            group.setItemVisibilityChecked(visible)
             group.setExpanded(visible)
 
     def removeFromMap(self):
