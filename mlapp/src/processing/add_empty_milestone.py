@@ -55,7 +55,7 @@ class AddEmptyMilestone(QgsProcessingAlgorithm):
         return 'Add Empty Milestone'
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/milestone.png")
+        return QIcon(":/plugins/mlapp/images/new-milestone.png")
 
     def createInstance(self):
         return AddEmptyMilestone()

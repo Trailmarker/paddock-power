@@ -6,13 +6,13 @@ from qgis.utils import iface
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QColor
 
-from .split_paddock_dialog import SplitPaddockDialog
+from .fenceline_analysis_dialog import SplitPaddockDialog
 from ...models.milestone import Milestone, PaddockPowerError
 from ..paddock_power_map_tool import PaddockPowerMapTool
 from ...utils import qgsDebug
 
 
-class SplitPaddockTool(PaddockPowerMapTool):
+class FencelineAnalysisTool(PaddockPowerMapTool):
     points = []
 
     def __init__(self, milestone):

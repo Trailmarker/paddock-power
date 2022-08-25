@@ -95,13 +95,13 @@ class PaddockPower:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         self.addAction(
-            QIcon(':/plugins/mlapp/images/split.png'),
+            QIcon(':/plugins/mlapp/images/paddock.png'),
             text=self.tr(u'Paddock View'),
             callback=self.openPaddockView,
             parent=self.iface.mainWindow())
 
         self.addAction(
-            QIcon(':/plugins/mlapp/images/split.png'),
+            QIcon(':/plugins/mlapp/images/split-paddock.png'),
             text=self.tr(u'Split Paddock Tool'),
             callback=self.runSplitPaddock,
             parent=self.iface.mainWindow())

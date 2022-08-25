@@ -62,7 +62,7 @@ class AddMilestoneFromExisting(QgsProcessingAlgorithm):
         return 'Add Milestone From Existing Milestone'
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/milestone.png")
+        return QIcon(":/plugins/mlapp/images/new-milestone.png")
 
     def createInstance(self):
         return AddMilestoneFromExisting()

@@ -9,6 +9,9 @@
         <file>images/delete-milestone.png</file>
         <file>images/logo.png</file>
         <file>images/ntg-primary-cmyk.png</file>
+        <file>images/new-paddock.png</file>
+        <file>images/split-paddock.png</file>
+        <file>images/paddock.png</file>
         <file>images/pipeline.png</file>
         <file>images/split.png</file>
     </qresource>

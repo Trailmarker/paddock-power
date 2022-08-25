@@ -54,7 +54,7 @@ class CreateProject(QgsProcessingAlgorithm):
         return 'Create Paddock Power Project'
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/icon.png")
+        return QIcon(":/plugins/mlapp/images/new-paddock.png")
 
     def createInstance(self):
         return CreateProject()
