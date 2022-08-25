@@ -5,7 +5,7 @@ from qgis.core import QgsVectorLayer
 from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerType
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
-from ..utils import resolveGeoPackageFile
+from ..utils import qgsDebug, resolveGeoPackageFile
 
 
 class Project(QObject):
@@ -70,8 +70,16 @@ class Project(QObject):
         milestone = Milestone(milestoneName, self.gpkgFile)
         milestone.create()
         self.milestones[milestoneName] = milestone
+        milestone.addToMap()
         self.milestonesUpdated.emit()
         return milestone
+
+    def addMilestoneFromExisting(self, milestoneName, existingMilestoneName):
+        """Add a milestone copied from an existing milestone."""
+        existingMilestone = self.getMilestone(existingMilestoneName)
+
+        addedMilestone = self.addMilestone(milestoneName)
+        existingMilestone.copyTo(addedMilestone)
 
     def deleteMilestone(self, milestoneName):
         """Delete a milestone from the project."""
