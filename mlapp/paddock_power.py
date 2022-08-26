@@ -13,6 +13,7 @@ from .resources_rc import *
 from .src.models.state import detectProject, getMilestone
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
+from .src.tools.fenceline_analysis.fenceline_analysis_tool import FencelineAnalysisTool
 from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
 from .src.utils import qgsDebug
 
@@ -102,6 +103,12 @@ class PaddockPower:
 
         self.addAction(
             QIcon(':/plugins/mlapp/images/split-paddock.png'),
+            text=self.tr(u'Fenceline Analysis Tool'),
+            callback=self.runFencelineAnalysis,
+            parent=self.iface.mainWindow())
+
+        self.addAction(
+            QIcon(':/plugins/mlapp/images/split-paddock.png'),
             text=self.tr(u'Split Paddock Tool'),
             callback=self.runSplitPaddock,
             parent=self.iface.mainWindow())
@@ -156,9 +163,18 @@ class PaddockPower:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
             self.paddockView.show()
 
+    def runFencelineAnalysis(self):
+        """Set FencelineAnalysisTool as a custom map tool."""
+        milestone = getMilestone()
+
+        if milestone is not None:
+            milestone.setTool(FencelineAnalysisTool(milestone))
+
     def runSplitPaddock(self):
-        """Set StraightLine as a custom map tool."""
+        """Set SplitPaddockTool as a custom map tool."""
         milestone = getMilestone()
 
         if milestone is not None:
             milestone.setTool(SplitPaddockTool(milestone))
+
+ 

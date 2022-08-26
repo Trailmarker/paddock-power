@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsApplication, QgsGeometry, QgsPoint, QgsWkbTypes
+import matplotlib.pyplot as plot
+import processing
+
+from qgis.core import QgsApplication, QgsDistanceArea, QgsGeometry, QgsPoint, QgsRasterLayer, QgsVectorLayer, QgsWkbTypes
 from qgis.gui import QgsRubberBand
 from qgis.utils import iface
 
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QColor
 
-from .fenceline_analysis_dialog import SplitPaddockDialog
+# from .fenceline_analysis_dialog import FencelineAnalysisDialog
 from ...models.milestone import Milestone, PaddockPowerError
 from ..paddock_power_map_tool import PaddockPowerMapTool
 from ...utils import qgsDebug
@@ -21,21 +24,12 @@ class FencelineAnalysisTool(PaddockPowerMapTool):
 
         if not isinstance(milestone, Milestone):
             raise PaddockPowerError(
-                "SplitPaddockTool.__init__: milestone is not a Milestone.")
+                "FencelineAnalysisTool.__init__: milestone is not a Milestone.")
 
         self.milestone = milestone
 
         # flag to know whether the tool is capturing a drawing
         self.capturing = False
-
-        paddockColour = QColor("green")
-        paddockColour.setAlphaF(0.8)
-        self.paddockFeatures = QgsRubberBand(
-            self.canvas, QgsWkbTypes.PolygonGeometry)
-        self.paddockFeatures.setWidth(2)
-        self.paddockFeatures.setColor(paddockColour)
-        self.paddockFeatures.setFillColor(paddockColour)
-        self.paddockFeatures.show()
 
         sketchColour = QColor("red")
         sketchColour.setAlphaF(0.8)
@@ -52,34 +46,50 @@ class FencelineAnalysisTool(PaddockPowerMapTool):
         self.guide.setLineStyle(Qt.DashLine)
         self.guide.show()
 
-        # QgsApplication.instance().focusChanged.connect(self.showDialogIfMainWindowActive)
-
-        self.showDialog()
 
     def showDialog(self):
-        """Show the Split Paddock dialog."""
-        self.dialog = SplitPaddockDialog(self)
-        self.dialog.setWindowFlags(
-            Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        """Show the Fenceline Analysis dialog."""
+        # self.dialog = FencelineAnalysisDialog(self)
+        # self.dialog.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Move to top left corner of map
         # See https://gis.stackexchange.com/questions/342728/getting-screen-coordinates-from-canvas-coordinate-using-pyqgis
-        point = self.canvas.mapToGlobal(QPoint(0, 0))
-        self.dialog.move(point.x() + 10, point.y() + 10)
+        # point = self.canvas.mapToGlobal(QPoint(0, 0))
+        # self.dialog.move(point.x() + 10, point.y() + 10)
 
-        self.dialog.show()
+        # self.dialog.show()
+
+        # Plot some sample data
+        listOfZValues = self.listOfZValues
+        listOfDistances = self.distancesList
+
+        minimumZValue = round(min(listOfZValues), 3)
+        maximumZValue = round(max(listOfZValues), 3)
+        meanZValue = round(sum(listOfZValues) / len(listOfZValues), 3)
+        maximumDistance = listOfDistances[-1]
+        plot.figure(figsize = (10,4))
+        plot.plot(listOfDistances, listOfZValues)
+        plot.plot([0, maximumDistance], [minimumZValue, minimumZValue],
+                  'g--', label='Min. : '+str(minimumZValue))
+        plot.plot([0, maximumDistance], [maximumZValue, maximumZValue],
+                  'r--', label='Max. : '+str(maximumZValue))
+        plot.plot([0, maximumDistance], [meanZValue, meanZValue], 'y--', label='Mean : ' + str(meanZValue))
+        plot.grid()
+        plot.legend(loc = 1)
+        plot.xlabel("Distance (km)")
+        plot.ylabel("Elevation (m)")
+        plot.fill_between(listOfDistances, listOfZValues, minimumZValue, alpha=0.5)
+        plot.show()
 
     def clear(self):
         self.sketch.reset()
         self.guide.reset()
-        self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
 
     def dispose(self):
         """Completely delete or destroy all graphics objects or other state associated with the tool."""
         self.canvas.scene().removeItem(self.sketch)
         self.canvas.scene().removeItem(self.guide)
-        self.canvas.scene().removeItem(self.paddockFeatures)
-        super(SplitPaddockTool, self).dispose()
+        super(FencelineAnalysisTool, self).dispose()
 
     def canvasMoveEvent(self, event):
         """Handle the canvas move event."""
@@ -107,35 +117,81 @@ class FencelineAnalysisTool(PaddockPowerMapTool):
             polyline = QgsGeometry.fromPolyline(self.points)
             self.sketch.setToGeometry(polyline)
 
-            self.updatePaddockFeatures()
+            self.updateFencelineAnalysis()
 
-        # if e.button() == Qt.RightButton:
-        #     self.capturing = False
-        #     self.milestone.unsetTool()
+        if e.button() == Qt.RightButton:
+            self.capturing = False
+            self.milestone.unsetTool()
+            self.showDialog()
 
-    def finishSplitPaddocks(self):
-        """Finish splitting paddocks."""
-        self.milestone.unsetTool()
-
-    def splitPaddocks(self):
-        """Split the currently crossed paddocks."""
-        self.milestone.paddockLayer.splitPaddocks(self.getSplitLine())
-        self.finishSplitPaddocks()
-
-    def getSplitLine(self):
+    def getFenceline(self):
         """Return the current split line."""
         return QgsGeometry.fromPolyline(self.points)
 
-    def updatePaddockFeatures(self):
+    def updateFencelineAnalysis(self):
         """Update the currently crossed paddock features."""
 
-        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.crossedPaddocks(
-            self.getSplitLine())
+        fenceline = self.getFenceline()
 
-        self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)
+        # See https://www.geodose.com/2021/02/python-qgis-tutorial-create-elevation-profile.html
 
-        for paddock in crossedPaddocks:
-            self.paddockFeatures.addGeometry(paddock.geometry(), None)
+        # Change these  
+        # dataDir = 'E:/Project/'  
+        # elevationData = dataDir + 'lidar_dem.tif' 
+        # analysisLine = dataDir + 'line_path.gpkg' 
+        # fencePoints = dataDir + 'out_points.gpkg' 
+        # fencePointsWithZ = dataDir + 'point_z.gpkg' 
+   
+        # Define raster layer and get cell resolution
+        # elevationLayer = QgsRasterLayer(elevationData,'ogr')
+        # interval = elevationLayer.rasterUnitsPerPixelX()
 
-        self.dialog.setFenceLength(croppedSplitLine.length())
-        self.sketch.setToGeometry(croppedSplitLine)
+        # Processing using SAGA and GRASS
+        # Convert input line to points … (shouldn't need to do this)
+        # processing.run("grass7:v.to.points", {
+        #     'input': analysisLine,
+        #     'use': 1,
+        #     'dmax': interval,
+        #     '-i': True,
+        #     '-t': False,
+        #     'output': fencePoints
+        # })
+
+        # Add elevation values from DEM in project to points
+        # processing.run("saga:addrastervaluestopoints", {
+        #     'SHAPES': fencePoints, 
+        #     'GRIDS': [elevationLayer],
+        #     'RESAMPLING': 0,
+        #     'RESULT': fencePointsWithZ
+        # })
+
+        # fencePointsWithZLayer = QgsVectorLayer(fencePointsWithZ,'ogr')
+
+        # features = fencePointsWithZLayer.getFeatures()
+        # first = next(features)
+        # firstPoint = first.geometry().asPoint()
+        # firstZValue = first.attributes()[-1]
+
+        # Curate the points to use QgsDistanceArea on them
+        # Empty dictionary
+        # fromPoint = firstPoint
+        # toPoint = None
+        # distancesList = [0]
+        # self.listOfZValues = [firstZValue]
+
+        # Calculate distances using the GDA2020 ellipsoid 
+        # distanceAreaCalculator = QgsDistanceArea()
+        # distanceAreaCalculator.setEllipsoid('GDA202') # Note: example uses 'NAD83'
+
+        # Get the Z value for each point
+        # for f in features:
+        #     zValue = f.attributes()[-1]
+        #     self.listOfZValues.append(zValue)
+        #     toPoint = f.geometry().asPoint()
+        #     distance = distanceAreaCalculator.measureLine(fromPoint, toPoint)
+        #     accumulatedLengthAtLineSegment = distance + distancesList[-1]
+        #     distancesList.append(accumulatedLengthAtLineSegment)
+        #     fromPoint = toPoint
+
+        self.distancesList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        self.listOfZValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
