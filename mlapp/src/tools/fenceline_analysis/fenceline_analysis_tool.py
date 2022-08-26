@@ -20,7 +20,7 @@ class FencelineAnalysisTool(PaddockPowerMapTool):
 
     def __init__(self, milestone):
 
-        super(PaddockPowerMapTool, self).__init__()
+        super(FencelineAnalysisTool, self).__init__()
 
         if not isinstance(milestone, Milestone):
             raise PaddockPowerError(

@@ -15,7 +15,7 @@ from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 from .src.tools.fenceline_analysis.fenceline_analysis_tool import FencelineAnalysisTool
 from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
-from .src.utils import qgsDebug
+from .src.utils import guiError, qgsDebug
 
 
 class PaddockPower:
@@ -167,14 +167,18 @@ class PaddockPower:
         """Set FencelineAnalysisTool as a custom map tool."""
         milestone = getMilestone()
 
-        if milestone is not None:
+        if milestone is None:
+            guiError("Please set the current Milestone before using the Fenceline Analysis tool.")
+        else:
             milestone.setTool(FencelineAnalysisTool(milestone))
 
     def runSplitPaddock(self):
         """Set SplitPaddockTool as a custom map tool."""
         milestone = getMilestone()
 
-        if milestone is not None:
+        if milestone is None:
+            guiError("Please set the current Milestone before using the Split Paddock tool.")
+        else:
             milestone.setTool(SplitPaddockTool(milestone))
 
  
