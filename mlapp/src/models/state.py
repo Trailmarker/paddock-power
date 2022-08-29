@@ -17,6 +17,12 @@ class State(QObject):
 
         self.project = None
 
+    def clearProject(self):
+        """Clear the current Paddock Power Project."""
+        if self.project is not None:
+            self.project = None
+        self.projectChanged.emit()
+
     def detectProject(self):
         """Detect a Paddock Power project in the current QGIS project."""
         if self.project is None:
@@ -78,6 +84,11 @@ def getMilestone():
     project = getProject()
     if project is not None:
         return project.currentMilestone
+
+
+def clearProject():
+    """Clear the current project."""
+    __STATE__.clearProject()
 
 
 def detectProject():

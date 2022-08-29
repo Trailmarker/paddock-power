@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QAction
 from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
-from .src.models.state import detectProject, getMilestone
+from .src.models.state import clearProject, detectProject, getMilestone
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 from .src.tools.fenceline_analysis.fenceline_analysis_tool import FencelineAnalysisTool
@@ -46,6 +46,7 @@ class PaddockPower:
         self.toolbar.setObjectName(u'PaddockPower')
 
         detectProject()
+        QgsProject.instance().cleared.connect(clearProject)
         QgsProject.instance().readProject.connect(detectProject)
 
         # Check if plugin was started the first time in current QGIS session
@@ -168,7 +169,8 @@ class PaddockPower:
         milestone = getMilestone()
 
         if milestone is None:
-            guiError("Please set the current Milestone before using the Fenceline Analysis tool.")
+            guiError(
+                "Please set the current Milestone before using the Fenceline Analysis tool.")
         else:
             milestone.setTool(FencelineAnalysisTool(milestone))
 
@@ -177,8 +179,7 @@ class PaddockPower:
         milestone = getMilestone()
 
         if milestone is None:
-            guiError("Please set the current Milestone before using the Split Paddock tool.")
+            guiError(
+                "Please set the current Milestone before using the Split Paddock tool.")
         else:
             milestone.setTool(SplitPaddockTool(milestone))
-
- 

@@ -4,6 +4,7 @@ from os import path
 
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsMessageLog, QgsProject
+from qgis.PyQt.QtCore import pyqtSignal
 
 
 def guiInformation(message):
@@ -68,3 +69,15 @@ def resolveStylePath(styleName):
     """Resolve the path of a style file packaged with the plugin."""
     relative = f"styles\\{styleName}.qml"
     return resolvePluginPath(relative)
+
+
+# See https://stackoverflow.com/questions/28258875/how-to-obtain-the-set-of-all-signals-for-a-given-widget
+def getSignals(source):
+    """Get the signals of an object."""
+    cls = source if isinstance(source, type) else type(source)
+    signal = type(pyqtSignal())
+    for subcls in cls.mro():
+        clsname = f'{subcls.__module__}.{subcls.__name__}'
+        for key, value in sorted(vars(subcls).items()):
+            if isinstance(value, signal):
+                print(f'{key} [{clsname}]')
