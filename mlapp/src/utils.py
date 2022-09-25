@@ -61,8 +61,7 @@ def resolveGeoPackageFile(projectFilePath=None):
         projectFilePath = resolveProjectFile()
     if projectFilePath is None:
         return None
-    else:
-        return f"{path.splitext(projectFilePath)[0]}.gpkg"
+    return f"{path.splitext(projectFilePath)[0]}.gpkg"
 
 
 def resolveStylePath(styleName):

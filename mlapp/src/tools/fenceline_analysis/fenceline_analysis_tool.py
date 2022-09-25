@@ -9,7 +9,7 @@ from qgis.utils import iface
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QColor
 
-# from .fenceline_analysis_dialog import FencelineAnalysisDialog
+from .fenceline_analysis_dialog import FencelineAnalysisDialog
 from ...models.milestone import Milestone, PaddockPowerError
 from ..paddock_power_map_tool import PaddockPowerMapTool
 from ...utils import qgsDebug
@@ -49,8 +49,8 @@ class FencelineAnalysisTool(PaddockPowerMapTool):
 
     def showDialog(self):
         """Show the Fenceline Analysis dialog."""
-        # self.dialog = FencelineAnalysisDialog(self)
-        # self.dialog.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dialog = FencelineAnalysisDialog(self)
+        self.dialog.show()
 
         # Move to top left corner of map
         # See https://gis.stackexchange.com/questions/342728/getting-screen-coordinates-from-canvas-coordinate-using-pyqgis
@@ -60,26 +60,26 @@ class FencelineAnalysisTool(PaddockPowerMapTool):
         # self.dialog.show()
 
         # Plot some sample data
-        listOfZValues = self.listOfZValues
-        listOfDistances = self.distancesList
+        # listOfZValues = self.listOfZValues
+        # listOfDistances = self.distancesList
 
-        minimumZValue = round(min(listOfZValues), 3)
-        maximumZValue = round(max(listOfZValues), 3)
-        meanZValue = round(sum(listOfZValues) / len(listOfZValues), 3)
-        maximumDistance = listOfDistances[-1]
-        plot.figure(figsize = (10,4))
-        plot.plot(listOfDistances, listOfZValues)
-        plot.plot([0, maximumDistance], [minimumZValue, minimumZValue],
-                  'g--', label='Min. : '+str(minimumZValue))
-        plot.plot([0, maximumDistance], [maximumZValue, maximumZValue],
-                  'r--', label='Max. : '+str(maximumZValue))
-        plot.plot([0, maximumDistance], [meanZValue, meanZValue], 'y--', label='Mean : ' + str(meanZValue))
-        plot.grid()
-        plot.legend(loc = 1)
-        plot.xlabel("Distance (km)")
-        plot.ylabel("Elevation (m)")
-        plot.fill_between(listOfDistances, listOfZValues, minimumZValue, alpha=0.5)
-        plot.show()
+        # minimumZValue = round(min(listOfZValues), 3)
+        # maximumZValue = round(max(listOfZValues), 3)
+        # meanZValue = round(sum(listOfZValues) / len(listOfZValues), 3)
+        # maximumDistance = listOfDistances[-1]
+        # plot.figure(figsize = (10,4))
+        # plot.plot(listOfDistances, listOfZValues)
+        # plot.plot([0, maximumDistance], [minimumZValue, minimumZValue],
+        #           'g--', label='Min. : '+str(minimumZValue))
+        # plot.plot([0, maximumDistance], [maximumZValue, maximumZValue],
+        #           'r--', label='Max. : '+str(maximumZValue))
+        # plot.plot([0, maximumDistance], [meanZValue, meanZValue], 'y--', label='Mean : ' + str(meanZValue))
+        # plot.grid()
+        # plot.legend(loc = 1)
+        # plot.xlabel("Distance (km)")
+        # plot.ylabel("Elevation (m)")
+        # plot.fill_between(listOfDistances, listOfZValues, minimumZValue, alpha=0.5)
+        # plot.show()
 
     def clear(self):
         self.sketch.reset()

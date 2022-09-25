@@ -5,6 +5,7 @@ from qgis.core import QgsApplication, QgsProject
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.utils import iface
 
 # Initialize Qt resources from file resources.py
 from .resources_rc import *
@@ -15,6 +16,7 @@ from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 from .src.tools.fenceline_analysis.fenceline_analysis_tool import FencelineAnalysisTool
 from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
+from .src.tools.test_tool import TestTool
 from .src.utils import guiError, qgsDebug
 
 
@@ -114,6 +116,13 @@ class PaddockPower:
             callback=self.runSplitPaddock,
             parent=self.iface.mainWindow())
 
+        self.addAction(
+            QIcon(':/plugins/mlapp/images/split-paddock.png'),
+            text=self.tr(u'Test Custom Identify Tool'),
+            callback=self.runTestTool,
+            parent=self.iface.mainWindow())
+
+
         # Will be set False in run()
         self.firstStart = True
 
@@ -183,3 +192,14 @@ class PaddockPower:
                 "Please set the current Milestone before using the Split Paddock tool.")
         else:
             milestone.setTool(SplitPaddockTool(milestone))
+
+    def runTestTool(self):
+        """Set TestTool as a custom map tool."""
+        milestone = getMilestone()
+
+        if milestone is None:
+            guiError(
+                "Please set the current Milestone before using the Test Custom Identify tool.")
+        else:
+            iface.mapCanvas().setMapTool(TestTool(iface.mapCanvas(), milestone))
+            qgsDebug("Set current map tool to TestTool")

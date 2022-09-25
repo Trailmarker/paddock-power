@@ -34,10 +34,10 @@ class CreateProject(QgsProcessingAlgorithm):
             gpkgFile = resolveGeoPackageFile(projectFilePath)
 
             milestone = None
-            if gpkgFile is not None:
-                project = Project(gpkgFile)
-                project.load()
-                milestone = project.addMilestone(milestoneName)
+            
+            project = Project(gpkgFile)
+            project.load()
+            milestone = project.addMilestone(milestoneName)
 
             outputs[self.NEW_MILESTONE_OUTPUT] = milestone
             results[self.NEW_MILESTONE_OUTPUT] = milestone

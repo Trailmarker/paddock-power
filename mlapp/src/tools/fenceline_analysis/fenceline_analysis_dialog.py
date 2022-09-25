@@ -4,6 +4,8 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog
 
+from .fenceline_analysis_canvas import FencelineAnalysisCanvas
+
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fenceline_analysis_dialog_base.ui')))
 
@@ -15,21 +17,14 @@ class FencelineAnalysisDialog(QDialog, FORM_CLASS):
         super(QDialog, self).__init__(parent)
         self.setupUi(self)
 
-        self.splitPaddockTool = splitPaddockTool
+        figure = FencelineAnalysisCanvas(self, width=5, height=4, dpi=100)
+        figure.axes.plot([0,1,2,3,4], [10,1,20,3,40])
 
-        self.cancelSplitButton.clicked.connect(self.reject)
-        self.confirmSplitButton.clicked.connect(self.accept)
+        self.horizontalLayout.addWidget(figure)
 
-    # def setFenceLength(self, length):
-    #     """Set the fence length."""
-    #     self.fenceLengthText.setText(f"{length:,.0f}")
+        self.dismissButton.clicked.connect(self.reject)
 
     def reject(self):
         """Reject the dialog."""
-        self.splitPaddockTool.finishSplitPaddocks()
         super(FencelineAnalysisDialog, self).reject()
 
-    def accept(self):
-        """Accept the dialog."""
-        self.splitPaddockTool.splitPaddocks()
-        super(FencelineAnalysisDialog, self).accept()

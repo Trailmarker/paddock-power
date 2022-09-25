@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from os import path
+
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsVectorLayer
 
@@ -26,27 +28,25 @@ class Project(QObject):
 
         self.isLoaded = False
 
-    def getMilestone(self, milestoneName):
-        """Get a milestone by name."""
+    def validateMilestoneName(self, milestoneName):
+        """Validate a Milestone name."""
         if not milestoneName:
             raise PaddockPowerError(
-                "Project.getMilestone: milestone name is empty.")
+                "Project.getMilestone: Milestone name is empty.")
 
         if milestoneName not in self.milestones:
             raise PaddockPowerError(
-                f"Project.getMilestone: milestone '{milestoneName}' does not exist.")
+                f"Project.getMilestone: Milestone '{milestoneName}' does not exist.")
+
+    def getMilestone(self, milestoneName):
+        """Get a milestone by name."""
+        self.validateMilestoneName(milestoneName)
 
         return self.milestones[milestoneName]
 
     def setMilestone(self, milestoneName):
         """Set the current milestone."""
-        if not milestoneName:
-            raise PaddockPowerError(
-                "Project.setMilestone: milestone name is empty.")
-
-        if milestoneName not in self.milestones:
-            raise PaddockPowerError(
-                f"Project.setMilestone: milestone '{milestoneName}' does not exist.")
+        self.validateMilestoneName(milestoneName)
 
         self.currentMilestone = self.milestones[milestoneName]
 
@@ -59,16 +59,15 @@ class Project(QObject):
 
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
-        if not milestoneName:
-            raise PaddockPowerError(
-                "Project.addMilestone: milestone name is empty.")
+        self.validateMilestoneName(milestoneName)
 
-        if milestoneName in self.milestones:
+        if not self.isLoaded:
             raise PaddockPowerError(
-                f"Project.addMilestone: milestone '{milestoneName}' already exists.")
+                "Project.addMilestone: cannot add Milestone to a Project that is empty.")
 
         milestone = Milestone(milestoneName, self.gpkgFile)
         milestone.create()
+
         self.milestones[milestoneName] = milestone
         milestone.addToMap()
         self.milestonesUpdated.emit()
@@ -83,14 +82,12 @@ class Project(QObject):
 
     def deleteMilestone(self, milestoneName):
         """Delete a milestone from the project."""
-        if not milestoneName:
+        self.validateMilestoneName(milestoneName)
+        
+        if not self.gpkgFile:
             raise PaddockPowerError(
-                "Project.deleteMilestone: milestone name is empty.")
-
-        if milestoneName not in self.milestones:
-            raise PaddockPowerError(
-                f"Project.deleteMilestone: milestone '{milestoneName}' does not exist.")
-
+                "Project.deleteMilestone: Project has no GeoPackage file yet.")
+        
         milestone = self.milestones.pop(milestoneName, None)
         milestone.removeFromMap()
         milestone.deleteFromGeoPackage()
@@ -106,6 +103,11 @@ class Project(QObject):
         assert(self.gpkgFile is not None)
 
         if self.isLoaded and not forceLoad:
+            return
+
+        # We go to a loaded state if the GeoPackage file does not exist
+        if not path.exists(self.gpkgFile):
+            self.isLoaded = True
             return
 
         milestoneNames = Project.findMilestones(self.gpkgFile)
