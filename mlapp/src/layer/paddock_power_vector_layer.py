@@ -4,6 +4,7 @@ from enum import Enum
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
+from .paddock_power_layer_source_type import PaddockPowerLayerSourceType
 from ..models.paddock_power_error import PaddockPowerError
 from ..utils import resolveStylePath
 
@@ -16,14 +17,6 @@ QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
 
 # Paddock Power data is held in the GDA2020 coordinate system
 PADDOCK_POWER_EPSG = 7845
-
-
-class PaddockPowerVectorLayerSourceType(Enum):
-    """Disambiguate between sources for a Paddock Power vector layer."""
-    File = 1,
-    Memory = 2
-
-
 class PaddockPowerVectorLayerType(Enum):
     """Enumeration of the types of Paddock Power vector layers."""
     # Note the order of this enumeration can be used to sort map layers for display purposes
@@ -42,11 +35,11 @@ class PaddockPowerVectorLayerType(Enum):
 
 
 class PaddockPowerVectorLayer(QgsVectorLayer):
-    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None,
+    def __init__(self, sourceType=PaddockPowerLayerSourceType.Memory, layerName=None,
                  wkbType=None, schema=None, gpkgFile=None, styleName=None):
         """Create a new Paddock Power vector layer."""
 
-        if sourceType == PaddockPowerVectorLayerSourceType.Memory:
+        if sourceType == PaddockPowerLayerSourceType.Memory:
             assert(layerName is not None)
             assert(wkbType is not None)
             assert(schema is not None)
@@ -61,7 +54,7 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
             self.dataProvider().addAttributes(schema)
             self.commitChanges()
 
-        elif sourceType == PaddockPowerVectorLayerSourceType.File:
+        elif sourceType == PaddockPowerLayerSourceType.File:
             assert(layerName is not None)
             assert(gpkgFile is not None)
 
@@ -97,7 +90,7 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
         if group is None:
             raise PaddockPowerError(
-                "PaddockPowerVectorLayer.ensureInMap: the layer group is not present")
+                "PaddockPowerVectorLayer.addToMap: the layer group is not present")
 
         node = group.findLayer(self.id())
         if node is None:

@@ -2,7 +2,7 @@
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsField, QgsWkbTypes
 
-from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerVectorLayerSourceType, PaddockPowerVectorLayerType
+from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType, PaddockPowerVectorLayerType
 
 
 class BoundaryLayer(PaddockPowerVectorLayer):
@@ -16,7 +16,7 @@ class BoundaryLayer(PaddockPowerVectorLayer):
 
     STYLE = "boundary"
 
-    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
+    def __init__(self, sourceType=PaddockPowerLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Boundary layer."""
 
         super(BoundaryLayer, self).__init__(sourceType,

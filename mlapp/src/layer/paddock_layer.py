@@ -3,7 +3,7 @@ from qgis.core import QgsFeature, QgsField, QgsFields, QgsGeometry, QgsLineStrin
 from qgis.PyQt.QtCore import QVariant
 
 from .paddock_power_vector_layer import (PaddockPowerVectorLayer,
-                                         PaddockPowerVectorLayerSourceType,
+                                         PaddockPowerLayerSourceType,
                                          PaddockPowerVectorLayerType)
 
 
@@ -20,7 +20,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
     STYLE = "paddock"
 
-    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
+    def __init__(self, sourceType=PaddockPowerLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Paddock layer."""
 
         super(PaddockLayer, self).__init__(sourceType,

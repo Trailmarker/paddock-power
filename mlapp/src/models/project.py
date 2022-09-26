@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from os import path
+import sqlite3
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsVectorLayer
 
+from ..layer.elevation_layer import ElevationLayer
+from ..layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
 from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerType
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
@@ -19,6 +22,8 @@ class Project(QObject):
         super(Project, self).__init__()
         self.milestones = {}
         self.currentMilestone = None
+
+        self.elevationLayer = None
 
         if gpkgFile is None:
             self.gpkgFile = resolveGeoPackageFile()
@@ -120,6 +125,10 @@ class Project(QObject):
             self.milestones[milestoneName] = milestone
             milestone.load()
 
+        elevationLayerName = Project.findElevationLayer(self.gpkgFile)
+        if elevationLayerName is not None:
+            self.elevationLayer = ElevationLayer(PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
+
         self.isLoaded = True
         self.milestonesUpdated.emit()
 
@@ -169,3 +178,20 @@ class Project(QObject):
                 milestones.add(rchop(layerName, match).strip())
 
         return list(milestones)
+
+    @classmethod
+    def findElevationLayer(cls, gpkgFile):
+        """Find the elevation layer in a project GeoPackage."""
+        db = sqlite3.connect(gpkgFile)
+        cursor = db.cursor()
+        cursor.execute("SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
+        grids = cursor.fetchall()
+
+        if len(grids) == 0:
+            return None
+        elif len(grids) == 1:
+            return grids[0][0]
+        else:
+            raise PaddockPowerError(
+                f"Project.findElevationLayer: multiple elevation layers found in {gpkgFile}")
+

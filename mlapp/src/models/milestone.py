@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsProject
 from qgis.utils import iface
 
-from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerSourceType, PaddockPowerVectorLayerType
+from ..layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
 from ..layer.boundary_layer import BoundaryLayer
 from ..layer.waterpoint_layer import WaterpointLayer
 from ..layer.pipeline_layer import PipelineLayer
@@ -63,19 +63,19 @@ class Milestone(QObject):
     def load(self):
         """Load this milestone its GeoPackage."""
         boundaryLayerName = f"{self.milestoneName} Boundary"
-        self.boundaryLayer = BoundaryLayer(sourceType=PaddockPowerVectorLayerSourceType.File,
+        self.boundaryLayer = BoundaryLayer(sourceType=PaddockPowerLayerSourceType.File,
                                            layerName=boundaryLayerName, gpkgFile=self.gpkgFile)
         waterpointLayerName = f"{self.milestoneName} Waterpoints"
-        self.waterpointLayer = WaterpointLayer(sourceType=PaddockPowerVectorLayerSourceType.File,
+        self.waterpointLayer = WaterpointLayer(sourceType=PaddockPowerLayerSourceType.File,
                                                layerName=waterpointLayerName, gpkgFile=self.gpkgFile)
         pipelineLayerName = f"{self.milestoneName} Pipeline"
-        self.pipelineLayer = PipelineLayer(sourceType=PaddockPowerVectorLayerSourceType.File,
+        self.pipelineLayer = PipelineLayer(sourceType=PaddockPowerLayerSourceType.File,
                                            layerName=pipelineLayerName, gpkgFile=self.gpkgFile)
         fenceLayerName = f"{self.milestoneName} Fence"
-        self.fenceLayer = FenceLayer(sourceType=PaddockPowerVectorLayerSourceType.File,
+        self.fenceLayer = FenceLayer(sourceType=PaddockPowerLayerSourceType.File,
                                      layerName=fenceLayerName, gpkgFile=self.gpkgFile)
         paddockLayerName = f"{self.milestoneName} Paddocks"
-        self.paddockLayer = PaddockLayer(sourceType=PaddockPowerVectorLayerSourceType.File,
+        self.paddockLayer = PaddockLayer(sourceType=PaddockPowerLayerSourceType.File,
                                          layerName=paddockLayerName, gpkgFile=self.gpkgFile)
 
         self.isLoaded = True

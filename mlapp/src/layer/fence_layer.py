@@ -2,7 +2,7 @@
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsField, QgsWkbTypes
 
-from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerVectorLayerSourceType, PaddockPowerVectorLayerType
+from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType, PaddockPowerVectorLayerType
 
 
 class FenceLayer(PaddockPowerVectorLayer):
@@ -14,7 +14,7 @@ class FenceLayer(PaddockPowerVectorLayer):
 
     STYLE = "fence"
 
-    def __init__(self, sourceType=PaddockPowerVectorLayerSourceType.Memory, layerName=None, gpkgFile=None):
+    def __init__(self, sourceType=PaddockPowerLayerSourceType.Memory, layerName=None, gpkgFile=None):
         """Create or open a Fence layer."""
 
         super(FenceLayer, self).__init__(sourceType,
