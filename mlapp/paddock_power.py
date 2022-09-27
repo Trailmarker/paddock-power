@@ -11,7 +11,7 @@ from qgis.utils import iface
 from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
-from .src.models.state import clearProject, detectProject, getMilestone
+from .src.models.state import clearProject, detectProject, getMilestone, getProject
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 from .src.tools.fenceline_analysis.fenceline_analysis_tool import FencelineAnalysisTool
@@ -181,7 +181,8 @@ class PaddockPower:
             guiError(
                 "Please set the current Milestone before using the Fenceline Analysis tool.")
         else:
-            milestone.setTool(FencelineAnalysisTool(milestone))
+            project = getProject()
+            milestone.setTool(FencelineAnalysisTool(milestone, project))
 
     def runSplitPaddock(self):
         """Set SplitPaddockTool as a custom map tool."""
