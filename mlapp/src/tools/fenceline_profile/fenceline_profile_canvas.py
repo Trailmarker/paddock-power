@@ -17,9 +17,8 @@ class FencelineProfileCanvas(FigureCanvasQTAgg):
                 "FencelineProfileCanvas.__init__: fencelineProfile is not a FencelineProfile.")
 
         # Extract fenceline profile axes
-        distances = [distance for (distance, _) in self.fenceLineProfile.profileData]
-        elevations = [elevation for (_, elevation)
-              in self.fenceLineProfile.profileData]
+        distances = [distance for (distance, _) in fencelineProfile.profileData]
+        elevations = [elevation for (_, elevation) in fencelineProfile.profileData]
 
         minimumZ = round(min(elevations), 1)
         maximumZ = round(max(elevations), 1)

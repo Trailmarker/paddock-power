@@ -14,7 +14,7 @@ from .resources_rc import *
 from .src.models.state import clearProject, detectProject, getMilestone, getProject
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
-from .src.tools.fenceline_analysis.fenceline_analysis_tool import FencelineAnalysisTool
+from .src.tools.fenceline_profile.fenceline_profile_tool import FencelineProfileTool
 from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
 from .src.tools.test_tool import TestTool
 from .src.utils import guiError, qgsDebug
@@ -107,7 +107,7 @@ class PaddockPower:
         self.addAction(
             QIcon(':/plugins/mlapp/images/split-paddock.png'),
             text=self.tr(u'Fenceline Analysis Tool'),
-            callback=self.runFencelineAnalysis,
+            callback=self.runFencelineProfile,
             parent=self.iface.mainWindow())
 
         self.addAction(
@@ -173,8 +173,8 @@ class PaddockPower:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
             self.paddockView.show()
 
-    def runFencelineAnalysis(self):
-        """Set FencelineAnalysisTool as a custom map tool."""
+    def runFencelineProfile(self):
+        """Set FencelineProfileTool as a custom map tool."""
         milestone = getMilestone()
 
         if milestone is None:
@@ -182,7 +182,7 @@ class PaddockPower:
                 "Please set the current Milestone before using the Fenceline Analysis tool.")
         else:
             project = getProject()
-            milestone.setTool(FencelineAnalysisTool(milestone, project))
+            milestone.setTool(FencelineProfileTool(milestone, project))
 
     def runSplitPaddock(self):
         """Set SplitPaddockTool as a custom map tool."""

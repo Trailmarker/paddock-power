@@ -8,6 +8,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 
 from ...models.milestone import Milestone
+from ...models.project import Project
 from ...models.paddock_power_error import PaddockPowerError
 from ..paddock_power_map_tool import PaddockPowerMapTool
 from .fenceline_profile import FencelineProfile
@@ -23,7 +24,11 @@ class FencelineProfileTool(PaddockPowerMapTool):
 
         if not isinstance(milestone, Milestone):
             raise PaddockPowerError(
-                "FencelineAnalysisTool.__init__: milestone is not a Milestone.")
+                "FencelineProfileTool.__init__: milestone is not a Milestone.")
+
+        if not isinstance(project, Project):
+            raise PaddockPowerError(
+                "FencelineProfileTool.__init__: project is not a Project.")
 
         self.milestone = milestone
         self.project = project
@@ -121,10 +126,10 @@ class FencelineProfileTool(PaddockPowerMapTool):
         if e.button() == Qt.RightButton:
             self.capturing = False
             self.milestone.unsetTool()
-            self.updateFencelineAnalysis()
+            self.updateFencelineProfile()
             self.showDialog()
 
-    def updateFencelineAnalysis(self):
+    def updateFencelineProfile(self):
         """Update the currently crossed paddock features."""
 
         fenceline = QgsGeometry.fromPolyline(self.points)

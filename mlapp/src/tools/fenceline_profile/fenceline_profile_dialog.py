@@ -15,13 +15,12 @@ class FencelineProfileDialog(QDialog, FORM_CLASS):
         """Constructor."""
 
         super(QDialog, self).__init__(parent)
+        self.setupUi(self)
 
         self.fencelineProfile = fencelineProfile
 
         fencelineProfileCanvas = FencelineProfileCanvas(self.fencelineProfile)
         self.horizontalLayout.addWidget(fencelineProfileCanvas)
-
-        self.setupUi(self)
 
         self.dismissButton.clicked.connect(self.reject)
 
