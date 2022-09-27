@@ -18,15 +18,13 @@ class FencelineProfileDialog(QDialog, FORM_CLASS):
 
         self.fencelineProfile = fencelineProfile
 
-        figure = FencelineProfileCanvas(fencelineProfile, width=5, height=4, dpi=100)
-        self.horizontalLayout.addWidget(figure)
+        fencelineProfileCanvas = FencelineProfileCanvas(self.fencelineProfile)
+        self.horizontalLayout.addWidget(fencelineProfileCanvas)
 
         self.setupUi(self)
-        
 
         self.dismissButton.clicked.connect(self.reject)
 
     def reject(self):
         """Reject the dialog."""
         super(FencelineProfileDialog, self).reject()
-

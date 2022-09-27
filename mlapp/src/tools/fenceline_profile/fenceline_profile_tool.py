@@ -48,7 +48,7 @@ class FencelineProfileTool(PaddockPowerMapTool):
 
     def showDialog(self):
         """Show the Fenceline Analysis dialog."""
-        self.dialog = FencelineProfileDialog(self)
+        self.dialog = FencelineProfileDialog(self.fencelineProfile)
         self.dialog.show()
 
         # Move to top left corner of map
