@@ -1,12 +1,12 @@
 [general]
 name=MLA Paddock Power
-qgisMinimumVersion=3.18
+qgisMinimumVersion=3.26
 description=Meat & Livestock Australia tool for cattle farm planning and financial modelling.
-version=0.6
+version=0.7
 author=Trailmarker
 email=tom@trailmarker.io
 
-about=Paddock Power is a farm planning tool developed by Trailmarker and RangeIQ with funding from Meat & Livestock Australia, features include farm mapping, carrying capacity modelling, etc.
+about=MLA Paddock Power is a farm planning tool developed by Trailmarker and RangeIQ with funding from Meat & Livestock Australia, features include farm mapping, carrying capacity modelling, etc.
 
 tracker=https://github.com/Trailmarker
 repository=https://github.com/Trailmarker
