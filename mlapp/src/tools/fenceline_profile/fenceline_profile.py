@@ -57,14 +57,12 @@ class FencelineProfile(QObject):
             point, QgsRaster.IdentifyFormatValue).results()[1]) for point in pointsAlongFenceline]
 
         # Calculate distances along line using the GDA2020 ellipsoid
-
         pointPairs = zip(pointsWithZ, pointsWithZ[1:])
         calculator = QgsDistanceArea()
 
-        # See QgsCoordinateReferenceSystem('EPSG:7844').ellipsoidAcronym()
         calculator.setSourceCrs(QgsCoordinateReferenceSystem(
             'EPSG:7845'), QgsProject.instance().transformContext())
-        # Note: previous example uses 'NAD83'
+        # See QgsCoordinateReferenceSystem('EPSG:7844').ellipsoidAcronym()
         calculator.setEllipsoid('EPSG:7019')
 
         cumulativeDistances = [0.0]
@@ -84,7 +82,16 @@ class FencelineProfile(QObject):
             cumulativeDistances.append(
                 cumulativeDistances[-1] + hypot(groundDistance, elevationVariation))
 
-        self.profileData = [(distance, point.z()) for distance, point in zip(
-            cumulativeDistances, pointsWithZ)]
+        # Store the profile data
+        self.distances = cumulativeDistances
+        self.elevations = [point.z() for point in pointsWithZ]
 
-        qgsDebug(str(self.profileData))
+        qgsDebug(str(self.distances))
+        qgsDebug(str(self.elevations))
+
+        self.minimumElevation = round(min(self.elevations), 1)
+        self.maximumElevation = round(max(self.elevations), 1)
+        self.meanElevation = round(
+            sum(self.elevations) / len(self.elevations), 1)
+
+        self.maximumDistance = self.distances[-1]

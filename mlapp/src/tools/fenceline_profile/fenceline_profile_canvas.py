@@ -16,27 +16,32 @@ class FencelineProfileCanvas(FigureCanvasQTAgg):
             raise PaddockPowerError(
                 "FencelineProfileCanvas.__init__: fencelineProfile is not a FencelineProfile.")
 
-        # Extract fenceline profile axes
-        distances = [distance for (distance, _) in fencelineProfile.profileData]
-        elevations = [elevation for (_, elevation) in fencelineProfile.profileData]
+        useMetres = (fencelineProfile.maximumDistance < 1000)
 
-        minimumZ = round(min(elevations), 1)
-        maximumZ = round(max(elevations), 1)
-        meanZ = round(sum(elevations) / len(elevations), 1)
+        distances = fencelineProfile.distances if useMetres else [
+            d / 1000 for d in fencelineProfile.distances]
+        maximumDistance = fencelineProfile.maximumDistance if useMetres else fencelineProfile.maximumDistance / 1000
 
-        maximumDistance = distances[-1]
+        yMinimum = 0.0
+
+        msShellDlg = {'fontname': 'MS Shell Dlg 2'}
 
         # Create a figure
-        figure = Figure(figsize = (10, 4))
+        figure = Figure(figsize=(10, 4))
         self.axes = figure.add_subplot(111)
-        self.axes.plot(distances, elevations)
-        self.axes.plot([0, maximumDistance], [minimumZ, minimumZ], 'g--', label=f"Min. : {minimumZ}")
-        self.axes.plot([0, maximumDistance], [maximumZ, maximumZ], 'r--', label=f"Max. : {maximumZ}")
-        self.axes.plot([0, maximumDistance], [meanZ, meanZ], 'y--', label=f"Mean : {meanZ}")
-        self.axes.grid()
-        self.axes.legend(loc = 1)
-        self.axes.set_xlabel("Distance (m)")
-        self.axes.set_ylabel("Elevation (m)")
-        self.axes.fill_between(distances, elevations, minimumZ, alpha=0.5)
+        self.axes.plot(distances, fencelineProfile.elevations)
+        self.axes.set_ylim(0.0, fencelineProfile.maximumElevation * 1.5)
+        # self.axes.plot([0, maximumDistance], [fencelineProfile.minimumElevation, fencelineProfile.minimumElevation], 'g--', label=f"Min. : {fencelineProfile.minimumElevation}")
+        # self.axes.plot([0, maximumDistance], [fencelineProfile.maximumElevation, fencelineProfile.maximumElevation], 'r--', label=f"Max. : {fencelineProfile.maximumElevation}")
+        # self.axes.plot([0, maximumDistance], [fencelineProfile.meanElevation, fencelineProfile.meanElevation], 'y--', label=f"Mean : {fencelineProfile.meanElevation}")
+        # self.axes.grid()
+        # self.axes.legend(loc = 1)
+        self.axes.set_xlabel(
+            f"Distance ({'m' if useMetres else 'km'})", **msShellDlg)
+        self.axes.set_ylabel("Elevation (m)", **msShellDlg)
+        self.axes.fill_between(fencelineProfile.distances,
+                               fencelineProfile.elevations, yMinimum, alpha=0.5)
+
+        figure.tight_layout()
 
         super(FencelineProfileCanvas, self).__init__(figure)

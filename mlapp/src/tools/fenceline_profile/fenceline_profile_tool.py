@@ -54,36 +54,9 @@ class FencelineProfileTool(PaddockPowerMapTool):
     def showDialog(self):
         """Show the Fenceline Analysis dialog."""
         self.dialog = FencelineProfileDialog(self.fencelineProfile)
-        self.dialog.show()
-
-        # Move to top left corner of map
-        # See https://gis.stackexchange.com/questions/342728/getting-screen-coordinates-from-canvas-coordinate-using-pyqgis
-        # point = self.canvas.mapToGlobal(QPoint(0, 0))
-        # self.dialog.move(point.x() + 10, point.y() + 10)
-
+        self.dialog.exec_()
+        
         # self.dialog.show()
-
-        # Plot some sample data
-        # listOfZValues = self.listOfZValues
-        # listOfDistances = self.distancesList
-
-        # minimumZValue = round(min(listOfZValues), 3)
-        # maximumZValue = round(max(listOfZValues), 3)
-        # meanZValue = round(sum(listOfZValues) / len(listOfZValues), 3)
-        # maximumDistance = listOfDistances[-1]
-        # plot.figure(figsize = (10,4))
-        # plot.plot(listOfDistances, listOfZValues)
-        # plot.plot([0, maximumDistance], [minimumZValue, minimumZValue],
-        #           'g--', label='Min. : '+str(minimumZValue))
-        # plot.plot([0, maximumDistance], [maximumZValue, maximumZValue],
-        #           'r--', label='Max. : '+str(maximumZValue))
-        # plot.plot([0, maximumDistance], [meanZValue, meanZValue], 'y--', label='Mean : ' + str(meanZValue))
-        # plot.grid()
-        # plot.legend(loc = 1)
-        # plot.xlabel("Distance (km)")
-        # plot.ylabel("Elevation (m)")
-        # plot.fill_between(listOfDistances, listOfZValues, minimumZValue, alpha=0.5)
-        # plot.show()
 
     def clear(self):
         self.sketch.reset()

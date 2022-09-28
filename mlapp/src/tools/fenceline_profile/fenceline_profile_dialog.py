@@ -2,7 +2,7 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtWidgets import QDialog, QSizePolicy
 
 from .fenceline_profile_canvas import FencelineProfileCanvas
 
@@ -18,11 +18,26 @@ class FencelineProfileDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.fencelineProfile = fencelineProfile
+        useMetres = (fencelineProfile.maximumDistance < 1000)
+
+        maximumDistance = fencelineProfile.maximumDistance if useMetres else fencelineProfile.maximumDistance / 1000
+        self.elevationStats.setText(
+            f"{fencelineProfile.minimumElevation:,.0f} – {fencelineProfile.maximumElevation:,.0f}m (mean {fencelineProfile.meanElevation})")
+
+        if useMetres:
+            self.fencelineLength.setText(f"{maximumDistance:,.0f}m")
+        else:
+            self.fencelineLength.setText(f"{maximumDistance:,.2f}km")
 
         fencelineProfileCanvas = FencelineProfileCanvas(self.fencelineProfile)
-        self.horizontalLayout.addWidget(fencelineProfileCanvas)
+        fencelineProfileCanvas.setSizePolicy(QSizePolicy(
+            QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding))
 
-        self.dismissButton.clicked.connect(self.reject)
+        self.gridLayout.addWidget(fencelineProfileCanvas, 2, 0, 1, 2)
+
+        # self.horizontalLayout.addWidget(fencelineProfileCanvas)
+
+        # self.dismissButton.clicked.connect(self.reject)
 
     def reject(self):
         """Reject the dialog."""
