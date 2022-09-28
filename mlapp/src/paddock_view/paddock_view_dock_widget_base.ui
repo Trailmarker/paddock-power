@@ -1,94 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>PaddockViewDockWidgetBase</class>
-  <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
-    <property name="geometry">
-      <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>436</width>
-        <height>588</height>
-      </rect>
+ <class>PaddockViewDockWidgetBase</class>
+ <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>436</width>
+    <height>588</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MLA Paddock Power | Paddock View</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QGridLayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetMaximumSize</enum>
     </property>
-    <property name="windowTitle">
-      <string>Paddock View</string>
-    </property>
-    <widget class="QWidget" name="dockWidgetContents">
-      <layout class="QGridLayout">
-        <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout">
-            <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
-            </property>
-            <item>
-              <widget class="QComboBox" name="milestoneComboBox">
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="font">
-                  <font>
-                    <pointsize>8</pointsize>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                  </font>
-                </property>
-                <property name="editable">
-                  <bool>false</bool>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <widget class="QPushButton" name="addMilestoneButton">
-                <property name="toolTip">
-                  <string>Add a new Milestone …</string>
-                </property>
-                <property name="text">
-                  <string/>
-                </property>
-                <property name="icon">
-                  <iconset>
-                    <normaloff>../../images/new-milestone.png</normaloff>../../images/new-milestone.png</iconset>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <widget class="QPushButton" name="deleteMilestoneButton">
-                <property name="toolTip">
-                  <string>Delete the current Milestone …</string>
-                </property>
-                <property name="text">
-                  <string/>
-                </property>
-                <property name="icon">
-                  <iconset>
-                    <normaloff>../../images/delete-milestone.png</normaloff>../../images/delete-milestone.png</iconset>
-                </property>
-              </widget>
-            </item>
-          </layout>
-        </item>
-        <item row="9" column="0">
-          <widget class="QTableView" name="tableView">
-            <property name="maximumSize">
-              <size>
-                <width>16777215</width>
-                <height>16777215</height>
-              </size>
-            </property>
-            <property name="font">
-              <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>8</pointsize>
-              </font>
-            </property>
-          </widget>
-        </item>
-      </layout>
-    </widget>
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <item>
+       <widget class="QComboBox" name="milestoneComboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="editable">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addMilestoneButton">
+        <property name="toolTip">
+         <string>Add a new Milestone …</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../images/new-milestone.png</normaloff>../../images/new-milestone.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deleteMilestoneButton">
+        <property name="toolTip">
+         <string>Delete the current Milestone …</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../images/delete-milestone.png</normaloff>../../images/delete-milestone.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="9" column="0">
+     <widget class="QTableView" name="tableView">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>MS Shell Dlg 2</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <resources/>
-  <connections/>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

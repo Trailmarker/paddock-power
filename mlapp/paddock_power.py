@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os.path
-
 from qgis.core import QgsApplication, QgsProject
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
@@ -12,6 +11,7 @@ from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.models.state import clearProject, detectProject, getMilestone, getProject
+from .src.tools.fenceline_profile.fenceline_profile_dock_widget import FencelineProfileDockWidget
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
 from .src.tools.fenceline_profile.fenceline_profile_tool import FencelineProfileTool
@@ -55,7 +55,10 @@ class PaddockPower:
         # Must be set in initGui() to survive plugin reloads
         self.firstStart = None
 
-        self.pluginIsActive = False
+        self.fencelineProfileIsActive = False
+        self.fencelineProfile = None
+
+        self.paddockViewIsActive = False
         self.paddockView = None
 
     def tr(self, message):
@@ -106,8 +109,8 @@ class PaddockPower:
 
         self.addAction(
             QIcon(':/plugins/mlapp/images/split-paddock.png'),
-            text=self.tr(u'Fenceline Analysis Tool'),
-            callback=self.runFencelineProfile,
+            text=self.tr(u'Fenceline Profile'),
+            callback=self.openFencelineProfile,
             parent=self.iface.mainWindow())
 
         self.addAction(
@@ -116,11 +119,11 @@ class PaddockPower:
             callback=self.runSplitPaddock,
             parent=self.iface.mainWindow())
 
-        self.addAction(
-            QIcon(':/plugins/mlapp/images/split-paddock.png'),
-            text=self.tr(u'Test Custom Identify Tool'),
-            callback=self.runTestTool,
-            parent=self.iface.mainWindow())
+        # self.addAction(
+        #     QIcon(':/plugins/mlapp/images/split-paddock.png'),
+        #     text=self.tr(u'Test Custom Identify Tool'),
+        #     callback=self.runTestTool,
+        #     parent=self.iface.mainWindow())
 
 
         # Will be set False in run()
@@ -137,11 +140,15 @@ class PaddockPower:
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
         # Disconnects
-        self.paddockView.closingPlugin.disconnect(self.onClosePlugin)
+        if self.fencelineProfile is not None:
+            self.fencelineProfile.closingPlugin.disconnect(self.onClosePlugin)
+        if self.paddockView is not None:
+            self.paddockView.closingPlugin.disconnect(self.onClosePlugin)
 
         # Remove this statement if dockwidget is to remain
         # for reuse if plugin is reopened
-        self.pluginIsActive = False
+        self.fencelineProfileIsActive = False
+        self.paddockViewIsActive = False
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
@@ -157,21 +164,38 @@ class PaddockPower:
         QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def openPaddockView(self):
-        """Run method that loads and starts the plugin"""
+        """Run method that loads and opens Paddock View."""
 
-        if not self.pluginIsActive:
-            self.pluginIsActive = True
+        if not self.paddockViewIsActive:
+            self.paddockViewIsActive = True
 
             # self.paddockView may not exist if:
             #    first run of plugin
             #    removed on close (see self.onClosePlugin method)
-            if self.paddockView == None:
+            if self.paddockView is None:
                 self.paddockView = PaddockViewDockWidget()
 
             # Connect to provide cleanup on closing of self.paddockView
             self.paddockView.closingPlugin.connect(self.onClosePlugin)
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
             self.paddockView.show()
+
+    def openFencelineProfile(self):
+        """Run method that loads and opens Fenceline Profile."""
+
+        if not self.fencelineProfileIsActive:
+            self.fencelineProfileIsActive = True
+
+            # self.paddockView may not exist if:
+            #    first run of plugin
+            #    removed on close (see self.onClosePlugin method)
+            if self.fencelineProfile is None:
+                self.fencelineProfile = FencelineProfileDockWidget()
+
+            # Connect to provide cleanup on closing of self.fencelineProfile
+            self.fencelineProfile.closingPlugin.connect(self.onClosePlugin)
+            self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.fencelineProfile)
+            self.fencelineProfile.show()
 
     def runFencelineProfile(self):
         """Set FencelineProfileTool as a custom map tool."""

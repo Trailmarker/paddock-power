@@ -4,12 +4,13 @@ import matplotlib.pyplot as plot
 from qgis.core import QgsGeometry, QgsPoint, QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 
 from ...models.milestone import Milestone
 from ...models.project import Project
 from ...models.paddock_power_error import PaddockPowerError
+from ...utils import qgsDebug
 from ..paddock_power_map_tool import PaddockPowerMapTool
 from .fenceline_profile import FencelineProfile
 from .fenceline_profile_dialog import FencelineProfileDialog
@@ -17,6 +18,8 @@ from .fenceline_profile_dialog import FencelineProfileDialog
 
 class FencelineProfileTool(PaddockPowerMapTool):
     points = []
+
+    fencelineProfileUpdated = pyqtSignal(FencelineProfile)
 
     def __init__(self, milestone, project):
 
@@ -53,8 +56,8 @@ class FencelineProfileTool(PaddockPowerMapTool):
 
     def showDialog(self):
         """Show the Fenceline Analysis dialog."""
-        self.dialog = FencelineProfileDialog(self.fencelineProfile)
-        self.dialog.exec_()
+        # self.dialog = FencelineProfileDialog(self.fencelineProfile)
+        # self.dialog.exec_()
         
         # self.dialog.show()
 
@@ -100,11 +103,12 @@ class FencelineProfileTool(PaddockPowerMapTool):
             self.capturing = False
             self.milestone.unsetTool()
             self.updateFencelineProfile()
-            self.showDialog()
+            # self.showDialog()
 
     def updateFencelineProfile(self):
-        """Update the currently crossed paddock features."""
-
+        """Update the current fenceline profile based on the sketch."""
+        qgsDebug("Updating fenceline profile …")
         fenceline = QgsGeometry.fromPolyline(self.points)
-        self.fencelineProfile = FencelineProfile(
-            fenceline, self.project.elevationLayer)
+        fencelineProfile = FencelineProfile(fenceline, self.project.elevationLayer)
+        self.fencelineProfileUpdated.emit(fencelineProfile)
+

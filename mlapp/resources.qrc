@@ -1,18 +1,18 @@
 <RCC>
     <qresource prefix="/plugins/mlapp" >
         <file>images/buffer.png</file>
+        <file>images/delete-milestone.png</file>
         <file>images/fenceline.png</file>
         <file>images/icon.png</file>
         <file>images/logo.png</file>
         <file>images/milestone.png</file>
         <file>images/new-milestone.png</file>
-        <file>images/delete-milestone.png</file>
-        <file>images/logo.png</file>
-        <file>images/ntg-primary-cmyk.png</file>
         <file>images/new-paddock.png</file>
-        <file>images/split-paddock.png</file>
+        <file>images/new-split-paddock.png</file>
+        <file>images/ntg-primary-cmyk.png</file>
         <file>images/paddock.png</file>
         <file>images/pipeline.png</file>
         <file>images/split.png</file>
+        <file>images/split-paddock.png</file>
     </qresource>
 </RCC>
