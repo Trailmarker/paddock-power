@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FencelineProfileDialogBase</class>
- <widget class="QDialog" name="FencelineProfileDialogBase">
+ <class>InfrastructureProfileDialogBase</class>
+ <widget class="QDialog" name="InfrastructureProfileDialogBase">
   <property name="geometry">
    <rect>
     <x>0</x>

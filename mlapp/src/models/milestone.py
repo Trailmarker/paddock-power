@@ -152,3 +152,8 @@ class Milestone(QObject):
             self.currentTool.dispose()
             iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
+
+    def planFence(self):
+        """Plan a fence for this milestone."""
+        self.fenceLayer.startEditing()
+        

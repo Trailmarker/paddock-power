@@ -11,10 +11,10 @@ from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.models.state import clearProject, detectProject, getMilestone, getProject
-from .src.tools.fenceline_profile.fenceline_profile_dock_widget import FencelineProfileDockWidget
+from .src.tools.infrastructure_profile.infrastructure_profile_dock_widget import InfrastructureProfileDockWidget
 from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
-from .src.tools.fenceline_profile.fenceline_profile_tool import FencelineProfileTool
+from .src.tools.infrastructure_profile.infrastructure_profile_tool import InfrastructureProfileTool
 from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
 from .src.tools.test_tool import TestTool
 from .src.utils import guiError, qgsDebug
@@ -110,7 +110,7 @@ class PaddockPower:
         self.addAction(
             QIcon(':/plugins/mlapp/images/split-paddock.png'),
             text=self.tr(u'Fenceline Profile'),
-            callback=self.openFencelineProfile,
+            callback=self.openInfrastructureProfile,
             parent=self.iface.mainWindow())
 
         self.addAction(
@@ -180,7 +180,7 @@ class PaddockPower:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
             self.paddockView.show()
 
-    def openFencelineProfile(self):
+    def openInfrastructureProfile(self):
         """Run method that loads and opens Fenceline Profile."""
 
         if not self.fencelineProfileIsActive:
@@ -190,15 +190,15 @@ class PaddockPower:
             #    first run of plugin
             #    removed on close (see self.onClosePlugin method)
             if self.fencelineProfile is None:
-                self.fencelineProfile = FencelineProfileDockWidget()
+                self.fencelineProfile = InfrastructureProfileDockWidget()
 
             # Connect to provide cleanup on closing of self.fencelineProfile
             self.fencelineProfile.closingPlugin.connect(self.onClosePlugin)
             self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.fencelineProfile)
             self.fencelineProfile.show()
 
-    def runFencelineProfile(self):
-        """Set FencelineProfileTool as a custom map tool."""
+    def runInfrastructureProfile(self):
+        """Set InfrastructureProfileTool as a custom map tool."""
         milestone = getMilestone()
 
         if milestone is None:
@@ -206,7 +206,7 @@ class PaddockPower:
                 "Please set the current Milestone before using the Fenceline Analysis tool.")
         else:
             project = getProject()
-            milestone.setTool(FencelineProfileTool(milestone, project))
+            milestone.setTool(InfrastructureProfileTool(milestone, project))
 
     def runSplitPaddock(self):
         """Set SplitPaddockTool as a custom map tool."""

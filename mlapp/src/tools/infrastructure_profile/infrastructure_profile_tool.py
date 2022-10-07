@@ -12,26 +12,26 @@ from ...models.project import Project
 from ...models.paddock_power_error import PaddockPowerError
 from ...utils import qgsDebug
 from ..paddock_power_map_tool import PaddockPowerMapTool
-from .fenceline_profile import FencelineProfile
-from .fenceline_profile_dialog import FencelineProfileDialog
+from .infrastructure_profile import InfrastructureProfile
+from .infrastructure_profile_dialog import InfrastructureProfileDialog
 
 
-class FencelineProfileTool(PaddockPowerMapTool):
+class InfrastructureProfileTool(PaddockPowerMapTool):
     points = []
 
-    fencelineProfileUpdated = pyqtSignal(FencelineProfile)
+    fencelineProfileUpdated = pyqtSignal(InfrastructureProfile)
 
     def __init__(self, milestone, project):
 
-        super(FencelineProfileTool, self).__init__()
+        super(InfrastructureProfileTool, self).__init__()
 
         if not isinstance(milestone, Milestone):
             raise PaddockPowerError(
-                "FencelineProfileTool.__init__: milestone is not a Milestone.")
+                "InfrastructureProfileTool.__init__: milestone is not a Milestone.")
 
         if not isinstance(project, Project):
             raise PaddockPowerError(
-                "FencelineProfileTool.__init__: project is not a Project.")
+                "InfrastructureProfileTool.__init__: project is not a Project.")
 
         self.milestone = milestone
         self.project = project
@@ -56,7 +56,7 @@ class FencelineProfileTool(PaddockPowerMapTool):
 
     def showDialog(self):
         """Show the Fenceline Analysis dialog."""
-        # self.dialog = FencelineProfileDialog(self.fencelineProfile)
+        # self.dialog = InfrastructureProfileDialog(self.fencelineProfile)
         # self.dialog.exec_()
         
         # self.dialog.show()
@@ -69,7 +69,7 @@ class FencelineProfileTool(PaddockPowerMapTool):
         """Completely delete or destroy all graphics objects or other state associated with the tool."""
         self.canvas.scene().removeItem(self.sketch)
         self.canvas.scene().removeItem(self.guide)
-        super(FencelineProfileTool, self).dispose()
+        super(InfrastructureProfileTool, self).dispose()
 
     def canvasMoveEvent(self, event):
         """Handle the canvas move event."""
@@ -102,13 +102,13 @@ class FencelineProfileTool(PaddockPowerMapTool):
         if e.button() == Qt.RightButton:
             self.capturing = False
             self.milestone.unsetTool()
-            self.updateFencelineProfile()
+            self.updateInfrastructureProfile()
             # self.showDialog()
 
-    def updateFencelineProfile(self):
+    def updateInfrastructureProfile(self):
         """Update the current fenceline profile based on the sketch."""
         qgsDebug("Updating fenceline profile …")
         fenceline = QgsGeometry.fromPolyline(self.points)
-        fencelineProfile = FencelineProfile(fenceline, self.project.elevationLayer)
+        fencelineProfile = InfrastructureProfile(fenceline, self.project.elevationLayer)
         self.fencelineProfileUpdated.emit(fencelineProfile)
 

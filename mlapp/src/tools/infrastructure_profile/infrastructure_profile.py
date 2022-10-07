@@ -13,10 +13,10 @@ from ...models.milestone import PaddockPowerError
 from ...utils import qgsDebug
 
 
-class FencelineProfile(QObject):
+class InfrastructureProfile(QObject):
     def __init__(self, fenceline, elevationLayer):
 
-        super(FencelineProfile, self).__init__()
+        super(InfrastructureProfile, self).__init__()
 
         if not isinstance(fenceline, QgsGeometry):
             raise PaddockPowerError(

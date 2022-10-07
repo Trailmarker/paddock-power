@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .fenceline_profile import FencelineProfile
+from .infrastructure_profile import InfrastructureProfile
 from ...models.paddock_power_error import PaddockPowerError
 from ...utils import qgsDebug
 
@@ -9,22 +9,22 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 
-class FencelineProfileCanvas(FigureCanvasQTAgg):
+class InfrastructureProfileCanvas(FigureCanvasQTAgg):
 
     def __init__(self, fencelineProfile):
 
-        if not isinstance(fencelineProfile, FencelineProfile):
+        if not isinstance(fencelineProfile, InfrastructureProfile):
             raise PaddockPowerError(
-                "FencelineProfileCanvas.__init__: fencelineProfile is not a FencelineProfile.")
+                "InfrastructureProfileCanvas.__init__: fencelineProfile is not a InfrastructureProfile.")
 
         useMetres = (fencelineProfile.maximumDistance < 1000)
 
-        qgsDebug(f"FencelineProfileCanvas.__init__: useMetres={useMetres}")
+        qgsDebug(f"InfrastructureProfileCanvas.__init__: useMetres={useMetres}")
 
         distances = fencelineProfile.distances if useMetres else [
             d / 1000 for d in fencelineProfile.distances]
 
-        qgsDebug(f"FencelineProfileCanvas.__init__: distances={str(distances)}")
+        qgsDebug(f"InfrastructureProfileCanvas.__init__: distances={str(distances)}")
 
         # maximumDistance = fencelineProfile.maximumDistance if useMetres else fencelineProfile.maximumDistance / 1000
 
@@ -50,6 +50,6 @@ class FencelineProfileCanvas(FigureCanvasQTAgg):
 
         figure.tight_layout()
 
-        super(FencelineProfileCanvas, self).__init__(figure)
+        super(InfrastructureProfileCanvas, self).__init__(figure)
 
 

@@ -52,9 +52,9 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         return (crossed, cropped)
 
-    def splitPaddocks(self, splitLine):
+    def splitPaddocks(self, fenceLine):
         """Split paddocks by a line and update the layer."""
-        crossedPaddocks, _ = self.crossedPaddocks(splitLine)
+        crossedPaddocks, _ = self.crossedPaddocks(fenceLine)
 
         self.startEditing()
 
@@ -63,7 +63,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         # Split all the relevant features—this should split every element in crossed
         fixedSplitLine = QgsLineString(
-            [QgsPoint(p.x(), p.y()) for p in splitLine.asPolyline()])
+            [QgsPoint(p.x(), p.y()) for p in fenceLine.asPolyline()])
 
         self.splitFeatures(fixedSplitLine, False, False)
 

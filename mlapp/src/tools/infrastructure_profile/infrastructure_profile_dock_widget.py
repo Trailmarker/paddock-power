@@ -9,14 +9,14 @@ from qgis.PyQt.QtWidgets import QDockWidget, QSizePolicy
 
 from ...models.state import detectProject, getMilestone, getProject, getState
 from ...utils import guiError, qgsDebug
-from .fenceline_profile_canvas import FencelineProfileCanvas
-from .fenceline_profile_tool import FencelineProfileTool
+from .infrastructure_profile_canvas import InfrastructureProfileCanvas
+from .infrastructure_profile_tool import InfrastructureProfileTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'fenceline_profile_dock_widget_base.ui')))
+    os.path.dirname(__file__), 'infrastructure_profile_dock_widget_base.ui')))
 
 
-class FencelineProfileDockWidget(QDockWidget, FORM_CLASS):
+class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
     renderNeeded = pyqtSignal()
@@ -55,7 +55,7 @@ class FencelineProfileDockWidget(QDockWidget, FORM_CLASS):
         detectProject()
 
     def sketchFenceline(self):
-        """Set FencelineProfileTool as a custom map tool."""
+        """Set InfrastructureProfileTool as a custom map tool."""
         milestone = getMilestone()
 
         if milestone is None:
@@ -63,11 +63,11 @@ class FencelineProfileDockWidget(QDockWidget, FORM_CLASS):
                 "Please set the current Milestone before using the Fenceline Profile tool.")
         else:
             project = getProject()
-            tool = FencelineProfileTool(milestone, project)
-            tool.fencelineProfileUpdated.connect(self.setFencelineProfile)
+            tool = InfrastructureProfileTool(milestone, project)
+            tool.fencelineProfileUpdated.connect(self.setInfrastructureProfile)
             milestone.setTool(tool)
 
-    def setFencelineProfile(self, fencelineProfile):
+    def setInfrastructureProfile(self, fencelineProfile):
         """Set the Fenceline Profile."""
      
         qgsDebug("Fenceline profile is being updated in dock widget …")
@@ -101,7 +101,7 @@ class FencelineProfileDockWidget(QDockWidget, FORM_CLASS):
             else:
                 self.fencelineLength.setText(f"{maximumDistance:,.2f}km")
 
-            self.fencelineProfileCanvas = FencelineProfileCanvas(self.fencelineProfile)
+            self.fencelineProfileCanvas = InfrastructureProfileCanvas(self.fencelineProfile)
             self.fencelineProfileCanvas.setSizePolicy(QSizePolicy(
                 QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding))
             # self.fencelineProfileCanvas.resize(1000,1000)

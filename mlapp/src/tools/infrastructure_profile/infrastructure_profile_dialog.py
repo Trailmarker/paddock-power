@@ -4,13 +4,13 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QSizePolicy
 
-from .fenceline_profile_canvas import FencelineProfileCanvas
+from .infrastructure_profile_canvas import InfrastructureProfileCanvas
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'fenceline_profile_dialog_base.ui')))
+    os.path.dirname(__file__), 'infrastructure_profile_dialog_base.ui')))
 
 
-class FencelineProfileDialog(QDialog, FORM_CLASS):
+class InfrastructureProfileDialog(QDialog, FORM_CLASS):
     def __init__(self, fencelineProfile, parent=None):
         """Constructor."""
 
@@ -29,7 +29,7 @@ class FencelineProfileDialog(QDialog, FORM_CLASS):
         else:
             self.fencelineLength.setText(f"{maximumDistance:,.2f}km")
 
-        fencelineProfileCanvas = FencelineProfileCanvas(self.fencelineProfile)
+        fencelineProfileCanvas = InfrastructureProfileCanvas(self.fencelineProfile)
         fencelineProfileCanvas.setSizePolicy(QSizePolicy(
             QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding))
 
@@ -41,4 +41,4 @@ class FencelineProfileDialog(QDialog, FORM_CLASS):
 
     def reject(self):
         """Reject the dialog."""
-        super(FencelineProfileDialog, self).reject()
+        super(InfrastructureProfileDialog, self).reject()
