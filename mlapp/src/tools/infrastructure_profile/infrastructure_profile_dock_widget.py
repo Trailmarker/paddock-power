@@ -103,7 +103,9 @@ class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
 
             self.fencelineProfileCanvas = InfrastructureProfileCanvas(self.fencelineProfile)
             self.fencelineProfileCanvas.setSizePolicy(QSizePolicy(
-                QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding))
+                QSizePolicy.MinimumExpanding, QSizePolicy.Maximum))
+
+            self.fencelineProfileCanvas.setMaximumHeight(250)
             # self.fencelineProfileCanvas.resize(1000,1000)
 
             # self.dockWidgetContents.setStyleSheet("background-color:red;")

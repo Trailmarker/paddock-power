@@ -33,7 +33,7 @@ class InfrastructureProfileCanvas(FigureCanvasQTAgg):
         msShellDlg = {'fontname': 'MS Shell Dlg 2'}
 
         # Create a figure
-        figure = Figure(figsize=(20, 6))
+        figure = Figure()
         self.axes = figure.add_subplot(111)
         self.axes.plot(distances, fencelineProfile.elevations)
         self.axes.set_ylim(0.0, fencelineProfile.maximumElevation * 1.5)
