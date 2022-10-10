@@ -109,7 +109,7 @@ class PaddockPower:
 
         self.addAction(
             QIcon(':/plugins/mlapp/images/split-paddock.png'),
-            text=self.tr(u'Fenceline Profile'),
+            text=self.tr(u'Plan Fences and Pipelines'),
             callback=self.openInfrastructureProfile,
             parent=self.iface.mainWindow())
 
@@ -181,7 +181,7 @@ class PaddockPower:
             self.paddockView.show()
 
     def openInfrastructureProfile(self):
-        """Run method that loads and opens Fenceline Profile."""
+        """Run method that loads and opens Plan Fences and Pipelines."""
 
         if not self.fencelineProfileIsActive:
             self.fencelineProfileIsActive = True

@@ -60,7 +60,7 @@ class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
 
         if milestone is None:
             guiError(
-                "Please set the current Milestone before using the Fenceline Profile tool.")
+                "Please set the current Milestone before using the Plan Fences and Pipelines tool.")
         else:
             project = getProject()
             tool = InfrastructureProfileTool(milestone, project)
@@ -68,7 +68,7 @@ class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
             milestone.setTool(tool)
 
     def setInfrastructureProfile(self, fencelineProfile):
-        """Set the Fenceline Profile."""
+        """Set the Plan Fences and Pipelines."""
      
         qgsDebug("Fenceline profile is being updated in dock widget …")
         self.fencelineProfile = fencelineProfile
@@ -76,7 +76,7 @@ class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
 
 
     def render(self):
-        """Show the Fenceline Profile."""
+        """Show the Plan Fences and Pipelines."""
 
         qgsDebug("Rendering")
 

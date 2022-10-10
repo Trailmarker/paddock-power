@@ -3,7 +3,6 @@ from qgis.PyQt.QtCore import Qt, QAbstractTableModel, QModelIndex
 from qgis.PyQt.QtGui import QColor
 
 from ..layer.paddock_layer import PaddockLayer
-from ..utils import qgsDebug
 
 
 class PaddockTableModel(QAbstractTableModel):
@@ -21,8 +20,22 @@ class PaddockTableModel(QAbstractTableModel):
         self.paddockLayer = paddockLayer
         self.features = []
 
+        self.dataChanged.connect(self.refreshFeatures)
+        self.refreshFeatures()
+
+    def refreshFeatures(self):
+        """Refresh array of features from the layer."""
         if self.paddockLayer is not None:
             self.features = [f for f in self.paddockLayer.getFeatures()]
+        else:
+            self.features = None
+        self.layoutChanged.emit()
+
+    def flags(self, index):
+        if index.column() == 0:
+            return Qt.ItemIsEnabled|Qt.ItemIsEditable
+        else:
+            return Qt.ItemIsEnabled
 
     def rowCount(self, parent=QModelIndex()):
         if self.paddockLayer is None:
@@ -54,3 +67,13 @@ class PaddockTableModel(QAbstractTableModel):
             return Qt.AlignRight
 
         return None
+
+    def setData(self, index, value, role):
+        """Set the data in a cell (currently 'Paddock Name' only is supported)."""
+        if role == Qt.EditRole:
+            if index.column() == 0:
+                self.features[index.row()].setAttribute("Paddock Name", value)
+                self.paddockLayer.updatePaddockFeature(self.features[index.row()])
+                self.dataChanged.emit(index, index)
+                return True
+        return False

@@ -52,6 +52,19 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         return (crossed, cropped)
 
+    def whileEditing(self, func):
+        """Run a function with the layer in edit mode."""
+        isEditing = self.isEditable()
+
+        if not isEditing:
+            self.startEditing()
+            func()
+            self.commitChanges()
+        else:
+            func()
+            self.commitChanges()
+            self.startEditing()
+
     def splitPaddocks(self, fenceLine):
         """Split paddocks by a line and update the layer."""
         crossedPaddocks, _ = self.crossedPaddocks(fenceLine)
@@ -78,28 +91,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         self.commitChanges()
 
-    # def splitPaddocks(self, splitLine):
-    #     """Split paddocks 'fully crossed' by a line and update the layer."""
-    #     crossed = self.crossedPaddocks(splitLine)
-
-    #     self.startEditing()
-
-    #     for paddock in crossed:
-    #         paddockName = paddock.attribute("Paddock Name")
-
-    #         # TODO splitGeometry is not working as expected / is deprecated
-    #         result, splitGeometries, _ = paddock.geometry().splitGeometry(splitLine.asPolyline(), False)
-
-    #         if result == QgsGeometry.OperationResult.Success:
-    #             for i, geometry in enumerate(splitGeometries):
-    #                 feature = QgsFeature(self.fields())
-    #                 feature.setAttributes(paddock.attributes())
-    #                 feature.setAttribute("Paddock Name", paddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
-    #                 feature.setAttribute("fid", 0)
-    #                 feature.setGeometry(geometry)
-
-    #                 self.addFeature(feature)
-
-    #             self.deleteFeature(paddock.id())
-
-    #     self.commitChanges()
+    def updatePaddockFeature(self, paddockFeature):
+        """Update a paddock feature."""
+        self.whileEditing(lambda: self.updateFeature(paddockFeature))
+        
