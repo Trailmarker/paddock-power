@@ -6,9 +6,9 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QDialog
 
-from ..models.paddock_power_error import PaddockPowerError
-from ..models.project import Project
-from ..utils import qgsDebug
+from ...models.paddock_power_error import PaddockPowerError
+from ...models.project import Project
+from ...utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'add_milestone_dialog_base.ui')))

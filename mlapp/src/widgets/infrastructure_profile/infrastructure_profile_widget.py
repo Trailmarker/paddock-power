@@ -19,7 +19,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
-    renderNeeded = pyqtSignal()
+    refreshUiNeeded = pyqtSignal()
 
     fencelineProfile = None
     fencelineProfileCanvas = None
@@ -41,7 +41,7 @@ class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
 
         getState().projectChanged.connect(self.setupConnections)
         getState().projectChanged.connect(self.render)
-        self.renderNeeded.connect(self.render)
+        self.refreshUiNeeded.connect(self.render)
 
         self.render()
 
@@ -72,18 +72,12 @@ class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
      
         qgsDebug("Fenceline profile is being updated in dock widget …")
         self.fencelineProfile = fencelineProfile
-        self.renderNeeded.emit()
+        self.refreshUiNeeded.emit()
 
 
-    def render(self):
+    def refreshUi(self):
         """Show the Plan Fences and Pipelines."""
 
-        qgsDebug("Rendering")
-
-        project, milestone = getProject(), getMilestone()
-
-        self.sketchFencelineButton.setEnabled(milestone is not None)
-        self.selectFencelineButton.setEnabled(milestone is not None)
 
         if self.fencelineProfileCanvas is not None:
             # self.gridLayout.removeWidget(self.fencelineProfileCanvas)
@@ -111,6 +105,10 @@ class InfrastructureProfileDockWidget(QDockWidget, FORM_CLASS):
             # self.dockWidgetContents.setStyleSheet("background-color:red;")
             # self.gridLayout.removeWidget(self.placeholderLabel)
             self.gridLayout.addWidget(self.fencelineProfileCanvas, 4, 0, 1, 4)
+
+            
+
+
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

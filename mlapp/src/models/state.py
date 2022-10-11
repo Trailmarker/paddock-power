@@ -47,6 +47,7 @@ class State(QObject):
         if self.project is not None:
             self.project.load()
             self.project.addToMap()
+            self.projectChanged.emit()
 
     def setProject(self, project):
         """Set the current milestone."""

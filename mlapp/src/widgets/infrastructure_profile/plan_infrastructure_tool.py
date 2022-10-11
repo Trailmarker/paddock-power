@@ -6,11 +6,9 @@ from qgis.utils import iface
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QColor
 
-from ..plan_infrastructure.plan_infrastructure_dialog import PlanInfrastructureDialog
 from ...models.milestone import Milestone, PaddockPowerError
-from ..paddock_power_map_tool import PaddockPowerMapTool
 from ...utils import qgsDebug
-
+from ..paddock_power_map_tool import PaddockPowerMapTool
 
 class PlanInfrastructureTool(PaddockPowerMapTool):
     points = []

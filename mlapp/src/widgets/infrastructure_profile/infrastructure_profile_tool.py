@@ -13,7 +13,6 @@ from ...models.paddock_power_error import PaddockPowerError
 from ...utils import qgsDebug
 from ..paddock_power_map_tool import PaddockPowerMapTool
 from .infrastructure_profile import InfrastructureProfile
-from .infrastructure_profile_dialog import InfrastructureProfileDialog
 
 
 class InfrastructureProfileTool(PaddockPowerMapTool):

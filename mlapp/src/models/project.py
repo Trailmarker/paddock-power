@@ -116,6 +116,7 @@ class Project(QObject):
             return
 
         milestoneNames = Project.findMilestones(self.gpkgFile)
+        milestoneNames.sort()
 
         self.milestones = {}
         self.currentMilestone = None
@@ -124,6 +125,9 @@ class Project(QObject):
             milestone = Milestone(milestoneName, self.gpkgFile)
             self.milestones[milestoneName] = milestone
             milestone.load()
+
+        if milestoneNames:
+            self.setMilestone(milestoneNames[0])
 
         elevationLayerName = Project.findElevationLayer(self.gpkgFile)
         if elevationLayerName is not None:

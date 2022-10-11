@@ -14,7 +14,7 @@ from ..layer.pipeline_layer import PipelineLayer
 from ..layer.fence_layer import FenceLayer
 from ..layer.paddock_layer import PaddockLayer
 
-from ..tools.paddock_power_map_tool import PaddockPowerMapTool
+from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 
 from .paddock_power_error import PaddockPowerError
 

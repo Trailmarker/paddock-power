@@ -4,25 +4,22 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QDockWidget
+from qgis.PyQt.QtWidgets import QWidget
 
 from .add_milestone_dialog import AddMilestoneDialog
-from .paddock_table_model import PaddockTableModel
-from ..models.state import detectProject, getState, getProject
-from ..utils import guiConfirm, qgsDebug
+from ...models.state import detectProject, getState, getProject
+from ...utils import guiConfirm, qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'paddock_view_dock_widget_base.ui')))
+    os.path.dirname(__file__), 'milestone_toolbar_base.ui')))
 
+class MilestoneToolbar(QWidget, FORM_CLASS):
 
-class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
-
-    closingPlugin = pyqtSignal()
-    renderNeeded = pyqtSignal()
+    refreshUiNeeded = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(QDockWidget, self).__init__(parent)
+        super(MilestoneToolbar, self).__init__(parent)
 
         self.setupUi(self)
 
@@ -41,7 +38,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         self.milestoneComboBox.currentIndexChanged.connect(
             self.milestoneComboBoxChanged)
 
-        self.renderNeeded.connect(self.render)
+        self.refreshUiNeeded.connect(self.render)
 
         self.render()
 
@@ -54,7 +51,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
     def showEvent(self, event):
         detectProject()
 
-    def render(self):
+    def refreshUi(self):
         """Show the Paddock View."""
 
         # qgsDebug("Rendering")
@@ -72,11 +69,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
             self.milestoneComboBox.setEnabled(False)
             self.addMilestoneButton.setEnabled(False)
             self.deleteMilestoneButton.setEnabled(False)
-
-            self.tableView.setModel(PaddockTableModel(None))
             return
-
-        # project.load(True)
 
         self.milestoneComboBox.clear()
         milestoneNames = [
@@ -91,10 +84,6 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         if project.currentMilestone is not None:
             self.milestoneComboBox.setCurrentText(
                 project.currentMilestone.milestoneName)
-            tableModel = PaddockTableModel(
-                project.currentMilestone.paddockLayer)
-            self.tableView.setModel(tableModel)
-
             self.addMilestoneButton.toolTip = "Add a new Milestone based on the current Milestone …"
             self.deleteMilestoneButton.setEnabled(True)
 
@@ -109,7 +98,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
             if project is not None:
                 qgsDebug(f"Setting current milestone to {milestoneName}")
                 project.setMilestone(milestoneName)
-                self.renderNeeded.emit()
+                self.refreshUiNeeded.emit()
 
     def addMilestone(self):
         """Add a new milestone."""
@@ -128,7 +117,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
             else:
                 project.addMilestone(newMilestoneName)
 
-        self.renderNeeded.emit()
+        self.refreshUiNeeded.emit()
 
     def deleteMilestone(self):
         """Delete the active milestone."""
@@ -142,8 +131,5 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
                 f"Are you sure you want to delete the Milestone '{project.currentMilestone.milestoneName}'?", "Delete current Milestone")
             if confirmed:
                 project.deleteMilestone(project.currentMilestone.milestoneName)
-                self.renderNeeded.emit()
+                self.refreshUiNeeded.emit()
 
-    def closeEvent(self, event):
-        self.closingPlugin.emit()
-        event.accept()

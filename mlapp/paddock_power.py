@@ -11,12 +11,11 @@ from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.models.state import clearProject, detectProject, getMilestone, getProject
-from .src.tools.infrastructure_profile.infrastructure_profile_dock_widget import InfrastructureProfileDockWidget
-from .src.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
+# from .src.tools.infrastructure_profile.infrastructure_profile_dock_widget import InfrastructureProfileDockWidget
+from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
-from .src.tools.infrastructure_profile.infrastructure_profile_tool import InfrastructureProfileTool
-from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
-from .src.tools.test_tool import TestTool
+# from .src.tools.infrastructure_profile.infrastructure_profile_tool import InfrastructureProfileTool
+# from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
 from .src.utils import guiError, qgsDebug
 
 
@@ -103,28 +102,15 @@ class PaddockPower:
 
         self.addAction(
             QIcon(':/plugins/mlapp/images/paddock.png'),
-            text=self.tr(u'Paddock View'),
+            text=self.tr(u'View Paddocks'),
             callback=self.openPaddockView,
-            parent=self.iface.mainWindow())
-
-        self.addAction(
-            QIcon(':/plugins/mlapp/images/split-paddock.png'),
-            text=self.tr(u'Plan Fences and Pipelines'),
-            callback=self.openInfrastructureProfile,
-            parent=self.iface.mainWindow())
-
-        self.addAction(
-            QIcon(':/plugins/mlapp/images/split-paddock.png'),
-            text=self.tr(u'Split Paddock Tool'),
-            callback=self.runSplitPaddock,
             parent=self.iface.mainWindow())
 
         # self.addAction(
         #     QIcon(':/plugins/mlapp/images/split-paddock.png'),
-        #     text=self.tr(u'Test Custom Identify Tool'),
-        #     callback=self.runTestTool,
+        #     text=self.tr(u'View and Plan Fences'),
+        #     callback=self.openInfrastructureProfile,
         #     parent=self.iface.mainWindow())
-
 
         # Will be set False in run()
         self.firstStart = True
@@ -180,33 +166,23 @@ class PaddockPower:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
             self.paddockView.show()
 
-    def openInfrastructureProfile(self):
-        """Run method that loads and opens Plan Fences and Pipelines."""
+    # def openInfrastructureProfile(self):
+    #     """Run method that loads and opens Plan Fences and Pipelines."""
 
-        if not self.fencelineProfileIsActive:
-            self.fencelineProfileIsActive = True
+    #     if not self.fencelineProfileIsActive:
+    #         self.fencelineProfileIsActive = True
 
-            # self.paddockView may not exist if:
-            #    first run of plugin
-            #    removed on close (see self.onClosePlugin method)
-            if self.fencelineProfile is None:
-                self.fencelineProfile = InfrastructureProfileDockWidget()
+    #         # self.paddockView may not exist if:
+    #         #    first run of plugin
+    #         #    removed on close (see self.onClosePlugin method)
+    #         if self.fencelineProfile is None:
+    #             self.fencelineProfile = InfrastructureProfileDockWidget()
 
-            # Connect to provide cleanup on closing of self.fencelineProfile
-            self.fencelineProfile.closingPlugin.connect(self.onClosePlugin)
-            self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.fencelineProfile)
-            self.fencelineProfile.show()
+    #         # Connect to provide cleanup on closing of self.fencelineProfile
+    #         self.fencelineProfile.closingPlugin.connect(self.onClosePlugin)
+    #         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.fencelineProfile)
+    #         self.fencelineProfile.show()
 
-    def runInfrastructureProfile(self):
-        """Set InfrastructureProfileTool as a custom map tool."""
-        milestone = getMilestone()
-
-        if milestone is None:
-            guiError(
-                "Please set the current Milestone before using the Fenceline Analysis tool.")
-        else:
-            project = getProject()
-            milestone.setTool(InfrastructureProfileTool(milestone, project))
 
     def runSplitPaddock(self):
         """Set SplitPaddockTool as a custom map tool."""
@@ -217,14 +193,3 @@ class PaddockPower:
                 "Please set the current Milestone before using the Split Paddock tool.")
         else:
             milestone.setTool(SplitPaddockTool(milestone))
-
-    def runTestTool(self):
-        """Set TestTool as a custom map tool."""
-        milestone = getMilestone()
-
-        if milestone is None:
-            guiError(
-                "Please set the current Milestone before using the Test Custom Identify tool.")
-        else:
-            iface.mapCanvas().setMapTool(TestTool(iface.mapCanvas(), milestone))
-            qgsDebug("Set current map tool to TestTool")
