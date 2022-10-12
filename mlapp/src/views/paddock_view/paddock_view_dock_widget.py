@@ -22,8 +22,12 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.state = PaddockPowerState()
-        # test filtering stuff
-        # self.paddockList.filterByName("Test")
+        
+        self.paddockFilterLineEdit.textChanged.connect(self.onPaddockFilterChanged)
+        self.clearPaddockFilterButton.clicked.connect(self.paddockFilterLineEdit.clear)
+
+    def onPaddockFilterChanged(self, text):
+        self.paddockList.filterByName(text)
 
     def showEvent(self, event):
         self.state.detectProject()

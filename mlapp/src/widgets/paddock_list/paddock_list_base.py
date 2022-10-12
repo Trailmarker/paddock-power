@@ -17,7 +17,7 @@ class PaddockListBase(QListWidget):
         """Filter the paddock list by name."""
         for item in [self.item(i) for i in range(self.count())]:
             widget = self.itemWidget(item)
-            item.setHidden(not filter in widget.paddock["Paddock Name"])
+            item.setHidden(not filter in str(widget.paddock["Paddock Name"]))
 
     def getPaddocks():
         """Get the paddocks."""
@@ -51,4 +51,4 @@ class PaddockListBase(QListWidget):
         """Refresh the layout based on the size hints of all the custom widgets."""
         for item in [self.item(i) for i in range(self.count())]:
             item.setSizeHint(self.itemWidget(item).sizeHint())
-            
+
