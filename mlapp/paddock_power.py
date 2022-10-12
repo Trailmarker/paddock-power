@@ -16,6 +16,7 @@ from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidg
 from .src.provider import Provider
 from .src.utils import qgsDebug
 
+
 class PaddockPower:
 
     def __init__(self, iface):
@@ -127,7 +128,8 @@ class PaddockPower:
         """Cleanup necessary items here when plugin dockwidget is closed"""
         # Disconnects
         if self.infrastructureView is not None:
-            self.infrastructureView.closingPlugin.disconnect(self.onClosePlugin)
+            self.infrastructureView.closingPlugin.disconnect(
+                self.onClosePlugin)
         if self.paddockView is not None:
             self.paddockView.closingPlugin.disconnect(self.onClosePlugin)
 
@@ -180,9 +182,9 @@ class PaddockPower:
 
             # Connect to provide cleanup on closing of self.infrastructureView
             self.infrastructureView.closingPlugin.connect(self.onClosePlugin)
-            self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.infrastructureView)
+            self.iface.addDockWidget(
+                Qt.BottomDockWidgetArea, self.infrastructureView)
             self.infrastructureView.show()
-
 
     # def runSplitPaddock(self):
     #     """Set SplitPaddockTool as a custom map tool."""

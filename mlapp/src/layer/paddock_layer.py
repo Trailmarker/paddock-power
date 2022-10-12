@@ -40,7 +40,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
     def planFenceLine(self, fenceLine):
         """Return a tuple consisting of a cropped fence geometry, a list of existing paddocks 'fully crossed' by the cropped fence geometry,
            and a list of planned paddocks resulting from splitting the paddocks using the cropped fence geometry."""
-                
+
         intersects = [p for p in self.getFeatures(
         ) if fenceLine.intersects(p.geometry())]
 
@@ -55,7 +55,8 @@ class PaddockLayer(PaddockPowerVectorLayer):
                 existingPaddocks.append(QgsFeature(paddock))
 
         # Crop the fence line to these existing paddocks - no loose ends
-        allExisting = QgsGeometry.unaryUnion(f.geometry() for f in existingPaddocks)
+        allExisting = QgsGeometry.unaryUnion(
+            f.geometry() for f in existingPaddocks)
         normalisedFenceLine = fenceLine.intersection(allExisting)
 
         fixedFenceLine = QgsLineString(
@@ -78,7 +79,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
                     "Paddock Name", crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
                 splitPaddock.setAttribute(
                     "Status", "Planned")
-                #self.updateFeature(splitPaddock)
+                # self.updateFeature(splitPaddock)
             plannedPaddocks.append(splitPaddocks)
 
         # roll back all these edits
@@ -135,5 +136,3 @@ class PaddockLayer(PaddockPowerVectorLayer):
         """Update a paddock feature's name."""
         paddockFeature.setAttribute("Paddock Name", paddockName)
         self.updatePaddockFeature(paddockFeature)
-
-        

@@ -10,6 +10,7 @@ from ...models.milestone import Milestone, PaddockPowerError
 from ...utils import qgsDebug
 from ..paddock_power_map_tool import PaddockPowerMapTool
 
+
 class PlanInfrastructureTool(PaddockPowerMapTool):
     points = []
 
@@ -122,7 +123,8 @@ class PlanInfrastructureTool(PaddockPowerMapTool):
         if self.planningFence:
             self.milestone.fenceLayer.planFence(self.getInfrastructureLine())
         else:
-            self.milestone.pipelineLayer.planPipeline(self.getInfrastructureLine())
+            self.milestone.pipelineLayer.planPipeline(
+                self.getInfrastructureLine())
 
         self.finishPlanningInfrastructure()
 

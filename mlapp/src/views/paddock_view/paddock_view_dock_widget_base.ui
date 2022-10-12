@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PaddockViewDockWidgetBase</class>
- <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>629</width>
-    <height>444</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>MLA Paddock Power | View Paddocks</string>
-  </property>
-  <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QGridLayout">
-    <property name="sizeConstraint">
-     <enum>QLayout::SetMaximumSize</enum>
-    </property>
-    <item row="1" column="0">
-     <widget class="PaddockList" name="paddockList"/>
-    </item>
-    <item row="0" column="0">
-     <widget class="MilestoneToolBar" name="milestoneToolBar" native="true"/>
-    </item>
-   </layout>
-  </widget>
- </widget>
- <customwidgets>
-  <customwidget>
-   <class>PaddockList</class>
-   <extends>QListView</extends>
-   <header>mlapp/src/widgets/paddock_list/paddock_list</header>
-  </customwidget>
-  <customwidget>
-   <class>MilestoneToolBar</class>
-   <extends>QWidget</extends>
-   <header>mlapp/src/widgets/milestone_tool_bar/milestone_tool_bar</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources/>
- <connections/>
+    <class>PaddockViewDockWidgetBase</class>
+    <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>629</width>
+                <height>444</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>MLA Paddock Power | View Paddocks</string>
+        </property>
+        <widget class="QWidget" name="dockWidgetContents">
+            <layout class="QGridLayout">
+                <property name="sizeConstraint">
+                    <enum>QLayout::SetMaximumSize</enum>
+                </property>
+                <item row="1" column="0">
+                    <widget class="PaddockList" name="paddockList"/>
+                </item>
+                <item row="0" column="0">
+                    <widget class="MilestoneToolBar" name="milestoneToolBar" native="true"/>
+                </item>
+            </layout>
+        </widget>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>PaddockList</class>
+            <extends>QListView</extends>
+            <header>mlapp/src/widgets/paddock_list/paddock_list</header>
+        </customwidget>
+        <customwidget>
+            <class>MilestoneToolBar</class>
+            <extends>QWidget</extends>
+            <header>mlapp/src/widgets/milestone_tool_bar/milestone_tool_bar</header>
+            <container>1</container>
+        </customwidget>
+    </customwidgets>
+    <resources/>
+    <connections/>
 </ui>

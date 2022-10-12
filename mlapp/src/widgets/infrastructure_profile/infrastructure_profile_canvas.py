@@ -19,12 +19,14 @@ class InfrastructureProfileCanvas(FigureCanvasQTAgg):
 
         useMetres = (fencelineProfile.maximumDistance < 1000)
 
-        qgsDebug(f"InfrastructureProfileCanvas.__init__: useMetres={useMetres}")
+        qgsDebug(
+            f"InfrastructureProfileCanvas.__init__: useMetres={useMetres}")
 
         distances = fencelineProfile.distances if useMetres else [
             d / 1000 for d in fencelineProfile.distances]
 
-        qgsDebug(f"InfrastructureProfileCanvas.__init__: distances={str(distances)}")
+        qgsDebug(
+            f"InfrastructureProfileCanvas.__init__: distances={str(distances)}")
 
         # maximumDistance = fencelineProfile.maximumDistance if useMetres else fencelineProfile.maximumDistance / 1000
 
@@ -51,5 +53,3 @@ class InfrastructureProfileCanvas(FigureCanvasQTAgg):
         figure.tight_layout()
 
         super(InfrastructureProfileCanvas, self).__init__(figure)
-
-

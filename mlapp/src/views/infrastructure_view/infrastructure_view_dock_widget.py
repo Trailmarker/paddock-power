@@ -34,7 +34,8 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         self.selectInfrastructureLineButton.setIcon(
             QIcon(":/plugins/mlapp/images/new-split-paddock.png"))
 
-        self.sketchInfrastructureLineButton.clicked.connect(self.sketchInfrastructureLine)
+        self.sketchInfrastructureLineButton.clicked.connect(
+            self.sketchInfrastructureLine)
 
         self.state = PaddockPowerState()
         connectPaddockPowerStateListener(self.state, self)
@@ -45,7 +46,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     def onProjectChanged(self, project):
         """Handle a change in the current Paddock Power project."""
         self.refreshUi()
-    
+
     @pyqtSlot()
     def onMilestoneChanged(self, milestone):
         """Handle a change in the current Paddock Power milestone."""
@@ -69,12 +70,13 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         else:
             project = self.state.getProject()
             tool = InfrastructureProfileTool(milestone, project)
-            tool.infrastructureProfileUpdated.connect(self.setInfrastructureProfile)
+            tool.infrastructureProfileUpdated.connect(
+                self.setInfrastructureProfile)
             milestone.setTool(tool)
 
     def setInfrastructureProfile(self, infrastructureProfle):
         """Set the infrastructure profile."""
-     
+
         # qgsDebug("Fenceline profile is being updated in dock widget …")
         self.infrastructureProfile = infrastructureProfle
         self.refreshUi()
@@ -97,18 +99,21 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
                 f"{self.infrastructureProfile.minimumElevation:,.0f} – {self.infrastructureProfile.maximumElevation:,.0f}m (mean {self.infrastructureProfile.meanElevation})")
 
             if useMetres:
-                self.infrastructureLengthText.setText(f"{maximumDistance:,.0f}m")
+                self.infrastructureLengthText.setText(
+                    f"{maximumDistance:,.0f}m")
             else:
-                self.infrastructureLengthText.setText(f"{maximumDistance:,.2f}km")
+                self.infrastructureLengthText.setText(
+                    f"{maximumDistance:,.2f}km")
 
-            self.infrastructureProfileCanvas = InfrastructureProfileCanvas(self.infrastructureProfile)
+            self.infrastructureProfileCanvas = InfrastructureProfileCanvas(
+                self.infrastructureProfile)
             self.infrastructureProfileCanvas.setSizePolicy(QSizePolicy(
                 QSizePolicy.MinimumExpanding, QSizePolicy.Maximum))
 
             self.infrastructureProfileCanvas.setMaximumHeight(250)
             self.gridLayout.removeWidget(self.placeholderLabel)
-            self.gridLayout.addWidget(self.infrastructureProfileCanvas, 4, 0, 1, 4)
-
+            self.gridLayout.addWidget(
+                self.infrastructureProfileCanvas, 4, 0, 1, 4)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

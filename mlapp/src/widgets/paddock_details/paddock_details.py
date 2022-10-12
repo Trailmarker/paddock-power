@@ -11,8 +11,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class PaddockDetails(QWidget, FORM_CLASS):
 
-    NAME, AREA, PERIMETER = ["Paddock Name", "Paddock Area (km²)", "Paddock Perimeter (km)"]
-    
+    NAME, AREA, PERIMETER = ["Paddock Name",
+                             "Paddock Area (km²)", "Paddock Perimeter (km)"]
+
     def __init__(self, paddock, parent=None):
         """Constructor."""
         super(QWidget, self).__init__(parent)
@@ -24,4 +25,3 @@ class PaddockDetails(QWidget, FORM_CLASS):
             self.areaText.setText(str(self.paddock[self.AREA]))
             self.perimeterText.setText(str(self.paddock[self.PERIMETER]))
             self.conditionComboBox.addItem("Not implemented yet")
-        

@@ -36,7 +36,8 @@ class InfrastructureProfile(QObject):
 
         # Get points along line at the granularity of the project elevation layer, using Shapely
         infrastructureLineLength = self.infrastructureLine.length()
-        shapelyInfrastructureLine = loads(bytes(self.infrastructureLine.asWkb()))
+        shapelyInfrastructureLine = loads(
+            bytes(self.infrastructureLine.asWkb()))
 
         elevationLayerCellSize = self.elevationLayer.rasterUnitsPerPixelX()
 
@@ -48,7 +49,8 @@ class InfrastructureProfile(QObject):
                 currentDistanceAlongInfrastructureLine)
             point = QgsGeometry.fromWkt(dumps(shapelyPoint)).asPoint()
             pointsAlongInfrastructureLine.append(point)
-            currentDistanceAlongInfrastructureLine = currentDistanceAlongInfrastructureLine + elevationLayerCellSize
+            currentDistanceAlongInfrastructureLine = currentDistanceAlongInfrastructureLine + \
+                elevationLayerCellSize
 
         # Add Z values to points along line
         dataProvider = self.elevationLayer.dataProvider()

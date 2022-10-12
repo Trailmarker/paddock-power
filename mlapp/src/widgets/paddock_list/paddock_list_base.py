@@ -3,6 +3,7 @@ from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem
 
 from .paddock_collapsible_list_item import PaddockCollapsibleListItem
 
+
 class PaddockListBase(QListWidget):
 
     def __init__(self, parent=None):
@@ -19,7 +20,8 @@ class PaddockListBase(QListWidget):
 
     def getPaddocks():
         """Get the paddocks."""
-        raise NotImplementedError("getPaddocks() must be implemented in a subclass")
+        raise NotImplementedError(
+            "getPaddocks() must be implemented in a subclass")
 
     def refreshUi(self):
         """Show the Paddock List."""

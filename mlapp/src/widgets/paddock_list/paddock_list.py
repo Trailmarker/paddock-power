@@ -2,6 +2,7 @@
 from ...models.paddock_power_state import PaddockPowerState
 from .paddock_list_base import PaddockListBase
 
+
 class PaddockList(PaddockListBase):
     def __init__(self, parent=None):
         """Constructor."""

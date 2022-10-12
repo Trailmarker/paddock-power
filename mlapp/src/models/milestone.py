@@ -156,4 +156,3 @@ class Milestone(QObject):
     def planFence(self):
         """Plan a fence for this milestone."""
         self.fenceLayer.startEditing()
-        

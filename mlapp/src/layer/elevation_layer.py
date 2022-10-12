@@ -14,7 +14,8 @@ class ElevationLayer(QgsRasterLayer):
         if sourceType == PaddockPowerLayerSourceType.Memory:
             assert(layerName is not None)
 
-            raise PaddockPowerError("ElevationLayer.__init__: Memory source type not implemented")
+            raise PaddockPowerError(
+                "ElevationLayer.__init__: Memory source type not implemented")
 
         elif sourceType == PaddockPowerLayerSourceType.File:
             assert(layerName is not None)
@@ -23,8 +24,8 @@ class ElevationLayer(QgsRasterLayer):
             # different from QgsVectorLayer GeoPackage URL format!
             rasterGpkgUrl = f"GPKG:{gpkgFile}:{layerName}"
 
-            super(ElevationLayer, self).__init__(rasterGpkgUrl, baseName=layerName)
-
+            super(ElevationLayer, self).__init__(
+                rasterGpkgUrl, baseName=layerName)
 
     def addToMap(self, group):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
@@ -35,4 +36,3 @@ class ElevationLayer(QgsRasterLayer):
         node = group.findLayer(self.id())
         if node is None:
             group.addLayer(self)
-

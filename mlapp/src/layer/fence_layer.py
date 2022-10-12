@@ -27,4 +27,3 @@ class FenceLayer(PaddockPowerVectorLayer):
     def getLayerType(self):
         """Return the Paddock Power layer type."""
         return PaddockPowerVectorLayerType.Fence
-

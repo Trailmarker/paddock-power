@@ -3,6 +3,7 @@ from qgis.PyQt.QtCore import QObject
 
 # See https://stackoverflow.com/questions/59459770/receiving-pyqtsignal-from-singleton
 
+
 class Singleton(type(QObject), type):
     def __init__(cls, name, bases, dict):
         super().__init__(name, bases, dict)

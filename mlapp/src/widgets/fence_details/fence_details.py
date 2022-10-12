@@ -11,7 +11,8 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
 
-    NAME, AREA, PERIMETER = ["Paddock Name", "Paddock Area (km²)", "Paddock Perimeter (km)"]
+    NAME, AREA, PERIMETER = ["Paddock Name",
+                             "Paddock Area (km²)", "Paddock Perimeter (km)"]
 
     def __init__(self, milestone, paddock, parent=None):
         """Constructor."""
@@ -21,18 +22,16 @@ class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
 
         self.milestone = milestone
         self.paddock = paddock
-        
+
         self.refreshUi()
 
     def refreshUi(self):
         """Show the Paddock Details."""
         if self.paddock is not None:
-            self.setTitle(self.paddock[self.NAME]) # QGroupBox function
+            self.setTitle(self.paddock[self.NAME])  # QGroupBox function
 
             self.nameText.setText(self.paddock[self.NAME])
             self.areaText.setText(self.paddock[self.AREA])
             self.perimeterText.setText(self.paddock[self.PERIMETER])
 
             self.conditionComboBox.addItem("Not implemented yet")
-
-

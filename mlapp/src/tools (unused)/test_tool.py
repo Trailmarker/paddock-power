@@ -7,6 +7,7 @@ from qgis.PyQt.QtGui import QColor
 from ..models.milestone import Milestone, PaddockPowerError
 from ..utils import qgsDebug
 
+
 class TestTool(QgsMapToolIdentifyFeature):
     def __init__(self, canvas, milestone):
         super(QgsMapToolIdentifyFeature, self).__init__(canvas)
@@ -19,7 +20,8 @@ class TestTool(QgsMapToolIdentifyFeature):
 
         self.setLayer(milestone.paddockLayer)
 
-        self.setCursor(QgsApplication.getThemeCursor(QgsApplication.Cursor.CrossHair))
+        self.setCursor(QgsApplication.getThemeCursor(
+            QgsApplication.Cursor.CrossHair))
 
     def canvasMoveEvent(self, event):
         """Handle the canvas move event."""
@@ -64,5 +66,3 @@ class TestTool(QgsMapToolIdentifyFeature):
 #       emit curveCaptured( geom );
 #     }
 #   }
-
-

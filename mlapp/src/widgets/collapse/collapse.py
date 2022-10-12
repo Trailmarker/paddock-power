@@ -5,6 +5,7 @@ from qgis.PyQt.QtWidgets import QAction, QFrame, QHBoxLayout, QToolBar, QToolBut
 
 from ...utils import qgsDebug
 
+
 class Collapse(QWidget):
     collapsed = pyqtSignal()
     expanded = pyqtSignal()
@@ -27,7 +28,8 @@ class Collapse(QWidget):
         self.toolBar = QToolBar()
         self.toolBar.setStyleSheet("QToolBar { padding: 0; }")
         self.toolBar.setFixedHeight(30)
-        self.toolBar.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed))
+        self.toolBar.setSizePolicy(QSizePolicy(
+            QSizePolicy.Minimum, QSizePolicy.Fixed))
 
         self.content = QScrollArea(
             maximumHeight=0, minimumHeight=0
@@ -72,7 +74,7 @@ class Collapse(QWidget):
             if checked
             else QAbstractAnimation.Backward
         )
-      
+
         self.toggleAnimation.start()
         if checked:
             self.expanded.emit()
@@ -98,11 +100,11 @@ class Collapse(QWidget):
     def sizeHint(self):
         """Return the size of the widget."""
         defaultSizeHint = super(Collapse, self).sizeHint()
-        
+
         height = self.collapsedHeight()
         if self.toggleButton.isChecked():
             height += self.contentHeight()
-        
+
         hint = QSize(defaultSizeHint.width(), height)
         return hint
 
@@ -126,4 +128,3 @@ class Collapse(QWidget):
         contentAnimation.setDuration(50)
         contentAnimation.setStartValue(0)
         contentAnimation.setEndValue(contentHeight)
-

@@ -12,6 +12,7 @@ from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
 from ..utils import resolveGeoPackageFile
 
+
 class Project(QObject):
     # emit this signal when paddocks are updated
     milestonesUpdated = pyqtSignal(dict)
@@ -87,11 +88,11 @@ class Project(QObject):
     def deleteMilestone(self, milestoneName):
         """Delete a milestone from the project."""
         self.validateMilestoneName(milestoneName)
-        
+
         if not self.gpkgFile:
             raise PaddockPowerError(
                 "Project.deleteMilestone: Project has no GeoPackage file yet.")
-        
+
         milestone = self.milestones.pop(milestoneName, None)
         milestone.removeFromMap()
         milestone.deleteFromGeoPackage()
@@ -128,13 +129,13 @@ class Project(QObject):
 
         elevationLayerName = Project.findElevationLayer(self.gpkgFile)
         if elevationLayerName is not None:
-            self.elevationLayer = ElevationLayer(PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
+            self.elevationLayer = ElevationLayer(
+                PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
 
         self.isLoaded = True
         self.milestonesUpdated.emit(self.milestones)
         if milestoneNames:
             self.setMilestone(milestoneNames[0])
-
 
     def addToMap(self):
         """Add the project to the map."""
@@ -188,7 +189,8 @@ class Project(QObject):
         """Find the elevation layer in a project GeoPackage."""
         db = sqlite3.connect(gpkgFile)
         cursor = db.cursor()
-        cursor.execute("SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
+        cursor.execute(
+            "SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
         grids = cursor.fetchall()
 
         if len(grids) == 0:
@@ -198,4 +200,3 @@ class Project(QObject):
         else:
             raise PaddockPowerError(
                 f"Project.findElevationLayer: multiple elevation layers found in {gpkgFile}")
-

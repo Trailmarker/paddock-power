@@ -57,7 +57,7 @@ class InfrastructureProfileTool(PaddockPowerMapTool):
         """Show the Fenceline Analysis dialog."""
         # self.dialog = InfrastructureProfileDialog(self.fencelineProfile)
         # self.dialog.exec_()
-        
+
         # self.dialog.show()
 
     def clear(self):
@@ -108,6 +108,6 @@ class InfrastructureProfileTool(PaddockPowerMapTool):
         """Update the current fenceline profile based on the sketch."""
         qgsDebug("Updating fenceline profile …")
         infrastructureLine = QgsGeometry.fromPolyline(self.points)
-        infrastructureProfile = InfrastructureProfile(infrastructureLine, self.project.elevationLayer)
+        infrastructureProfile = InfrastructureProfile(
+            infrastructureLine, self.project.elevationLayer)
         self.infrastructureProfileUpdated.emit(infrastructureProfile)
-

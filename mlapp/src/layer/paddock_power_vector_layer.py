@@ -17,6 +17,8 @@ QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
 
 # Paddock Power data is held in the GDA2020 coordinate system
 PADDOCK_POWER_EPSG = 7845
+
+
 class PaddockPowerVectorLayerType(Enum):
     """Enumeration of the types of Paddock Power vector layers."""
     # Note the order of this enumeration can be used to sort map layers for display purposes

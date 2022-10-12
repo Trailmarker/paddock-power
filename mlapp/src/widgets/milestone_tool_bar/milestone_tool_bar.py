@@ -13,6 +13,7 @@ from .add_milestone_dialog import AddMilestoneDialog
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'milestone_tool_bar_base.ui')))
 
+
 class MilestoneToolBar(QWidget, FORM_CLASS):
 
     def __init__(self, parent=None):
@@ -41,7 +42,7 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
     def onProjectChanged(self, project):
         """Handle a change in the current Paddock Power project."""
         self.refreshUi()
-    
+
     @pyqtSlot()
     def onMilestoneChanged(self, milestone):
         """Handle a change in the current Paddock Power milestone."""
@@ -78,10 +79,10 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
 
         if project.milestone is not None:
             self.milestoneComboBox.setCurrentText(
-                project.milestone.milestoneName)    
+                project.milestone.milestoneName)
             self.addMilestoneButton.toolTip = "Add a new Milestone based on the current Milestone …"
             self.deleteMilestoneButton.setEnabled(True)
-        
+
         self.milestoneComboBox.blockSignals(False)
 
     def milestoneComboBoxChanged(self, index):
@@ -121,4 +122,3 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
                 f"Are you sure you want to delete the Milestone '{project.milestone.milestoneName}'?", "Delete current Milestone")
             if confirmed:
                 project.deleteMilestone(project.milestone.milestoneName)
-
