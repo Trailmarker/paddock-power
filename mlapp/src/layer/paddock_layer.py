@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import (QgsField, QgsGeometry, QgsLineString, QgsPoint,
+from qgis.core import (QgsFeature, QgsField, QgsGeometry, QgsLineString, QgsPoint,
                        QgsWkbTypes)
 from qgis.PyQt.QtCore import QVariant
 
@@ -37,23 +37,54 @@ class PaddockLayer(PaddockPowerVectorLayer):
         """Return the Paddock Power layer type."""
         return PaddockPowerVectorLayerType.Paddock
 
-    def crossedPaddocks(self, splitLine):
-        """Return a tuple, a list of paddocks 'fully crossed' by a splitting line and a crop of the
-           splitting line to the crossed paddocks."""
+    def planFenceLine(self, fenceLine):
+        """Return a tuple consisting of a cropped fence geometry, a list of existing paddocks 'fully crossed' by the cropped fence geometry,
+           and a list of planned paddocks resulting from splitting the paddocks using the cropped fence geometry."""
+                
         intersects = [p for p in self.getFeatures(
-        ) if splitLine.intersects(p.geometry())]
-        crossed = []
+        ) if fenceLine.intersects(p.geometry())]
+
+        # Find the existing paddocks crossed by the fence line
+        existingPaddocks = []
         for paddock in intersects:
             polygon = paddock.geometry().asMultiPolygon()
             boundaryLine = QgsGeometry.fromMultiPolylineXY(polygon[0])
-            intersection = boundaryLine.intersection(splitLine)
+            intersection = boundaryLine.intersection(fenceLine)
             if intersection.isMultipart():
-                crossed.append(paddock)
+                # Deep copy the crossed paddocks
+                existingPaddocks.append(QgsFeature(paddock))
 
-        allCrossed = QgsGeometry.unaryUnion(f.geometry() for f in crossed)
-        cropped = splitLine.intersection(allCrossed)
+        # Crop the fence line to these existing paddocks - no loose ends
+        allExisting = QgsGeometry.unaryUnion(f.geometry() for f in existingPaddocks)
+        normalisedFenceLine = fenceLine.intersection(allExisting)
 
-        return (crossed, cropped)
+        fixedFenceLine = QgsLineString(
+            [QgsPoint(p.x(), p.y()) for p in normalisedFenceLine.asPolyline()])
+
+        # Use editing mode temporarily to derive the split paddocks
+        self.startEditing()
+        self.splitFeatures(fixedFenceLine, False, False)
+
+        crossedPaddockNames = [crossedPaddock['Paddock Name']
+                               for crossedPaddock in existingPaddocks]
+        plannedPaddocks = []
+        for crossedPaddockName in crossedPaddockNames:
+            # Deep copy the split paddocks
+            splitPaddocks = [QgsFeature(p) for p in self.getFeatures(
+            ) if p['Paddock Name'] == crossedPaddockName]
+
+            for i, splitPaddock in enumerate(splitPaddocks):
+                splitPaddock.setAttribute(
+                    "Paddock Name", crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
+                splitPaddock.setAttribute(
+                    "Status", "Planned")
+                #self.updateFeature(splitPaddock)
+            plannedPaddocks.append(splitPaddocks)
+
+        # roll back all these edits
+        self.rollBack()
+
+        return (normalisedFenceLine, existingPaddocks, plannedPaddocks)
 
     def whileEditing(self, func):
         """Run a function with the layer in edit mode."""
@@ -70,7 +101,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
     def splitPaddocks(self, fenceLine):
         """Split paddocks by a line and update the layer."""
-        crossedPaddocks, _ = self.crossedPaddocks(fenceLine)
+        crossedPaddocks, _ = self.planFence(fenceLine)
 
         self.startEditing()
 
@@ -100,7 +131,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
         """Update a paddock feature."""
         self.whileEditing(lambda: self.updateFeature(paddockFeature))
 
-    def updatePaddockFeature(self, paddockFeature, paddockName):
+    def updatePaddockName(self, paddockFeature, paddockName):
         """Update a paddock feature's name."""
         paddockFeature.setAttribute("Paddock Name", paddockName)
         self.updatePaddockFeature(paddockFeature)

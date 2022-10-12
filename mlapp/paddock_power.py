@@ -11,13 +11,10 @@ from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
 from .src.models.state import clearProject, detectProject, getMilestone, getProject
-# from .src.tools.infrastructure_profile.infrastructure_profile_dock_widget import InfrastructureProfileDockWidget
+from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
 from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
-# from .src.tools.infrastructure_profile.infrastructure_profile_tool import InfrastructureProfileTool
-# from .src.tools.split_paddock.split_paddock_tool import SplitPaddockTool
 from .src.utils import guiError, qgsDebug
-
 
 class PaddockPower:
 
@@ -54,8 +51,8 @@ class PaddockPower:
         # Must be set in initGui() to survive plugin reloads
         self.firstStart = None
 
-        self.fencelineProfileIsActive = False
-        self.fencelineProfile = None
+        self.infrastructureViewIsActive = False
+        self.infrastructureView = None
 
         self.paddockViewIsActive = False
         self.paddockView = None
@@ -106,11 +103,11 @@ class PaddockPower:
             callback=self.openPaddockView,
             parent=self.iface.mainWindow())
 
-        # self.addAction(
-        #     QIcon(':/plugins/mlapp/images/split-paddock.png'),
-        #     text=self.tr(u'View and Plan Fences'),
-        #     callback=self.openInfrastructureProfile,
-        #     parent=self.iface.mainWindow())
+        self.addAction(
+            QIcon(':/plugins/mlapp/images/split-paddock.png'),
+            text=self.tr(u'View and Plan Fences and Pipelines'),
+            callback=self.openInfrastructureView,
+            parent=self.iface.mainWindow())
 
         # Will be set False in run()
         self.firstStart = True
@@ -126,14 +123,14 @@ class PaddockPower:
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
         # Disconnects
-        if self.fencelineProfile is not None:
-            self.fencelineProfile.closingPlugin.disconnect(self.onClosePlugin)
+        if self.infrastructureView is not None:
+            self.infrastructureView.closingPlugin.disconnect(self.onClosePlugin)
         if self.paddockView is not None:
             self.paddockView.closingPlugin.disconnect(self.onClosePlugin)
 
         # Remove this statement if dockwidget is to remain
         # for reuse if plugin is reopened
-        self.fencelineProfileIsActive = False
+        self.infrastructureViewIsActive = False
         self.paddockViewIsActive = False
 
     def unload(self):
@@ -166,30 +163,30 @@ class PaddockPower:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
             self.paddockView.show()
 
-    # def openInfrastructureProfile(self):
-    #     """Run method that loads and opens Plan Fences and Pipelines."""
+    def openInfrastructureView(self):
+        """Run method that loads and opens Plan Fences and Pipelines."""
 
-    #     if not self.fencelineProfileIsActive:
-    #         self.fencelineProfileIsActive = True
+        if not self.infrastructureViewIsActive:
+            self.infrastructureViewIsActive = True
 
-    #         # self.paddockView may not exist if:
-    #         #    first run of plugin
-    #         #    removed on close (see self.onClosePlugin method)
-    #         if self.fencelineProfile is None:
-    #             self.fencelineProfile = InfrastructureProfileDockWidget()
+            # self.infrastructureView may not exist if:
+            #    first run of plugin
+            #    removed on close (see self.onClosePlugin method)
+            if self.infrastructureView is None:
+                self.infrastructureView = InfrastructureViewDockWidget()
 
-    #         # Connect to provide cleanup on closing of self.fencelineProfile
-    #         self.fencelineProfile.closingPlugin.connect(self.onClosePlugin)
-    #         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.fencelineProfile)
-    #         self.fencelineProfile.show()
+            # Connect to provide cleanup on closing of self.infrastructureView
+            self.infrastructureView.closingPlugin.connect(self.onClosePlugin)
+            self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.infrastructureView)
+            self.infrastructureView.show()
 
 
-    def runSplitPaddock(self):
-        """Set SplitPaddockTool as a custom map tool."""
-        milestone = getMilestone()
+    # def runSplitPaddock(self):
+    #     """Set SplitPaddockTool as a custom map tool."""
+    #     milestone = getMilestone()
 
-        if milestone is None:
-            guiError(
-                "Please set the current Milestone before using the Split Paddock tool.")
-        else:
-            milestone.setTool(SplitPaddockTool(milestone))
+    #     if milestone is None:
+    #         guiError(
+    #             "Please set the current Milestone before using the Split Paddock tool.")
+    #     else:
+    #         milestone.setTool(SplitPaddockTool(milestone))

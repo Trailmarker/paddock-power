@@ -18,7 +18,7 @@ from .infrastructure_profile import InfrastructureProfile
 class InfrastructureProfileTool(PaddockPowerMapTool):
     points = []
 
-    fencelineProfileUpdated = pyqtSignal(InfrastructureProfile)
+    infrastructureProfileUpdated = pyqtSignal(InfrastructureProfile)
 
     def __init__(self, milestone, project):
 
@@ -107,7 +107,7 @@ class InfrastructureProfileTool(PaddockPowerMapTool):
     def updateInfrastructureProfile(self):
         """Update the current fenceline profile based on the sketch."""
         qgsDebug("Updating fenceline profile …")
-        fenceline = QgsGeometry.fromPolyline(self.points)
-        fencelineProfile = InfrastructureProfile(fenceline, self.project.elevationLayer)
-        self.fencelineProfileUpdated.emit(fencelineProfile)
+        infrastructureLine = QgsGeometry.fromPolyline(self.points)
+        infrastructureProfile = InfrastructureProfile(infrastructureLine, self.project.elevationLayer)
+        self.infrastructureProfileUpdated.emit(infrastructureProfile)
 

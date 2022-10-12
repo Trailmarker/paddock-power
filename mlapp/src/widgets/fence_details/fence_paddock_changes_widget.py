@@ -1,51 +1,50 @@
-# # -*- coding: utf-8 -*-
-# from ast import If
-# import os
+# -*- coding: utf-8 -*-
+import os
 
-# from qgis.PyQt import uic
-# from qgis.PyQt.QtCore import pyqtSignal
-# from qgis.PyQt.QtGui import QIcon
-# from qgis.PyQt.QtWidgets import QWidget
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QWidget
 
-# from ...views.paddock_view.paddock_table_model import PaddockTableModel
-# from ...utils import guiConfirm, qgsDebug
+from qgis.core import QgsFeature
 
-# FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-#     os.path.dirname(__file__), 'infrastructure_existing_new_paddocks_base.ui')))
+from ...models.paddock_power_error import PaddockPowerError
+from ...models.state import getMilestone
+from ...utils import guiConfirm, qgsDebug
 
+FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
+    os.path.dirname(__file__), 'fence_paddock_changes_widget_base.ui')))
 
-# class FencePaddockChangesWidget(QWidget, FORM_CLASS):
+class FencePaddockChangesWidget(QWidget, FORM_CLASS):
 
-#     closingPlugin = pyqtSignal()
-#     refreshUiNeeded = pyqtSignal()
+    refreshUiNeeded = pyqtSignal()
 
-#     def __init__(self, paddockLayer, fence, parent=None):
-#         """Constructor."""
-#         super(QWidget, self).__init__(parent)
+    def __init__(self, fence, parent=None):
+        """Constructor."""
+        super(QWidget, self).__init__(parent)
 
-#         self.setupUi(self)
+        self.setupUi(self)
 
-#         self.refreshUiNeeded.connect(self.render)
-        
-#         self.paddockLayer = paddockLayer
+        self.refreshUiNeeded.connect(self.refreshUi)
+        self.existingPaddocks = []
+        self.plannedPaddocks = []
+        self.setFence(fence)
 
-#         self.render()
+    def refreshUi(self):
+        """Show the Paddock View."""
+        self.existingPaddockMiniList.setPaddocks(self.existingPaddocks)
+        self.plannedPaddockMiniList.setPaddocks(self.plannedPaddocks)
 
-#     def refreshUi(self):
-#         """Show the Paddock View."""
-
-#         if not self.existingPaddocks:
-#             self.existingPaddocksTableView.setModel(PaddockTableModel(None))
-#         else:
-#             self.existingPaddocksTableView.setModel(PaddockTableModel(self.paddockLayer, self.existingPaddocks))
-
-#         if not self.newPaddocks:
-#            self.newPaddocksTableView.setModel(PaddockTableModel(None))
-#         else:
-#             self.newPaddocksTableView.setModel(PaddockTableModel(self.paddockLayer, self.newPaddocks))
-
-#     def setFeatures(self, existingFeatures, newFeatures):
-#         self.existingPaddocks = existingFeatures
-#         self.newPaddocks = newFeatures
-#         self.refreshUiNeeded.emit()
-
+    def refreshPaddockChanges(self):
+        """Refresh the paddock changes."""
+        milestone = getMilestone()
+        if milestone is not None:
+            paddockLayer = milestone.paddockLayer
+            croppedFenceLine, self.existingPaddocks, self.plannedPaddocks = paddockLayer.planFenceLine(self.fence.geometry())
+            self.fence.setGeometry(croppedFenceLine)
+            
+    def setFence(self, fence):
+        if fence is None or not isinstance(fence, QgsFeature):
+            raise PaddockPowerError("FencePaddockChangesWidget.setFence: fence must be a QgsFeature")
+        self.fence = fence
+        self.refreshPaddockChanges()
+        self.refreshUiNeeded.emit()

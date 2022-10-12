@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>InfrastructureExistingNewPaddocks</class>
- <widget class="QWidget" name="InfrastructureExistingNewPaddocks">
+ <class>FencePaddockChangesWidgetBase</class>
+ <widget class="QWidget" name="FencePaddockChangesWidgetBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,25 +15,25 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="existingPaddocksGroupBox">
+    <widget class="QGroupBox" name="existingPaddockGroupBox">
      <property name="title">
-      <string>Existing Paddocks</string>
+      <string>Existing Paddocks split by this Fence</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QTableView" name="existingPaddocksTableView"/>
+       <widget class="QListWidget" name="existingPaddockMiniList"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="newPaddocksGroupBox">
+    <widget class="QGroupBox" name="plannedPaddockGroupBox">
      <property name="title">
-      <string>New Paddocks</string>
+      <string>New Paddocks after building this Fence</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QTableView" name="newPaddocksTableView"/>
+       <widget class="QListWidget" name="plannedPaddockMiniList"/>
       </item>
      </layout>
     </widget>

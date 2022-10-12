@@ -28,8 +28,8 @@ class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
         self.milestone = milestone
         self.paddock = paddock
         
-        self.refreshUiNeeded.connect(self.render)
-        self.render()
+        self.refreshUiNeeded.connect(self.refreshUi)
+        self.refreshUi()
 
     def refreshUi(self):
         """Show the Paddock Details."""

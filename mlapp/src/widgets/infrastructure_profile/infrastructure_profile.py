@@ -14,47 +14,47 @@ from ...utils import qgsDebug
 
 
 class InfrastructureProfile(QObject):
-    def __init__(self, fenceline, elevationLayer):
+    def __init__(self, infrastructureLine, elevationLayer):
 
         super(InfrastructureProfile, self).__init__()
 
-        if not isinstance(fenceline, QgsGeometry):
+        if not isinstance(infrastructureLine, QgsGeometry):
             raise PaddockPowerError(
-                "FencelineData.__init__: fenceline is not a QgsGeometry.")
+                "InfrastructureProfile.__init__: infrastructureLine is not a QgsGeometry.")
 
         if not isinstance(elevationLayer, ElevationLayer):
             raise PaddockPowerError(
-                "FencelineData.__init__: elevationLayer is not an ElevationLayer.")
+                "InfrastructureProfile.__init__: elevationLayer is not an ElevationLayer.")
 
-        self.fenceline = fenceline
+        self.infrastructureLine = infrastructureLine
         self.elevationLayer = elevationLayer
 
-        self.analyseFenceline()
+        self.analyseInfrastructureLine()
 
-    def analyseFenceline(self):
-        """Update the fenceline data."""
+    def analyseInfrastructureLine(self):
+        """Update the infrastructureLine data."""
 
         # Get points along line at the granularity of the project elevation layer, using Shapely
-        fencelineLength = self.fenceline.length()
-        shapelyFenceline = loads(bytes(self.fenceline.asWkb()))
+        infrastructureLineLength = self.infrastructureLine.length()
+        shapelyInfrastructureLine = loads(bytes(self.infrastructureLine.asWkb()))
 
         elevationLayerCellSize = self.elevationLayer.rasterUnitsPerPixelX()
 
-        currentDistanceAlongFenceline = elevationLayerCellSize
-        pointsAlongFenceline = []
+        currentDistanceAlongInfrastructureLine = elevationLayerCellSize
+        pointsAlongInfrastructureLine = []
 
-        while currentDistanceAlongFenceline < fencelineLength:
-            shapelyPoint = shapelyFenceline.interpolate(
-                currentDistanceAlongFenceline)
+        while currentDistanceAlongInfrastructureLine < infrastructureLineLength:
+            shapelyPoint = shapelyInfrastructureLine.interpolate(
+                currentDistanceAlongInfrastructureLine)
             point = QgsGeometry.fromWkt(dumps(shapelyPoint)).asPoint()
-            pointsAlongFenceline.append(point)
-            currentDistanceAlongFenceline = currentDistanceAlongFenceline + elevationLayerCellSize
+            pointsAlongInfrastructureLine.append(point)
+            currentDistanceAlongInfrastructureLine = currentDistanceAlongInfrastructureLine + elevationLayerCellSize
 
         # Add Z values to points along line
         dataProvider = self.elevationLayer.dataProvider()
 
         pointsWithZ = [QgsPoint(point.x(), point.y(), dataProvider.identify(
-            point, QgsRaster.IdentifyFormatValue).results()[1]) for point in pointsAlongFenceline]
+            point, QgsRaster.IdentifyFormatValue).results()[1]) for point in pointsAlongInfrastructureLine]
 
         # Calculate distances along line using the GDA2020 ellipsoid
         pointPairs = zip(pointsWithZ, pointsWithZ[1:])

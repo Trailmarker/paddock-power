@@ -133,7 +133,7 @@ class PlanInfrastructureTool(PaddockPowerMapTool):
     def updateCrossedPaddocks(self):
         """Update the currently crossed paddock features."""
 
-        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.crossedPaddocks(
+        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.planFence(
             self.getInfrastructureLine())
 
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)

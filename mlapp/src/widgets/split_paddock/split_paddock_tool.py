@@ -8,7 +8,7 @@ from qgis.PyQt.QtGui import QColor
 
 from .split_paddock_dialog import SplitPaddockDialog
 from ...models.milestone import Milestone, PaddockPowerError
-from ..paddock_power_map_tool import PaddockPowerMapTool
+from ...widgets.paddock_power_map_tool import PaddockPowerMapTool
 from ...utils import qgsDebug
 
 
@@ -129,7 +129,7 @@ class SplitPaddockTool(PaddockPowerMapTool):
     def updatePaddockFeatures(self):
         """Update the currently crossed paddock features."""
 
-        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.crossedPaddocks(
+        crossedPaddocks, croppedSplitLine = self.milestone.paddockLayer.planFence(
             self.getSplitLine())
 
         self.paddockFeatures.reset(QgsWkbTypes.PolygonGeometry)

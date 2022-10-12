@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pydoc import resolve
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsProject
 

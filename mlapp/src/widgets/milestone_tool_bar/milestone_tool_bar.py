@@ -11,15 +11,15 @@ from ...models.state import detectProject, getState, getProject
 from ...utils import guiConfirm, qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'milestone_toolbar_base.ui')))
+    os.path.dirname(__file__), 'milestone_tool_bar_base.ui')))
 
-class MilestoneToolbar(QWidget, FORM_CLASS):
+class MilestoneToolBar(QWidget, FORM_CLASS):
 
     refreshUiNeeded = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(MilestoneToolbar, self).__init__(parent)
+        super(MilestoneToolBar, self).__init__(parent)
 
         self.setupUi(self)
 
@@ -34,19 +34,19 @@ class MilestoneToolbar(QWidget, FORM_CLASS):
         detectProject()
 
         getState().projectChanged.connect(self.setupConnections)
-        getState().projectChanged.connect(self.render)
+        getState().projectChanged.connect(self.refreshUi)
         self.milestoneComboBox.currentIndexChanged.connect(
             self.milestoneComboBoxChanged)
 
-        self.refreshUiNeeded.connect(self.render)
+        self.refreshUiNeeded.connect(self.refreshUi)
 
-        self.render()
+        self.refreshUi()
 
     def setupConnections(self):
         """Reconnect things as necessary."""
         project = getProject()
         if project is not None:
-            project.currentMilestoneChanged.connect(self.render)
+            project.currentMilestoneChanged.connect(self.refreshUi)
 
     def showEvent(self, event):
         detectProject()
