@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QObject
 
+from qgis.core import QgsFeature
+
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
 from .project import Project
@@ -9,9 +11,12 @@ from ..utils import resolveGeoPackageFile, qgsDebug
 
 
 class PaddockPowerState(QObject, metaclass=Singleton):
-    projectChanged = pyqtSignal(Project)
     milestoneChanged = pyqtSignal(Milestone)
     milestonesUpdated = pyqtSignal(dict)
+    projectChanged = pyqtSignal(Project)
+    selectedFenceChanged = pyqtSignal(QgsFeature)
+    selectedPaddockChanged = pyqtSignal(QgsFeature)
+    selectedPipelineChanged = pyqtSignal(QgsFeature)
 
     project = None
 
@@ -56,6 +61,16 @@ class PaddockPowerState(QObject, metaclass=Singleton):
             return self.project.milestone
         else:
             return None
+
+    def getSelectedFence(self):
+        """Get the selected Fence."""
+        if self.project is not None and self.project.milestone is not None:
+            return self.project.milestone.selectedFence
+    
+    def getSelectedPaddock(self):
+        """Get the selected Paddock."""
+        if self.project is not None and self.project.milestone is not None:
+            return self.project.milestone.selectedPaddock
 
     def clearProject(self):
         """Clear the current Project, for example if the current QGIS project is closed."""
@@ -106,35 +121,30 @@ class PaddockPowerState(QObject, metaclass=Singleton):
             f"PaddockPowerState.onMilestoneChanged: milestone changed to {str(milestone)}")
         """Handle a change in the current Paddock Power milestone."""
         if self.project.milestone is not None:
-            # eg handle change in selected Paddock or Fence
-            pass
-
-    @pyqtSlot()
-    def onMilestonesUpdated(self, milestones):
-        """Handle a change to the current collection of Paddock Power milestones."""
-        qgsDebug(
-            f"PaddockPowerState.onMilestonesUpdated: milestones changed to {str(milestones)}")
-        pass
+            self.project.milestone.selectedFenceChanged.connect(
+                lambda f: self.selectedFenceChanged.emit(f))
+            self.project.milestone.selectedPaddockChanged.connect(
+                lambda p: self.selectedPaddockChanged.emit(p))
+            self.project.milestone.selectedPipelineChanged.connect(
+                lambda p: self.selectedPipelineChanged.emit(p))
 
 
 def connectPaddockPowerStateListener(state, listener):
     """Connect a listener to the Paddock Power state."""
     if listener is not None:
-        if hasattr(listener, "onProjectChanged") and callable(listener.onProjectChanged):
-            state.projectChanged.connect(
-                lambda p: listener.onProjectChanged(p))
-        else:
-            raise PaddockPowerError(
-                "PaddockPowerState.listen: listener has no onProjectChanged method.")
         if hasattr(listener, "onMilestoneChanged") and callable(listener.onMilestoneChanged):
             state.milestoneChanged.connect(
                 lambda m: listener.onMilestoneChanged(m))
-        else:
-            raise PaddockPowerError(
-                "PaddockPowerState.listen: listener has no onMilestoneChanged method.")
         if hasattr(listener, "onMilestonesUpdated") and callable(listener.onMilestonesUpdated):
             state.milestonesUpdated.connect(
                 lambda ms: listener.onMilestonesUpdated(ms))
-        else:
-            raise PaddockPowerError(
-                "PaddockPowerState.listen: listener has no onMilestonesUpdated method.")
+        if hasattr(listener, "onProjectChanged") and callable(listener.onProjectChanged):
+            state.projectChanged.connect(
+                lambda p: listener.onProjectChanged(p))
+        if hasattr(listener, "onSelectedFenceChanged") and callable(listener.onSelectedFenceChanged):
+            state.selectedFenceChanged.connect(
+                lambda ms: listener.onSelectedFenceChanged(ms))
+        if hasattr(listener, "onSelectedPaddockChanged") and callable(listener.onSelectedPaddockChanged):
+            state.selectedPaddockChanged.connect(
+                lambda ms: listener.onSelectedPaddockChanged(ms))
+

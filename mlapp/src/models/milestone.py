@@ -4,7 +4,7 @@ from os import path
 import processing
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from qgis.core import QgsProject
+from qgis.core import QgsFeature, QgsProject
 from qgis.utils import iface
 
 from ..layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
@@ -21,7 +21,9 @@ from .paddock_power_error import PaddockPowerError
 
 class Milestone(QObject):
     # emit this signal when paddocks are updated
-    paddocksUpdated = pyqtSignal()
+    selectedFenceChanged = pyqtSignal(QgsFeature)
+    selectedPaddockChanged = pyqtSignal(QgsFeature)
+    selectedPipelineChanged = pyqtSignal(QgsFeature)
 
     def __init__(self, milestoneName, gpkgFile):
         super(Milestone, self).__init__()
@@ -30,6 +32,10 @@ class Milestone(QObject):
         self.gpkgFile = gpkgFile
         self.currentTool = None
         self.isLoaded = False
+
+        self.selectedFence = None
+        self.selectedPaddock = None
+        self.selectedPipeline = None
 
     def create(self):
         """Create this milestone in its GeoPackage."""
@@ -153,6 +159,23 @@ class Milestone(QObject):
             iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
 
-    def planFence(self):
-        """Plan a fence for this milestone."""
-        self.fenceLayer.startEditing()
+    def setSelectedFence(self, fence):
+        if not isinstance(fence, QgsFeature):
+            raise PaddockPowerError(
+                "Milestone.selectFence: fence must be a QgsFeature")
+        self.selectedFence = fence
+        self.selectedFenceChanged.emit(self.selectedFence)
+
+    def setSelectedPaddock(self, paddock):
+        if not isinstance(paddock, QgsFeature):
+            raise PaddockPowerError(
+                "Milestone.selectPaddock: paddock must be a QgsFeature")
+        self.selectedPaddock = paddock
+        self.selectedFenceChanged.emit(self.selectedPaddock)
+
+    def setSelectedPipeline(self, pipeline):
+        if not isinstance(pipeline, QgsFeature):
+            raise PaddockPowerError(
+                "Milestone.selectPipeline: pipeline must be a QgsFeature")
+        self.selectedPipeline = pipeline
+        self.selectedPipelineChanged.emit(self.selectedPipeline)
