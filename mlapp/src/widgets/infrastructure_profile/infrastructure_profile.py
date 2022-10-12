@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import QObject
 
 from ...layer.elevation_layer import ElevationLayer
 from ...models.milestone import PaddockPowerError
-from ...utils import qgsDebug
+# from ...utils import qgsDebug
 
 
 class InfrastructureProfile(QObject):
@@ -88,8 +88,8 @@ class InfrastructureProfile(QObject):
         self.distances = cumulativeDistances
         self.elevations = [point.z() for point in pointsWithZ]
 
-        qgsDebug(str(self.distances))
-        qgsDebug(str(self.elevations))
+        # qgsDebug(str(self.distances))
+        # qgsDebug(str(self.elevations))
 
         self.minimumElevation = round(min(self.elevations), 1)
         self.maximumElevation = round(max(self.elevations), 1)
