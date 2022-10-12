@@ -89,21 +89,22 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
                 self.gridLayout.removeWidget(self.infrastructureProfileCanvas)
                 del self.infrastructureProfileCanvas
                 self.infrastructureProfileCanvas = None
-            self.gridLayout.addWidget(self.placeholderLabel, 4, 0, 1, 4)
 
         if self.infrastructureProfile is not None:
             useMetres = (self.infrastructureProfile.maximumDistance < 1000)
 
             maximumDistance = self.infrastructureProfile.maximumDistance if useMetres else self.infrastructureProfile.maximumDistance / 1000
             self.elevationRangeText.setText(
-                f"{self.infrastructureProfile.minimumElevation:,.0f} – {self.infrastructureProfile.maximumElevation:,.0f}m (mean {self.infrastructureProfile.meanElevation})")
+                f"{self.infrastructureProfile.minimumElevation:,.0f} – {self.infrastructureProfile.maximumElevation:,.0f} (mean {self.infrastructureProfile.meanElevation})")
 
             if useMetres:
+                self.infrastructureLengthLabel.setText("Minimum estimated length (m)")
                 self.infrastructureLengthText.setText(
-                    f"{maximumDistance:,.0f}m")
+                    f"{maximumDistance:,.0f}")
             else:
+                self.infrastructureLengthLabel.setText("Minimum estimated length (km)")
                 self.infrastructureLengthText.setText(
-                    f"{maximumDistance:,.2f}km")
+                    f"{maximumDistance:,.2f}")
 
             self.infrastructureProfileCanvas = InfrastructureProfileCanvas(
                 self.infrastructureProfile)
@@ -111,7 +112,6 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
                 QSizePolicy.MinimumExpanding, QSizePolicy.Maximum))
 
             self.infrastructureProfileCanvas.setMaximumHeight(250)
-            self.gridLayout.removeWidget(self.placeholderLabel)
             self.gridLayout.addWidget(
                 self.infrastructureProfileCanvas, 4, 0, 1, 4)
 

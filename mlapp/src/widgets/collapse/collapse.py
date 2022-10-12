@@ -41,7 +41,7 @@ class Collapse(QWidget):
 
         self.headerLayout = QHBoxLayout()
         self.headerLayout.setSpacing(0)
-        self.headerLayout.setContentsMargins(3, 3, 3, 3)
+        self.headerLayout.setContentsMargins(3, 0, 3, 3)
         self.headerLayout.addWidget(self.toggleButton)
         self.headerLayout.addStretch()
         self.headerLayout.addWidget(self.toolBar)
