@@ -76,8 +76,6 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
 
     def setInfrastructureProfile(self, infrastructureProfle):
         """Set the infrastructure profile."""
-
-        # qgsDebug("Fenceline profile is being updated in dock widget …")
         self.infrastructureProfile = infrastructureProfle
         self.refreshUi()
 

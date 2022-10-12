@@ -19,8 +19,8 @@
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="areaLabel">
+     <item row="1" column="0">
+      <widget class="QLabel" name="perimeterLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -33,28 +33,7 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Area (km²)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="conditionLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-         <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string notr="true">Condition</string>
+        <string notr="true">Perimeter (km)</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -79,13 +58,24 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="conditionComboBox">
+     <item row="2" column="0">
+      <widget class="QLabel" name="conditionLabel">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Paddock condition</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -107,27 +97,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="perimeterLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string notr="true">Perimeter (km)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="0">
       <widget class="QLabel" name="capacityLabel">
        <property name="sizePolicy">
@@ -136,7 +105,7 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-      <property name="font">
+       <property name="font">
         <font>
          <pointsize>8</pointsize>
         </font>
@@ -161,6 +130,40 @@
         <font>
          <pointsize>8</pointsize>
         </font>
+       </property>
+       <property name="text">
+        <string>Not yet implemented</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="areaLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Area (km²)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="conditionText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
        <property name="text">
         <string>Not yet implemented</string>

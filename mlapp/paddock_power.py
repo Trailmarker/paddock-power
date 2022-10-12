@@ -13,6 +13,7 @@ from .resources_rc import *
 from .src.models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
 from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
+from .src.widgets.paddock_details.selected_paddock_rubber_band import SelectedPaddockRubberBand
 from .src.provider import Provider
 from .src.utils import qgsDebug
 
@@ -54,6 +55,8 @@ class PaddockPower:
 
         QgsProject.instance().cleared.connect(self.state.clearProject)
         QgsProject.instance().readProject.connect(self.state.detectProject)
+
+        self.selectedPaddockRubberBand = SelectedPaddockRubberBand(iface.mapCanvas())
 
         self.infrastructureViewIsActive = False
         self.infrastructureView = None

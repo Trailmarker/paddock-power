@@ -19,4 +19,4 @@ class PaddockList(PaddockListBase):
     def getPaddocks(self):
         """Get the paddocks."""
         milestone = self.state.getMilestone()
-        return milestone.paddockLayer.getFeatures() if milestone is not None else None
+        return [paddock for paddock in milestone.paddockLayer.getFeatures()] if milestone is not None else None

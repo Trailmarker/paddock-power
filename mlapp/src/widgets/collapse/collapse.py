@@ -26,7 +26,11 @@ class Collapse(QWidget):
         self.toggleAnimation = QParallelAnimationGroup(self)
 
         self.toolBar = QToolBar()
-        self.toolBar.setStyleSheet("QToolBar { padding: 0; }")
+        self.toolBar.setStyleSheet("""QToolBar { padding: 0; }
+                                      QToolButton::indicator {
+                                        height: 20;
+                                        width: 20;
+                                      }""")
         self.toolBar.setFixedHeight(30)
         self.toolBar.setSizePolicy(QSizePolicy(
             QSizePolicy.Minimum, QSizePolicy.Fixed))
@@ -81,12 +85,24 @@ class Collapse(QWidget):
         else:
             self.collapsed.emit()
 
+    @pyqtSlot()
+    def setExpanded(self, expanded=True):
+        checked = self.toggleButton.isChecked()
+        if checked != expanded:
+            self.toggleButton.toggle()
+
     def setTitle(self, title):
         self.toggleButton.setText(title)
 
-    def addToolBarAction(self, action):
+    def addToolBarAction(self, action, callback):
         """Add an action to the toolbar."""
+        action.triggered.connect(callback)
         self.toolBar.addAction(action)
+
+    def removeToolBarAction(self, action):
+        """Remove an action from the toolbar."""
+        action.triggered.disconnect()
+        self.toolBar.removeAction(action)
 
     def collapsedHeight(self):
         return self.headerLayout.sizeHint().height()

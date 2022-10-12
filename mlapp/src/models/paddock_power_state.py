@@ -107,18 +107,15 @@ class PaddockPowerState(QObject, metaclass=Singleton):
     @pyqtSlot()
     def onProjectChanged(self, project):
         """Handle a change in the current Paddock Power project."""
-        qgsDebug(
-            f"PaddockPowerState.onProjectChanged: project changed to {str(project)}")
         if self.project is not None:
             self.project.milestoneChanged.connect(
                 lambda m: self.milestoneChanged.emit(m))
             self.project.milestonesUpdated.connect(
                 lambda ms: self.milestonesUpdated.emit(ms))
+            self.onMilestoneChanged(self.project.milestone)
 
     @pyqtSlot()
     def onMilestoneChanged(self, milestone):
-        qgsDebug(
-            f"PaddockPowerState.onMilestoneChanged: milestone changed to {str(milestone)}")
         """Handle a change in the current Paddock Power milestone."""
         if self.project.milestone is not None:
             self.project.milestone.selectedFenceChanged.connect(

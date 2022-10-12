@@ -128,11 +128,11 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         self.commitChanges()
 
-    def updatePaddockFeature(self, paddockFeature):
+    def updatePaddock(self, paddockFeature):
         """Update a paddock feature."""
         self.whileEditing(lambda: self.updateFeature(paddockFeature))
 
     def updatePaddockName(self, paddockFeature, paddockName):
         """Update a paddock feature's name."""
         paddockFeature.setAttribute("Paddock Name", paddockName)
-        self.updatePaddockFeature(paddockFeature)
+        self.updatePaddock(paddockFeature)

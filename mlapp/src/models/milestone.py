@@ -171,7 +171,7 @@ class Milestone(QObject):
             raise PaddockPowerError(
                 "Milestone.selectPaddock: paddock must be a QgsFeature")
         self.selectedPaddock = paddock
-        self.selectedFenceChanged.emit(self.selectedPaddock)
+        self.selectedPaddockChanged.emit(self.selectedPaddock)
 
     def setSelectedPipeline(self, pipeline):
         if not isinstance(pipeline, QgsFeature):

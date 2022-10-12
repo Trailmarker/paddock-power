@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem
 
 from .paddock_collapsible_list_item import PaddockCollapsibleListItem
@@ -27,15 +28,22 @@ class PaddockListBase(QListWidget):
         """Show the Paddock List."""
         paddocks = self.getPaddocks()
 
+        # Sort Paddocks alphabetically
+        paddocks.sort(key=lambda x: x["Paddock Name"])
+
         if paddocks is not None:
             for paddock in paddocks:
                 widget = PaddockCollapsibleListItem(paddock)
                 item = QListWidgetItem(self)
                 item.setSizeHint(widget.sizeHint())
+
+                # Prevent selection of the items
+                item.setFlags(item.flags() | Qt.ItemIsSelectable)
+
                 self.addItem(item)
                 self.setItemWidget(item, widget)
-                widget.collapsed.connect(self.refreshLayout)
-                widget.expanded.connect(self.refreshLayout)
+
+                widget.layoutRefreshNeeded.connect(self.refreshLayout)
         else:
             self.clear()
 
@@ -43,3 +51,4 @@ class PaddockListBase(QListWidget):
         """Refresh the layout based on the size hints of all the custom widgets."""
         for item in [self.item(i) for i in range(self.count())]:
             item.setSizeHint(self.itemWidget(item).sizeHint())
+            
