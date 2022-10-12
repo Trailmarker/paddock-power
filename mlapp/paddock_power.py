@@ -10,11 +10,11 @@ from qgis.utils import iface
 from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
-from .src.models.state import clearProject, detectProject, getMilestone, getProject
+from .src.models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
 from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
-from .src.utils import guiError, qgsDebug
+from .src.utils import qgsDebug
 
 class PaddockPower:
 
@@ -43,13 +43,16 @@ class PaddockPower:
         self.toolbar = self.iface.addToolBar(u'PaddockPower')
         self.toolbar.setObjectName(u'PaddockPower')
 
-        detectProject()
-        QgsProject.instance().cleared.connect(clearProject)
-        QgsProject.instance().readProject.connect(detectProject)
-
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.firstStart = None
+
+        self.state = PaddockPowerState()
+        connectPaddockPowerStateListener(self.state, self.state)
+        self.state.detectProject()
+
+        QgsProject.instance().cleared.connect(self.state.clearProject)
+        QgsProject.instance().readProject.connect(self.state.detectProject)
 
         self.infrastructureViewIsActive = False
         self.infrastructureView = None

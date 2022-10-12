@@ -29,9 +29,9 @@ class AddMilestoneDialog(QDialog, FORM_CLASS):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setWindowIcon(QIcon(":/plugins/mlapp/images/new-milestone.png"))
 
-        if project.currentMilestone is not None:
+        if project.milestone is not None:
             self.setWindowTitle(
-                f"Add Milestone from '{project.currentMilestone.milestoneName}'")
+                f"Add Milestone from '{project.milestone.milestoneName}'")
 
         self.project = project
 

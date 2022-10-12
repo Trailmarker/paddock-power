@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem
 
 from .paddock_collapsible_list_item import PaddockCollapsibleListItem
 
 class PaddockListBase(QListWidget):
-    refreshUiNeeded = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""

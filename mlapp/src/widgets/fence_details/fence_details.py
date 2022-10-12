@@ -2,12 +2,8 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtGui import QIcon
 
 from qgis.gui import QgsCollapsibleGroupBox
-
-from ...utils import guiConfirm, qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_details_group_box_base.ui')))
@@ -16,8 +12,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
 
     NAME, AREA, PERIMETER = ["Paddock Name", "Paddock Area (km²)", "Paddock Perimeter (km)"]
-    
-    refreshUiNeeded = pyqtSignal()
 
     def __init__(self, milestone, paddock, parent=None):
         """Constructor."""
@@ -28,7 +22,6 @@ class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
         self.milestone = milestone
         self.paddock = paddock
         
-        self.refreshUiNeeded.connect(self.refreshUi)
         self.refreshUi()
 
     def refreshUi(self):

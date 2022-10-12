@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QDockWidget
 
-from ...models.state import detectProject
+from ...models.paddock_power_state import PaddockPowerState
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_view_dock_widget_base.ui')))
@@ -21,11 +21,12 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
 
         self.setupUi(self)
 
+        self.state = PaddockPowerState()
         # test filtering stuff
         # self.paddockList.filterByName("Test")
 
     def showEvent(self, event):
-        detectProject()
+        self.state.detectProject()
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

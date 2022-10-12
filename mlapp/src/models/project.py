@@ -10,18 +10,17 @@ from ..layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
 from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerType
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
-from ..utils import qgsDebug, resolveGeoPackageFile
-
+from ..utils import resolveGeoPackageFile
 
 class Project(QObject):
     # emit this signal when paddocks are updated
-    milestonesUpdated = pyqtSignal()
-    currentMilestoneChanged = pyqtSignal()
+    milestonesUpdated = pyqtSignal(dict)
+    milestoneChanged = pyqtSignal(Milestone)
 
     def __init__(self, gpkgFile=None):
         super(Project, self).__init__()
         self.milestones = {}
-        self.currentMilestone = None
+        self.milestone = None
 
         self.elevationLayer = None
 
@@ -53,14 +52,14 @@ class Project(QObject):
         """Set the current milestone."""
         self.validateMilestoneName(milestoneName)
 
-        self.currentMilestone = self.milestones[milestoneName]
+        self.milestone = self.milestones[milestoneName]
 
         # Set the current milestone's layer group visible, and hide others
         for milestone in self.milestones.values():
             milestone.setVisible(milestone.milestoneName == milestoneName)
 
-        self.currentMilestoneChanged.emit()
-        return self.currentMilestone
+        self.milestoneChanged.emit(self.milestone)
+        return self.milestone
 
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
@@ -75,7 +74,7 @@ class Project(QObject):
 
         self.milestones[milestoneName] = milestone
         milestone.addToMap()
-        self.milestonesUpdated.emit()
+        self.milestonesUpdated.emit(self.milestones)
         return milestone
 
     def addMilestoneFromExisting(self, milestoneName, existingMilestoneName):
@@ -97,11 +96,12 @@ class Project(QObject):
         milestone.removeFromMap()
         milestone.deleteFromGeoPackage()
 
-        if self.currentMilestone is not None and self.currentMilestone.milestoneName == milestoneName:
-            self.currentMilestone = None
-            self.currentMilestoneChanged.emit()
+        # Deleting the current Milestone
+        if self.milestone is not None and self.milestone.milestoneName == milestoneName:
+            self.milestone = None
+            self.milestoneChanged.emit(self.milestone)
 
-        self.milestonesUpdated.emit()
+        self.milestonesUpdated.emit(self.milestones)
 
     def load(self, forceLoad=False):
         """Load this project from its GeoPackage."""
@@ -119,22 +119,22 @@ class Project(QObject):
         milestoneNames.sort()
 
         self.milestones = {}
-        self.currentMilestone = None
+        self.milestone = None
 
         for milestoneName in milestoneNames:
             milestone = Milestone(milestoneName, self.gpkgFile)
             self.milestones[milestoneName] = milestone
             milestone.load()
 
-        if milestoneNames:
-            self.setMilestone(milestoneNames[0])
-
         elevationLayerName = Project.findElevationLayer(self.gpkgFile)
         if elevationLayerName is not None:
             self.elevationLayer = ElevationLayer(PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
 
         self.isLoaded = True
-        self.milestonesUpdated.emit()
+        self.milestonesUpdated.emit(self.milestones)
+        if milestoneNames:
+            self.setMilestone(milestoneNames[0])
+
 
     def addToMap(self):
         """Add the project to the map."""

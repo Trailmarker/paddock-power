@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ...models.state import getProject
+from ...models.paddock_power_state import PaddockPowerState
 from .paddock_list_base import PaddockListBase
 
 class PaddockList(PaddockListBase):
@@ -8,12 +8,14 @@ class PaddockList(PaddockListBase):
 
         super(PaddockListBase, self).__init__(parent)
 
-        self.project = getProject()
-        if self.project is not None:
-            self.project.currentMilestoneChanged.connect(self.refreshUi)
-            self.refreshUi()
+        self.state = PaddockPowerState()
+
+        # refreshUi is implemented in PaddockListBase
+        self.state.milestoneChanged.connect(self.refreshUi)
+
+        self.refreshUi()
 
     def getPaddocks(self):
         """Get the paddocks."""
-        milestone = self.project.currentMilestone
+        milestone = self.state.getMilestone()
         return milestone.paddockLayer.getFeatures() if milestone is not None else None

@@ -2,13 +2,13 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QDockWidget, QSizePolicy
 
 
-from ...models.state import detectProject, getMilestone, getProject, getState
-from ...utils import guiError, qgsDebug
+from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
+from ...utils import guiError
 from ...widgets.infrastructure_profile.infrastructure_profile_canvas import InfrastructureProfileCanvas
 from ...widgets.infrastructure_profile.infrastructure_profile_tool import InfrastructureProfileTool
 
@@ -19,7 +19,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
-    refreshUiNeeded = pyqtSignal()
 
     infrastructureProfile = None
     infrastructureProfileCanvas = None
@@ -37,32 +36,38 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
 
         self.sketchInfrastructureLineButton.clicked.connect(self.sketchInfrastructureLine)
 
-        detectProject()
-
-        getState().projectChanged.connect(self.setupConnections)
-        getState().projectChanged.connect(self.refreshUi)
-        self.refreshUiNeeded.connect(self.refreshUi)
+        self.state = PaddockPowerState()
+        connectPaddockPowerStateListener(self.state, self)
 
         self.refreshUi()
 
-    def setupConnections(self):
-        """Reconnect things as necessary."""
-        project = getProject()
-        if project is not None:
-            project.currentMilestoneChanged.connect(self.refreshUi)
+    @pyqtSlot()
+    def onProjectChanged(self, project):
+        """Handle a change in the current Paddock Power project."""
+        self.refreshUi()
+    
+    @pyqtSlot()
+    def onMilestoneChanged(self, milestone):
+        """Handle a change in the current Paddock Power milestone."""
+        self.refreshUi()
+
+    @pyqtSlot()
+    def onMilestonesUpdated(self, milestones):
+        """Handle a change to the current collection of Paddock Power milestones."""
+        pass
 
     def showEvent(self, event):
-        detectProject()
+        self.state.detectProject()
 
     def sketchInfrastructureLine(self):
         """Set InfrastructureProfileTool as a custom map tool."""
-        milestone = getMilestone()
+        milestone = self.state.getMilestone()
 
         if milestone is None:
             guiError(
                 "Please set the current Milestone before using the Sketch Infrastructure Line tool.")
         else:
-            project = getProject()
+            project = self.state.getProject()
             tool = InfrastructureProfileTool(milestone, project)
             tool.infrastructureProfileUpdated.connect(self.setInfrastructureProfile)
             milestone.setTool(tool)
@@ -72,12 +77,10 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
      
         # qgsDebug("Fenceline profile is being updated in dock widget …")
         self.infrastructureProfile = infrastructureProfle
-        self.refreshUiNeeded.emit()
-
+        self.refreshUi()
 
     def refreshUi(self):
         """Show the Infrastructure Profile."""
-
         # If we have no current infrastructure profile data, clean up the canvas object
         if self.infrastructureProfile is None:
             if self.infrastructureProfileCanvas is not None:
@@ -105,7 +108,6 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
             self.infrastructureProfileCanvas.setMaximumHeight(250)
             self.gridLayout.removeWidget(self.placeholderLabel)
             self.gridLayout.addWidget(self.infrastructureProfileCanvas, 4, 0, 1, 4)
-
 
 
     def closeEvent(self, event):
