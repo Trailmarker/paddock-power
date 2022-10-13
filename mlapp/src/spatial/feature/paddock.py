@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-from re import I
 from qgis.core import (QgsFeature, QgsField, QgsFields)
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
 
-from ..models.paddock_power_error import PaddockPowerError
-from .calculator import Calculator
-from .paddock_power_feature import PaddockPowerFeature
+from ...models.paddock_power_error import PaddockPowerError
+from ..calculator import Calculator
+from .feature import Feature
 
 
-class Paddock(PaddockPowerFeature):
+class Paddock(Feature):
     NAME, AREA, PERIMETER, CONDITION = ["Paddock Name",
                                         "Paddock Area (km²)",
                                         "Paddock Perimeter (km)",
@@ -25,7 +24,7 @@ class Paddock(PaddockPowerFeature):
                  typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=CONDITION, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name=PaddockPowerFeature.STATUS, type=QVariant.String, typeName="String",
+        QgsField(name=Feature.STATUS, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid)
     ]
 
@@ -49,8 +48,8 @@ class Paddock(PaddockPowerFeature):
 
     def recalculate(self, elevationLayer=None):
         """Recalculate the area and perimeter of the Paddock."""
-        area = Calculator.calculateArea(self.geometry())
-        perimeter = Calculator.calculatePerimeter(self.geometry())
+        area = round(Calculator.calculateArea(self.geometry()) / 1000000, 2)
+        perimeter = round(Calculator.calculatePerimeter(self.geometry()) / 1000, 2)
         self.setAttribute(Paddock.AREA, area)
         self.setAttribute(Paddock.PERIMETER, perimeter)
 

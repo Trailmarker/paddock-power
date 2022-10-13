@@ -5,9 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from qgis.core import QgsFeature
-
-from ...layer.fence import Fence, asFence
+from ...spatial.feature.fence import Fence, asFence
 from ...models.paddock_power_error import PaddockPowerError
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from ...utils import qgsDebug
@@ -50,16 +48,12 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     @pyqtSlot()
     def onSelectedFenceChanged(self, fence):
         """Handle a change in the selected fence."""
-        qgsDebug("FencePaddockChangesWidget.onSelectedFenceChanged")
         self.clearFence()
         self.setFence(asFence(fence))
         self.refreshUi()
 
     def refreshUi(self):
         """Show the Paddock View."""
-        qgsDebug(f"self.superseededPaddocks: {self.supersededPaddocks}")
-        qgsDebug(f"self.superseededPaddocks.__class__.__name__: {self.supersededPaddocks.__class__.__name__}")
-
         self.setVisible(self.fence is not None)
 
         self.supersededPaddockMiniList.setPaddocks(self.supersededPaddocks)

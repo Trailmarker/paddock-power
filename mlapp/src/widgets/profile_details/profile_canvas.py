@@ -4,7 +4,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib
 matplotlib.use('Qt5Agg')
 
-from ...layer.profile import Profile
+from ...spatial.profile import Profile
 from ...models.paddock_power_error import PaddockPowerError
 
 

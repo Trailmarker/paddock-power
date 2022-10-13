@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os.path
-from mlapp.src.widgets.fence_details.selected_fence_rubber_band import SelectedFenceRubberBand
 from qgis.core import QgsApplication, QgsProject
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon

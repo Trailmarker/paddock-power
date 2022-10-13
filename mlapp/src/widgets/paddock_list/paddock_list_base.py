@@ -35,6 +35,10 @@ class PaddockListBase(QListWidget):
         # Sort Paddocks alphabetically
         paddocks.sort(key=lambda x: x["Paddock Name"])
 
+        # Initially clear the list
+        self.clear()
+
+        # Then repopulate it if we have Paddocks
         if paddocks is not None:
             for paddock in paddocks:
                 widget = PaddockCollapsibleListItem(paddock)
@@ -48,8 +52,6 @@ class PaddockListBase(QListWidget):
                 self.setItemWidget(item, widget)
 
                 widget.layoutRefreshNeeded.connect(self.refreshLayout)
-        else:
-            self.clear()
 
     def refreshLayout(self):
         """Refresh the layout based on the size hints of all the custom widgets."""

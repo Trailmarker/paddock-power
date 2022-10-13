@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsWkbTypes
 
-from .fence import Fence, asFence
+from ..feature.fence import Fence, asFence
 from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType, PaddockPowerVectorLayerType
 
 

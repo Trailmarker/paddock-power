@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-from ..models.paddock_power_error import PaddockPowerError
-from .paddock_power_feature_status import PaddockPowerFeatureStatus
+from ...models.paddock_power_error import PaddockPowerError
+from .feature_status import FeatureStatus
 
-class PaddockPowerFeature:
+class Feature:
     STATUS = "Status"
 
     def status(self):
         #return PaddockPowerFeatureStatus[self[PaddockPowerFeature.STATUS]]
-        return PaddockPowerFeatureStatus.Planned
+        return FeatureStatus.Planned
 
     def setStatus(self, status):
-        if not isinstance(status, PaddockPowerFeatureStatus):
+        if not isinstance(status, FeatureStatus):
             raise PaddockPowerError("PaddockPowerFeature.setStatus: status must be a PaddockPowerFeatureStatus")
         
         #self.setAttribute(PaddockPowerFeature.STATUS, status.name)

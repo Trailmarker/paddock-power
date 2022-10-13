@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.layer.paddock_power_feature_status import PaddockPowerFeatureStatus
 from qgis.core import QgsGeometry, QgsPoint, QgsWkbTypes
 from qgis.gui import QgsRubberBand
 

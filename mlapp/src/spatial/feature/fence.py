@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.layer.paddock_power_feature import PaddockPowerFeature
-from mlapp.src.layer.paddock_power_feature_status import PaddockPowerFeatureStatus
 from qgis.core import (QgsFeature, QgsField, QgsFields,
                        QgsGeometry, QgsLineString, QgsPoint)
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
 
-from ..models.paddock_power_error import PaddockPowerError
-from ..utils import qgsDebug
-from .calculator import Calculator
+from ...models.paddock_power_error import PaddockPowerError
+from ...utils import qgsDebug
+from ..calculator import Calculator
+from .feature import Feature
+from .feature_status import FeatureStatus
+from .line_feature import LineFeature
 from .paddock import asPaddock
-from .paddock_power_feature import PaddockPowerFeature
 
 
-class Fence(PaddockPowerFeature):
+class Fence(LineFeature):
     BUILD_ORDER, LENGTH, STATUS = ["Build Order",
-                                   "Fence Length",
-                                   "Status"]
+                                   LineFeature.LENGTH,
+                                   Feature.STATUS]
 
     SCHEMA = [
         QgsField(name=BUILD_ORDER, type=QVariant.LongLong, typeName="Integer64",
@@ -37,9 +37,6 @@ class Fence(PaddockPowerFeature):
     def fenceBuildOrder(self):
         return self[Fence.BUILD_ORDER]
 
-    def fenceLength(self):
-        return self[Fence.LENGTH]
-
     def setFenceBuildOrder(self, buildOrder):
         self.setAttribute(Fence.BUILD_ORDER, buildOrder)
 
@@ -49,7 +46,8 @@ class Fence(PaddockPowerFeature):
     def recalculate(self, elevationLayer=None):
         """Recalculate the length of this Fence."""
         self.profile = Calculator.calculateProfile(self.geometry(), elevationLayer)
-        self.setAttribute(Fence.LENGTH, self.profile.maximumDistance)
+        length = round(self.profile.maximumDistance, 2)
+        self.setAttribute(Fence.LENGTH, length)
 
     def analyseFence(self, paddockLayer):
         """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
@@ -99,7 +97,7 @@ class Fence(PaddockPowerFeature):
         plannedPaddocks = []
         for crossedPaddock in supersededPaddocks:
             # This paddock would be superseded by the split
-            crossedPaddock.setStatus(PaddockPowerFeatureStatus.Superseded)
+            crossedPaddock.setStatus(FeatureStatus.Superseded)
             paddockLayer.updatePaddock(crossedPaddock)
 
             crossedPaddockName = crossedPaddock.paddockName()
@@ -111,7 +109,7 @@ class Fence(PaddockPowerFeature):
             for i, splitPaddock in enumerate(splitPaddocks):
                 splitPaddock.setPaddockName(
                     crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
-                splitPaddock.setStatus(PaddockPowerFeatureStatus.Planned)
+                splitPaddock.setStatus(FeatureStatus.Planned)
                 splitPaddock.recalculate()
                 paddockLayer.updatePaddock(splitPaddock)
                 plannedPaddocks.append(splitPaddock)

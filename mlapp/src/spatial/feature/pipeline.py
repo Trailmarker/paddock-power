@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.layer.paddock_power_feature import PaddockPowerFeature
-from mlapp.src.layer.paddock_power_feature_status import PaddockPowerFeatureStatus
 from qgis.core import (QgsFeature, QgsField, QgsFields)
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
 
-from ..models.paddock_power_error import PaddockPowerError
-from .calculator import Calculator
-from .paddock_power_feature import PaddockPowerFeature
+from ...models.paddock_power_error import PaddockPowerError
+from ..calculator import Calculator
+from .feature import Feature
+from .line_feature import LineFeature
 
 
-class Pipeline(PaddockPowerFeature):
-    LENGTH, STATUS = ["Pipeline Length",
-                      "Status"]
+class Pipeline(LineFeature):
+    LENGTH, STATUS = [LineFeature.LENGTH,
+                      Feature.STATUS]
 
     SCHEMA = [
         QgsField(name=LENGTH, type=QVariant.Double, typeName="Real",
@@ -28,12 +27,6 @@ class Pipeline(PaddockPowerFeature):
         # Cache the length profile
         self.profile = None
 
-    def pipelineLength(self):
-        return self[Pipeline.LENGTH]
-
-    def setPipelineLength(self, length):
-        self.setAttribute(Pipeline.LENGTH, length)
-
     def getProfile(self):
         return self.profile
 
@@ -41,8 +34,9 @@ class Pipeline(PaddockPowerFeature):
         """Recalculate the length of this Pipeline."""
         self.profile = Calculator.calculateProfile(
             self.geometry(), elevationLayer)
-        self.setFenceLength(self.profile.maximumDistance)
-
+        length = round(self.profile.maximumDistance, 2)
+        self.setAttribute(Pipeline.LENGTH, length)
+        
 
 PipelineFeature = type('PipelineFeature', (Pipeline, QgsFeature), {})
 

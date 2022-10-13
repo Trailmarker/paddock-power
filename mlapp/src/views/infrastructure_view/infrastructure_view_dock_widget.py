@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
-from mlapp.src.models.paddock_power_error import PaddockPowerError
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QDockWidget, QSizePolicy
+from qgis.PyQt.QtWidgets import QDockWidget
 
-
-from ...layer.calculator import Calculator
-from ...layer.fence import Fence, asFence, makeFence
-from ...layer.paddock_power_feature_status import PaddockPowerFeatureStatus
-from ...layer.pipeline import Pipeline, asPipeline, makePipeline
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
+from ...spatial.feature.fence import makeFence
+from ...spatial.feature.feature_status import FeatureStatus
+from ...spatial.feature.pipeline import makePipeline
 from ...utils import guiError
 from .sketch_line_tool import SketchLineTool
 
@@ -86,11 +82,8 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         fence = makeFence()
         fence.setGeometry(sketchLine)
         fence.recalculate(project.elevationLayer)
-        fence.setStatus(PaddockPowerFeatureStatus.Planned)
+        fence.setStatus(FeatureStatus.Planned)
 
-        if not isinstance(fence, Fence):
-            raise PaddockPowerError("InfrastructureViewDockWidget.onSketchFenceFinished: fence is not a Fence")
-        
         milestone.setSelectedFence(fence)
 
     def sketchPipeline(self):
@@ -112,7 +105,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         pipeline = makePipeline()
         pipeline.setGeometry(sketchLine)
         pipeline.recalculate(project.elevationLayer)
-        pipeline.setStatus(PaddockPowerFeatureStatus.Planned)
+        pipeline.setStatus(FeatureStatus.Planned)
         
         milestone.setSelectedPipeline(pipeline)
 

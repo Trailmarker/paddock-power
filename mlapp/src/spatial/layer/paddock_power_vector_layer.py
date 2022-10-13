@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-
 from enum import Enum
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
+from ...models.paddock_power_error import PaddockPowerError
+from ...utils import resolveStylePath
 from .paddock_power_layer_source_type import PaddockPowerLayerSourceType
-from ..models.paddock_power_error import PaddockPowerError
-from ..utils import resolveStylePath
 
 # Couple of lookup dictionaries (locally useful only)
 QVARIANT_TYPES = dict([(getattr(QVariant, v), v) for v, m in vars(
@@ -117,7 +116,7 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
     def getFeatures(self):
         """Get the features in this layer."""
         return self.adaptFeatures(super().getFeatures())
- 
+
     def whileEditing(self, func):
         """Run a function with the layer in edit mode."""
         isEditing = self.isEditable()

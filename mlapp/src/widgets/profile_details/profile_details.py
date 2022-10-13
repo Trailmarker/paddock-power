@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
-from mlapp.src.models.paddock_power_error import PaddockPowerError
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...layer.calculator import Calculator
-from ...layer.fence import Fence, asFence
-from ...layer.paddock_power_feature_status import PaddockPowerFeatureStatus
-from ...layer.pipeline import Pipeline, asPipeline
+from ...spatial.calculator import Calculator
+from ...spatial.feature.fence import Fence, asFence
+from ...spatial.feature.pipeline import Pipeline, asPipeline
+from ...models.paddock_power_error import PaddockPowerError
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from ...utils import guiError
 from .profile_canvas import ProfileCanvas

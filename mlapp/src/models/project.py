@@ -5,12 +5,12 @@ import sqlite3
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsVectorLayer
 
-from ..layer.elevation_layer import ElevationLayer
-from ..layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
-from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerType
+from ..spatial.layer.elevation_layer import ElevationLayer
+from ..spatial.layer.paddock_layer import PaddockPowerVectorLayerType
+from ..spatial.layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
+from ..utils import resolveGeoPackageFile
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
-from ..utils import resolveGeoPackageFile
 
 
 class Project(QObject):

@@ -3,7 +3,7 @@
 from enum import Enum
 
 
-class PaddockPowerFeatureStatus(Enum):
+class FeatureStatus(Enum):
     """Allowed statuses for a Paddock Power feature."""
     Planned = "Planned",
     Existing = "Existing",

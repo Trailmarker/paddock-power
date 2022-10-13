@@ -2,8 +2,8 @@
 
 from qgis.core import QgsRasterLayer
 
+from ...models.paddock_power_error import PaddockPowerError
 from .paddock_power_layer_source_type import PaddockPowerLayerSourceType
-from ..models.paddock_power_error import PaddockPowerError
 
 
 class ElevationLayer(QgsRasterLayer):

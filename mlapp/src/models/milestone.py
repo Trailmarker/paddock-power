@@ -7,15 +7,15 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsFeature, QgsProject
 from qgis.utils import iface
 
-from ..layer.boundary_layer import BoundaryLayer
-from ..layer.fence import Fence
-from ..layer.fence_layer import FenceLayer
-from ..layer.paddock import Paddock
-from ..layer.paddock_layer import PaddockLayer
-from ..layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
-from ..layer.pipeline import Pipeline
-from ..layer.pipeline_layer import PipelineLayer
-from ..layer.waterpoint_layer import WaterpointLayer
+from ..spatial.layer.boundary_layer import BoundaryLayer
+from ..spatial.feature.fence import Fence
+from ..spatial.layer.fence_layer import FenceLayer
+from ..spatial.feature.paddock import Paddock
+from ..spatial.layer.paddock_layer import PaddockLayer
+from ..spatial.layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
+from ..spatial.feature.pipeline import Pipeline
+from ..spatial.layer.pipeline_layer import PipelineLayer
+from ..spatial.layer.waterpoint_layer import WaterpointLayer
 from ..utils import qgsDebug
 
 from ..widgets.paddock_power_map_tool import PaddockPowerMapTool

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsWkbTypes
 
-from .paddock import Paddock, asPaddock
+from ..feature.paddock import Paddock, asPaddock
 from .paddock_power_vector_layer import (PaddockPowerLayerSourceType,
                                          PaddockPowerVectorLayer,
                                          PaddockPowerVectorLayerType)
