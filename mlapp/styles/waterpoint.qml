@@ -1238,23 +1238,6 @@
       </editWidget>
     </field>
   </fieldConfiguration>
-  <aliases>
-    <alias index="0" field="fid" name=""/>
-    <alias index="1" field="Waterpoint Type" name="Type"/>
-    <alias index="2" field="Waterpoint Name" name="Name"/>
-    <alias index="3" field="Waterpoint Reference" name="Bore reference number"/>
-    <alias index="4" field="Waterpoint Bore Yield (l/sec)" name="Bore yield (L/sec)"/>
-    <alias index="5" field="Waterpoint Bore Report" name="Link to bore report"/>
-    <alias index="6" field="Waterpoint Status" name=""/>
-    <alias index="7" field="Waterpoint Date Commisioned" name="Date commisioned"/>
-    <alias index="8" field="Waterpoint Date Decommisioned" name="Date decommisioned"/>
-    <alias index="9" field="Waterpoint Start Month" name="Month usable from"/>
-    <alias index="10" field="Waterpoint End Month" name="Month usable to"/>
-    <alias index="11" field="Waterpoint Longitude" name="Longitude (wgs84)"/>
-    <alias index="12" field="Waterpoint Latitude" name="Latitude (wgs84)"/>
-    <alias index="13" field="Waterpoint Elevation" name="Elevation (m)"/>
-    <alias index="14" field="Date Edited" name=""/>
-  </aliases>
   <defaults>
     <default applyOnUpdate="0" expression="" field="fid"/>
     <default applyOnUpdate="0" expression="" field="Waterpoint Type"/>

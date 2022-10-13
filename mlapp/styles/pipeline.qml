@@ -355,15 +355,6 @@
       </editWidget>
     </field>
   </fieldConfiguration>
-  <aliases>
-    <alias index="0" field="fid" name=""/>
-    <alias index="1" field="Name" name=""/>
-    <alias index="2" field="Status" name=""/>
-    <alias index="3" field="Date Commisioned" name=""/>
-    <alias index="4" field="Date Decommisioned" name=""/>
-    <alias index="5" field="Length (km)" name=""/>
-    <alias index="6" field="Date Edited" name=""/>
-  </aliases>
   <defaults>
     <default applyOnUpdate="0" expression="" field="fid"/>
     <default applyOnUpdate="0" expression="" field="Name"/>

@@ -419,14 +419,14 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Paddock Name">
+    <field configurationFlags="None" name="Name">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Paddock Area (km²)">
+    <field configurationFlags="None" name="Area (km²)">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -440,29 +440,14 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Current Watered Area (km²)">
+    <field configurationFlags="None" name="Watered Area (km²)">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Date Created">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
   </fieldConfiguration>
-  <aliases>
-    <alias index="0" field="fid" name=""/>
-    <alias index="1" field="Paddock Name" name=""/>
-    <alias index="2" field="Paddock Area (km²)" name=""/>
-    <alias index="3" field="Buffer Distance (km)" name=""/>
-    <alias index="4" field="Current Watered Area (km²)" name=""/>
-    <alias index="5" field="Date Created" name=""/>
-  </aliases>
   <defaults>
     <default applyOnUpdate="0" expression="" field="fid"/>
     <default applyOnUpdate="0" expression="" field="Paddock Name"/>

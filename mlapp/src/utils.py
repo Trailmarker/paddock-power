@@ -80,3 +80,21 @@ def getSignals(source):
         for key, value in sorted(vars(subcls).items()):
             if isinstance(value, signal):
                 print(f'{key} [{clsname}]')
+
+
+def clearItem(item):
+    """Fully delete a QWidget or QLayout and all of its children."""
+    if hasattr(item, "layout"):
+        if callable(item.layout):
+            layout = item.layout()
+            if layout is not None:
+                for i in reversed(range(layout.count())):
+                    clearItem(layout.itemAt(i))
+                del layout
+
+    if hasattr(item, "widget"):
+        if callable(item.widget):
+            widget = item.widget()
+            if widget is not None:
+                widget.setParent(None)
+                del widget

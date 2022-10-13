@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+  <class>InfrastructureViewDockWidgetBase</class>
+  <widget class="QDockWidget" name="InfrastructureViewDockWidgetBase">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>776</width>
+        <height>500</height>
+      </rect>
+    </property>
+    <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+      </sizepolicy>
+    </property>
+    <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+      <string notr="true"/>
+    </property>
+    <property name="windowTitle">
+      <string>MLA Paddock Power | Plan Fences and Pipelines</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents">
+      <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+        </sizepolicy>
+      </property>
+      <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+        <string notr="true"/>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+          <layout class="QHBoxLayout" name="headerLayout">
+            <item>
+              <widget class="QToolButton" name="sketchFenceButton">
+                <property name="toolTip">
+                  <string>Sketch Fence …</string>
+                </property>
+                <property name="text">
+                  <string/>
+                </property>
+                <property name="icon">
+                  <iconset>
+                    <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="QToolButton" name="selectFenceButton">
+                <property name="toolTip">
+                  <string>Select Existing Fence …</string>
+                </property>
+                <property name="text">
+                  <string/>
+                </property>
+                <property name="icon">
+                  <iconset>
+                    <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="QToolButton" name="selectPipelineButton">
+                <property name="toolTip">
+                  <string>Sketch Pipeline …</string>
+                </property>
+                <property name="text">
+                  <string/>
+                </property>
+                <property name="icon">
+                  <iconset>
+                    <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="QToolButton" name="sketchPipelineButton">
+                <property name="toolTip">
+                  <string>Select Existing Pipeline …</string>
+                </property>
+                <property name="text">
+                  <string/>
+                </property>
+                <property name="icon">
+                  <iconset>
+                    <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <spacer name="toolbarSpacer">
+                <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                  <size>
+                    <width>40</width>
+                    <height>20</height>
+                  </size>
+                </property>
+              </spacer>
+            </item>
+            <item>
+              <widget class="MilestoneToolBar" name="milestoneToolBar" native="true">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                  <size>
+                    <width>100</width>
+                    <height>0</height>
+                  </size>
+                </property>
+              </widget>
+            </item>
+          </layout>
+        </item>
+        <item>
+          <layout class="QHBoxLayout" name="contentLayout">
+            <property name="topMargin">
+              <number>0</number>
+            </property>
+            <item>
+              <widget class="FenceList" name="fenceList" native="true">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                  <size>
+                    <width>100</width>
+                    <height>0</height>
+                  </size>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="ProfileDetails" name="profileDetails" native="true">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                  <string notr="true"/>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="FencePaddockChanges" name="fencePaddockChanges" native="true">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                  <size>
+                    <width>100</width>
+                    <height>0</height>
+                  </size>
+                </property>
+                <property name="styleSheet">
+                  <string notr="true"/>
+                </property>
+              </widget>
+            </item>
+          </layout>
+        </item>
+        <item>
+          <spacer name="verticalSpacer">
+            <property name="orientation">
+              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+              <size>
+                <width>0</width>
+                <height>0</height>
+              </size>
+            </property>
+          </spacer>
+        </item>
+      </layout>
+    </widget>
+  </widget>
+  <customwidgets>
+    <customwidget>
+      <class>MilestoneToolBar</class>
+      <extends>QWidget</extends>
+      <header>mlapp/src/widgets/milestone_tool_bar/milestone_tool_bar</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>ProfileDetails</class>
+      <extends>QWidget</extends>
+      <header>mlapp/src/widgets/profile_details/profile_details</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>FencePaddockChanges</class>
+      <extends>QWidget</extends>
+      <header>mlapp/src/widgets/fence_details/fence_paddock_changes</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>FenceList</class>
+      <extends>QWidget</extends>
+      <header>mlapp/src/widgets/fence_list/fence_list</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
+  <resources/>
+  <connections/>
+</ui>

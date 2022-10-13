@@ -34,7 +34,7 @@ class CreateProject(QgsProcessingAlgorithm):
             gpkgFile = resolveGeoPackageFile(projectFilePath)
 
             milestone = None
-            
+
             project = Project(gpkgFile)
             project.load()
             milestone = project.addMilestone(milestoneName)

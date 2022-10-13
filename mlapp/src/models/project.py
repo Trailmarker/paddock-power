@@ -5,23 +5,34 @@ import sqlite3
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsVectorLayer
 
-from ..layer.elevation_layer import ElevationLayer
-from ..layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
-from ..layer.paddock_power_vector_layer import PaddockPowerVectorLayerType
+# -*- coding: utf-8 -*-
+from ..spatial.feature.boundary import Boundary
+from ..spatial.feature.waterpoint import Waterpoint
+from ..spatial.feature.pipeline import Pipeline
+from ..spatial.feature.fence import Fence
+from ..spatial.feature.paddock import Paddock
+from ..spatial.feature.land_system import LandSystem
+from ..spatial.layer.elevation_layer import ElevationLayer
+from ..spatial.layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
+from ..utils import resolveGeoPackageFile
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
-from ..utils import qgsDebug, resolveGeoPackageFile
 
 
 class Project(QObject):
+    PROJECT_BASE_DATA_GROUP = "Base Data"
+
+    PADDOCK_POWER_FEATURE_TYPES = (
+        Boundary, Waterpoint, Pipeline, Fence, Paddock, LandSystem)
+
     # emit this signal when paddocks are updated
-    milestonesUpdated = pyqtSignal()
-    currentMilestoneChanged = pyqtSignal()
+    milestonesUpdated = pyqtSignal(dict)
+    milestoneChanged = pyqtSignal(Milestone)
 
     def __init__(self, gpkgFile=None):
         super(Project, self).__init__()
         self.milestones = {}
-        self.currentMilestone = None
+        self.milestone = None
 
         self.elevationLayer = None
 
@@ -53,29 +64,26 @@ class Project(QObject):
         """Set the current milestone."""
         self.validateMilestoneName(milestoneName)
 
-        self.currentMilestone = self.milestones[milestoneName]
+        if self.milestone is not None:
+            self.milestone.disconnectAll()
+
+        self.milestone = self.milestones[milestoneName]
 
         # Set the current milestone's layer group visible, and hide others
         for milestone in self.milestones.values():
             milestone.setVisible(milestone.milestoneName == milestoneName)
 
-        self.currentMilestoneChanged.emit()
-        return self.currentMilestone
+        self.milestoneChanged.emit(self.milestone)
+        return self.milestone
 
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
-        self.validateMilestoneName(milestoneName)
-
-        if not self.isLoaded:
-            raise PaddockPowerError(
-                "Project.addMilestone: cannot add Milestone to a Project that is empty.")
-
         milestone = Milestone(milestoneName, self.gpkgFile)
         milestone.create()
 
         self.milestones[milestoneName] = milestone
         milestone.addToMap()
-        self.milestonesUpdated.emit()
+        self.milestonesUpdated.emit(self.milestones)
         return milestone
 
     def addMilestoneFromExisting(self, milestoneName, existingMilestoneName):
@@ -88,49 +96,53 @@ class Project(QObject):
     def deleteMilestone(self, milestoneName):
         """Delete a milestone from the project."""
         self.validateMilestoneName(milestoneName)
-        
+
         if not self.gpkgFile:
             raise PaddockPowerError(
                 "Project.deleteMilestone: Project has no GeoPackage file yet.")
-        
+
         milestone = self.milestones.pop(milestoneName, None)
         milestone.removeFromMap()
         milestone.deleteFromGeoPackage()
 
-        if self.currentMilestone is not None and self.currentMilestone.milestoneName == milestoneName:
-            self.currentMilestone = None
-            self.currentMilestoneChanged.emit()
+        # Deleting the current Milestone
+        if self.milestone is not None and self.milestone.milestoneName == milestoneName:
+            self.milestone = None
+            self.milestoneChanged.emit(self.milestone)
 
-        self.milestonesUpdated.emit()
+        self.milestonesUpdated.emit(self.milestones)
 
     def load(self, forceLoad=False):
         """Load this project from its GeoPackage."""
         assert(self.gpkgFile is not None)
 
-        if self.isLoaded and not forceLoad:
-            return
+        if not self.isLoaded or forceLoad:
+            # We go to a loaded state if the GeoPackage file does not exist
+            if not path.exists(self.gpkgFile):
+                self.isLoaded = True
+                return
 
-        # We go to a loaded state if the GeoPackage file does not exist
-        if not path.exists(self.gpkgFile):
+            milestoneNames = Project.findMilestones(self.gpkgFile)
+            milestoneNames.sort()
+
+            self.milestones = {}
+            self.milestone = None
+
+            for milestoneName in milestoneNames:
+                milestone = Milestone(milestoneName, self.gpkgFile)
+                self.milestones[milestoneName] = milestone
+                milestone.load()
+
+            elevationLayerName = Project.findElevationLayer(self.gpkgFile)
+            if elevationLayerName is not None:
+                self.elevationLayer = ElevationLayer(
+                    PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
+
             self.isLoaded = True
-            return
+            self.milestonesUpdated.emit(self.milestones)
 
-        milestoneNames = Project.findMilestones(self.gpkgFile)
-
-        self.milestones = {}
-        self.currentMilestone = None
-
-        for milestoneName in milestoneNames:
-            milestone = Milestone(milestoneName, self.gpkgFile)
-            self.milestones[milestoneName] = milestone
-            milestone.load()
-
-        elevationLayerName = Project.findElevationLayer(self.gpkgFile)
-        if elevationLayerName is not None:
-            self.elevationLayer = ElevationLayer(PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
-
-        self.isLoaded = True
-        self.milestonesUpdated.emit()
+        if self.milestone is None:
+            self.setMilestone(list(self.milestones.keys())[0])
 
     def addToMap(self):
         """Add the project to the map."""
@@ -141,6 +153,9 @@ class Project(QObject):
 
         for milestoneName in milestoneNames:
             self.milestones[milestoneName].addToMap()
+
+        # baseDataGroup = QgsProject.instance().layerTreeRoot().findGroup(Project.PROJECT_BASE_DATA_GROUP)
+        # self.elevationLayer.addToMap(baseDataGroup)
 
     def removeFromMap(self):
         """Remove the project from the map."""
@@ -164,16 +179,17 @@ class Project(QObject):
 
         layerNames = [l.split('!!::!!')[1]
                       for l in layers.dataProvider().subLayers()]
-        layerTypeNames = [el.name for el in PaddockPowerVectorLayerType]
+        featureTypeNames = [
+            ft.__name__ for ft in Project.PADDOCK_POWER_FEATURE_TYPES]
 
         milestones = set()
         for layerName in layerNames:
             match = next(
-                (t for t in layerTypeNames if layerName.endswith(t + 's')), None)
+                (t for t in featureTypeNames if layerName.endswith(t + 's')), None)
             if match is not None:
                 milestones.add(rchop(layerName, match + 's').strip())
             match = next(
-                (t for t in layerTypeNames if layerName.endswith(t)), None)
+                (t for t in featureTypeNames if layerName.endswith(t)), None)
             if match is not None:
                 milestones.add(rchop(layerName, match).strip())
 
@@ -184,7 +200,8 @@ class Project(QObject):
         """Find the elevation layer in a project GeoPackage."""
         db = sqlite3.connect(gpkgFile)
         cursor = db.cursor()
-        cursor.execute("SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
+        cursor.execute(
+            "SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
         grids = cursor.fetchall()
 
         if len(grids) == 0:
@@ -194,4 +211,3 @@ class Project(QObject):
         else:
             raise PaddockPowerError(
                 f"Project.findElevationLayer: multiple elevation layers found in {gpkgFile}")
-
