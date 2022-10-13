@@ -78,7 +78,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         milestone = self.state.getMilestone()
         if milestone is not None:
             paddockLayer = milestone.paddockLayer
-            _, self.supersededPaddocks, self.plannedPaddocks = self.fence.analyseFence(paddockLayer)
+            _, self.supersededPaddocks, self.plannedPaddocks = self.fence.planFence(paddockLayer)
         else:
             raise PaddockPowerError("FencePaddockChangesWidget.setFence: current milestone should not be empty")
 

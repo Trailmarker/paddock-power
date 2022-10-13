@@ -49,7 +49,7 @@ class Fence(LineFeature):
         length = round(self.profile.maximumDistance, 2)
         self.setAttribute(Fence.LENGTH, length)
 
-    def analyseFence(self, paddockLayer):
+    def planFence(self, paddockLayer):
         """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
            and a list of planned paddocks resulting from splitting the paddocks using the cropped fence geometry."""
 
@@ -111,11 +111,11 @@ class Fence(LineFeature):
                     crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
                 splitPaddock.setStatus(FeatureStatus.Planned)
                 splitPaddock.recalculate()
-                paddockLayer.updatePaddock(splitPaddock)
+                # paddockLayer.updatePaddock(splitPaddock)
                 plannedPaddocks.append(splitPaddock)
 
         # roll back all these edits
-        paddockLayer.rollBack()
+        paddockLayer.commitChanges()
 
         return (normalisedFenceLine, supersededPaddocks, plannedPaddocks)
 

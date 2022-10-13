@@ -5,6 +5,7 @@ from qgis.PyQt.QtCore import QVariant
 
 from ...models.paddock_power_error import PaddockPowerError
 from ...utils import resolveStylePath
+from ..feature.feature import Feature
 from .paddock_power_layer_source_type import PaddockPowerLayerSourceType
 
 # Couple of lookup dictionaries (locally useful only)
@@ -99,6 +100,15 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
         node = group.findLayer(self.id())
         if node is None:
             group.addLayer(self)
+
+    def addFeature(self, feature):
+        """Add a feature to the layer."""
+        if not isinstance(feature, Feature):
+            raise PaddockPowerError(
+                "PaddockPowerVectorLayer.addFeature: the feature is not a Feature")
+        
+        feature.clearId()
+        super().addFeature(feature)
 
     def setFeatureAdapter(self, featureAdapter):
         """Set the QgsFeature mixin for this layer."""

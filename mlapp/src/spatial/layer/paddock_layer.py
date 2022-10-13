@@ -27,6 +27,10 @@ class PaddockLayer(PaddockPowerVectorLayer):
         """Return the Paddock Power layer type."""
         return PaddockPowerVectorLayerType.Paddock
 
+    def deletePaddock(self, paddockFeature):
+        """Delete a Paddock feature."""
+        self.whileEditing(lambda: self.deleteFeature(paddockFeature.id()))
+
     def updatePaddock(self, paddockFeature):
         """Update a Paddock feature."""
         self.whileEditing(lambda: self.updateFeature(paddockFeature))

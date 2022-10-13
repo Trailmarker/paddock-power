@@ -10,10 +10,11 @@ from .feature import Feature
 
 
 class Paddock(Feature):
-    NAME, AREA, PERIMETER, CONDITION = ["Paddock Name",
-                                        "Paddock Area (km²)",
-                                        "Paddock Perimeter (km)",
-                                        "Condition"]
+    NAME, AREA, PERIMETER, CONDITION, BUILD_FENCE = ["Paddock Name",
+                                                     "Paddock Area (km²)",
+                                                     "Paddock Perimeter (km)",
+                                                     "Condition",
+                                                     "Build Fence"]
 
     SCHEMA = [
         QgsField(name=NAME, type=QVariant.String, typeName="String",
@@ -23,6 +24,8 @@ class Paddock(Feature):
         QgsField(name=PERIMETER, type=QVariant.Double,
                  typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=CONDITION, type=QVariant.String, typeName="String",
+                 len=0, prec=0, comment="", subType=QVariant.Invalid),
+        QgsField(name=BUILD_FENCE, type=QVariant.LongLong, typeName="Integer64",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=Feature.STATUS, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid)
@@ -40,11 +43,17 @@ class Paddock(Feature):
     def paddockCondition(self):
         return str(self[Paddock.CONDITION])
 
+    def paddockBuildFence(self):
+        return self[Paddock.BUILD_FENCE]
+
     def setPaddockName(self, name):
         self.setAttribute(Paddock.NAME, name)
 
     def setPaddockCondition(self, condition):
         self.setAttribute(Paddock.CONDITION, condition)
+
+    def setPaddockBuildFence(self, buildFence):
+        self.setAttribute(Paddock.BUILD_FENCE, buildFence)
 
     def recalculate(self, elevationLayer=None):
         """Recalculate the area and perimeter of the Paddock."""
