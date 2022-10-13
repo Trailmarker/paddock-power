@@ -13,10 +13,10 @@ from ...models.paddock_power_state import PaddockPowerState, connectPaddockPower
 from ...utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'fence_paddock_changes_widget_base.ui')))
+    os.path.dirname(__file__), 'fence_paddock_changes_base.ui')))
 
 
-class FencePaddockChangesWidget(QWidget, FORM_CLASS):
+class FencePaddockChanges(QWidget, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -32,6 +32,8 @@ class FencePaddockChangesWidget(QWidget, FORM_CLASS):
         self.fence = None
         self.supersededPaddocks = []
         self.plannedPaddocks = []
+
+        self.refreshUi()
 
     @pyqtSlot()
     def onProjectChanged(self, project):
@@ -57,6 +59,8 @@ class FencePaddockChangesWidget(QWidget, FORM_CLASS):
         """Show the Paddock View."""
         qgsDebug(f"self.superseededPaddocks: {self.supersededPaddocks}")
         qgsDebug(f"self.superseededPaddocks.__class__.__name__: {self.supersededPaddocks.__class__.__name__}")
+
+        self.setVisible(self.fence is not None)
 
         self.supersededPaddockMiniList.setPaddocks(self.supersededPaddocks)
         self.plannedPaddockMiniList.setPaddocks(self.plannedPaddocks)

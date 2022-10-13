@@ -13,8 +13,7 @@ from ...layer.fence import Fence, asFence, makeFence
 from ...layer.paddock_power_feature_status import PaddockPowerFeatureStatus
 from ...layer.pipeline import Pipeline, asPipeline, makePipeline
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
-from ...utils import guiError, qgsDebug
-from ...widgets.infrastructure_profile.profile_canvas import ProfileCanvas
+from ...utils import guiError
 from .sketch_line_tool import SketchLineTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -31,19 +30,19 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.selectedInfrastructure = None
-        self.profileCanvas = None
-
-        self.sketchInfrastructureLineButton.setIcon(
-            QIcon(":/plugins/mlapp/images/new-split-paddock.png"))
-        self.selectInfrastructureLineButton.setIcon(
-            QIcon(":/plugins/mlapp/images/new-split-paddock.png"))
-
-        self.sketchInfrastructureLineButton.clicked.connect(
-            self.sketchFence)
+        # self.sketchInfrastructureLineButton.setIcon(
+        #     QIcon(":/plugins/mlapp/images/new-split-paddock.png"))
+        # self.selectInfrastructureLineButton.setIcon(
+        #     QIcon(":/plugins/mlapp/images/new-split-paddock.png"))
 
         self.state = PaddockPowerState()
         connectPaddockPowerStateListener(self.state, self)
+
+        self.sketchFenceButton.clicked.connect(
+            self.sketchFence)
+
+        self.sketchPipelineButton.clicked.connect(
+            self.sketchPipeline)
 
         self.refreshUi()
 
@@ -60,23 +59,13 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         """Handle a change in the current Paddock Power milestone."""
         self.refreshUi()
 
-    @pyqtSlot()
-    def onSelectedFenceChanged(self, fence):
-        """Handle a change to the selected Fence."""
-        self.setSelectedInfrastructure(asFence(fence))
+    # @pyqtSlot()
+    # def onSelectedFenceChanged(self, _):
+    #     self.refreshUi()
 
-    @pyqtSlot()
-    def onSelectedPipelineChanged(self, pipeline):
-        """Handle a change to the selected Pipeline."""
-        self.setSelectedInfrastructure(asPipeline(pipeline))
-
-    def setSelectedInfrastructure(self, infrastructure):
-        """Set the selected Infrastructure."""
-        if not isinstance(infrastructure, Fence) and not isinstance(infrastructure, Pipeline):
-            raise PaddockPowerError("InfrastructureViewDockWidget.setSelectedInfrastructure: infrastructure is not a Fence or Pipeline")
-        self.selectedInfrastructure = infrastructure
-
-        self.refreshUi()
+    # @pyqtSlot()
+    # def onSelectedPipelineChanged(self, _):
+    #     self.refreshUi()
 
     def sketchFence(self):
         """Sketch and analyse a new Fence."""
@@ -130,51 +119,13 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     def refreshUi(self):
         """Show the Infrastructure Profile."""
         # If we have no current infrastructure profile data, clean up the canvas object
-        if self.selectedInfrastructure is None:
-            if self.profileCanvas is not None:
-                self.gridLayout.removeWidget(self.profileCanvas)
-                del self.profileCanvas
-                self.profileCanvas = None
+        milestone = self.state.getMilestone()
 
-        if self.selectedInfrastructure is not None:
-            milestone, project = self.state.getMilestone(), self.state.getProject()
-
-            if milestone is None:
-                guiError(
-                    "Please set the current Milestone before using the Sketch Infrastructure Line tool.")
-                self.selectedInfrastructure = None
-                self.refreshUi()
-
-            profile = self.selectedInfrastructure.getProfile()
-
-            if profile is None:
-                profile = Calculator.calculateProfile(
-                    self.selectedInfrastructure.geometry(), project.elevationLayer)
-
-            useMetres = (profile.maximumDistance < 1000)
-
-            maximumDistance = profile.maximumDistance if useMetres else profile.maximumDistance / 1000
-            self.elevationRangeText.setText(
-                f"{profile.minimumElevation:,.0f} – {profile.maximumElevation:,.0f} (mean {profile.meanElevation})")
-
-            if useMetres:
-                self.infrastructureLengthLabel.setText(
-                    "Minimum estimated length (m)")
-                self.infrastructureLengthText.setText(
-                    f"{maximumDistance:,.0f}")
-            else:
-                self.infrastructureLengthLabel.setText(
-                    "Minimum estimated length (km)")
-                self.infrastructureLengthText.setText(
-                    f"{maximumDistance:,.2f}")
-
-            self.profileCanvas = ProfileCanvas(profile)
-            self.profileCanvas.setSizePolicy(QSizePolicy(
-                QSizePolicy.MinimumExpanding, QSizePolicy.Maximum))
-
-            self.profileCanvas.setMaximumHeight(250)
-            self.gridLayout.addWidget(
-                self.profileCanvas, 4, 0, 1, 4)
+        for button in [self.sketchFenceButton,
+                       self.sketchPipelineButton,
+                       self.selectFenceButton,
+                       self.selectPipelineButton]:
+            button.setEnabled(milestone is not None)
 
     def closeEvent(self, event):
         self.closingDockWidget.emit()

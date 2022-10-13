@@ -204,12 +204,4 @@ class PaddockPower:
                 Qt.BottomDockWidgetArea, self.infrastructureView)
             self.infrastructureView.show()
 
-    # def runSplitPaddock(self):
-    #     """Set SplitPaddockTool as a custom map tool."""
-    #     milestone = getMilestone()
 
-    #     if milestone is None:
-    #         guiError(
-    #             "Please set the current Milestone before using the Split Paddock tool.")
-    #     else:
-    #         milestone.setTool(SplitPaddockTool(milestone))

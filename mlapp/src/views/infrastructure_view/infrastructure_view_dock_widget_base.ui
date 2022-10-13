@@ -19,6 +19,9 @@
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <property name="windowTitle">
    <string>MLA Paddock Power | Plan Fences and Pipelines</string>
   </property>
@@ -37,156 +40,122 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+     <layout class="QHBoxLayout" name="headerLayout">
+      <item>
+       <widget class="QToolButton" name="sketchFenceButton">
+        <property name="toolTip">
+         <string>Sketch Fence …</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="selectFenceButton">
+        <property name="toolTip">
+         <string>Select Existing Fence …</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="selectPipelineButton">
+        <property name="toolTip">
+         <string>Sketch Pipeline …</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="sketchPipelineButton">
+        <property name="toolTip">
+         <string>Select Existing Pipeline …</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="toolbarSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="MilestoneToolBar" name="milestoneToolBar" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="contentLayout">
+      <property name="topMargin">
+       <number>0</number>
       </property>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="selectInfrastructureLineButton">
-        <property name="toolTip">
-         <string>Select an existing fenceline …</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="sketchInfrastructureLineButton">
-        <property name="toolTip">
-         <string>Sketch a fenceline …</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="elevationRangeText">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="3">
-       <widget class="QLabel" name="infrastructureLengthLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Minimum estimated length (m)</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="3">
-       <widget class="QLabel" name="elevationRangeLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string notr="true">Elevation variation (m)</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <layout class="QHBoxLayout" name="milestoneToolBarLayout">
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="MilestoneToolBar" name="milestoneToolBar" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="3" column="3">
-       <widget class="QLabel" name="infrastructureLengthText">
+      <item>
+       <widget class="ProfileDetails" name="profileDetails" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
        </widget>
       </item>
-      <item row="1" column="4" rowspan="4">
-       <widget class="FencePaddockChangesWidget" name="fencePaddockChanges" native="true">
-        <layout class="QVBoxLayout" name="paddockLayout">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetDefaultConstraint</enum>
-         </property>
-        </layout>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="4">
-       <widget class="QLabel" name="placeholderLabel">
-        <property name="text">
-         <string/>
+      <item>
+       <widget class="FencePaddockChanges" name="fencePaddockChanges" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
        </widget>
       </item>
@@ -216,9 +185,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>FencePaddockChangesWidget</class>
+   <class>ProfileDetails</class>
    <extends>QWidget</extends>
-   <header>mlapp/src/widgets/fence_details/fence_paddock_changes_widget</header>
+   <header>mlapp/src/widgets/profile_details/profile_details</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FencePaddockChanges</class>
+   <extends>QWidget</extends>
+   <header>mlapp/src/widgets/fence_details/fence_paddock_changes</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

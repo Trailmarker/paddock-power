@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem
+from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
 
 from .paddock_collapsible_list_item import PaddockCollapsibleListItem
 
@@ -10,7 +10,11 @@ class PaddockListBase(QListWidget):
     def __init__(self, parent=None):
         """Constructor."""
 
-        super(QListWidget, self).__init__(parent)
+        super().__init__(parent)
+        # self.setWidgetResizable(True)
+        self.setFrameStyle(QFrame.NoFrame)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
     def filterByName(self, filter):
@@ -52,3 +56,10 @@ class PaddockListBase(QListWidget):
         for item in [self.item(i) for i in range(self.count())]:
             item.setSizeHint(self.itemWidget(item).sizeHint())
 
+    def sizeHint(self):
+        hint = super().sizeHint()
+
+        # Add the width of the vertical scrollbar
+        hint.setWidth(self.sizeHintForColumn(0) + self.verticalScrollBar().width())
+
+        return hint

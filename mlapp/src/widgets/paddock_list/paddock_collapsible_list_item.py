@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, QSize, QState, QStateMachine
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QVBoxLayout, QWidget
+from qgis.PyQt.QtWidgets import QAction, QSizePolicy, QVBoxLayout, QWidget
 
 from qgis.core import QgsRectangle
 from qgis.utils import iface
@@ -10,7 +10,7 @@ from ...models.paddock_power_state import PaddockPowerState
 from ..collapse.collapse import Collapse
 from ..paddock_details.paddock_details import PaddockDetails
 from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
-
+from ...utils import qgsDebug
 
 class PaddockCollapsibleListItem(QWidget):
     layoutRefreshNeeded = pyqtSignal()
@@ -62,6 +62,7 @@ class PaddockCollapsibleListItem(QWidget):
         layout.addWidget(self.collapse)
         layout.addStretch()
 
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.setLayout(layout)
 
         self.collapse.collapsed.connect(self.layoutRefreshNeeded.emit)
@@ -69,7 +70,6 @@ class PaddockCollapsibleListItem(QWidget):
 
         # Set up state machine
         self.machine = QStateMachine()
-        self.machine.setGlobalRestorePolicy(QStateMachine.RestoreProperties)
 
         self.viewState = QState()
         self.editState = QState()
@@ -128,6 +128,7 @@ class PaddockCollapsibleListItem(QWidget):
 
     def sizeHint(self):
         """Return the size of the widget."""
+        # The embedded Collapse item controls the width.
         hint = QSize(self.collapse.sizeHint().width(),
                      self.collapse.sizeHint().height())
         return hint

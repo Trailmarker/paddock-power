@@ -75,6 +75,17 @@ class Fence(PaddockPowerFeature):
             f.geometry() for f in supersededPaddocks)
         normalisedFenceLine = fenceLine.intersection(allExisting)
 
+        if normalisedFenceLine.isEmpty():
+            return fenceLine, [], []
+
+        # If this leaves the fence line multipart, reduce it to a single part
+        if normalisedFenceLine.isMultipart():
+            normalisedFenceLine = normalisedFenceLine.combine()
+
+        if normalisedFenceLine.isMultipart():
+            raise PaddockPowerError(
+                "Fence.analyseFence: fence line is still multipart")
+
         # Set this fence's geometry to the normalised output
         self.setGeometry(normalisedFenceLine)
 

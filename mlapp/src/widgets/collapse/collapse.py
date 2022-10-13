@@ -22,7 +22,7 @@ class Collapse(QWidget):
         )
         self.toggleButton.setArrowType(Qt.RightArrow)
         self.toggleButton.toggled.connect(self.toggle)
-
+        self.toggleButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.toggleAnimation = QParallelAnimationGroup(self)
 
         self.toolBar = QToolBar()
@@ -33,13 +33,13 @@ class Collapse(QWidget):
                                       }""")
         self.toolBar.setFixedHeight(30)
         self.toolBar.setSizePolicy(QSizePolicy(
-            QSizePolicy.Minimum, QSizePolicy.Fixed))
+            QSizePolicy.Minimum, QSizePolicy.Minimum))
 
         self.content = QScrollArea(
             maximumHeight=0, minimumHeight=0
         )
         self.content.setSizePolicy(
-            QSizePolicy.Expanding, QSizePolicy.Fixed
+            QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding
         )
         self.content.setFrameShape(QFrame.NoFrame)
 
@@ -115,13 +115,18 @@ class Collapse(QWidget):
 
     def sizeHint(self):
         """Return the size of the widget."""
-        defaultSizeHint = super(Collapse, self).sizeHint()
+        #defaultSizeHint = super().sizeHint()
+
+        headerWidth = self.headerLayout.sizeHint().width()
+        contentWidth = self.content.sizeHint().width()
+
+        width = max(headerWidth, contentWidth)
 
         height = self.collapsedHeight()
         if self.toggleButton.isChecked():
             height += self.contentHeight()
 
-        hint = QSize(defaultSizeHint.width(), height)
+        hint = QSize(width, height)
         return hint
 
     def setContentLayout(self, layout):
