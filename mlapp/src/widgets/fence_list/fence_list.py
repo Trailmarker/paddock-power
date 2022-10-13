@@ -16,8 +16,6 @@ class FenceList(QListWidget):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
-        self.setMaximumWidth(500)
-
         self.state = PaddockPowerState()
         self.state.milestoneChanged.connect(self.refreshUi)
 

@@ -56,13 +56,6 @@ class Fence(LineFeature):
         """Return a list of paddocks that have been Planned by this Fence."""
         return self.plannedPaddocks
 
-    def recalculate(self, elevationLayer=None):
-        """Recalculate the length of this Fence."""
-        self.profile = Calculator.calculateProfile(
-            self.geometry(), elevationLayer)
-        length = round(self.profile.maximumDistance, 2)
-        self.setAttribute(Fence.LENGTH, length)
-
 
 FenceFeature = type('FenceFeature', (Fence, QgsFeature), {})
 
