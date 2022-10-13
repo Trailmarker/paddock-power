@@ -44,6 +44,7 @@ class Milestone(QObject):
 
     def create(self):
         """Create this milestone in its GeoPackage."""
+        # TODO these are not consistent
         # Create paddocks, pipeline, fence, waterpoints, boundary layers
         boundary = BoundaryLayer(layerName=f"{self.milestoneName} Boundary")
         waterpoint = WaterpointLayer(

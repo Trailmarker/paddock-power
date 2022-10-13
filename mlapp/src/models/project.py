@@ -3,7 +3,7 @@ from os import path
 import sqlite3
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer
 
 # -*- coding: utf-8 -*-
 from ..spatial.feature.boundary import Boundary
@@ -20,6 +20,8 @@ from .paddock_power_error import PaddockPowerError
 
 
 class Project(QObject):
+    PROJECT_BASE_DATA_GROUP = "Base Data"
+
     PADDOCK_POWER_FEATURE_TYPES = (
         Boundary, Waterpoint, Pipeline, Fence, Paddock, LandSystem)
 
@@ -139,6 +141,7 @@ class Project(QObject):
         if self.milestone is None:
             self.setMilestone(list(self.milestones.keys())[0])
 
+    
     def addToMap(self):
         """Add the project to the map."""
         # Remove first to keep order sane
@@ -148,6 +151,9 @@ class Project(QObject):
 
         for milestoneName in milestoneNames:
             self.milestones[milestoneName].addToMap()
+
+        # baseDataGroup = QgsProject.instance().layerTreeRoot().findGroup(Project.PROJECT_BASE_DATA_GROUP)
+        # self.elevationLayer.addToMap(baseDataGroup)
 
     def removeFromMap(self):
         """Remove the project from the map."""

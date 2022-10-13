@@ -153,7 +153,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
                 plannedPaddocks.append(splitPaddock)
 
         for paddock in supersededPaddocks:
-            splitPaddock.setPaddockBuildFence(fence.fenceBuildOrder())
+            paddock.setPaddockBuildFence(fence.fenceBuildOrder())
             paddock.setStatus(FeatureStatus.Superseded)
             self.updateFeature(paddock)
 
