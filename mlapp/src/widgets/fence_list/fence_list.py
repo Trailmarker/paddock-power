@@ -2,51 +2,51 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
 
-from .paddock_collapsible_list_item import PaddockCollapsibleListItem
+from ...models.paddock_power_state import PaddockPowerState
+from .fence_list_item import FenceListItem
 
-
-class PaddockListBase(QListWidget):
+class FenceList(QListWidget):
 
     def __init__(self, parent=None):
         """Constructor."""
 
         super().__init__(parent)
-        # self.setWidgetResizable(True)
         self.setFrameStyle(QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
-    def filterByName(self, filter):
-        """Filter the paddock list by name."""
-        if filter is None:
-            return
-        for item in [self.item(i) for i in range(self.count())]:
-            widget = self.itemWidget(item)
-            item.setHidden(not filter.lower()
-                           in widget.paddock.featureName().lower())
+        self.setMaximumWidth(500)
 
-    def getPaddocks():
-        """Get the paddocks."""
-        raise NotImplementedError(
-            "getPaddocks() must be implemented in a subclass")
+        self.state = PaddockPowerState()
+        self.state.milestoneChanged.connect(self.refreshUi)
+
+        self.refreshUi()
+
+    def getFences(self):
+        """Get the fences."""
+        milestone = self.state.getMilestone()
+        return [fence for fence in milestone.fenceLayer.getFeatures()] if milestone is not None else None
 
     def refreshUi(self):
         """Show the Paddock List."""
         # Initially clear the list
         self.clear()
 
-        paddocks = self.getPaddocks()
+        fences = self.getFences()
 
-        if not paddocks:
+        if not fences:
+            self.setVisible(False)
             return
 
-        # Sort Paddocks alphabetically
-        paddocks.sort(key=lambda x: x.featureName())
+        self.setVisible(True)   
 
-        # Repopulate list since we have Paddocks
-        for paddock in paddocks:
-            widget = PaddockCollapsibleListItem(paddock)
+        # Sort Fences by Build Order
+        fences.sort(key=lambda x: x.fenceBuildOrder())
+
+        # Repopulate list if we have Fences
+        for fence in fences:
+            widget = FenceListItem(fence)
             item = QListWidgetItem(self)
             item.setSizeHint(widget.sizeHint())
 
@@ -67,7 +67,6 @@ class PaddockListBase(QListWidget):
         hint = super().sizeHint()
 
         # Add the width of the vertical scrollbar
-        hint.setWidth(self.sizeHintForColumn(
-            0) + self.verticalScrollBar().width())
+        hint.setWidth(self.sizeHintForColumn(0) + self.verticalScrollBar().width())
 
         return hint

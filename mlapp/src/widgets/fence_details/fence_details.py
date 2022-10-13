@@ -18,17 +18,11 @@ class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
         self.setupUi(self)
 
         self.milestone = milestone
-        self.paddock = paddock
+        self.fence = paddock
 
         self.refreshUi()
 
     def refreshUi(self):
-        """Show the Paddock Details."""
-        if self.paddock is not None:
-            self.setTitle(self.paddock[self.NAME])  # QGroupBox function
-
-            self.nameText.setText(self.paddock[self.NAME])
-            self.areaText.setText(self.paddock[self.AREA])
-            self.perimeterText.setText(self.paddock[self.PERIMETER])
-
-            self.conditionComboBox.addItem("Not implemented yet")
+        """Show the Fence Details."""
+        if self.fence is not None:
+            self.lengthText.setText(self.fence.featureLength())

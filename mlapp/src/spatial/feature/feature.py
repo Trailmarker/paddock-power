@@ -4,6 +4,7 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsField
 
 from ...models.paddock_power_error import PaddockPowerError
+from ...utils import qgsDebug
 from .feature_status import FeatureStatus
 
 
@@ -13,15 +14,22 @@ class Feature:
     NAME = "Name"
 
     SCHEMA = [
+        QgsField(name=FID, type=QVariant.LongLong, typeName="Integer64",
+                 len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=NAME, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=STATUS, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid)
     ]
 
-    def clearId(self):
-        """Clear the feature's id."""
-        self.setAttribute(Feature.FID, None)
+    # def clearId(self):
+    #     """Clear the feature's id."""
+    #     self.setAttribute(Feature.FID, None)
+    def debug(self):
+        """Dump the Feature's attributes to the log."""
+        for field in self.fields():
+            qgsDebug("{}: {}".format(field.name(), self[field.name()]))
+
 
     def status(self):
         try:

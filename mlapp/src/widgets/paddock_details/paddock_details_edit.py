@@ -33,4 +33,4 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
         milestone = self.state.getMilestone()
         if milestone is not None:
             self.paddock.setFeatureName(self.nameLineEdit.text())
-            milestone.paddockLayer.instantCommitFeature(self.paddock)
+            milestone.paddockLayer.instantUpdateFeature(self.paddock)

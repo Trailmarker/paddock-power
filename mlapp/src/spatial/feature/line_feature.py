@@ -22,5 +22,5 @@ class LineFeature(Feature):
         """Recalculate the length of this Pipeline."""
         self.profile = Calculator.calculateProfile(
             self.geometry(), elevationLayer)
-        length = round(self.profile.maximumDistance, 2)
+        length = round(self.profile.maximumDistance / 1000, 2)
         self.setAttribute(LineFeature.LENGTH, length)

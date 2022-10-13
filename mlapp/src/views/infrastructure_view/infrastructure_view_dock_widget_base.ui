@@ -134,6 +134,22 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="FenceList" name="fenceList" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="ProfileDetails" name="profileDetails" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -153,6 +169,12 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
@@ -194,6 +216,12 @@
    <class>FencePaddockChanges</class>
    <extends>QWidget</extends>
    <header>mlapp/src/widgets/fence_details/fence_paddock_changes</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FenceList</class>
+   <extends>QWidget</extends>
+   <header>mlapp/src/widgets/fence_list/fence_list</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

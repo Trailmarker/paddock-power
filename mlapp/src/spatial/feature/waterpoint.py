@@ -9,9 +9,7 @@ from .feature import Feature
 
 
 class Waterpoint(Feature):
-    AREA = "Area (km²)"
-    PERIMETER = "Perimeter (km)"
-    TYPE = "Waterpoint Type"
+    WATERPOINT_TYPE = "Waterpoint Type"
     REFERENCE = "Reference"
     BORE_YIELD = "Bore Yield (L/s)"
     BORE_REPORT_URL = "Bore Report URL"
@@ -22,7 +20,7 @@ class Waterpoint(Feature):
     ELEVATION = "Elevation (m)"
 
     SCHEMA = Feature.SCHEMA + [
-        QgsField(name=TYPE, type=QVariant.String, typeName="String",
+        QgsField(name=WATERPOINT_TYPE, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=REFERENCE, type=QVariant.String,
                  typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),

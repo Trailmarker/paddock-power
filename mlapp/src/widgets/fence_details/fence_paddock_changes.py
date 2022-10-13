@@ -47,8 +47,13 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     def onSelectedFenceChanged(self, fence):
         """Handle a change in the selected fence."""
         self.clearFence()
-        self.setFence(asFence(fence))
-        self.refreshUi()
+
+        if fence is not None:
+            fence = asFence(fence)
+            milestone = self.state.getMilestone()
+            milestone.paddockLayer.updateFencePaddocks(fence)
+            self.setFence(fence)
+            self.refreshUi()
 
     def refreshUi(self):
         """Show the Paddock View."""

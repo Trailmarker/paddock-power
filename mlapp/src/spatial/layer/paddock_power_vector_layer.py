@@ -3,7 +3,7 @@ from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
 from ...models.paddock_power_error import PaddockPowerError
-from ...utils import resolveStylePath
+from ...utils import qgsDebug, resolveStylePath
 from ..feature.feature import Feature
 from .paddock_power_layer_source_type import PaddockPowerLayerSourceType
 
@@ -89,7 +89,15 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
             raise PaddockPowerError(
                 "PaddockPowerVectorLayer.addFeature: the feature is not a Feature")
 
-        feature.clearId()
+        for field in feature.fields():
+            qgsDebug(f"addFeature: field.name() {field.name()}")
+            
+            if field.name() not in self.fields().names():
+                raise PaddockPowerError(
+                    f"Cannot add feature to {self.name()}: field {field.name()} is not present")
+            
+
+        #feature.clearId()
         super().addFeature(feature)
 
     def setFeatureAdapter(self, featureAdapter):
@@ -116,9 +124,9 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
 
         return self.adaptFeatures(super().getFeatures(request))
 
-    def getFeaturesByStatus(self, *statuses):
+    def getFeaturesByStatus(self, *statuses, request=None):
         """Get the features in this layer filtered by one or more FeatureStatus values."""
-        return [f for f in self.getFeatures() if f.status() in statuses]
+        return [f for f in self.getFeatures(request) if f.status() in statuses]
 
     def whileEditing(self, func):
         """Run a function with the layer in edit mode."""
@@ -142,7 +150,11 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
             if isEditing and not newIsEditing:
                 self.startEditing()
 
-    def instantCommitFeature(self, feature):
+    def instantAddFeature(self, feature):
+        """Start editing, add a Feature and commt the changes."""
+        self.whileEditing(lambda: self.addFeature(feature))
+
+    def instantUpdateFeature(self, feature):
         """Start editing, update a Feature and commt the changes."""
         self.whileEditing(lambda: self.updateFeature(feature))
 

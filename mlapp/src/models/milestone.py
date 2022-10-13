@@ -17,7 +17,7 @@ from ..spatial.layer.paddock_layer import PaddockLayer
 from ..spatial.layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
 from ..spatial.layer.pipeline_layer import PipelineLayer
 from ..spatial.layer.waterpoint_layer import WaterpointLayer
-from ..utils import guiError, qgsDebug
+from ..utils import guiError
 
 from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 
@@ -165,21 +165,21 @@ class Milestone(QObject):
             self.currentTool = None
 
     def setSelectedFence(self, fence):
-        if not isinstance(fence, Fence):
+        if fence is not None and not isinstance(fence, Fence):
             raise PaddockPowerError(
                 "Milestone.setSelectedFence: fence must be a Fence")
         self.selectedFence = fence
         self.selectedFenceChanged.emit(self.selectedFence)
 
     def setSelectedPaddock(self, paddock):
-        if not isinstance(paddock, Paddock):
+        if paddock is not None and not isinstance(paddock, Paddock):
             raise PaddockPowerError(
                 "Milestone.setSelectedPaddock: paddock must be a Paddock")
         self.selectedPaddock = paddock
         self.selectedPaddockChanged.emit(self.selectedPaddock)
 
     def setSelectedPipeline(self, pipeline):
-        if not isinstance(pipeline, Pipeline):
+        if pipeline is not None and not isinstance(pipeline, Pipeline):
             raise PaddockPowerError(
                 "Milestone.setSelectedPipeline: pipeline must be a Pipeline")
         self.selectedPipeline = pipeline
@@ -189,13 +189,21 @@ class Milestone(QObject):
         if not isinstance(fence, Fence):
             raise PaddockPowerError(
                 "Milestone.draftFence: fence must be a Fence")
-        
-        fence.recalculate()
+
+        normalisedFenceLine, supersededPaddocks = self.paddockLayer.getCrossedPaddocks(fence.geometry())
+
+        if normalisedFenceLine is None or normalisedFenceLine.isEmpty() or not supersededPaddocks:
+            guiError("The Fence you have sketched does not cross or touch any Paddocks.")
+            return
+
+        fence.setGeometry(normalisedFenceLine)
         fence.setFenceBuildOrder(self.fenceLayer.nextBuildOrder())
         fence.setStatus(FeatureStatus.Draft)
-        self.fenceLayer.instantCommitFeature(fence)
+        fence.recalculate()
 
-        return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+        self.fenceLayer.instantAddFeature(fence)
+        draftFence = self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+        return draftFence
 
     def planFence(self, fence):
         """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
@@ -209,22 +217,20 @@ class Milestone(QObject):
             self.paddockLayer.startEditing()
             self.fenceLayer.startEditing()
 
-            normalisedFenceLine, supersededPaddocks, plannedPaddocks = self.paddockLayer.planPaddocks(self)
-            fence.setGeometry(normalisedFenceLine)
+            supersededPaddocks, plannedPaddocks = self.paddockLayer.planPaddocks(fence)
+            
             fence.setSupersededPaddocks(supersededPaddocks)
             fence.setPlannedPaddocks(plannedPaddocks)
-            fence.recalculate()
             fence.setStatus(FeatureStatus.Planned)
+            fence.recalculate()
             self.fenceLayer.updateFeature(fence)
 
             self.fenceLayer.commitChanges()
             self.paddockLayer.commitChanges()
         except Exception as e:
+            self.fenceLayer.rollBack()
             self.paddockLayer.rollBack()
             raise PaddockPowerError(f"Milestone.planFence: failed to plan fence {str(e)}")
-        finally:
-            self.paddockLayer.stopEditing()
-            self.fenceLayer.stopEditing()
 
         return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
 
@@ -234,19 +240,19 @@ class Milestone(QObject):
             raise PaddockPowerError(
                 "Milestone.undoFence: fence must be a Fence")
 
-        if fence.fenceBuildOrder() < self.fenceLayer.currentBuildOrder():
-            guiError("You can only undo the most recently planned Fence.")
-            return
+        # if fence.fenceBuildOrder() < self.fenceLayer.currentBuildOrder():
+        #     guiError("You can only undo the most recently planned Fence.")
+        #     return
 
         try:
             self.paddockLayer.startEditing()
             self.fenceLayer.startEditing()
 
-            self.paddockLayer.undoPlanPaddocks(self)
+            self.paddockLayer.undoPlanPaddocks(fence)
             fence.setStatus(FeatureStatus.Draft)
-            fence.setSupersededPaddocks([])
+            # fence.setSupersededPaddocks([])
             fence.setPlannedPaddocks([])
-            self.fenceLayer.instantCommitFeature(fence)
+            self.fenceLayer.instantUpdateFeature(fence)
 
             self.fenceLayer.commitChanges
             self.paddockLayer.commitChanges()
@@ -254,9 +260,6 @@ class Milestone(QObject):
             self.fenceLayer.rollBack()
             self.paddockLayer.rollBack()
             raise PaddockPowerError(f"Milestone.undoPlanFence: failed to undo fence {str(e)}")
-        finally:
-            self.paddockLayer.stopEditing()
-            self.fenceLayer.stopEditing()
 
         return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
         

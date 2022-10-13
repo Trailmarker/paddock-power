@@ -87,7 +87,7 @@ class PaddockCollapsibleListItem(QWidget):
         self.viewState.entered.connect(self.refreshUi)
         self.editState.entered.connect(self.refreshUi)
         self.editState.entered.connect(self.collapse.setExpanded)
-        self.machine.started.connect(self.refreshUi)
+       
         self.machine.start()
 
         self.refreshUi()

@@ -55,13 +55,13 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         """Handle a change in the current Paddock Power milestone."""
         self.refreshUi()
 
-    # @pyqtSlot()
-    # def onSelectedFenceChanged(self, _):
-    #     self.refreshUi()
+    @pyqtSlot()
+    def onSelectedFenceChanged(self, _):
+        self.refreshUi()
 
-    # @pyqtSlot()
-    # def onSelectedPipelineChanged(self, _):
-    #     self.refreshUi()
+    @pyqtSlot()
+    def onSelectedPipelineChanged(self, _):
+        self.refreshUi()
 
     def sketchFence(self):
         """Sketch and analyse a new Fence."""
@@ -82,9 +82,9 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         fence = makeFence()
         fence.setGeometry(sketchLine)
         fence.recalculate(project.elevationLayer)
-        fence.setStatus(FeatureStatus.Planned)
 
-        milestone.setSelectedFence(fence)
+        draftFence = milestone.draftFence(fence)
+        milestone.setSelectedFence(draftFence)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""

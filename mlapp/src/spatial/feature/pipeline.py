@@ -1,43 +1,17 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QVariant
 
-from qgis.core import QgsFeature, QgsField, QgsFields
+from qgis.core import QgsFeature, QgsFields
 
 from ...models.paddock_power_error import PaddockPowerError
-from ..calculator import Calculator
-from .feature import Feature
 from .line_feature import LineFeature
 
 
 class Pipeline(LineFeature):
-    NAME, LENGTH, STATUS = [Feature.NAME,
-                            LineFeature.LENGTH,
-                            Feature.STATUS]
-
-    SCHEMA = [
-        QgsField(name=NAME, type=QVariant.String, typeName="String",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name=LENGTH, type=QVariant.Double, typeName="Real",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name=STATUS, type=QVariant.String, typeName="String",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid)
-    ]
+    SCHEMA = LineFeature.SCHEMA
 
     def __init__(self):
         super().__init__()
-
-        # Cache the length profile
-        self.profile = None
-
-    def getProfile(self):
-        return self.profile
-
-    def recalculate(self, elevationLayer=None):
-        """Recalculate the length of this Pipeline."""
-        self.profile = Calculator.calculateProfile(
-            self.geometry(), elevationLayer)
-        length = round(self.profile.maximumDistance, 2)
-        self.setAttribute(Pipeline.LENGTH, length)
 
 
 PipelineFeature = type('PipelineFeature', (Pipeline, QgsFeature), {})

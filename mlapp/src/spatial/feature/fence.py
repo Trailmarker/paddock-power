@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.core import (QgsFeature, QgsField, QgsFields,
-                       QgsGeometry, QgsLineString, QgsPoint)
+from qgis.core import QgsFeature, QgsField, QgsFields
+
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
@@ -9,9 +9,7 @@ from ...models.paddock_power_error import PaddockPowerError
 from ...utils import qgsDebug
 from ..calculator import Calculator
 from .feature import Feature
-from .feature_status import FeatureStatus
 from .line_feature import LineFeature
-from .paddock import asPaddock
 
 
 class Fence(LineFeature):
@@ -20,14 +18,8 @@ class Fence(LineFeature):
                                          Feature.STATUS,
                                          "Build Order"]
 
-    SCHEMA = [
-        QgsField(name=NAME, type=QVariant.String, typeName="String",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name=LENGTH, type=QVariant.Double, typeName="Real",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
+    SCHEMA = LineFeature.SCHEMA + [
         QgsField(name=BUILD_ORDER, type=QVariant.LongLong, typeName="Integer64",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name=STATUS, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid)
     ]
 
@@ -66,18 +58,20 @@ class Fence(LineFeature):
 
     def recalculate(self, elevationLayer=None):
         """Recalculate the length of this Fence."""
-        self.profile = Calculator.calculateProfile(self.geometry(), elevationLayer)
+        self.profile = Calculator.calculateProfile(
+            self.geometry(), elevationLayer)
         length = round(self.profile.maximumDistance, 2)
         self.setAttribute(Fence.LENGTH, length)
 
 
-
 FenceFeature = type('FenceFeature', (Fence, QgsFeature), {})
+
 
 def ensureAttrs(fence, *attrs):
     for attr in attrs:
         if not hasattr(fence, attr):
             setattr(fence, attr, None)
+
 
 def asFence(feature):
     """Return a Fence object from a QgsFeature."""
@@ -92,6 +86,7 @@ def asFence(feature):
     feature.supersededPaddocks = []
     feature.plannedPaddocks = []
     return feature
+
 
 def makeFence():
     """Return a new and empty Fence object."""

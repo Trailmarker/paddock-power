@@ -45,8 +45,6 @@ class ProfileDetails(QWidget, FORM_CLASS):
             milestone, project = self.state.getMilestone(), self.state.getProject()
 
             if milestone is None:
-                guiError(
-                    "Please set the current Milestone before using the Sketch Infrastructure Line tool.")
                 self.selectedInfrastructure = None
                 self.refreshUi()
 
