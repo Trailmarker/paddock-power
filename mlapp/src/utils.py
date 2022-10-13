@@ -98,4 +98,3 @@ def clearItem(item):
             if widget is not None:
                 widget.setParent(None)
                 del widget
-       

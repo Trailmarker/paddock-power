@@ -11,7 +11,6 @@ class WaterpointBuffer(AreaFeature):
     BUFFER_DISTANCE, WATERED_AREA = ["Buffer Distance (km)",
                                      "Watered Area (km²)"]
 
-
     SCHEMA = AreaFeature.SCHEMA + [
         QgsField(name=BUFFER_DISTANCE, type=QVariant.Double, typeName="Real",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
@@ -25,17 +24,21 @@ class WaterpointBuffer(AreaFeature):
     def wateredArea(self):
         return self[WaterpointBuffer.WATERED_AREA]
 
-    def recalculate(self, bufferDistance, landSystemLayer = None):
+    def recalculate(self, bufferDistance, landSystemLayer=None):
         """Recalculate stats for this Waterpoint Buffer"""
         # TODO
         pass
 
-WaterpointBufferFeature = type('WaterpointBufferFeature', (WaterpointBuffer, QgsFeature), {})
+
+WaterpointBufferFeature = type(
+    'WaterpointBufferFeature', (WaterpointBuffer, QgsFeature), {})
+
 
 def asWaterpointBuffer(feature):
     """Return a WaterpointBuffer object from a QgsFeature."""
     if not isinstance(feature, QgsFeature):
-        raise WaterpointBufferPowerError("asWaterpointBuffer: feature is not a QgsFeature")
+        raise WaterpointBufferPowerError(
+            "asWaterpointBuffer: feature is not a QgsFeature")
     if not isinstance(feature, WaterpointBuffer):
         feature.__class__ = WaterpointBufferFeature
     return feature

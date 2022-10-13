@@ -22,9 +22,11 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.state = PaddockPowerState()
-        
-        self.paddockFilterLineEdit.textChanged.connect(self.onPaddockFilterChanged)
-        self.clearPaddockFilterButton.clicked.connect(self.paddockFilterLineEdit.clear)
+
+        self.paddockFilterLineEdit.textChanged.connect(
+            self.onPaddockFilterChanged)
+        self.clearPaddockFilterButton.clicked.connect(
+            self.paddockFilterLineEdit.clear)
 
     def onPaddockFilterChanged(self, text):
         self.paddockList.filterByName(text)

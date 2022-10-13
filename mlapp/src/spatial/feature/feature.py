@@ -31,7 +31,6 @@ class Feature:
         for field in self.fields():
             qgsDebug("{}: {}".format(field.name(), self[field.name()]))
 
-
     def status(self):
         try:
             return FeatureStatus[self[Feature.STATUS]]

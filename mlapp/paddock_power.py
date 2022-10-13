@@ -57,8 +57,10 @@ class PaddockPower:
         QgsProject.instance().cleared.connect(self.state.clearProject)
         QgsProject.instance().readProject.connect(self.state.detectProject)
 
-        self.selectedPaddockRubberBand = SelectedPaddockRubberBand(iface.mapCanvas())
-        self.selectedFenceRubberBand = SelectedFenceRubberBand(iface.mapCanvas())
+        self.selectedPaddockRubberBand = SelectedPaddockRubberBand(
+            iface.mapCanvas())
+        self.selectedFenceRubberBand = SelectedFenceRubberBand(
+            iface.mapCanvas())
 
         self.infrastructureViewIsActive = False
         self.infrastructureView = None
@@ -135,7 +137,7 @@ class PaddockPower:
             self.selectedPaddockRubberBand.hide()
             self.selectedPaddockRubberBand.reset()
             iface.mapCanvas().scene().removeItem(self.selectedPaddockRubberBand)
-        
+
         if self.selectedFenceRubberBand is not None:
             self.selectedFenceRubberBand.hide()
             self.selectedFenceRubberBand.reset()
@@ -143,7 +145,8 @@ class PaddockPower:
 
     def onClosePaddockView(self):
         if self.paddockView is not None:
-            self.paddockView.closingDockWidget.disconnect(self.onClosePaddockView)
+            self.paddockView.closingDockWidget.disconnect(
+                self.onClosePaddockView)
 
         self.paddockViewIsActive = False
         # Remove this statement if dockwidget is to remain
@@ -154,7 +157,7 @@ class PaddockPower:
         if self.infrastructureView is not None:
             self.infrastructureView.closingDockWidget.disconnect(
                 self.onCloseInfrastructureView)
-   
+
         self.infrastructureViewIsActive = False
         self.infrastructureView = None
 
@@ -198,9 +201,8 @@ class PaddockPower:
                 self.infrastructureView = InfrastructureViewDockWidget()
 
             # Connect to provide cleanup on closing of self.infrastructureView
-            self.infrastructureView.closingDockWidget.connect(self.onCloseInfrastructureView)
+            self.infrastructureView.closingDockWidget.connect(
+                self.onCloseInfrastructureView)
             self.iface.addDockWidget(
                 Qt.BottomDockWidgetArea, self.infrastructureView)
             self.infrastructureView.show()
-
-

@@ -72,7 +72,8 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
                 "Please set the current Milestone before using the Sketch Line tool.")
         else:
             tool = SketchLineTool(milestone)
-            tool.sketchFinished.connect(lambda sketchLine: self.onSketchFenceFinished(sketchLine))
+            tool.sketchFinished.connect(
+                lambda sketchLine: self.onSketchFenceFinished(sketchLine))
             milestone.setTool(tool)
 
     @pyqtSlot()
@@ -101,12 +102,12 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     @pyqtSlot()
     def onSketchPipelineFinished(self, sketchLine):
         milestone, project = self.state.getMilestone(), self.state.getProject()
-        
+
         pipeline = makePipeline()
         pipeline.setGeometry(sketchLine)
         pipeline.recalculate(project.elevationLayer)
         pipeline.setStatus(FeatureStatus.Planned)
-        
+
         milestone.setSelectedPipeline(pipeline)
 
     def refreshUi(self):

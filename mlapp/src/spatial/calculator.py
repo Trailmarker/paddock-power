@@ -9,6 +9,7 @@ from qgis.core import QgsCoordinateReferenceSystem, QgsDistanceArea, QgsGeometry
 from ..models.paddock_power_error import PaddockPowerError
 from .profile import Profile
 
+
 def makeDistanceAreaCalculator():
     """Return a QgsDistanceArea object with the correct settings for the project."""
     calculator = QgsDistanceArea()
@@ -18,9 +19,10 @@ def makeDistanceAreaCalculator():
     calculator.setEllipsoid('EPSG:7019')
     return calculator
 
+
 class Calculator:
     QGIS_CALCULATOR = makeDistanceAreaCalculator()
- 
+
     @staticmethod
     def calculateElevationAtPoint(point, elevationLayer=None):
         if elevationLayer is None:
@@ -33,7 +35,7 @@ class Calculator:
         pointXY = point.asPoint()
         dataProvider = elevationLayer.dataProvider()
         return dataProvider.identify(pointXY, QgsRaster.IdentifyFormatValue).results()[1]
-        
+
     @staticmethod
     def calculateProfile(line, elevationLayer=None):
         """Calculate the length of a line."""
@@ -55,14 +57,14 @@ class Calculator:
 
         distances = [0.0]
         elevations = []
-        
+
         if elevationLayer is None:
             calculator = QgsDistanceArea()
             points = line.asPolyline()
 
             # Calculate distances along line using the GDA2020 ellipsoid
             pointPairs = zip(points, points[1:])
-     
+
             for p1, p2 in pointPairs:
                 if p1 is None or p2 is None:
                     break
@@ -70,7 +72,7 @@ class Calculator:
                 # Calculate the ellipsoidal ground distance
                 groundDistance = calculator.measureLine(p1, p2)
                 distances.append(distances[-1] + groundDistance)
-            
+
             elevations = [0.0 for point in points]
 
         else:
@@ -124,12 +126,12 @@ class Calculator:
 
         maximumDistance = distances[-1]
 
-        return Profile(maximumDistance = maximumDistance,
-                                 distances = distances,
-                                 elevations = elevations,
-                                 minimumElevation = minimumElevation,
-                                 maximumElevation = maximumElevation,
-                                 meanElevation = meanElevation)
+        return Profile(maximumDistance=maximumDistance,
+                       distances=distances,
+                       elevations=elevations,
+                       minimumElevation=minimumElevation,
+                       maximumElevation=maximumElevation,
+                       meanElevation=meanElevation)
 
     @staticmethod
     def calculateArea(polygon):
@@ -142,7 +144,6 @@ class Calculator:
         # if polygon.isMultipart():
         #     raise PaddockPowerError(
         #         "Calculator.calculateArea: Paddock Power should not be used with multi-part polygons.")
-
 
         calculator = Calculator.QGIS_CALCULATOR
 

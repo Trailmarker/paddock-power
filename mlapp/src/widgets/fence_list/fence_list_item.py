@@ -11,6 +11,7 @@ from ...spatial.feature.feature_status import FeatureStatus
 from ...spatial.feature.fence import Fence
 from ...utils import qgsDebug
 
+
 class FenceListItem(QWidget):
     layoutRefreshNeeded = pyqtSignal()
 
@@ -26,7 +27,8 @@ class FenceListItem(QWidget):
         self.fence = fence
 
         self.titleLabel = QLabel()
-        self.titleLabel.setText(f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
+        self.titleLabel.setText(
+            f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
 
         self.toolBar = QToolBar()
         self.toolBar.setStyleSheet("""QToolBar { padding: 0; }
@@ -70,20 +72,20 @@ class FenceListItem(QWidget):
 
         self.draftedState.addTransition(self.plan, self.plannedState)
         self.plannedState.addTransition(self.undoPlan, self.draftedState)
-        
+
         self.machine.addState(self.draftedState)
         self.machine.addState(self.plannedState)
 
-        self.machine.setInitialState(self.plannedState 
+        self.machine.setInitialState(self.plannedState
                                      if fence.status() == FeatureStatus.Planned
                                      else self.draftedState)
-        
+
         self.plan.connect(self.planFence)
         self.undoPlan.connect(self.undoPlanFence)
 
         self.draftedState.entered.connect(self.refreshUi)
         self.plannedState.entered.connect(self.refreshUi)
-    
+
         self.machine.start()
 
         self.refreshUi()
@@ -91,7 +93,8 @@ class FenceListItem(QWidget):
     def refreshUi(self):
         drafted = self.draftedState in self.machine.configuration()
 
-        self.titleLabel.setText(f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
+        self.titleLabel.setText(
+            f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
         if drafted:
             self.titleLabel.setStyleSheet("background-color: rgb(242,212,215)")
 
@@ -104,15 +107,19 @@ class FenceListItem(QWidget):
 
     def planFence(self):
         milestone = self.state.getMilestone()
-        qgsDebug(f"FenceListItem.planFence: self.fence.__class__.__name__ = {self.fence.__class__.__name__}")
-        qgsDebug(f"FenceListItem.planFence: isinstance(self.fence, Fence) = {str(isinstance(self.fence, Fence))}")
+        qgsDebug(
+            f"FenceListItem.planFence: self.fence.__class__.__name__ = {self.fence.__class__.__name__}")
+        qgsDebug(
+            f"FenceListItem.planFence: isinstance(self.fence, Fence) = {str(isinstance(self.fence, Fence))}")
         if milestone is not None:
             milestone.planFence(self.fence)
 
     def undoPlanFence(self):
         milestone = self.state.getMilestone()
-        qgsDebug(f"FenceListItem.undoPlanFence: self.fence.__class__.__name__ = {self.fence.__class__.__name__}")
-        qgsDebug(f"FenceListItem.undoPlanFence: isinstance(self.fence, Fence) = {str(isinstance(self.fence, Fence))}")
+        qgsDebug(
+            f"FenceListItem.undoPlanFence: self.fence.__class__.__name__ = {self.fence.__class__.__name__}")
+        qgsDebug(
+            f"FenceListItem.undoPlanFence: isinstance(self.fence, Fence) = {str(isinstance(self.fence, Fence))}")
         if milestone is not None:
             milestone.undoPlanFence(self.fence)
 

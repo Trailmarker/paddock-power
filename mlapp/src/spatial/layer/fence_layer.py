@@ -30,10 +30,10 @@ class FenceLayer(PaddockPowerVectorLayer):
         """Get the last planned Fence Build Order."""
         if self.featureCount() == 0:
             return 0
-        
+
         fields = self.fields()
         buildOrderIndex = fields.indexFromName(Fence.BUILD_ORDER)
-        
+
         return max(self.maximumValue(buildOrderIndex), 0)
 
     def nextBuildOrder(self):
@@ -42,15 +42,17 @@ class FenceLayer(PaddockPowerVectorLayer):
 
     def getFenceByBuildOrder(self, buildOrder):
         """Get a Fence by its Build Order."""
-        buildOrderRequest = QgsFeatureRequest().setFilterExpression(f'"{Fence.BUILD_ORDER}" = {buildOrder}')
-        
+        buildOrderRequest = QgsFeatureRequest().setFilterExpression(
+            f'"{Fence.BUILD_ORDER}" = {buildOrder}')
+
         fences = list(self.getFeatures(buildOrderRequest))
 
         if not fences:
             return None
 
         if len(fences) > 1:
-            guiError(f"Integrity problem: your Project has multiple Fences with Build Order {buildOrder}")
+            guiError(
+                f"Integrity problem: your Project has multiple Fences with Build Order {buildOrder}")
 
         return fences[0]
 

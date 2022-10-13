@@ -91,11 +91,11 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
 
         for field in feature.fields():
             qgsDebug(f"addFeature: field.name() {field.name()}")
-            
+
             if field.name() not in self.fields().names():
                 raise PaddockPowerError(
                     f"Cannot add feature to {self.name()}: field {field.name()} is not present")
-            
+
         feature.clearId()
         super().addFeature(feature)
 
@@ -175,5 +175,3 @@ def dumpLayerFieldsByName(layerName):
     project = QgsProject.instance()
     layer = project.mapLayersByName(layerName)[0]
     dumpQgsFields(layer.fields())
-
-

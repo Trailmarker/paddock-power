@@ -18,4 +18,3 @@ class PipelineLayer(PaddockPowerVectorLayer):
                                             Pipeline.SCHEMA,
                                             gpkgFile,
                                             styleName=self.STYLE)
-

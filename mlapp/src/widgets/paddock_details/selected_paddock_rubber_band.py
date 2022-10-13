@@ -8,6 +8,7 @@ from qgis.gui import QgsRubberBand
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from ...utils import qgsDebug
 
+
 class SelectedPaddockRubberBand(QgsRubberBand):
 
     def __init__(self, canvas, parent=None):

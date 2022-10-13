@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
+from ...models.paddock_power_error import PaddockPowerError
+from ...spatial.profile import Profile
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib
 matplotlib.use('Qt5Agg')
-
-from ...spatial.profile import Profile
-from ...models.paddock_power_error import PaddockPowerError
 
 
 class ProfileCanvas(FigureCanvasQTAgg):

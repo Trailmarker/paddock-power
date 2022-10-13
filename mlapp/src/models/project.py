@@ -3,7 +3,7 @@ from os import path
 import sqlite3
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
-from qgis.core import QgsProject, QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 # -*- coding: utf-8 -*-
 from ..spatial.feature.boundary import Boundary
@@ -144,7 +144,6 @@ class Project(QObject):
         if self.milestone is None:
             self.setMilestone(list(self.milestones.keys())[0])
 
-    
     def addToMap(self):
         """Add the project to the map."""
         # Remove first to keep order sane
@@ -180,7 +179,8 @@ class Project(QObject):
 
         layerNames = [l.split('!!::!!')[1]
                       for l in layers.dataProvider().subLayers()]
-        featureTypeNames = [ft.__name__ for ft in Project.PADDOCK_POWER_FEATURE_TYPES]
+        featureTypeNames = [
+            ft.__name__ for ft in Project.PADDOCK_POWER_FEATURE_TYPES]
 
         milestones = set()
         for layerName in layerNames:

@@ -22,7 +22,8 @@ class Collapse(QWidget):
         )
         self.toggleButton.setArrowType(Qt.RightArrow)
         self.toggleButton.toggled.connect(self.toggle)
-        self.toggleButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.toggleButton.setSizePolicy(
+            QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.toggleAnimation = QParallelAnimationGroup(self)
 
         self.toolBar = QToolBar()

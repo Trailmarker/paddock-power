@@ -12,6 +12,7 @@ from ..paddock_details.paddock_details import PaddockDetails
 from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
 from ...utils import qgsDebug
 
+
 class PaddockCollapsibleListItem(QWidget):
     layoutRefreshNeeded = pyqtSignal()
 
@@ -87,7 +88,7 @@ class PaddockCollapsibleListItem(QWidget):
         self.viewState.entered.connect(self.refreshUi)
         self.editState.entered.connect(self.refreshUi)
         self.editState.entered.connect(self.collapse.setExpanded)
-       
+
         self.machine.start()
 
         self.refreshUi()
@@ -96,7 +97,8 @@ class PaddockCollapsibleListItem(QWidget):
         editing = self.editState in self.machine.configuration()
 
         # Set title to paddock name with some details
-        self.setTitle(f"{self.paddock.featureName()} ({self.paddock.featureArea()} km², ?? AE)")
+        self.setTitle(
+            f"{self.paddock.featureName()} ({self.paddock.featureArea()} km², ?? AE)")
 
         # Hide or show forms
         self.paddockDetails.setVisible(not editing)

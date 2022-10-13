@@ -18,6 +18,6 @@ class WaterpointLayer(PaddockPowerVectorLayer):
                                               Waterpoint.SCHEMA,
                                               gpkgFile,
                                               styleName=self.STYLE)
-        
+
         # Convert all QGIS features to Waterpoint objects
         self.setFeatureAdapter(asWaterpoint)

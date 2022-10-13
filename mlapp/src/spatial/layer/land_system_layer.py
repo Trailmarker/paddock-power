@@ -13,12 +13,11 @@ class LandSystemLayer(PaddockPowerVectorLayer):
         """Create or open a Pipeline layer."""
 
         super(LandSystemLayer, self).__init__(sourceType,
-                                               layerName,
-                                               QgsWkbTypes.LineString,
-                                               LandSystem.SCHEMA,
-                                               gpkgFile,
-                                               styleName=self.STYLE)
+                                              layerName,
+                                              QgsWkbTypes.LineString,
+                                              LandSystem.SCHEMA,
+                                              gpkgFile,
+                                              styleName=self.STYLE)
 
         # Convert all QGIS features to Fences
         self.setFeatureAdapter(asLandSystem)
-

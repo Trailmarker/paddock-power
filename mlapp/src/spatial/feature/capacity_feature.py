@@ -5,12 +5,13 @@ from qgis.core import QgsField
 
 from .area_feature import AreaFeature
 
+
 class CapacityFeature(AreaFeature):
     CAPACITY = "AE/km²"
 
     SCHEMA = AreaFeature.SCHEMA + [
-            QgsField(name="AE/km²", type=QVariant.Double, typeName="Real",
-                        len=0, prec=0, comment="", subType=QVariant.Invalid)
+        QgsField(name="AE/km²", type=QVariant.Double, typeName="Real",
+                 len=0, prec=0, comment="", subType=QVariant.Invalid)
     ]
 
     def featureCapacity(self):

@@ -18,7 +18,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
-        
+
         qgsDebug("FencePaddockChangesWidget.__init__")
         super().__init__(parent)
 
@@ -71,7 +71,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.plannedPaddockMiniList.clear()
         else:
             self.setVisible(True)
-            self.supersededPaddockMiniList.setPaddocks(self.fence.supersededPaddocks)
+            self.supersededPaddockMiniList.setPaddocks(
+                self.fence.supersededPaddocks)
             self.plannedPaddockMiniList.setPaddocks(self.fence.plannedPaddocks)
 
     def clearFence(self):
@@ -83,9 +84,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         if fence is not None and not isinstance(fence, Fence):
             raise PaddockPowerError(
                 "FencePaddockChangesWidget.setFence: fence must be a Fence")
-        
+
         if fence is None:
             self.clearFence()
-        
-        self.fence = fence
 
+        self.fence = fence

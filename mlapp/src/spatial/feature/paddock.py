@@ -10,7 +10,7 @@ from .capacity_feature import CapacityFeature
 class Paddock(CapacityFeature):
     CONDITION, BUILD_FENCE = ["Condition",
                               "Build Fence"]
-                           
+
     SCHEMA = CapacityFeature.SCHEMA + [
         QgsField(name=CONDITION, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),

@@ -5,6 +5,7 @@ from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
 from ...models.paddock_power_state import PaddockPowerState
 from .fence_list_item import FenceListItem
 
+
 class FenceList(QListWidget):
 
     def __init__(self, parent=None):
@@ -38,7 +39,7 @@ class FenceList(QListWidget):
             self.setVisible(False)
             return
 
-        self.setVisible(True)   
+        self.setVisible(True)
 
         # Sort Fences by Build Order
         fences.sort(key=lambda x: x.fenceBuildOrder())
@@ -66,6 +67,7 @@ class FenceList(QListWidget):
         hint = super().sizeHint()
 
         # Add the width of the vertical scrollbar
-        hint.setWidth(self.sizeHintForColumn(0) + self.verticalScrollBar().width())
+        hint.setWidth(self.sizeHintForColumn(
+            0) + self.verticalScrollBar().width())
 
         return hint
