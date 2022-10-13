@@ -5,7 +5,7 @@ from qgis.core import QgsFeature, QgsFeatureRequest, QgsGeometry, QgsLineString,
 from ...models.paddock_power_error import PaddockPowerError
 from ..feature.feature_status import FeatureStatus
 from ..feature.fence import Fence
-from ..feature.paddock import Paddock, asPaddock
+from ..feature.paddock import Paddock, asPaddock, makePaddock
 from .paddock_power_vector_layer import PaddockPowerLayerSourceType, PaddockPowerVectorLayer
 
 
@@ -80,6 +80,9 @@ class PaddockLayer(PaddockPowerVectorLayer):
             raise PaddockPowerError(
                 "PaddockLayer.planPaddocks: fence must have a positive Build Order to be Planned")
 
+        maximumFid = self.maximumValue(self.fields().indexFromName(Paddock.FID))
+        maximumFid = maximumFid + 100
+
         fenceLine = fence.geometry()
 
         _, supersededPaddocks = self.getCrossedPaddocks(
@@ -116,23 +119,41 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
             qgsDebug(f"PaddockLayer.planPaddocks: splitPaddocks IDs are {str([f.id() for f in splitPaddocks])}")
                              
-            # splitPaddocks = [f for f in splitPaddocks if f.id() != crossedPaddock.id()]
+            minimumFid = min([f.id() for f in splitPaddocks])
 
             for i, splitPaddock in enumerate(splitPaddocks):
+                # If this is one of the 'crossed' paddocks after the split, add, don't update
+                createNew = splitPaddock.id() == crossedPaddock.id()
+                
+                if createNew:
+                    # Try to create an entirely new Paddock feature
+                    # Conflicts get quite weird here
+                    newPaddock = QgsFeature(self.fields())
+
+                    for field in self.fields():
+                        if field.name() != Paddock.FID:
+                            newPaddock.setAttribute(field.name(), splitPaddock.attribute(field.name()))
+
+                    newPaddock.setGeometry(splitPaddock.geometry())
+                    splitPaddock = asPaddock(newPaddock)
+                
                 newName = crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
                 qgsDebug(f"PaddockLayer.planPaddocks: new name is {newName}")
                 splitPaddock.setFeatureName(newName)
                 splitPaddock.setStatus(FeatureStatus.Planned)
                 splitPaddock.setPaddockBuildFence(fence.fenceBuildOrder())
                 splitPaddock.recalculate()
-                # If this is one of the 'crossed' paddocks after the split, add, don't update
-                if splitPaddock.id() == crossedPaddock.id():
+
+                if createNew:
+                    # Add the new Paddock
                     self.addFeature(splitPaddock)
                 else:
                     self.updateFeature(splitPaddock)
+
                 plannedPaddocks.append(splitPaddock)
 
         for paddock in supersededPaddocks:
+            splitPaddock.setPaddockBuildFence(fence.fenceBuildOrder())
             paddock.setStatus(FeatureStatus.Superseded)
             self.updateFeature(paddock)
 

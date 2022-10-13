@@ -22,9 +22,10 @@ class Feature:
                  len=0, prec=0, comment="", subType=QVariant.Invalid)
     ]
 
-    # def clearId(self):
-    #     """Clear the feature's id."""
-    #     self.setAttribute(Feature.FID, None)
+    def clearId(self, minimumFid=0):
+        """Clear the feature's id."""
+        self.setId(minimumFid - 1)
+
     def debug(self):
         """Dump the Feature's attributes to the log."""
         for field in self.fields():

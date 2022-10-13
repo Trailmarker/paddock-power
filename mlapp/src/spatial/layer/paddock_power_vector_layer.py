@@ -96,8 +96,7 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
                 raise PaddockPowerError(
                     f"Cannot add feature to {self.name()}: field {field.name()} is not present")
             
-
-        #feature.clearId()
+        feature.clearId()
         super().addFeature(feature)
 
     def setFeatureAdapter(self, featureAdapter):
