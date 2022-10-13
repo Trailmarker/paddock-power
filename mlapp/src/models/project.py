@@ -108,35 +108,34 @@ class Project(QObject):
         """Load this project from its GeoPackage."""
         assert(self.gpkgFile is not None)
 
-        if self.isLoaded and not forceLoad:
-            return
+        if not self.isLoaded or forceLoad:
+            # We go to a loaded state if the GeoPackage file does not exist
+            if not path.exists(self.gpkgFile):
+                self.isLoaded = True
+                return
 
-        # We go to a loaded state if the GeoPackage file does not exist
-        if not path.exists(self.gpkgFile):
+            milestoneNames = Project.findMilestones(self.gpkgFile)
+            milestoneNames.sort()
+
+            self.milestones = {}
+            self.milestone = None
+
+            for milestoneName in milestoneNames:
+                milestone = Milestone(milestoneName, self.gpkgFile)
+                self.milestones[milestoneName] = milestone
+                milestone.load()
+
+            elevationLayerName = Project.findElevationLayer(self.gpkgFile)
+            if elevationLayerName is not None:
+                self.elevationLayer = ElevationLayer(
+                    PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
+
             self.isLoaded = True
-            return
-
-        milestoneNames = Project.findMilestones(self.gpkgFile)
-        milestoneNames.sort()
-
-        self.milestones = {}
-        self.milestone = None
-
-        for milestoneName in milestoneNames:
-            milestone = Milestone(milestoneName, self.gpkgFile)
-            self.milestones[milestoneName] = milestone
-            milestone.load()
-
-        elevationLayerName = Project.findElevationLayer(self.gpkgFile)
-        if elevationLayerName is not None:
-            self.elevationLayer = ElevationLayer(
-                PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
-
-        self.isLoaded = True
-        self.milestonesUpdated.emit(self.milestones)
-        if milestoneNames:
-            self.setMilestone(milestoneNames[0])
-
+            self.milestonesUpdated.emit(self.milestones)
+        
+        if self.milestone is None:
+            self.setMilestone(list(self.milestones.keys())[0])
+        
     def addToMap(self):
         """Add the project to the map."""
         # Remove first to keep order sane

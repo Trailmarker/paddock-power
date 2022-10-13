@@ -90,6 +90,8 @@ class PaddockCollapsibleListItem(QWidget):
         self.machine.started.connect(self.refreshUi)
         self.machine.start()
 
+        self.refreshUi()
+
     def refreshUi(self):
         editing = self.editState in self.machine.configuration()
 
