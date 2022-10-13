@@ -17,6 +17,7 @@ class PaddockPowerState(QObject, metaclass=Singleton):
     selectedFenceChanged = pyqtSignal(QgsFeature)
     selectedPaddockChanged = pyqtSignal(QgsFeature)
     selectedPipelineChanged = pyqtSignal(QgsFeature)
+    milestoneDataChanged = pyqtSignal()
 
     project = None
 
@@ -66,7 +67,7 @@ class PaddockPowerState(QObject, metaclass=Singleton):
         """Get the selected Fence."""
         if self.project is not None and self.project.milestone is not None:
             return self.project.milestone.selectedFence
-    
+
     def getSelectedPaddock(self):
         """Get the selected Paddock."""
         if self.project is not None and self.project.milestone is not None:
@@ -124,6 +125,8 @@ class PaddockPowerState(QObject, metaclass=Singleton):
                 lambda p: self.selectedPaddockChanged.emit(p))
             self.project.milestone.selectedPipelineChanged.connect(
                 lambda p: self.selectedPipelineChanged.emit(p))
+            self.project.milestone.milestoneDataChanged.connect(
+                lambda: self.milestoneDataChanged.emit())
 
 
 def connectPaddockPowerStateListener(state, listener):
@@ -147,4 +150,6 @@ def connectPaddockPowerStateListener(state, listener):
         if hasattr(listener, "onSelectedPipelineChanged") and callable(listener.onSelectedPipelineChanged):
             state.selectedPipelineChanged.connect(
                 lambda p: listener.onSelectedPipelineChanged(p))
-
+        if hasattr(listener, "onMilestoneDataChanged") and callable(listener.onMilestoneDataChanged):
+            state.milestoneDataChanged.connect(
+                lambda: listener.onMilestoneDataChanged())

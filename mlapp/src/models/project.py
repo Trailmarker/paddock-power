@@ -64,6 +64,9 @@ class Project(QObject):
         """Set the current milestone."""
         self.validateMilestoneName(milestoneName)
 
+        if self.milestone is not None:
+            self.milestone.disconnectAll()
+
         self.milestone = self.milestones[milestoneName]
 
         # Set the current milestone's layer group visible, and hide others

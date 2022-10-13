@@ -29,6 +29,7 @@ class Milestone(QObject):
     selectedFenceChanged = pyqtSignal(QgsFeature)
     selectedPaddockChanged = pyqtSignal(QgsFeature)
     selectedPipelineChanged = pyqtSignal(QgsFeature)
+    milestoneDataChanged = pyqtSignal()
 
     def __init__(self, milestoneName, gpkgFile):
         super(Milestone, self).__init__()
@@ -89,6 +90,12 @@ class Milestone(QObject):
         paddockLayerName = f"{self.milestoneName} Paddocks"
         self.paddockLayer = PaddockLayer(sourceType=PaddockPowerLayerSourceType.File,
                                          layerName=paddockLayerName, gpkgFile=self.gpkgFile)
+
+        # TODO hacky
+        self.fenceLayer.featureAdded.connect(
+            lambda: self.milestoneDataChanged.emit())
+        self.paddockLayer.featureAdded.connect(
+            lambda: self.milestoneDataChanged.emit())
 
         self.isLoaded = True
 
@@ -191,10 +198,12 @@ class Milestone(QObject):
             raise PaddockPowerError(
                 "Milestone.draftFence: fence must be a Fence")
 
-        normalisedFenceLine, supersededPaddocks = self.paddockLayer.getCrossedPaddocks(fence.geometry())
+        normalisedFenceLine, supersededPaddocks = self.paddockLayer.getCrossedPaddocks(
+            fence.geometry())
 
         if normalisedFenceLine is None or normalisedFenceLine.isEmpty() or not supersededPaddocks:
-            guiError("The Fence you have sketched does not cross or touch any Paddocks.")
+            guiError(
+                "The Fence you have sketched does not cross or touch any Paddocks.")
             return
 
         fence.setGeometry(normalisedFenceLine)
@@ -203,13 +212,14 @@ class Milestone(QObject):
         fence.recalculate()
 
         self.fenceLayer.instantAddFeature(fence)
-        draftFence = self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+        draftFence = self.fenceLayer.getFenceByBuildOrder(
+            fence.fenceBuildOrder())
         return draftFence
 
     def planFence(self, fence):
         """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
            and a list of planned paddocks resulting from splitting the paddocks using the cropped fence geometry."""
-        
+
         if not isinstance(fence, Fence):
             raise PaddockPowerError(
                 "Milestone.planFence: fence must be a Fence")
@@ -218,8 +228,9 @@ class Milestone(QObject):
             self.paddockLayer.startEditing()
             self.fenceLayer.startEditing()
 
-            supersededPaddocks, plannedPaddocks = self.paddockLayer.planPaddocks(fence)
-            
+            supersededPaddocks, plannedPaddocks = self.paddockLayer.planPaddocks(
+                fence)
+
             fence.setSupersededPaddocks(supersededPaddocks)
             fence.setPlannedPaddocks(plannedPaddocks)
             fence.setStatus(FeatureStatus.Planned)
@@ -231,7 +242,8 @@ class Milestone(QObject):
         except Exception as e:
             self.fenceLayer.rollBack()
             self.paddockLayer.rollBack()
-            raise PaddockPowerError(f"Milestone.planFence: failed to plan fence {str(e)}")
+            raise PaddockPowerError(
+                f"Milestone.planFence: failed to plan fence {str(e)}")
 
         return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
 
@@ -260,7 +272,14 @@ class Milestone(QObject):
         except Exception as e:
             self.fenceLayer.rollBack()
             self.paddockLayer.rollBack()
-            raise PaddockPowerError(f"Milestone.undoPlanFence: failed to undo fence {str(e)}")
+            raise PaddockPowerError(
+                f"Milestone.undoPlanFence: failed to undo fence {str(e)}")
 
         return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
-        
+
+    def disconnectAll(self):
+        """Disconnect all signals from the milestone."""
+        self.selectedFenceChanged.disconnect()
+        self.selectedPaddockChanged.disconnect()
+        self.selectedPipelineChanged.disconnect()
+        self.milestoneDataChanged.disconnect()

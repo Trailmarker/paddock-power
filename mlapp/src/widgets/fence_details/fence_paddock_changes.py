@@ -44,6 +44,14 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         self.refreshUi()
 
     @pyqtSlot()
+    def onMilestoneDataChanged(self):
+        """Handle a change to the underlying Milestone data."""
+        self.clearFence()
+
+        milestone = self.state.getMilestone()
+        self.onSelectedFenceChanged(milestone.selectedFence)
+
+    @pyqtSlot()
     def onSelectedFenceChanged(self, fence):
         """Handle a change in the selected fence."""
         self.clearFence()

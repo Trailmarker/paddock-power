@@ -18,6 +18,7 @@ class FenceList(QListWidget):
 
         self.state = PaddockPowerState()
         self.state.milestoneChanged.connect(self.refreshUi)
+        self.state.milestoneDataChanged.connect(self.refreshUi)
 
         self.refreshUi()
 
