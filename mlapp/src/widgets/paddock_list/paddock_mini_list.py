@@ -6,11 +6,10 @@ from .paddock_list_base import PaddockListBase
 
 
 class PaddockMiniList(PaddockListBase):
-    def __init__(self, paddocks, parent=None):
+    def __init__(self, parent=None):
         """Constructor."""
-        super(PaddockListBase, self).__init__(parent)
-
-        self.setPaddocks(paddocks)
+        super().__init__(parent)
+        self.paddocks = []
 
     def getPaddocks(self):
         """Get the paddocks."""

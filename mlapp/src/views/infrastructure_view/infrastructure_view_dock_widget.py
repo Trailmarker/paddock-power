@@ -23,7 +23,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
 
-    closingPlugin = pyqtSignal()
+    closingDockWidget = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -177,5 +177,5 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
                 self.profileCanvas, 4, 0, 1, 4)
 
     def closeEvent(self, event):
-        self.closingPlugin.emit()
+        self.closingDockWidget.emit()
         event.accept()

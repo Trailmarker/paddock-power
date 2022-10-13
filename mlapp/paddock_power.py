@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os.path
+from mlapp.src.widgets.fence_details.selected_fence_rubber_band import SelectedFenceRubberBand
 from qgis.core import QgsApplication, QgsProject
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
@@ -13,6 +14,7 @@ from .resources_rc import *
 from .src.models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
 from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
+from .src.widgets.fence_details.selected_fence_rubber_band import SelectedFenceRubberBand
 from .src.widgets.paddock_details.selected_paddock_rubber_band import SelectedPaddockRubberBand
 from .src.provider import Provider
 from .src.utils import qgsDebug
@@ -57,6 +59,7 @@ class PaddockPower:
         QgsProject.instance().readProject.connect(self.state.detectProject)
 
         self.selectedPaddockRubberBand = SelectedPaddockRubberBand(iface.mapCanvas())
+        self.selectedFenceRubberBand = SelectedFenceRubberBand(iface.mapCanvas())
 
         self.infrastructureViewIsActive = False
         self.infrastructureView = None
@@ -127,19 +130,34 @@ class PaddockPower:
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
 
-    def onClosePlugin(self):
-        """Cleanup necessary items here when plugin dockwidget is closed"""
-        # Disconnects
-        if self.infrastructureView is not None:
-            self.infrastructureView.closingPlugin.disconnect(
-                self.onClosePlugin)
-        if self.paddockView is not None:
-            self.paddockView.closingPlugin.disconnect(self.onClosePlugin)
+    def cleanUpRubberBands(self):
+        # Clean up rubber bands
+        if self.selectedPaddockRubberBand is not None:
+            self.selectedPaddockRubberBand.hide()
+            self.selectedPaddockRubberBand.reset()
+            iface.mapCanvas().scene().removeItem(self.selectedPaddockRubberBand)
+        
+        if self.selectedFenceRubberBand is not None:
+            self.selectedFenceRubberBand.hide()
+            self.selectedFenceRubberBand.reset()
+            iface.mapCanvas().scene().removeItem(self.selectedFenceRubberBand)
 
-        # Remove this statement if dockwidget is to remain
-        # for reuse if plugin is reopened
-        self.infrastructureViewIsActive = False
+    def onClosePaddockView(self):
+        if self.paddockView is not None:
+            self.paddockView.closingDockWidget.disconnect(self.onClosePaddockView)
+
         self.paddockViewIsActive = False
+        # Remove this statement if dockwidget is to remain
+        # for reuse if it is reopened later
+        self.paddockView = None
+
+    def onCloseInfrastructureView(self):
+        if self.infrastructureView is not None:
+            self.infrastructureView.closingDockWidget.disconnect(
+                self.onCloseInfrastructureView)
+   
+        self.infrastructureViewIsActive = False
+        self.infrastructureView = None
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
@@ -151,6 +169,9 @@ class PaddockPower:
         # Remove the toolbar
         del self.toolbar
 
+        # Clean up the rubber bands
+        self.cleanUpRubberBands()
+
         # Remove processing provider
         QgsApplication.processingRegistry().removeProvider(self.provider)
 
@@ -160,14 +181,11 @@ class PaddockPower:
         if not self.paddockViewIsActive:
             self.paddockViewIsActive = True
 
-            # self.paddockView may not exist if:
-            #    first run of plugin
-            #    removed on close (see self.onClosePlugin method)
             if self.paddockView is None:
                 self.paddockView = PaddockViewDockWidget()
 
             # Connect to provide cleanup on closing of self.paddockView
-            self.paddockView.closingPlugin.connect(self.onClosePlugin)
+            self.paddockView.closingDockWidget.connect(self.onClosePaddockView)
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
             self.paddockView.show()
 
@@ -177,14 +195,11 @@ class PaddockPower:
         if not self.infrastructureViewIsActive:
             self.infrastructureViewIsActive = True
 
-            # self.infrastructureView may not exist if:
-            #    first run of plugin
-            #    removed on close (see self.onClosePlugin method)
             if self.infrastructureView is None:
                 self.infrastructureView = InfrastructureViewDockWidget()
 
             # Connect to provide cleanup on closing of self.infrastructureView
-            self.infrastructureView.closingPlugin.connect(self.onClosePlugin)
+            self.infrastructureView.closingDockWidget.connect(self.onCloseInfrastructureView)
             self.iface.addDockWidget(
                 Qt.BottomDockWidgetArea, self.infrastructureView)
             self.infrastructureView.show()

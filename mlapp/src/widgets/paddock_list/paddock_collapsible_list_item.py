@@ -93,8 +93,8 @@ class PaddockCollapsibleListItem(QWidget):
     def refreshUi(self):
         editing = self.editState in self.machine.configuration()
 
-        # Set title to paddock name
-        self.setTitle(str(self.paddock["Paddock Name"]))
+        # Set title to paddock name with some details
+        self.setTitle(f"{self.paddock.paddockName()} ({self.paddock.paddockArea()} km², ?? AE)")
 
         # Hide or show forms
         self.paddockDetails.setVisible(not editing)
@@ -113,7 +113,7 @@ class PaddockCollapsibleListItem(QWidget):
 
     def selectPaddock(self):
         """Select this paddock."""
-        self.collapse.setExpanded(True)
+        # self.collapse.setExpanded(True)
         milestone = self.state.getMilestone()
         if milestone is not None:
             milestone.setSelectedPaddock(self.paddock)

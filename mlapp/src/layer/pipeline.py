@@ -6,6 +6,7 @@ from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
 
+from ..models.paddock_power_error import PaddockPowerError
 from .calculator import Calculator
 from .paddock_power_feature import PaddockPowerFeature
 
@@ -43,13 +44,17 @@ class Pipeline(PaddockPowerFeature):
         self.setFenceLength(self.profile.maximumDistance)
 
 
+PipelineFeature = type('PipelineFeature', (Pipeline, QgsFeature), {})
+
 def asPipeline(feature):
     """Return a Pipeline object from a QgsFeature."""
-    feature.__class__ = type('PipelineFeature', (Pipeline, QgsFeature), {})
+    if not isinstance(feature, QgsFeature):
+        raise PaddockPowerError("asPipeline: feature is not a QgsFeature")
+    if not isinstance(feature, Pipeline):
+        feature.__class__ = PipelineFeature
     if not hasattr(feature, 'profile'):
         setattr(feature, 'profile', None)
     return feature
-
 
 def makePipeline():
     """Return a new and empty Pipeline object."""

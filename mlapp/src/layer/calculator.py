@@ -126,9 +126,9 @@ class Calculator:
             raise PaddockPowerError(
                 "Calculator.calculateArea: polygon is not a QgsGeometry.")
 
-        if polygon.ismMultipart():
-            raise PaddockPowerError(
-                "Calculator.calculateArea: Paddock Power should not be used with multi-part polygons.")
+        # if polygon.isMultipart():
+        #     raise PaddockPowerError(
+        #         "Calculator.calculateArea: Paddock Power should not be used with multi-part polygons.")
 
 
         calculator = Calculator.QGIS_CALCULATOR
@@ -143,9 +143,9 @@ class Calculator:
             raise PaddockPowerError(
                 "Calculator.calculatePerimeter: polygon is not a QgsGeometry.")
 
-        if polygon.ismMultipart():
-            raise PaddockPowerError(
-                "Calculator.calculatePerimeter: Paddock Power should not be used with multi-part polygons.")
+        # if polygon.isMultipart():
+        #     raise PaddockPowerError(
+        #         "Calculator.calculatePerimeter: Paddock Power should not be used with multi-part polygons.")
 
         calculator = Calculator.QGIS_CALCULATOR
 

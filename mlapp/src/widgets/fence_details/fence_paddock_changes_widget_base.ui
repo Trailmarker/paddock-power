@@ -36,7 +36,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QListWidget" name="supersededPaddockMiniList"/>
+       <widget class="PaddockMiniList" name="supersededPaddockMiniList"/>
       </item>
      </layout>
     </widget>
@@ -48,13 +48,20 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QListWidget" name="plannedPaddockMiniList"/>
+       <widget class="PaddockMiniList" name="plannedPaddockMiniList"/>
       </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PaddockMiniList</class>
+   <extends>QListWidget</extends>
+   <header>mlapp/src/widgets/paddock_list/paddock_mini_list</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

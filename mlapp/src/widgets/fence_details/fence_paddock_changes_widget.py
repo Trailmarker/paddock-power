@@ -7,8 +7,10 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from qgis.core import QgsFeature
 
+from ...layer.fence import Fence, asFence
 from ...models.paddock_power_error import PaddockPowerError
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
+from ...utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_paddock_changes_widget_base.ui')))
@@ -16,17 +18,20 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class FencePaddockChangesWidget(QWidget, FORM_CLASS):
 
-    def __init__(self, fence, parent=None):
+    def __init__(self, parent=None):
         """Constructor."""
-        super(QWidget, self).__init__(parent)
+        
+        qgsDebug("FencePaddockChangesWidget.__init__")
+        super().__init__(parent)
 
         self.setupUi(self)
 
         self.state = PaddockPowerState()
         connectPaddockPowerStateListener(self.state, self)
 
-        self.clearFence()
-        self.setFence(fence)
+        self.fence = None
+        self.supersededPaddocks = []
+        self.plannedPaddocks = []
 
     @pyqtSlot()
     def onProjectChanged(self, project):
@@ -43,10 +48,16 @@ class FencePaddockChangesWidget(QWidget, FORM_CLASS):
     @pyqtSlot()
     def onSelectedFenceChanged(self, fence):
         """Handle a change in the selected fence."""
-        self.setFence(fence)
+        qgsDebug("FencePaddockChangesWidget.onSelectedFenceChanged")
+        self.clearFence()
+        self.setFence(asFence(fence))
+        self.refreshUi()
 
     def refreshUi(self):
         """Show the Paddock View."""
+        qgsDebug(f"self.superseededPaddocks: {self.supersededPaddocks}")
+        qgsDebug(f"self.superseededPaddocks.__class__.__name__: {self.supersededPaddocks.__class__.__name__}")
+
         self.supersededPaddockMiniList.setPaddocks(self.supersededPaddocks)
         self.plannedPaddockMiniList.setPaddocks(self.plannedPaddocks)
 
@@ -56,13 +67,15 @@ class FencePaddockChangesWidget(QWidget, FORM_CLASS):
         self.plannedPaddocks = []
 
     def setFence(self, fence):
-        if fence is not None and not isinstance(fence, QgsFeature):
+        if fence is not None and not isinstance(fence, Fence):
             raise PaddockPowerError(
-                "FencePaddockChangesWidget.setFence: fence must be a QgsFeature")
+                "FencePaddockChangesWidget.setFence: fence must be a Fence")
         
         if fence is None:
+            qgsDebug("FencePaddockChangesWidget.setFence: fence is None")
             self.clearFence()
         
+        qgsDebug("FencePaddockChangesWidget.setFence: fence is not None")
         self.fence = fence
         milestone = self.state.getMilestone()
         if milestone is not None:
@@ -71,4 +84,3 @@ class FencePaddockChangesWidget(QWidget, FORM_CLASS):
         else:
             raise PaddockPowerError("FencePaddockChangesWidget.setFence: current milestone should not be empty")
 
-        self.refreshUi()

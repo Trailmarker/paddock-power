@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from re import I
 from qgis.core import (QgsFeature, QgsField, QgsFields)
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
 
+from ..models.paddock_power_error import PaddockPowerError
 from .calculator import Calculator
 from .paddock_power_feature import PaddockPowerFeature
 
@@ -45,19 +47,23 @@ class Paddock(PaddockPowerFeature):
     def setPaddockCondition(self, condition):
         self.setAttribute(Paddock.CONDITION, condition)
 
-    def calculate(self, elevationLayer=None):
+    def recalculate(self, elevationLayer=None):
         """Recalculate the area and perimeter of the Paddock."""
         area = Calculator.calculateArea(self.geometry())
         perimeter = Calculator.calculatePerimeter(self.geometry())
-        self.setPaddockArea(area)
-        self.setPaddockPerimeter(perimeter)
+        self.setAttribute(Paddock.AREA, area)
+        self.setAttribute(Paddock.PERIMETER, perimeter)
 
 
+PaddockFeature = type('PaddockFeature', (Paddock, QgsFeature), {})
 
 
 def asPaddock(feature):
     """Return a Paddock object from a QgsFeature."""
-    feature.__class__ = type('PaddockFeature', (Paddock, QgsFeature), {})
+    if not isinstance(feature, QgsFeature):
+        raise PaddockPowerError("asPaddock: feature is not a QgsFeature")
+    if not isinstance(feature, Paddock):
+        feature.__class__ = PaddockFeature
     return feature
 
 

@@ -13,7 +13,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
 
-    closingPlugin = pyqtSignal()
+    closingDockWidget = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -33,5 +33,5 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         self.state.detectProject()
 
     def closeEvent(self, event):
-        self.closingPlugin.emit()
+        self.closingDockWidget.emit()
         event.accept()

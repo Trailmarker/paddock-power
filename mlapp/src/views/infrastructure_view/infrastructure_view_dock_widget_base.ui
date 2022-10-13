@@ -41,13 +41,18 @@
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
-      <item row="1" column="4" rowspan="4">
-       <widget class="QWidget" name="fencePaddockChanges" native="true">
-        <layout class="QVBoxLayout" name="paddockLayout">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetDefaultConstraint</enum>
-         </property>
-        </layout>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="selectInfrastructureLineButton">
+        <property name="toolTip">
+         <string>Select an existing fenceline …</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+        </property>
        </widget>
       </item>
       <item row="1" column="0">
@@ -64,24 +69,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="selectInfrastructureLineButton">
-        <property name="toolTip">
-         <string>Select an existing fenceline …</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QLabel" name="infrastructureLengthText">
+      <item row="2" column="3">
+       <widget class="QLabel" name="elevationRangeText">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -114,24 +105,6 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="elevationRangeText">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
         </property>
        </widget>
       </item>
@@ -183,6 +156,40 @@
         </item>
        </layout>
       </item>
+      <item row="3" column="3">
+       <widget class="QLabel" name="infrastructureLengthText">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" rowspan="4">
+       <widget class="FencePaddockChangesWidget" name="fencePaddockChanges" native="true">
+        <layout class="QVBoxLayout" name="paddockLayout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+        </layout>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="4">
+       <widget class="QLabel" name="placeholderLabel">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -206,6 +213,12 @@
    <class>MilestoneToolBar</class>
    <extends>QWidget</extends>
    <header>mlapp/src/widgets/milestone_tool_bar/milestone_tool_bar</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FencePaddockChangesWidget</class>
+   <extends>QWidget</extends>
+   <header>mlapp/src/widgets/fence_details/fence_paddock_changes_widget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

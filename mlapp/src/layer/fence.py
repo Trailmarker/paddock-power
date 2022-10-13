@@ -7,6 +7,8 @@ from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
 
+from ..models.paddock_power_error import PaddockPowerError
+from ..utils import qgsDebug
 from .calculator import Calculator
 from .paddock import asPaddock
 from .paddock_power_feature import PaddockPowerFeature
@@ -41,16 +43,13 @@ class Fence(PaddockPowerFeature):
     def setFenceBuildOrder(self, buildOrder):
         self.setAttribute(Fence.BUILD_ORDER, buildOrder)
 
-    def setFenceLength(self, length):
-        self.setAttribute(Fence.LENGTH, length)
-
     def getProfile(self):
         return self.profile
 
     def recalculate(self, elevationLayer=None):
         """Recalculate the length of this Fence."""
         self.profile = Calculator.calculateProfile(self.geometry(), elevationLayer)
-        self.setFenceLength(self.profile.maximumDistance)
+        self.setAttribute(Fence.LENGTH, self.profile.maximumDistance)
 
     def analyseFence(self, paddockLayer):
         """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
@@ -102,8 +101,9 @@ class Fence(PaddockPowerFeature):
                 splitPaddock.setPaddockName(
                     crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
                 splitPaddock.setStatus(PaddockPowerFeatureStatus.Planned)
+                splitPaddock.recalculate()
                 paddockLayer.updatePaddock(splitPaddock)
-            plannedPaddocks.append(splitPaddocks)
+                plannedPaddocks.append(splitPaddock)
 
         # roll back all these edits
         paddockLayer.rollBack()
@@ -114,7 +114,12 @@ FenceFeature = type('FenceFeature', (Fence, QgsFeature), {})
 
 def asFence(feature):
     """Return a Fence object from a QgsFeature."""
-    feature.__class__ = FenceFeature
+    if not isinstance(feature, QgsFeature):
+        qgsDebug(f"feature: {str(feature)}")
+        qgsDebug(f"feature.__class__.__name__: {feature.__class__.__name__}")
+        raise PaddockPowerError("asFence: feature is not a QgsFeature")
+    if not isinstance(feature, Fence):
+        feature.__class__ = FenceFeature
     if not hasattr(feature, 'profile'):
         setattr(feature, 'profile', None)
     return feature
