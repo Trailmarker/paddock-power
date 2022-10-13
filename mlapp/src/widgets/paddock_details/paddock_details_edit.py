@@ -23,7 +23,7 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
         self.paddock = paddock
 
         if self.paddock is not None:
-            self.nameLineEdit.setText(self.paddock.paddockName())
+            self.nameLineEdit.setText(self.paddock.featureName())
             self.conditionComboBox.setEnabled(False)
             self.conditionComboBox.addItem("Not yet implemented")
 
@@ -32,6 +32,5 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
         """Save the Paddock Details."""
         milestone = self.state.getMilestone()
         if milestone is not None:
-            self.paddock.setPaddockName(self.nameLineEdit.text())
-            # self.paddock[self.CONDITION] = self.conditionComboBox.currentText()
-            milestone.paddockLayer.updatePaddock(self.paddock)
+            self.paddock.setFeatureName(self.nameLineEdit.text())
+            milestone.paddockLayer.instantCommitFeature(self.paddock)

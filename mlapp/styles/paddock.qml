@@ -96,7 +96,7 @@
     <rules key="{ae00e2e1-e43a-4b40-9242-a06fc53238ae}">
       <rule filter="  &quot;Paddock Area (km²)&quot;  > 5" key="{e67b7858-b3e6-4fb7-9252-fb87730a1e72}">
         <settings calloutType="simple">
-          <text-style capitalization="0" fontItalic="0" fontStrikeout="0" multilineHeight="1" fontLetterSpacing="0" textOpacity="1" textOrientation="horizontal" fontUnderline="0" isExpression="1" fontWeight="75" legendString="Aa" fontKerning="1" allowHtml="0" fontSizeMapUnitScale="3x:0,0,0,0,0,0" fontWordSpacing="0" fontSize="12" namedStyle="Bold" fontSizeUnit="Point" fontFamily="MS Shell Dlg 2" blendMode="0" fieldName=" title(  &quot;Paddock Name&quot;  || ' PDK' ||  '\n' || round(  &quot;Paddock Area (km²)&quot;  ,1) || 'km²')" previewBkgrdColor="0,0,0,255" textColor="0,0,0,255" useSubstitutions="0">
+          <text-style capitalization="0" fontItalic="0" fontStrikeout="0" multilineHeight="1" fontLetterSpacing="0" textOpacity="1" textOrientation="horizontal" fontUnderline="0" isExpression="1" fontWeight="75" legendString="Aa" fontKerning="1" allowHtml="0" fontSizeMapUnitScale="3x:0,0,0,0,0,0" fontWordSpacing="0" fontSize="12" namedStyle="Bold" fontSizeUnit="Point" fontFamily="MS Shell Dlg 2" blendMode="0" fieldName=" title(  &quot;Name&quot;  || ' PDK' ||  '\n' || round(  &quot;Paddock Area (km²)&quot;  ,1) || 'km²')" previewBkgrdColor="0,0,0,255" textColor="0,0,0,255" useSubstitutions="0">
             <families/>
             <text-buffer bufferJoinStyle="128" bufferSizeUnits="MM" bufferSizeMapUnitScale="3x:0,0,0,0,0,0" bufferNoFill="1" bufferBlendMode="0" bufferColor="255,255,255,255" bufferSize="0.5" bufferDraw="1" bufferOpacity="1"/>
             <text-mask maskEnabled="0" maskOpacity="1" maskSizeUnits="MM" maskSizeMapUnitScale="3x:0,0,0,0,0,0" maskedSymbolLayers="" maskSize="0" maskType="0" maskJoinStyle="128"/>
@@ -377,7 +377,7 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Paddock Name">
+    <field configurationFlags="None" name="Name">
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
@@ -387,7 +387,7 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Paddock Status">
+    <field configurationFlags="None" name="Status">
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
@@ -406,7 +406,7 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Paddock Area (km²)">
+    <field configurationFlags="None" name="Area (km²)">
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
@@ -416,69 +416,20 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Paddock Perimeter (km)">
+    <field configurationFlags="None" name="Perimeter (km)">
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
             <Option value="false" type="bool" name="IsMultiline"/>
             <Option value="false" type="bool" name="UseHtml"/>
-          </Option>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="Paddock Date Commisioned">
-      <editWidget type="DateTime">
-        <config>
-          <Option type="Map">
-            <Option value="true" type="bool" name="allow_null"/>
-            <Option value="true" type="bool" name="calendar_popup"/>
-            <Option value="yyyy-MM-dd" type="QString" name="display_format"/>
-            <Option value="yyyy-MM-dd" type="QString" name="field_format"/>
-            <Option value="false" type="bool" name="field_iso_format"/>
-          </Option>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="Paddock Date Decommisioned">
-      <editWidget type="DateTime">
-        <config>
-          <Option type="Map">
-            <Option value="true" type="bool" name="allow_null"/>
-            <Option value="true" type="bool" name="calendar_popup"/>
-            <Option value="yyyy-MM-dd" type="QString" name="display_format"/>
-            <Option value="yyyy-MM-dd" type="QString" name="field_format"/>
-            <Option value="false" type="bool" name="field_iso_format"/>
-          </Option>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="Date Edited">
-      <editWidget type="DateTime">
-        <config>
-          <Option type="Map">
-            <Option value="true" type="bool" name="allow_null"/>
-            <Option value="true" type="bool" name="calendar_popup"/>
-            <Option value="yyyy-MM-dd" type="QString" name="display_format"/>
-            <Option value="yyyy-MM-dd" type="QString" name="field_format"/>
-            <Option value="false" type="bool" name="field_iso_format"/>
           </Option>
         </config>
       </editWidget>
     </field>
   </fieldConfiguration>
-  <aliases>
-    <alias index="0" field="fid" name=""/>
-    <alias index="1" field="Paddock Name" name=""/>
-    <alias index="2" field="Paddock Status" name=""/>
-    <alias index="3" field="Paddock Area (km²)" name=""/>
-    <alias index="4" field="Paddock Perimeter (km)" name=""/>
-    <alias index="5" field="Paddock Date Commisioned" name=""/>
-    <alias index="6" field="Paddock Date Decommisioned" name=""/>
-    <alias index="7" field="Date Edited" name=""/>
-  </aliases>
   <defaults>
     <default applyOnUpdate="0" expression="" field="fid"/>
-    <default applyOnUpdate="0" expression="" field="Paddock Name"/>
+    <default applyOnUpdate="0" expression="" field="Name"/>
     <default applyOnUpdate="0" expression="" field="Paddock Status"/>
     <default applyOnUpdate="1" expression="round($area * 0.000001, 2)" field="Paddock Area (km²)"/>
     <default applyOnUpdate="1" expression=" round($perimeter / 1000, 2)" field="Paddock Perimeter (km)"/>
@@ -488,7 +439,7 @@
   </defaults>
   <constraints>
     <constraint notnull_strength="1" constraints="3" field="fid" unique_strength="1" exp_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Paddock Name" unique_strength="0" exp_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Name" unique_strength="0" exp_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Paddock Status" unique_strength="0" exp_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Paddock Area (km²)" unique_strength="0" exp_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Paddock Perimeter (km)" unique_strength="0" exp_strength="0"/>
@@ -498,7 +449,7 @@
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="fid" desc=""/>
-    <constraint exp="" field="Paddock Name" desc=""/>
+    <constraint exp="" field="Name" desc=""/>
     <constraint exp="" field="Paddock Status" desc=""/>
     <constraint exp="" field="Paddock Area (km²)" desc=""/>
     <constraint exp="" field="Paddock Perimeter (km)" desc=""/>
@@ -514,7 +465,7 @@
     <columns>
       <column width="-1" type="actions" hidden="1"/>
       <column width="-1" type="field" hidden="0" name="fid"/>
-      <column width="-1" type="field" hidden="0" name="Paddock Name"/>
+      <column width="-1" type="field" hidden="0" name="Name"/>
       <column width="114" type="field" hidden="0" name="Paddock Area (km²)"/>
       <column width="140" type="field" hidden="0" name="Paddock Perimeter (km)"/>
       <column width="-1" type="field" hidden="0" name="Date Edited"/>
@@ -552,7 +503,7 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <attributeEditorForm>
-    <attributeEditorField index="1" showLabel="1" name="Paddock Name"/>
+    <attributeEditorField index="1" showLabel="1" name="Name"/>
     <attributeEditorField index="3" showLabel="1" name="Paddock Area (km²)"/>
     <attributeEditorField index="4" showLabel="1" name="Paddock Perimeter (km)"/>
     <attributeEditorField index="-1" showLabel="1" name="Date Commisioned"/>
@@ -611,7 +562,7 @@ def my_form_open(dialog, layer, feature):
     <field editable="1" name="Paddock Area (km²)"/>
     <field editable="1" name="Paddock Date Commisioned"/>
     <field editable="1" name="Paddock Date Decommisioned"/>
-    <field editable="1" name="Paddock Name"/>
+    <field editable="1" name="Name"/>
     <field editable="1" name="Paddock Perimeter (km)"/>
     <field editable="1" name="Paddock Proposed?"/>
     <field editable="1" name="Paddock Status"/>
@@ -670,7 +621,7 @@ def my_form_open(dialog, layer, feature):
     <field labelOnTop="1" name="Paddock Area (km²)"/>
     <field labelOnTop="1" name="Paddock Date Commisioned"/>
     <field labelOnTop="1" name="Paddock Date Decommisioned"/>
-    <field labelOnTop="1" name="Paddock Name"/>
+    <field labelOnTop="1" name="Name"/>
     <field labelOnTop="1" name="Paddock Perimeter (km)"/>
     <field labelOnTop="1" name="Paddock Proposed?"/>
     <field labelOnTop="1" name="Paddock Status"/>

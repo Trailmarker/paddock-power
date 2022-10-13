@@ -96,7 +96,7 @@ class PaddockCollapsibleListItem(QWidget):
         editing = self.editState in self.machine.configuration()
 
         # Set title to paddock name with some details
-        self.setTitle(f"{self.paddock.paddockName()} ({self.paddock.paddockArea()} km², ?? AE)")
+        self.setTitle(f"{self.paddock.featureName()} ({self.paddock.featureArea()} km², ?? AE)")
 
         # Hide or show forms
         self.paddockDetails.setVisible(not editing)

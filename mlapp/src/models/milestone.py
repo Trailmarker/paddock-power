@@ -7,16 +7,17 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsFeature, QgsProject
 from qgis.utils import iface
 
-from ..spatial.layer.boundary_layer import BoundaryLayer
+from ..spatial.feature.feature_status import FeatureStatus
 from ..spatial.feature.fence import Fence
-from ..spatial.layer.fence_layer import FenceLayer
 from ..spatial.feature.paddock import Paddock
+from ..spatial.feature.pipeline import Pipeline
+from ..spatial.layer.boundary_layer import BoundaryLayer
+from ..spatial.layer.fence_layer import FenceLayer
 from ..spatial.layer.paddock_layer import PaddockLayer
 from ..spatial.layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
-from ..spatial.feature.pipeline import Pipeline
 from ..spatial.layer.pipeline_layer import PipelineLayer
 from ..spatial.layer.waterpoint_layer import WaterpointLayer
-from ..utils import qgsDebug
+from ..utils import guiError, qgsDebug
 
 from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 
@@ -183,3 +184,79 @@ class Milestone(QObject):
                 "Milestone.setSelectedPipeline: pipeline must be a Pipeline")
         self.selectedPipeline = pipeline
         self.selectedPipelineChanged.emit(self.selectedPipeline)
+
+    def draftFence(self, fence):
+        if not isinstance(fence, Fence):
+            raise PaddockPowerError(
+                "Milestone.draftFence: fence must be a Fence")
+        
+        fence.recalculate()
+        fence.setFenceBuildOrder(self.fenceLayer.nextBuildOrder())
+        fence.setStatus(FeatureStatus.Draft)
+        self.fenceLayer.instantCommitFeature(fence)
+
+        return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+
+    def planFence(self, fence):
+        """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
+           and a list of planned paddocks resulting from splitting the paddocks using the cropped fence geometry."""
+        
+        if not isinstance(fence, Fence):
+            raise PaddockPowerError(
+                "Milestone.planFence: fence must be a Fence")
+
+        try:
+            self.paddockLayer.startEditing()
+            self.fenceLayer.startEditing()
+
+            normalisedFenceLine, supersededPaddocks, plannedPaddocks = self.paddockLayer.planPaddocks(self)
+            fence.setGeometry(normalisedFenceLine)
+            fence.setSupersededPaddocks(supersededPaddocks)
+            fence.setPlannedPaddocks(plannedPaddocks)
+            fence.recalculate()
+            fence.setStatus(FeatureStatus.Planned)
+            self.fenceLayer.updateFeature(fence)
+
+            self.fenceLayer.commitChanges()
+            self.paddockLayer.commitChanges()
+        except Exception as e:
+            self.paddockLayer.rollBack()
+            raise PaddockPowerError(f"Milestone.planFence: failed to plan fence {str(e)}")
+        finally:
+            self.paddockLayer.stopEditing()
+            self.fenceLayer.stopEditing()
+
+        return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+
+    def undoPlanFence(self, fence):
+        """Undo the Paddock changes created by a planned Fence and return the Fence to Draft status."""
+        if not isinstance(fence, Fence):
+            raise PaddockPowerError(
+                "Milestone.undoFence: fence must be a Fence")
+
+        if fence.fenceBuildOrder() < self.fenceLayer.currentBuildOrder():
+            guiError("You can only undo the most recently planned Fence.")
+            return
+
+        try:
+            self.paddockLayer.startEditing()
+            self.fenceLayer.startEditing()
+
+            self.paddockLayer.undoPlanPaddocks(self)
+            fence.setStatus(FeatureStatus.Draft)
+            fence.setSupersededPaddocks([])
+            fence.setPlannedPaddocks([])
+            self.fenceLayer.instantCommitFeature(fence)
+
+            self.fenceLayer.commitChanges
+            self.paddockLayer.commitChanges()
+        except Exception as e:
+            self.fenceLayer.rollBack()
+            self.paddockLayer.rollBack()
+            raise PaddockPowerError(f"Milestone.undoPlanFence: failed to undo fence {str(e)}")
+        finally:
+            self.paddockLayer.stopEditing()
+            self.fenceLayer.stopEditing()
+
+        return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+        

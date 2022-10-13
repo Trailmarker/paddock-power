@@ -28,8 +28,6 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         connectPaddockPowerStateListener(self.state, self)
 
         self.fence = None
-        self.supersededPaddocks = []
-        self.plannedPaddocks = []
 
         self.refreshUi()
 
@@ -54,10 +52,14 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
 
     def refreshUi(self):
         """Show the Paddock View."""
-        self.setVisible(self.fence is not None)
-
-        self.supersededPaddockMiniList.setPaddocks(self.supersededPaddocks)
-        self.plannedPaddockMiniList.setPaddocks(self.plannedPaddocks)
+        if self.fence is None:
+            self.setVisible(False)
+            self.supersededPaddockMiniList.clear()
+            self.plannedPaddockMiniList.clear()
+        else:
+            self.setVisible(True)
+            self.supersededPaddockMiniList.setPaddocks(self.fence.supersededPaddocks)
+            self.plannedPaddockMiniList.setPaddocks(self.fence.plannedPaddocks)
 
     def clearFence(self):
         self.fence = None
@@ -70,15 +72,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
                 "FencePaddockChangesWidget.setFence: fence must be a Fence")
         
         if fence is None:
-            qgsDebug("FencePaddockChangesWidget.setFence: fence is None")
             self.clearFence()
         
-        qgsDebug("FencePaddockChangesWidget.setFence: fence is not None")
         self.fence = fence
-        milestone = self.state.getMilestone()
-        if milestone is not None:
-            paddockLayer = milestone.paddockLayer
-            _, self.supersededPaddocks, self.plannedPaddocks = self.fence.planFence(paddockLayer)
-        else:
-            raise PaddockPowerError("FencePaddockChangesWidget.setFence: current milestone should not be empty")
 

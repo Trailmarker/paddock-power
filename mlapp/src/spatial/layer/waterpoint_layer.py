@@ -1,34 +1,11 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsField, QgsWkbTypes
+from qgis.core import QgsWkbTypes
 
-from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType, PaddockPowerVectorLayerType
+from ..feature.waterpoint import Waterpoint, asWaterpoint
+from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType
 
 
 class WaterpointLayer(PaddockPowerVectorLayer):
-
-    SCHEMA = [
-        QgsField(name="Waterpoint Type", type=QVariant.String, typeName="String",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Name", type=QVariant.String, typeName="String",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Reference", type=QVariant.String,
-                 typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Bore Yield (l/sec)", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Bore Report", type=QVariant.String,
-                 typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Start Month", type=QVariant.String,
-                 typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint End Month", type=QVariant.String,
-                 typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Longitude", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Latitude", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Waterpoint Elevation", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid)
-    ]
 
     STYLE = "waterpoint"
 
@@ -38,10 +15,9 @@ class WaterpointLayer(PaddockPowerVectorLayer):
         super(WaterpointLayer, self).__init__(sourceType,
                                               layerName,
                                               QgsWkbTypes.Point,
-                                              self.SCHEMA,
+                                              Waterpoint.SCHEMA,
                                               gpkgFile,
                                               styleName=self.STYLE)
-
-    def getLayerType(self):
-        """Return the Paddock Power layer type."""
-        return PaddockPowerVectorLayerType.Waterpoint
+        
+        # Convert all QGIS features to Waterpoint objects
+        self.setFeatureAdapter(asWaterpoint)

@@ -19,9 +19,11 @@ class PaddockListBase(QListWidget):
 
     def filterByName(self, filter):
         """Filter the paddock list by name."""
+        if filter is None:
+            return
         for item in [self.item(i) for i in range(self.count())]:
             widget = self.itemWidget(item)
-            item.setHidden(not filter in str(widget.paddock["Paddock Name"]))
+            item.setHidden(not filter.lower() in widget.paddock.featureName().lower())
 
     def getPaddocks():
         """Get the paddocks."""
@@ -33,7 +35,7 @@ class PaddockListBase(QListWidget):
         paddocks = self.getPaddocks()
 
         # Sort Paddocks alphabetically
-        paddocks.sort(key=lambda x: x["Paddock Name"])
+        paddocks.sort(key=lambda x: x.featureName())
 
         # Initially clear the list
         self.clear()

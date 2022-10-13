@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsField, QgsWkbTypes
+from qgis.core import QgsWkbTypes
 
-from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType, PaddockPowerVectorLayerType
+from ..feature.boundary import Boundary, asBoundary
+from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType
 
 
 class BoundaryLayer(PaddockPowerVectorLayer):
-
-    SCHEMA = [
-        QgsField(name="Property Name", type=QVariant.String, typeName="String",
-                 len=50, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Property Area (km²)", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid)
-    ]
 
     STYLE = "boundary"
 
@@ -22,10 +16,8 @@ class BoundaryLayer(PaddockPowerVectorLayer):
         super(BoundaryLayer, self).__init__(sourceType,
                                             layerName,
                                             QgsWkbTypes.MultiPolygon,
-                                            self.SCHEMA,
+                                            Boundary.SCHEMA,
                                             gpkgFile,
                                             styleName=self.STYLE)
-
-    def getLayerType(self):
-        """Return the Paddock Power layer type."""
-        return PaddockPowerVectorLayerType.Boundary
+        # Convert all QGIS features to Boundary objects
+        self.setFeatureAdapter(asBoundary)

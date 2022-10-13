@@ -22,6 +22,19 @@ class Calculator:
     QGIS_CALCULATOR = makeDistanceAreaCalculator()
  
     @staticmethod
+    def calculateElevationAtPoint(point, elevationLayer=None):
+        if elevationLayer is None:
+            return 0.0
+
+        if not isinstance(point, QgsGeometry):
+            raise PaddockPowerError(
+                "Calculator.calculateElevationAtPoint: point is not a QgsGeometry.")
+
+        pointXY = point.asPoint()
+        dataProvider = elevationLayer.dataProvider()
+        return dataProvider.identify(pointXY, QgsRaster.IdentifyFormatValue).results()[1]
+        
+    @staticmethod
     def calculateProfile(line, elevationLayer=None):
         """Calculate the length of a line."""
 

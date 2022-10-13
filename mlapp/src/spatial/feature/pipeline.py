@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from qgis.core import (QgsFeature, QgsField, QgsFields)
 from qgis.PyQt.QtCore import QVariant
 
-from qgis.core import QgsFeature
+from qgis.core import QgsFeature, QgsField, QgsFields
 
 from ...models.paddock_power_error import PaddockPowerError
 from ..calculator import Calculator
@@ -11,10 +10,13 @@ from .line_feature import LineFeature
 
 
 class Pipeline(LineFeature):
-    LENGTH, STATUS = [LineFeature.LENGTH,
-                      Feature.STATUS]
+    NAME, LENGTH, STATUS = [Feature.NAME,
+                            LineFeature.LENGTH,
+                            Feature.STATUS]
 
     SCHEMA = [
+        QgsField(name=NAME, type=QVariant.String, typeName="String",
+                 len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=LENGTH, type=QVariant.Double, typeName="Real",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=STATUS, type=QVariant.String, typeName="String",
@@ -36,9 +38,10 @@ class Pipeline(LineFeature):
             self.geometry(), elevationLayer)
         length = round(self.profile.maximumDistance, 2)
         self.setAttribute(Pipeline.LENGTH, length)
-        
+
 
 PipelineFeature = type('PipelineFeature', (Pipeline, QgsFeature), {})
+
 
 def asPipeline(feature):
     """Return a Pipeline object from a QgsFeature."""
@@ -49,6 +52,7 @@ def asPipeline(feature):
     if not hasattr(feature, 'profile'):
         setattr(feature, 'profile', None)
     return feature
+
 
 def makePipeline():
     """Return a new and empty Pipeline object."""

@@ -17,7 +17,11 @@ class PaddockMiniList(PaddockListBase):
 
     def setPaddocks(self, paddocks):
         """Set the paddocks."""
-        if paddocks is None or not all(isinstance(paddock, QgsFeature) for paddock in paddocks):
+        if paddocks is None:
+            self.paddocks = []
+            return
+
+        if not all(isinstance(paddock, QgsFeature) for paddock in paddocks):
             raise PaddockPowerError(
                 "PaddockMiniList.setPaddocks: paddocks must be a list of QgsFeature objects")
         self.paddocks = paddocks

@@ -5,8 +5,14 @@ import sqlite3
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsVectorLayer
 
+# -*- coding: utf-8 -*-
+from ..spatial.feature.boundary import Boundary
+from ..spatial.feature.waterpoint import Waterpoint
+from ..spatial.feature.pipeline import Pipeline
+from ..spatial.feature.fence import Fence
+from ..spatial.feature.paddock import Paddock
+from ..spatial.feature.land_system import LandSystem
 from ..spatial.layer.elevation_layer import ElevationLayer
-from ..spatial.layer.paddock_layer import PaddockPowerVectorLayerType
 from ..spatial.layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
 from ..utils import resolveGeoPackageFile
 from .milestone import Milestone
@@ -14,6 +20,9 @@ from .paddock_power_error import PaddockPowerError
 
 
 class Project(QObject):
+    PADDOCK_POWER_FEATURE_TYPES = (
+        Boundary, Waterpoint, Pipeline, Fence, Paddock, LandSystem)
+
     # emit this signal when paddocks are updated
     milestonesUpdated = pyqtSignal(dict)
     milestoneChanged = pyqtSignal(Milestone)
@@ -64,12 +73,6 @@ class Project(QObject):
 
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
-        self.validateMilestoneName(milestoneName)
-
-        if not self.isLoaded:
-            raise PaddockPowerError(
-                "Project.addMilestone: cannot add Milestone to a Project that is empty.")
-
         milestone = Milestone(milestoneName, self.gpkgFile)
         milestone.create()
 
@@ -132,10 +135,10 @@ class Project(QObject):
 
             self.isLoaded = True
             self.milestonesUpdated.emit(self.milestones)
-        
+
         if self.milestone is None:
             self.setMilestone(list(self.milestones.keys())[0])
-        
+
     def addToMap(self):
         """Add the project to the map."""
         # Remove first to keep order sane
@@ -168,16 +171,16 @@ class Project(QObject):
 
         layerNames = [l.split('!!::!!')[1]
                       for l in layers.dataProvider().subLayers()]
-        layerTypeNames = [el.name for el in PaddockPowerVectorLayerType]
+        featureTypeNames = [ft.__name__ for ft in Project.PADDOCK_POWER_FEATURE_TYPES]
 
         milestones = set()
         for layerName in layerNames:
             match = next(
-                (t for t in layerTypeNames if layerName.endswith(t + 's')), None)
+                (t for t in featureTypeNames if layerName.endswith(t + 's')), None)
             if match is not None:
                 milestones.add(rchop(layerName, match + 's').strip())
             match = next(
-                (t for t in layerTypeNames if layerName.endswith(t)), None)
+                (t for t in featureTypeNames if layerName.endswith(t)), None)
             if match is not None:
                 milestones.add(rchop(layerName, match).strip())
 

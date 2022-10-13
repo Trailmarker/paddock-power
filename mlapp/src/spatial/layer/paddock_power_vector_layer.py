@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
-from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
 from ...models.paddock_power_error import PaddockPowerError
@@ -17,23 +16,6 @@ QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
 
 # Paddock Power data is held in the GDA2020 coordinate system
 PADDOCK_POWER_EPSG = 7845
-
-
-class PaddockPowerVectorLayerType(Enum):
-    """Enumeration of the types of Paddock Power vector layers."""
-    # Note the order of this enumeration can be used to sort map layers for display purposes
-    Boundary = 1
-    Waterpoint = 2
-    Pipeline = 3
-    Fence = 4
-    Paddock = 5
-    LandSystems = 6
-
-    @classmethod
-    def guessLayerType(cls, layerName):
-        """Guess the type of a Paddock Power vector layer based on the layerName."""
-        layerTypeNames = [e.name for e in PaddockPowerVectorLayerType]
-        return next(t for t in layerTypeNames if t in layerName)
 
 
 class PaddockPowerVectorLayer(QgsVectorLayer):
@@ -106,7 +88,7 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
         if not isinstance(feature, Feature):
             raise PaddockPowerError(
                 "PaddockPowerVectorLayer.addFeature: the feature is not a Feature")
-        
+
         feature.clearId()
         super().addFeature(feature)
 
@@ -123,22 +105,46 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
         else:
             return features
 
-    def getFeatures(self):
+    def getFeatures(self, request=None):
         """Get the features in this layer."""
-        return self.adaptFeatures(super().getFeatures())
+        if request is None:
+            return self.adaptFeatures(super().getFeatures())
+
+        if not isinstance(request, QgsFeatureRequest):
+            raise PaddockPowerError(
+                "PaddockPowerVectorLayer.getFeatures: the request is not a QgsRequest")
+
+        return self.adaptFeatures(super().getFeatures(request))
+
+    def getFeaturesByStatus(self, *statuses):
+        """Get the features in this layer filtered by one or more FeatureStatus values."""
+        return [f for f in self.getFeatures() if f.status() in statuses]
 
     def whileEditing(self, func):
         """Run a function with the layer in edit mode."""
         isEditing = self.isEditable()
 
-        if not isEditing:
-            self.startEditing()
-            func()
-            self.commitChanges()
-        else:
-            func()
-            self.commitChanges()
-            self.startEditing()
+        try:
+            if not isEditing:
+                self.startEditing()
+                func()
+                self.commitChanges()
+            else:
+                func()
+                self.commitChanges()
+                self.startEditing()
+        except Exception as e:
+            self.rollBack()
+            raise PaddockPowerError(
+                f"PaddockPowerVectorLayer.whileEditing: an exception occurred {str(e)}")
+        finally:
+            newIsEditing = self.isEditable()
+            if isEditing and not newIsEditing:
+                self.startEditing()
+
+    def instantCommitFeature(self, feature):
+        """Start editing, update a Feature and commt the changes."""
+        self.whileEditing(lambda: self.updateFeature(feature))
 
 
 # Helper functions - used to convert QgsField objects to code in the console as below
@@ -159,8 +165,4 @@ def dumpLayerFieldsByName(layerName):
     layer = project.mapLayersByName(layerName)[0]
     dumpQgsFields(layer.fields())
 
-# Also: layer.wkbType() is the storage for the "real" WKB geometry type
-# By observation:
-# * paddocks, boundary, watered areas and land systems are QgsWkbTypes.MultiPolygon
-# * fences and pipelines are QgsWkbTypes.LineString
-# * water points are QgsWkbTypes.Point
+

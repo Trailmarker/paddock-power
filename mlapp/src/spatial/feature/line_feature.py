@@ -1,10 +1,19 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import QVariant
+
+from qgis.core import QgsField
+
 from ..calculator import Calculator
 from .feature import Feature
 
 
 class LineFeature(Feature):
     LENGTH = "Length (km)"
+
+    SCHEMA = Feature.SCHEMA + [
+        QgsField(name=LENGTH, type=QVariant.Double, typeName="Real",
+                 len=0, prec=0, comment="", subType=QVariant.Invalid)
+    ]
 
     def featureLength(self):
         return self[LineFeature.LENGTH]
