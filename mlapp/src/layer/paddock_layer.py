@@ -3,23 +3,13 @@ from qgis.core import (QgsFeature, QgsField, QgsGeometry, QgsLineString, QgsPoin
                        QgsWkbTypes)
 from qgis.PyQt.QtCore import QVariant
 
+from .paddock import Paddock, makePaddock
 from .paddock_power_vector_layer import (PaddockPowerLayerSourceType,
                                          PaddockPowerVectorLayer,
                                          PaddockPowerVectorLayerType)
 
 
 class PaddockLayer(PaddockPowerVectorLayer):
-
-    SCHEMA = [
-        QgsField(name="Paddock Name", type=QVariant.String, typeName="String",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Paddock Area (km²)", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Paddock Perimeter (km)", type=QVariant.Double,
-                 typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name="Status", type=QVariant.String, typeName="String",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid)
-    ]
 
     STYLE = "paddock"
 
@@ -29,9 +19,11 @@ class PaddockLayer(PaddockPowerVectorLayer):
         super(PaddockLayer, self).__init__(sourceType,
                                            layerName,
                                            QgsWkbTypes.MultiPolygon,
-                                           self.SCHEMA,
+                                           Paddock.SCHEMA,
                                            gpkgFile,
                                            styleName=self.STYLE)
+        # Convert all QGIS features to Paddocks
+        self.setFeatureAdapter(makePaddock)
 
     def getLayerType(self):
         """Return the Paddock Power layer type."""
@@ -134,5 +126,5 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
     def updatePaddockName(self, paddockFeature, paddockName):
         """Update a paddock feature's name."""
-        paddockFeature.setAttribute("Paddock Name", paddockName)
+        paddockFeature.setPaddockName(paddockName)
         self.updatePaddock(paddockFeature)

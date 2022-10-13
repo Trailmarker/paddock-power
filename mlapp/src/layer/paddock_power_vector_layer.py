@@ -41,6 +41,9 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
                  wkbType=None, schema=None, gpkgFile=None, styleName=None):
         """Create a new Paddock Power vector layer."""
 
+        # By default, we don't adapt the features
+        self.featureAdapter = None
+
         if sourceType == PaddockPowerLayerSourceType.Memory:
             assert(layerName is not None)
             assert(wkbType is not None)
@@ -98,6 +101,23 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
         if node is None:
             group.addLayer(self)
 
+    def setFeatureAdapter(self, featureAdapter):
+        """Set the QgsFeature mixin for this layer."""
+        self.featureAdapter = featureAdapter
+
+    def adaptFeatures(self, features):
+        """Adapt the features in this layer."""
+        if self.featureAdapter is not None:
+            for feature in features:
+                feature = self.featureAdapter(feature)
+                yield feature
+        else:
+            return features
+
+    def getFeatures(self):
+        """Get the features in this layer."""
+        return self.adaptFeatures(super().getFeatures())
+ 
 
 # Helper functions - used to convert QgsField objects to code in the console as below
 def dumpQgsFieldConstructorStatement(field):

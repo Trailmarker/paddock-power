@@ -13,9 +13,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class PaddockDetailsEdit(QWidget, FORM_CLASS):
 
-    NAME, AREA, PERIMETER = ["Paddock Name",
-                             "Paddock Area (km²)", "Paddock Perimeter (km)"]
-
     def __init__(self, paddock, parent=None):
         """Constructor."""
         super(QWidget, self).__init__(parent)
@@ -26,7 +23,7 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
         self.paddock = paddock
 
         if self.paddock is not None:
-            self.nameLineEdit.setText(str(self.paddock[self.NAME]))
+            self.nameLineEdit.setText(self.paddock.paddockName())
             self.conditionComboBox.setEnabled(False)
             self.conditionComboBox.addItem("Not yet implemented")
 
@@ -35,6 +32,6 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
         """Save the Paddock Details."""
         milestone = self.state.getMilestone()
         if milestone is not None:
-            self.paddock[self.NAME] = self.nameLineEdit.text()
+            self.paddock.setPaddockName(self.nameLineEdit.text())
             # self.paddock[self.CONDITION] = self.conditionComboBox.currentText()
             milestone.paddockLayer.updatePaddock(self.paddock)

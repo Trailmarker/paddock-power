@@ -21,6 +21,6 @@ class PaddockDetails(QWidget, FORM_CLASS):
 
         self.paddock = paddock
         if self.paddock is not None:
-            self.areaText.setText(str(self.paddock[self.AREA]))
-            self.perimeterText.setText(str(self.paddock[self.PERIMETER]))
+            self.areaText.setText(str(self.paddock.paddockArea()))
+            self.perimeterText.setText(str(self.paddock.paddockPerimeter()))
             # self.conditionText.setText("Not yet implemented")
