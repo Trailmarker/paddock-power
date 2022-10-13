@@ -118,6 +118,19 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
         """Get the features in this layer."""
         return self.adaptFeatures(super().getFeatures())
  
+    def whileEditing(self, func):
+        """Run a function with the layer in edit mode."""
+        isEditing = self.isEditable()
+
+        if not isEditing:
+            self.startEditing()
+            func()
+            self.commitChanges()
+        else:
+            func()
+            self.commitChanges()
+            self.startEditing()
+
 
 # Helper functions - used to convert QgsField objects to code in the console as below
 def dumpQgsFieldConstructorStatement(field):

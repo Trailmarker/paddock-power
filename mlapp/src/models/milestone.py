@@ -7,12 +7,16 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsFeature, QgsProject
 from qgis.utils import iface
 
-from ..layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
 from ..layer.boundary_layer import BoundaryLayer
-from ..layer.waterpoint_layer import WaterpointLayer
-from ..layer.pipeline_layer import PipelineLayer
+from ..layer.fence import Fence
 from ..layer.fence_layer import FenceLayer
+from ..layer.paddock import Paddock
 from ..layer.paddock_layer import PaddockLayer
+from ..layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
+from ..layer.pipeline import Pipeline
+from ..layer.pipeline_layer import PipelineLayer
+from ..layer.waterpoint_layer import WaterpointLayer
+from ..utils import qgsDebug
 
 from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 
@@ -160,22 +164,22 @@ class Milestone(QObject):
             self.currentTool = None
 
     def setSelectedFence(self, fence):
-        if not isinstance(fence, QgsFeature):
+        if not isinstance(fence, Fence):
             raise PaddockPowerError(
-                "Milestone.selectFence: fence must be a QgsFeature")
+                "Milestone.setSelectedFence: fence must be a Fence")
         self.selectedFence = fence
         self.selectedFenceChanged.emit(self.selectedFence)
 
     def setSelectedPaddock(self, paddock):
-        if not isinstance(paddock, QgsFeature):
+        if not isinstance(paddock, Paddock):
             raise PaddockPowerError(
-                "Milestone.selectPaddock: paddock must be a QgsFeature")
+                "Milestone.setSelectedPaddock: paddock must be a Paddock")
         self.selectedPaddock = paddock
         self.selectedPaddockChanged.emit(self.selectedPaddock)
 
     def setSelectedPipeline(self, pipeline):
-        if not isinstance(pipeline, QgsFeature):
+        if not isinstance(pipeline, Pipeline):
             raise PaddockPowerError(
-                "Milestone.selectPipeline: pipeline must be a QgsFeature")
+                "Milestone.setSelectedPipeline: pipeline must be a Pipeline")
         self.selectedPipeline = pipeline
         self.selectedPipelineChanged.emit(self.selectedPipeline)

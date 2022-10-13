@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsField, QgsWkbTypes
+from qgis.core import QgsWkbTypes
 
+from .fence import Fence, asFence
 from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType, PaddockPowerVectorLayerType
 
 
 class FenceLayer(PaddockPowerVectorLayer):
-
-    SCHEMA = [
-        QgsField(name="Length (km)", type=QVariant.Double, typeName="Real",
-                 len=0, prec=0, comment="", subType=QVariant.Invalid)
-    ]
 
     STYLE = "fence"
 
@@ -20,10 +15,17 @@ class FenceLayer(PaddockPowerVectorLayer):
         super(FenceLayer, self).__init__(sourceType,
                                          layerName,
                                          QgsWkbTypes.LineString,
-                                         self.SCHEMA,
+                                         Fence.SCHEMA,
                                          gpkgFile,
-                                         styleName=self.STYLE)
+                                         styleName=FenceLayer.STYLE)
+
+        # Convert all QGIS features to Fences
+        self.setFeatureAdapter(asFence)
 
     def getLayerType(self):
         """Return the Paddock Power layer type."""
         return PaddockPowerVectorLayerType.Fence
+
+    def updateFence(self, fenceFeature):
+        """Update a Fence feature."""
+        self.whileEditing(lambda: self.updateFeature(fenceFeature))

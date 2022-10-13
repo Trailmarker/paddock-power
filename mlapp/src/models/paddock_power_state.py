@@ -140,8 +140,11 @@ def connectPaddockPowerStateListener(state, listener):
                 lambda p: listener.onProjectChanged(p))
         if hasattr(listener, "onSelectedFenceChanged") and callable(listener.onSelectedFenceChanged):
             state.selectedFenceChanged.connect(
-                lambda ms: listener.onSelectedFenceChanged(ms))
+                lambda f: listener.onSelectedFenceChanged(f))
         if hasattr(listener, "onSelectedPaddockChanged") and callable(listener.onSelectedPaddockChanged):
             state.selectedPaddockChanged.connect(
-                lambda ms: listener.onSelectedPaddockChanged(ms))
+                lambda p: listener.onSelectedPaddockChanged(p))
+        if hasattr(listener, "onSelectedPipelineChanged") and callable(listener.onSelectedPipelineChanged):
+            state.selectedPipelineChanged.connect(
+                lambda p: listener.onSelectedPipelineChanged(p))
 

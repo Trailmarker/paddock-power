@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-from qgis.core import (QgsFeature, QgsField, QgsGeometry, QgsLineString, QgsPoint,
-                       QgsWkbTypes)
+from qgis.core import (QgsFeature, QgsField, QgsFields)
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsFeature
 
-class Paddock(QgsFeature):
-    NAME, AREA, PERIMETER, CONDITION, STATUS = ["Paddock Name",
-                                                "Paddock Area (km²)",
-                                                "Paddock Perimeter (km)",
-                                                "Condition",
-                                                "Status"]
+from .calculator import Calculator
+from .paddock_power_feature import PaddockPowerFeature
+
+
+class Paddock(PaddockPowerFeature):
+    NAME, AREA, PERIMETER, CONDITION = ["Paddock Name",
+                                        "Paddock Area (km²)",
+                                        "Paddock Perimeter (km)",
+                                        "Condition"]
 
     SCHEMA = [
         QgsField(name=NAME, type=QVariant.String, typeName="String",
@@ -21,35 +23,49 @@ class Paddock(QgsFeature):
                  typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
         QgsField(name=CONDITION, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid),
-        QgsField(name=STATUS, type=QVariant.String, typeName="String",
+        QgsField(name=PaddockPowerFeature.STATUS, type=QVariant.String, typeName="String",
                  len=0, prec=0, comment="", subType=QVariant.Invalid)
     ]
 
     def paddockName(self):
-        """Return the name of the paddock."""
-        return str(self[self.NAME])
+        return str(self[Paddock.NAME])
 
     def paddockArea(self):
-        """Return the area of the paddock."""
-        return self[self.AREA]
+        return self[Paddock.AREA]
 
     def paddockPerimeter(self):
-        """Return the perimeter of the paddock."""
-        return self[self.PERIMETER]
+        return self[Paddock.PERIMETER]
+
+    def paddockCondition(self):
+        return str(self[Paddock.CONDITION])
 
     def setPaddockName(self, name):
-        """Set the name of the paddock."""
-        self.setAttribute(self.NAME, name)
+        self.setAttribute(Paddock.NAME, name)
 
-    def setPaddockArea(self, area):
-        """Set the area of the paddock."""
-        self.setAttribute(self.AREA, area)
+    def setPaddockCondition(self, condition):
+        self.setAttribute(Paddock.CONDITION, condition)
 
-    def setPaddockPerimeter(self, perimeter):
-        """Set the perimeter of the paddock."""
-        self.setAttribute(self.PERIMETER, perimeter)
+    def calculate(self, elevationLayer=None):
+        """Recalculate the area and perimeter of the Paddock."""
+        area = Calculator.calculateArea(self.geometry())
+        perimeter = Calculator.calculatePerimeter(self.geometry())
+        self.setPaddockArea(area)
+        self.setPaddockPerimeter(perimeter)
 
-def makePaddock(feature):
+
+
+
+def asPaddock(feature):
     """Return a Paddock object from a QgsFeature."""
     feature.__class__ = type('PaddockFeature', (Paddock, QgsFeature), {})
     return feature
+
+
+def makePaddock():
+    """Return a new and empty Paddock object."""
+    fields = QgsFields()
+    for field in Paddock.SCHEMA:
+        fields.append(field)
+
+    feature = QgsFeature(fields)
+    return asPaddock(feature)

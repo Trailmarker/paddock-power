@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import matplotlib.pyplot as plot
-
+from mlapp.src.layer.paddock_power_feature_status import PaddockPowerFeatureStatus
 from qgis.core import QgsGeometry, QgsPoint, QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
@@ -8,32 +7,24 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 
 from ...models.milestone import Milestone
-from ...models.project import Project
 from ...models.paddock_power_error import PaddockPowerError
-from ...utils import qgsDebug
-from ..paddock_power_map_tool import PaddockPowerMapTool
-from .infrastructure_profile import InfrastructureProfile
+from ...widgets.paddock_power_map_tool import PaddockPowerMapTool
 
 
-class InfrastructureProfileTool(PaddockPowerMapTool):
+class SketchLineTool(PaddockPowerMapTool):
     points = []
 
-    infrastructureProfileUpdated = pyqtSignal(InfrastructureProfile)
+    sketchFinished = pyqtSignal(QgsGeometry)
 
-    def __init__(self, milestone, project):
+    def __init__(self, milestone):
 
-        super(InfrastructureProfileTool, self).__init__()
+        super().__init__()
 
         if not isinstance(milestone, Milestone):
             raise PaddockPowerError(
-                "InfrastructureProfileTool.__init__: milestone is not a Milestone.")
-
-        if not isinstance(project, Project):
-            raise PaddockPowerError(
-                "InfrastructureProfileTool.__init__: project is not a Project.")
+                "SketchLineTool.__init__: milestone is not a Milestone.")
 
         self.milestone = milestone
-        self.project = project
 
         # flag to know whether the tool is capturing a drawing
         self.capturing = False
@@ -53,13 +44,6 @@ class InfrastructureProfileTool(PaddockPowerMapTool):
         self.guide.setLineStyle(Qt.DashLine)
         self.guide.show()
 
-    def showDialog(self):
-        """Show the Fenceline Analysis dialog."""
-        # self.dialog = InfrastructureProfileDialog(self.fencelineProfile)
-        # self.dialog.exec_()
-
-        # self.dialog.show()
-
     def clear(self):
         self.sketch.reset()
         self.guide.reset()
@@ -68,7 +52,7 @@ class InfrastructureProfileTool(PaddockPowerMapTool):
         """Completely delete or destroy all graphics objects or other state associated with the tool."""
         self.canvas.scene().removeItem(self.sketch)
         self.canvas.scene().removeItem(self.guide)
-        super(InfrastructureProfileTool, self).dispose()
+        super().dispose()
 
     def canvasMoveEvent(self, event):
         """Handle the canvas move event."""
@@ -96,17 +80,13 @@ class InfrastructureProfileTool(PaddockPowerMapTool):
             polyline = QgsGeometry.fromPolyline(self.points)
             self.sketch.setToGeometry(polyline)
 
-            # self.updateFencelineAnalysis()
-
         if e.button() == Qt.RightButton:
             self.capturing = False
             self.milestone.unsetTool()
-            self.updateInfrastructureProfile()
-            # self.showDialog()
+            self.updateLine()
 
-    def updateInfrastructureProfile(self):
+    def updateLine(self):
         """Update the current fenceline profile based on the sketch."""
-        infrastructureLine = QgsGeometry.fromPolyline(self.points)
-        infrastructureProfile = InfrastructureProfile(
-            infrastructureLine, self.project.elevationLayer)
-        self.infrastructureProfileUpdated.emit(infrastructureProfile)
+        sketchLine = QgsGeometry.fromPolyline(self.points)
+
+        self.sketchFinished.emit(sketchLine)

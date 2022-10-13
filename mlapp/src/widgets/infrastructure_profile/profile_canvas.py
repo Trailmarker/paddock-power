@@ -1,32 +1,25 @@
 # -*- coding: utf-8 -*-
-from .infrastructure_profile import InfrastructureProfile
-from ...models.paddock_power_error import PaddockPowerError
-from ...utils import qgsDebug
-
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib
 matplotlib.use('Qt5Agg')
 
+from ...layer.profile import Profile
+from ...models.paddock_power_error import PaddockPowerError
 
-class InfrastructureProfileCanvas(FigureCanvasQTAgg):
 
-    def __init__(self, fencelineProfile):
+class ProfileCanvas(FigureCanvasQTAgg):
 
-        if not isinstance(fencelineProfile, InfrastructureProfile):
+    def __init__(self, profile):
+
+        if not isinstance(profile, Profile):
             raise PaddockPowerError(
-                "InfrastructureProfileCanvas.__init__: fencelineProfile is not a InfrastructureProfile.")
+                "InfrastructureProfileCanvas.__init__: profile must be a Profile")
 
-        useMetres = (fencelineProfile.maximumDistance < 1000)
+        useMetres = (profile.maximumDistance < 1000)
 
-        qgsDebug(
-            f"InfrastructureProfileCanvas.__init__: useMetres={useMetres}")
-
-        distances = fencelineProfile.distances if useMetres else [
-            d / 1000 for d in fencelineProfile.distances]
-
-        qgsDebug(
-            f"InfrastructureProfileCanvas.__init__: distances={str(distances)}")
+        distances = profile.distances if useMetres else [
+            d / 1000 for d in profile.distances]
 
         # maximumDistance = fencelineProfile.maximumDistance if useMetres else fencelineProfile.maximumDistance / 1000
 
@@ -37,8 +30,8 @@ class InfrastructureProfileCanvas(FigureCanvasQTAgg):
         # Create a figure
         figure = Figure()
         self.axes = figure.add_subplot(111)
-        self.axes.plot(distances, fencelineProfile.elevations)
-        self.axes.set_ylim(0.0, fencelineProfile.maximumElevation * 1.5)
+        self.axes.plot(distances, profile.elevations)
+        self.axes.set_ylim(0.0, profile.maximumElevation * 1.5)
         # self.axes.plot([0, maximumDistance], [fencelineProfile.minimumElevation, fencelineProfile.minimumElevation], 'g--', label=f"Min. : {fencelineProfile.minimumElevation}")
         # self.axes.plot([0, maximumDistance], [fencelineProfile.maximumElevation, fencelineProfile.maximumElevation], 'r--', label=f"Max. : {fencelineProfile.maximumElevation}")
         # self.axes.plot([0, maximumDistance], [fencelineProfile.meanElevation, fencelineProfile.meanElevation], 'y--', label=f"Mean : {fencelineProfile.meanElevation}")
@@ -48,8 +41,8 @@ class InfrastructureProfileCanvas(FigureCanvasQTAgg):
             f"Distance ({'m' if useMetres else 'km'})", **msShellDlg)
         self.axes.set_ylabel("Elevation (m)", **msShellDlg)
         self.axes.fill_between(distances,
-                               fencelineProfile.elevations, yMinimum, alpha=0.5)
+                               profile.elevations, yMinimum, alpha=0.5)
 
         figure.tight_layout()
 
-        super(InfrastructureProfileCanvas, self).__init__(figure)
+        super(ProfileCanvas, self).__init__(figure)
