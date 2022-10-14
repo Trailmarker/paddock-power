@@ -3,8 +3,8 @@ from qgis.PyQt.QtCore import QMetaType
 
 from qgis.core import QgsFeatureRequest, QgsWkbTypes
 
-from ...models.paddock_power_error import PaddockPowerError
 from ...utils import guiError
+from ..feature.feature_status import FeatureStatus
 from ..feature.fence import Fence, asFence
 from .paddock_power_vector_layer import PaddockPowerVectorLayer, PaddockPowerLayerSourceType
 
@@ -26,19 +26,24 @@ class FenceLayer(PaddockPowerVectorLayer):
         # Convert all QGIS features to Fences
         self.setFeatureAdapter(asFence)
 
-    def currentBuildOrder(self):
-        """Get the last planned Fence Build Order."""
-        if self.featureCount() == 0:
-            return 0
+    def fenceCount(self):
+        """Get the number of Fences in the layer."""
+        return len([f for f in self.getFeatures()])
 
-        fields = self.fields()
-        buildOrderIndex = fields.indexFromName(Fence.BUILD_ORDER)
+    def getBuildOrder(self):
+        """The lowest Build Order of any Fence in Draft status."""
+        fences = list(self.getFeatures())
+        if not fences:
+            return (0, 0, 0)
 
-        return max(self.maximumValue(buildOrderIndex), 0)
+        pairs = [(f.fenceBuildOrder(), f) for f in fences]
+        pairs.sort(key=lambda p: p[0])
 
-    def nextBuildOrder(self):
-        """Get the next Fence Build Order."""
-        return self.currentBuildOrder() + 1
+        currentBuildOrder = max([bo for (bo, _) in pairs], default=0)       
+        lowestDraftBuildOrder = min([bo for (bo, f) in pairs if f.status() == FeatureStatus.Draft], default=currentBuildOrder+1)
+        highestPlannedBuildOrder = max([bo for (bo, f) in pairs if f.status() == FeatureStatus.Planned], default=0)
+
+        return (currentBuildOrder, lowestDraftBuildOrder, highestPlannedBuildOrder)
 
     def getFenceByBuildOrder(self, buildOrder):
         """Get a Fence by its Build Order."""

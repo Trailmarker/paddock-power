@@ -96,6 +96,8 @@ class PaddockCollapsibleListItem(QWidget):
     def refreshUi(self):
         editing = self.editState in self.machine.configuration()
 
+        self.setStatus(self.paddock.status())
+
         # Set title to paddock name with some details
         self.setTitle(
             f"{self.paddock.featureName()} ({self.paddock.featureArea()} km², ?? AE)")
@@ -111,6 +113,9 @@ class PaddockCollapsibleListItem(QWidget):
 
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
+
+    def setStatus(self, status):
+        self.collapse.setStatus(status)
 
     def setTitle(self, title):
         self.collapse.setTitle(title)

@@ -11,7 +11,6 @@ class PaddockListBase(QListWidget):
         """Constructor."""
 
         super().__init__(parent)
-        # self.setWidgetResizable(True)
         self.setFrameStyle(QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)

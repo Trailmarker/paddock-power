@@ -3,11 +3,15 @@ from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QObject
 
 from qgis.core import QgsFeature
 
+from ..spatial.feature.fence import FenceFeature
+from ..widgets.fence_details.fence_selection import FenceSelection
+from ..widgets.paddock_details.paddock_selection import PaddockSelection
+from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
+from ..utils import resolveGeoPackageFile, qgsDebug
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
 from .project import Project
 from .singleton import Singleton
-from ..utils import resolveGeoPackageFile, qgsDebug
 
 
 class PaddockPowerState(QObject, metaclass=Singleton):
@@ -18,11 +22,17 @@ class PaddockPowerState(QObject, metaclass=Singleton):
     selectedPaddockChanged = pyqtSignal(QgsFeature)
     selectedPipelineChanged = pyqtSignal(QgsFeature)
     milestoneDataChanged = pyqtSignal()
+    pluginUnloading = pyqtSignal()
 
     project = None
 
     def __init__(self):
         super().__init__()
+
+        self.selectionsInitialised = False
+        self.fenceSelection = None
+        self.paddockSelection = None
+        self.pipelineSelection = None
 
     def detectProject(self):
         """Detect a Paddock Power project in the current QGIS project."""
@@ -104,6 +114,30 @@ class PaddockPowerState(QObject, metaclass=Singleton):
         else:
             raise PaddockPowerError(
                 "PaddockPowerState.setMilestone: there is no current Project.")
+
+    def initSelections(self, canvas):
+        """Initialize the selections."""
+        self.selectionsInitialised = True
+
+        self.paddockSelection = PaddockSelection(canvas)
+        self.pipelineSelection = PipelineSelection(canvas)
+        self.fenceSelection = FenceSelection(canvas)
+
+        for selection in [self.paddockSelection,
+                          self.pipelineSelection,
+                          self.fenceSelection]:
+            self.pluginUnloading.connect(lambda: selection.cleanUp())
+            self.projectChanged.connect(
+                lambda _: selection.clearSelectedFeature)
+            self.milestoneChanged.connect(
+                lambda _: selection.clearSelectedFeature)
+
+        self.selectedPaddockChanged.connect(
+            self.paddockSelection.setSelectedFeature)
+        self.selectedPipelineChanged.connect(
+            self.pipelineSelection.setSelectedFeature)
+        self.selectedFenceChanged.connect(
+            self.fenceSelection.setSelectedFeature)
 
     @pyqtSlot()
     def onProjectChanged(self, project):

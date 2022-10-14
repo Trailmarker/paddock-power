@@ -91,13 +91,15 @@ class Milestone(QObject):
         self.paddockLayer = PaddockLayer(sourceType=PaddockPowerLayerSourceType.File,
                                          layerName=paddockLayerName, gpkgFile=self.gpkgFile)
 
-        # TODO hacky
-        self.fenceLayer.featureAdded.connect(
-            lambda: self.milestoneDataChanged.emit())
-        self.paddockLayer.featureAdded.connect(
-            lambda: self.milestoneDataChanged.emit())
+        self.connectLayerDataEvents()
 
         self.isLoaded = True
+
+    def connectLayerDataEvents(self):
+        """Connect to layer data changed events."""
+        # TODO self.boundaryLayer, self.waterpointLayer, 
+        for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer]:
+            layer.afterCommitChanges.connect(self.milestoneDataChanged)
 
     def findGroup(self):
         """Find this milestone's group in the Layers panel."""
@@ -198,6 +200,8 @@ class Milestone(QObject):
             raise PaddockPowerError(
                 "Milestone.draftFence: fence must be a Fence")
 
+        currentBuildOrder, _, _ = self.fenceLayer.getBuildOrder()
+
         normalisedFenceLine, supersededPaddocks = self.paddockLayer.getCrossedPaddocks(
             fence.geometry())
 
@@ -207,7 +211,7 @@ class Milestone(QObject):
             return
 
         fence.setGeometry(normalisedFenceLine)
-        fence.setFenceBuildOrder(self.fenceLayer.nextBuildOrder())
+        fence.setFenceBuildOrder(currentBuildOrder + 1)
         fence.setStatus(FeatureStatus.Draft)
         fence.recalculate()
 
@@ -223,6 +227,13 @@ class Milestone(QObject):
         if not isinstance(fence, Fence):
             raise PaddockPowerError(
                 "Milestone.planFence: fence must be a Fence")
+
+        _, lowestDraftBuildOrder, _ = self.fenceLayer.getBuildOrder()
+
+        if fence.fenceBuildOrder() > lowestDraftBuildOrder:
+            guiError(
+                "You must Plan your Drafted Fences from first to last according to Build Order.")
+            return
 
         try:
             self.paddockLayer.startEditing()
@@ -253,9 +264,12 @@ class Milestone(QObject):
             raise PaddockPowerError(
                 "Milestone.undoFence: fence must be a Fence")
 
-        # if fence.fenceBuildOrder() < self.fenceLayer.currentBuildOrder():
-        #     guiError("You can only undo the most recently planned Fence.")
-        #     return
+        _, _, highestPlannedBuildOrder = self.fenceLayer.getBuildOrder()
+
+        if fence.fenceBuildOrder() < highestPlannedBuildOrder:
+            guiError(
+                "Undo your Planned Fences from last to first.")
+            return
 
         try:
             self.paddockLayer.startEditing()

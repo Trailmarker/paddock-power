@@ -56,7 +56,10 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         """Handle a change in the selected fence."""
         self.clearFence()
 
+        qgsDebug(f"FencePaddockChangesWidget.onSelectedFenceChanged: fence={str(fence)}")
+
         if fence is not None:
+            qgsDebug(f"FencePaddockChangesWidget.onSelectedFenceChanged: fence is not None")
             fence = asFence(fence)
             milestone = self.state.getMilestone()
             milestone.paddockLayer.updateFencePaddocks(fence)
@@ -66,7 +69,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     def refreshUi(self):
         """Show the Paddock View."""
         if self.fence is None:
-            self.setVisible(False)
+            # self.setVisible(False)
             self.supersededPaddockMiniList.clear()
             self.plannedPaddockMiniList.clear()
         else:

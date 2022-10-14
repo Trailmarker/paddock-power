@@ -9,6 +9,7 @@ from qgis.utils import iface
 from ...models.paddock_power_state import PaddockPowerState
 from ...spatial.feature.feature_status import FeatureStatus
 from ...spatial.feature.fence import Fence
+from ...widgets.feature_status_label import FeatureStatusLabel
 from ...utils import qgsDebug
 
 
@@ -30,6 +31,8 @@ class FenceListItem(QWidget):
         self.titleLabel.setText(
             f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
 
+        self.statusLabel = FeatureStatusLabel(None)
+
         self.toolBar = QToolBar()
         self.toolBar.setStyleSheet("""QToolBar { padding: 0; }
                                       QToolButton::indicator {
@@ -37,8 +40,8 @@ class FenceListItem(QWidget):
                                         width: 20;
                                       }""")
         self.toolBar.setFixedHeight(30)
-        self.toolBar.setSizePolicy(QSizePolicy(
-            QSizePolicy.Minimum, QSizePolicy.Minimum))
+        # self.toolBar.setSizePolicy(QSizePolicy(
+        #     QSizePolicy.Minimum, QSizePolicy.Minimum))
 
         self.undoPlanAction = QAction(QIcon(
             ':/plugins/mlapp/images/item-undo.png'), self.tr(u'Undo Plan Fence'), self)
@@ -59,6 +62,7 @@ class FenceListItem(QWidget):
         self.layout.setContentsMargins(3, 0, 3, 3)
         self.layout.addWidget(self.titleLabel)
         self.layout.addStretch()
+        self.layout.addWidget(self.statusLabel)
         self.layout.addWidget(self.toolBar)
 
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -90,19 +94,23 @@ class FenceListItem(QWidget):
 
         self.refreshUi()
 
+    def setStatus(self, status):
+        self.statusLabel.setStatus(status)
+
     def refreshUi(self):
         drafted = self.draftedState in self.machine.configuration()
 
+        self.setStatus(self.fence.status())
+
         self.titleLabel.setText(
             f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
-        if drafted:
-            self.titleLabel.setStyleSheet("background-color: rgb(242,212,215)")
-
+    
         # Hide or show toolbar items
         self.undoPlanAction.setVisible(not drafted)
         self.planAction.setVisible(drafted)
 
         # Force a layout refresh
+        qgsDebug("Forcing layout refresh")
         self.layoutRefreshNeeded.emit()
 
     def planFence(self):
@@ -141,6 +149,9 @@ class FenceListItem(QWidget):
     def sizeHint(self):
         """Return the size of the widget."""
         # The embedded Collapse item controls the width.
+
         hint = QSize(self.layout.sizeHint().width(),
                      self.layout.sizeHint().height())
+        qgsDebug(f"FenceListItem.sizeHint: self.sizeHint = {str(hint)}")
+
         return hint

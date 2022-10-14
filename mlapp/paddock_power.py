@@ -13,8 +13,6 @@ from .resources_rc import *
 from .src.models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
 from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
-from .src.widgets.fence_details.selected_fence_rubber_band import SelectedFenceRubberBand
-from .src.widgets.paddock_details.selected_paddock_rubber_band import SelectedPaddockRubberBand
 from .src.provider import Provider
 from .src.utils import qgsDebug
 
@@ -52,15 +50,12 @@ class PaddockPower:
 
         self.state = PaddockPowerState()
         connectPaddockPowerStateListener(self.state, self.state)
+        self.state.initSelections(iface.mapCanvas())
         self.state.detectProject()
 
         QgsProject.instance().cleared.connect(self.state.clearProject)
         QgsProject.instance().readProject.connect(self.state.detectProject)
 
-        self.selectedPaddockRubberBand = SelectedPaddockRubberBand(
-            iface.mapCanvas())
-        self.selectedFenceRubberBand = SelectedFenceRubberBand(
-            iface.mapCanvas())
 
         self.infrastructureViewIsActive = False
         self.infrastructureView = None
@@ -131,18 +126,6 @@ class PaddockPower:
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
 
-    def cleanUpRubberBands(self):
-        # Clean up rubber bands
-        if self.selectedPaddockRubberBand is not None:
-            self.selectedPaddockRubberBand.hide()
-            self.selectedPaddockRubberBand.reset()
-            iface.mapCanvas().scene().removeItem(self.selectedPaddockRubberBand)
-
-        if self.selectedFenceRubberBand is not None:
-            self.selectedFenceRubberBand.hide()
-            self.selectedFenceRubberBand.reset()
-            iface.mapCanvas().scene().removeItem(self.selectedFenceRubberBand)
-
     def onClosePaddockView(self):
         if self.paddockView is not None:
             self.paddockView.closingDockWidget.disconnect(
@@ -171,8 +154,7 @@ class PaddockPower:
         # Remove the toolbar
         del self.toolbar
 
-        # Clean up the rubber bands
-        self.cleanUpRubberBands()
+        self.state.pluginUnloading.emit()
 
         # Remove processing provider
         QgsApplication.processingRegistry().removeProvider(self.provider)

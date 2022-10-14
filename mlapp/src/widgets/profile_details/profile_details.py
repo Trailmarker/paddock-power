@@ -35,10 +35,12 @@ class ProfileDetails(QWidget, FORM_CLASS):
 
     def refreshUi(self):
         """Refresh the UI."""
-        # If we have no current selected infrastructure, hide the widget
+        # If we have no current selected infrastructure, hide stuff
+        for label in [self.elevationRangeLabel, self.elevationRangeText, self.infrastructureLengthLabel, self.infrastructureLengthText]:
+            label.setVisible(self.selectedInfrastructure is not None)
+        
         if self.selectedInfrastructure is None:
             self.cleanupProfileCanvas()
-            self.setVisible(False)
             return
 
         if self.selectedInfrastructure is not None:

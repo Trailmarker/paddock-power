@@ -30,8 +30,7 @@ class PaddockLayer(PaddockPowerVectorLayer):
            and the Paddocks that are completely crossed by the specified line."""
 
         # We are only interested in Paddocks that are current
-        existingAndPlannedPaddocks = self.getFeaturesByStatus(
-            FeatureStatus.Existing, FeatureStatus.Planned)
+        existingAndPlannedPaddocks = self.getFeaturesByStatus(FeatureStatus.Existing, FeatureStatus.Planned)
 
         intersects = [
             p for p in existingAndPlannedPaddocks if fenceLine.intersects(p.geometry())]
@@ -206,7 +205,10 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         buildFenceRequest = QgsFeatureRequest().setFilterExpression(
             f'"{Paddock.BUILD_FENCE}" = {buildFence}')
-        fencePaddocks = self.getFeaturesByStatus(request=buildFenceRequest)
+
+        fencePaddocks = list(self.getFeatures(request=buildFenceRequest))
+
+        qgsDebug(f"PaddockLayer.getPaddocksByFence: len(fencePaddocks) = {len(fencePaddocks)}")
 
         return ([f for f in fencePaddocks if f.status() == FeatureStatus.Superseded],
                 [f for f in fencePaddocks if f.status() == FeatureStatus.Planned])
@@ -215,11 +217,12 @@ class PaddockLayer(PaddockPowerVectorLayer):
         """Get the Paddocks with the specified Build Order."""
 
         if fence.status() == FeatureStatus.Draft:
-            normalisedFenceLine, supersededPaddocks = self.getCrossedPaddocks(
+            _, supersededPaddocks = self.getCrossedPaddocks(
                 fence.geometry())
             return supersededPaddocks, []
 
         buildOrder = fence.fenceBuildOrder()
+        qgsDebug(f"PaddockLayer.getPaddocksByFence: buildOrder is {buildOrder}")
 
         if buildOrder <= 0:
             raise PaddockPowerError(
@@ -230,6 +233,10 @@ class PaddockLayer(PaddockPowerVectorLayer):
     def updateFencePaddocks(self, fence):
         """Update the superseded and planned Paddocks for a Fence."""
 
+        qgsDebug("PaddockLayer.updateFencePaddocks: entered")
+
         supersededPaddocks, plannedPaddocks = self.getPaddocksByFence(fence)
+
         fence.setSupersededPaddocks(supersededPaddocks)
         fence.setPlannedPaddocks(plannedPaddocks)
+        

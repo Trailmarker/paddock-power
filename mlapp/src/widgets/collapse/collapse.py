@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from mlapp.src.widgets.feature_status_label import FeatureStatusLabel
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QAbstractAnimation, QParallelAnimationGroup, QPropertyAnimation, QSize, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QFrame, QHBoxLayout, QToolBar, QToolButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget
@@ -26,6 +27,8 @@ class Collapse(QWidget):
             QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.toggleAnimation = QParallelAnimationGroup(self)
 
+        self.statusLabel = FeatureStatusLabel(None)
+
         self.toolBar = QToolBar()
         self.toolBar.setStyleSheet("""QToolBar { padding: 0; }
                                       QToolButton::indicator {
@@ -49,6 +52,7 @@ class Collapse(QWidget):
         self.headerLayout.setContentsMargins(3, 0, 3, 3)
         self.headerLayout.addWidget(self.toggleButton)
         self.headerLayout.addStretch()
+        self.headerLayout.addWidget(self.statusLabel)
         self.headerLayout.addWidget(self.toolBar)
 
         layout = QVBoxLayout(self)
@@ -92,6 +96,9 @@ class Collapse(QWidget):
         if checked != expanded:
             self.toggleButton.toggle()
 
+    def setStatus(self, status):
+        self.statusLabel.setStatus(status)
+
     def setTitle(self, title):
         self.toggleButton.setText(title)
 
@@ -99,11 +106,6 @@ class Collapse(QWidget):
         """Add an action to the toolbar."""
         action.triggered.connect(callback)
         self.toolBar.addAction(action)
-
-    def removeToolBarAction(self, action):
-        """Remove an action from the toolbar."""
-        action.triggered.disconnect()
-        self.toolBar.removeAction(action)
 
     def collapsedHeight(self):
         return self.headerLayout.sizeHint().height()

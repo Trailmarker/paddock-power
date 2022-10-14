@@ -85,7 +85,8 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         fence.recalculate(project.elevationLayer)
 
         draftFence = milestone.draftFence(fence)
-        milestone.setSelectedFence(draftFence)
+        if draftFence is not None:
+            milestone.setSelectedFence(draftFence)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
