@@ -6,7 +6,6 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsFeature
 
 from ...models.paddock_power_error import PaddockPowerError
-from ...utils import qgsDebug
 from ..calculator import Calculator
 from .feature import Feature
 from .line_feature import LineFeature
@@ -69,8 +68,6 @@ def ensureAttrs(fence, *attrs):
 def asFence(feature):
     """Return a Fence object from a QgsFeature."""
     if not isinstance(feature, QgsFeature):
-        qgsDebug(f"feature: {str(feature)}")
-        qgsDebug(f"feature.__class__.__name__: {feature.__class__.__name__}")
         raise PaddockPowerError("asFence: feature is not a QgsFeature")
     # Hack in the other attributes
     if not isinstance(feature, Fence):

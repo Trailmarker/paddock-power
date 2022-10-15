@@ -105,29 +105,22 @@ class FenceListItem(QWidget):
         self.titleLabel.setText(
             f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
     
+        # qgsDebug(f"FenceListItem.refreshUi: titleLabel.font() = {str(self.titleLabel.font().toString())}")
+
         # Hide or show toolbar items
         self.undoPlanAction.setVisible(not drafted)
         self.planAction.setVisible(drafted)
 
         # Force a layout refresh
-        qgsDebug("Forcing layout refresh")
         self.layoutRefreshNeeded.emit()
 
     def planFence(self):
         milestone = self.state.getMilestone()
-        qgsDebug(
-            f"FenceListItem.planFence: self.fence.__class__.__name__ = {self.fence.__class__.__name__}")
-        qgsDebug(
-            f"FenceListItem.planFence: isinstance(self.fence, Fence) = {str(isinstance(self.fence, Fence))}")
         if milestone is not None:
             milestone.planFence(self.fence)
 
     def undoPlanFence(self):
         milestone = self.state.getMilestone()
-        qgsDebug(
-            f"FenceListItem.undoPlanFence: self.fence.__class__.__name__ = {self.fence.__class__.__name__}")
-        qgsDebug(
-            f"FenceListItem.undoPlanFence: isinstance(self.fence, Fence) = {str(isinstance(self.fence, Fence))}")
         if milestone is not None:
             milestone.undoPlanFence(self.fence)
 
@@ -152,6 +145,4 @@ class FenceListItem(QWidget):
 
         hint = QSize(self.layout.sizeHint().width(),
                      self.layout.sizeHint().height())
-        qgsDebug(f"FenceListItem.sizeHint: self.sizeHint = {str(hint)}")
-
         return hint

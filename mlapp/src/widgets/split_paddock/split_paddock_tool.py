@@ -9,7 +9,6 @@ from qgis.PyQt.QtGui import QColor
 from .split_paddock_dialog import SplitPaddockDialog
 from ...models.milestone import Milestone, PaddockPowerError
 from ...widgets.paddock_power_map_tool import PaddockPowerMapTool
-from ...utils import qgsDebug
 
 
 class SplitPaddockTool(PaddockPowerMapTool):

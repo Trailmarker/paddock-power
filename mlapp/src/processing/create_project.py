@@ -7,7 +7,7 @@ from qgis.core import (QgsProcessing, QgsProcessingAlgorithm,
 
 from ..models.paddock_power_error import PaddockPowerError
 from ..models.project import Project
-from ..utils import qgsDebug, resolveGeoPackageFile
+from ..utils import resolveGeoPackageFile
 
 
 class CreateProject(QgsProcessingAlgorithm):

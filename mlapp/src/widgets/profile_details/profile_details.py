@@ -3,14 +3,13 @@ import os
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
-from qgis.PyQt.QtWidgets import QWidget
+from qgis.PyQt.QtWidgets import QWidget, QLabel
 
 from ...spatial.calculator import Calculator
 from ...spatial.feature.fence import Fence, asFence
 from ...spatial.feature.pipeline import Pipeline, asPipeline
 from ...models.paddock_power_error import PaddockPowerError
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
-from ...utils import guiError
 from .profile_canvas import ProfileCanvas
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -24,6 +23,11 @@ class ProfileDetails(QWidget, FORM_CLASS):
         super(QWidget, self).__init__(parent)
 
         self.setupUi(self)
+
+        self.fooBar = QLabel("FooBar")
+        self.fooBar.setObjectName("fooBar")
+
+        self.layout().addWidget(self.fooBar)
 
         self.selectedInfrastructure = None
         self.profileCanvas = None

@@ -4,9 +4,6 @@ from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QAbstractAnimation, QParallel
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QFrame, QHBoxLayout, QToolBar, QToolButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget
 
-from ...utils import qgsDebug
-
-
 class Collapse(QWidget):
     collapsed = pyqtSignal()
     expanded = pyqtSignal()

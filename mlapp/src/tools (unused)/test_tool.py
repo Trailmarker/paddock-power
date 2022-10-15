@@ -10,7 +10,7 @@ from ..utils import qgsDebug
 
 class TestTool(QgsMapToolIdentifyFeature):
     def __init__(self, canvas, milestone):
-        super(QgsMapToolIdentifyFeature, self).__init__(canvas)
+        super().__init__(canvas)
 
         if not isinstance(milestone, Milestone):
             raise PaddockPowerError(
@@ -29,7 +29,7 @@ class TestTool(QgsMapToolIdentifyFeature):
 
     def canvasPressEvent(self, event):
 
-        # super(QgsMapToolIdentifyFeature, self).canvasPressEvent(event)
+        # super().canvasPressEvent(event)
 
         # if event.button == Qt.LeftButton:
         #     event.ignore()

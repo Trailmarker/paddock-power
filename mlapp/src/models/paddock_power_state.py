@@ -42,8 +42,8 @@ class PaddockPowerState(QObject, metaclass=Singleton):
                 if gpkgFile is not None:
                     milestones = Project.findMilestones(gpkgFile)
                     if milestones:
-                        qgsDebug(
-                            f"PaddockPowerState.detectProject: detected project with {len(milestones)} milestones in {gpkgFile}")
+                        # qgsDebug(
+                        #     f"PaddockPowerState.detectProject: detected project with {len(milestones)} milestones in {gpkgFile}")
                         project = Project(gpkgFile)
                         self.setProject(project)
                         return
@@ -52,7 +52,7 @@ class PaddockPowerState(QObject, metaclass=Singleton):
                     "PaddockPowerState.detectProject: exception occurred while detecting project.")
                 qgsDebug(str(e))
                 pass
-            qgsDebug("PaddockPowerState.detectProject: no project detected.")
+            # qgsDebug("PaddockPowerState.detectProject: no project detected.")
         else:
             self.refreshProject()
 

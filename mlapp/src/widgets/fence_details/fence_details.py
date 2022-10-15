@@ -13,7 +13,7 @@ class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
 
     def __init__(self, milestone, paddock, parent=None):
         """Constructor."""
-        super(QgsCollapsibleGroupBox, self).__init__(parent)
+        super().__init__(parent)
 
         self.setupUi(self)
 

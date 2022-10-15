@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.utils import qgsDebug
 from qgis.core import QgsFeature, QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsWkbTypes
 
 from ...models.paddock_power_error import PaddockPowerError
+from ...utils import qgsDebug
 from ..feature.feature_status import FeatureStatus
 from ..feature.fence import Fence
 from ..feature.paddock import Paddock, asPaddock, makePaddock
@@ -94,39 +94,23 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         self.splitFeatures(splitLine, False, False)
 
-        qgsDebug("PaddockLayer.planPaddocks: features got split")
-
         existingAndPlannedPaddocks = self.getFeaturesByStatus(
             FeatureStatus.Existing, FeatureStatus.Planned)
 
         plannedPaddocks = []
 
-        qgsDebug(
-            f"PaddockLayer.planPaddocks: len(supersededPaddocks) = {len(supersededPaddocks)}")
-
         for crossedPaddock in supersededPaddocks:
             crossedPaddockName = crossedPaddock.featureName()
-
-            qgsDebug(
-                f"PaddockLayer.planPaddocks: crossed paddock name is {crossedPaddockName}, {crossedPaddock.id()}")
 
             # Derive the split paddocks
             splitPaddocks = [asPaddock(f) for f in existingAndPlannedPaddocks
                              if f.featureName() == crossedPaddockName]
 
-            qgsDebug(
-                f"PaddockLayer.planPaddocks: len(splitPaddocks) = {len(splitPaddocks)}")
-
-            qgsDebug(
-                f"PaddockLayer.planPaddocks: splitPaddocks IDs are {str([f.id() for f in splitPaddocks])}")
-
-            minimumFid = min([f.id() for f in splitPaddocks])
-
             for i, splitPaddock in enumerate(splitPaddocks):
                 # If this is one of the 'crossed' paddocks after the split, add, don't update
-                createNew = splitPaddock.id() == crossedPaddock.id()
+                creatingNewPaddock = splitPaddock.id() == crossedPaddock.id()
 
-                if createNew:
+                if creatingNewPaddock:
                     # Try to create an entirely new Paddock feature
                     # Conflicts get quite weird here
                     newPaddock = QgsFeature(self.fields())
@@ -139,15 +123,14 @@ class PaddockLayer(PaddockPowerVectorLayer):
                     newPaddock.setGeometry(splitPaddock.geometry())
                     splitPaddock = asPaddock(newPaddock)
 
-                newName = crossedPaddockName + ' ' + \
+                defaultName = crossedPaddockName + ' ' + \
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
-                qgsDebug(f"PaddockLayer.planPaddocks: new name is {newName}")
-                splitPaddock.setFeatureName(newName)
+                splitPaddock.setFeatureName(defaultName)
                 splitPaddock.setStatus(FeatureStatus.Planned)
                 splitPaddock.setPaddockBuildFence(fence.fenceBuildOrder())
                 splitPaddock.recalculate()
 
-                if createNew:
+                if creatingNewPaddock:
                     # Add the new Paddock
                     self.addFeature(splitPaddock)
                 else:
@@ -208,8 +191,6 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
         fencePaddocks = list(self.getFeatures(request=buildFenceRequest))
 
-        qgsDebug(f"PaddockLayer.getPaddocksByFence: len(fencePaddocks) = {len(fencePaddocks)}")
-
         return ([f for f in fencePaddocks if f.status() == FeatureStatus.Superseded],
                 [f for f in fencePaddocks if f.status() == FeatureStatus.Planned])
 
@@ -222,7 +203,6 @@ class PaddockLayer(PaddockPowerVectorLayer):
             return supersededPaddocks, []
 
         buildOrder = fence.fenceBuildOrder()
-        qgsDebug(f"PaddockLayer.getPaddocksByFence: buildOrder is {buildOrder}")
 
         if buildOrder <= 0:
             raise PaddockPowerError(
@@ -232,9 +212,6 @@ class PaddockLayer(PaddockPowerVectorLayer):
 
     def updateFencePaddocks(self, fence):
         """Update the superseded and planned Paddocks for a Fence."""
-
-        qgsDebug("PaddockLayer.updateFencePaddocks: entered")
-
         supersededPaddocks, plannedPaddocks = self.getPaddocksByFence(fence)
 
         fence.setSupersededPaddocks(supersededPaddocks)

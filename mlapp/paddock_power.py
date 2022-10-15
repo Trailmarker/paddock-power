@@ -14,7 +14,6 @@ from .src.models.paddock_power_state import PaddockPowerState, connectPaddockPow
 from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
 from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
-from .src.utils import qgsDebug
 
 
 class PaddockPower:
@@ -55,7 +54,6 @@ class PaddockPower:
 
         QgsProject.instance().cleared.connect(self.state.clearProject)
         QgsProject.instance().readProject.connect(self.state.detectProject)
-
 
         self.infrastructureViewIsActive = False
         self.infrastructureView = None

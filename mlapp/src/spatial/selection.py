@@ -5,7 +5,6 @@ from qgis.core import QgsFeature, QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
 from ..models.paddock_power_error import PaddockPowerError
-from ..utils import qgsDebug
 
 class Selection(QgsRubberBand):
 
@@ -44,7 +43,6 @@ class Selection(QgsRubberBand):
             raise PaddockPowerError(
                 "Selection.setSelection: feature must be a QgsFeature object")
 
-        qgsDebug("Selection.setSelection: feature: {}".format(str(feature)))
         self.selectedFeature = feature
         self.refreshUi()
 

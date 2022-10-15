@@ -40,7 +40,6 @@ class FeatureStatusLabel(QLabel):
                       f"     margin: 2px;\n"
                       f"     padding: 2px;\n"
                       f"}}\n")
-        qgsDebug(f"FeatureStatusLabel.refreshUi: stylesheet: {stylesheet}")
 
         self.setStyleSheet(stylesheet)
         self.setText(self.status.name)

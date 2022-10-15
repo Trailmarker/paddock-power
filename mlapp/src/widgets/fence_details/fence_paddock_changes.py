@@ -8,7 +8,6 @@ from qgis.PyQt.QtWidgets import QWidget
 from ...spatial.feature.fence import Fence, asFence
 from ...models.paddock_power_error import PaddockPowerError
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
-from ...utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_paddock_changes_base.ui')))
@@ -18,8 +17,6 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
-
-        qgsDebug("FencePaddockChangesWidget.__init__")
         super().__init__(parent)
 
         self.setupUi(self)
@@ -56,10 +53,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         """Handle a change in the selected fence."""
         self.clearFence()
 
-        qgsDebug(f"FencePaddockChangesWidget.onSelectedFenceChanged: fence={str(fence)}")
-
         if fence is not None:
-            qgsDebug(f"FencePaddockChangesWidget.onSelectedFenceChanged: fence is not None")
             fence = asFence(fence)
             milestone = self.state.getMilestone()
             milestone.paddockLayer.updateFencePaddocks(fence)

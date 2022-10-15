@@ -17,7 +17,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(QDockWidget, self).__init__(parent)
+        super().__init__(parent)
 
         self.setupUi(self)
 

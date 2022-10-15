@@ -3,7 +3,7 @@ from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QVariant
 
 from ...models.paddock_power_error import PaddockPowerError
-from ...utils import qgsDebug, resolveStylePath
+from ...utils import resolveStylePath
 from ..feature.feature import Feature
 from .paddock_power_layer_source_type import PaddockPowerLayerSourceType
 
@@ -90,8 +90,6 @@ class PaddockPowerVectorLayer(QgsVectorLayer):
                 "PaddockPowerVectorLayer.addFeature: the feature is not a Feature")
 
         for field in feature.fields():
-            qgsDebug(f"addFeature: field.name() {field.name()}")
-
             if field.name() not in self.fields().names():
                 raise PaddockPowerError(
                     f"Cannot add feature to {self.name()}: field {field.name()} is not present")

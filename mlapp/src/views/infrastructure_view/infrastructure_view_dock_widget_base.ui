@@ -144,7 +144,7 @@
         <property name="title">
          <string>Fences</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QVBoxLayout" name="fencesVerticalLayout">
          <item>
           <widget class="FenceList" name="fenceList"/>
          </item>
@@ -153,20 +153,41 @@
       </item>
       <item>
        <widget class="QGroupBox" name="profileGroupBox">
+        <property name="styleSheet">
+         <string notr="true">background-colour: rgb(255,255,255);</string>
+        </property>
         <property name="title">
          <string>Elevation Profile</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <layout class="QVBoxLayout" name="profileVerticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="ProfileDetails" name="profileDetails" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true"/>
+            <string notr="true">QLabel#fooBar {
+	color: red;
+	font: 8pt &quot;MS Shell Dlg 2&quot;;
+}</string>
            </property>
           </widget>
          </item>

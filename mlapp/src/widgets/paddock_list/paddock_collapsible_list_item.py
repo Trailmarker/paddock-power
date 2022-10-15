@@ -10,7 +10,6 @@ from ...models.paddock_power_state import PaddockPowerState
 from ..collapse.collapse import Collapse
 from ..paddock_details.paddock_details import PaddockDetails
 from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
-from ...utils import qgsDebug
 
 
 class PaddockCollapsibleListItem(QWidget):
