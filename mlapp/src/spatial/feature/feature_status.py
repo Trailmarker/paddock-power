@@ -9,7 +9,7 @@ class FeatureStatus(Enum):
     Planned = "Planned",
     Existing = "Existing",
     Superseded = "Superseded",
-    Historical = "Historical",
+    Archived = "Archived",
     Unknown = "Unknown"
 
     def toColour(self):
@@ -22,8 +22,8 @@ class FeatureStatus(Enum):
             return (215, 195, 163)
         elif self == FeatureStatus.Superseded:
             return (147, 151, 153)
-        elif self == FeatureStatus.Historical:
-            raise NotImplementedError("Historical status not implemented")
+        elif self == FeatureStatus.Archived:
+            raise NotImplementedError("Archived status not implemented")
         else:
             raise NotImplementedError("Unknown status not implemented")
 
@@ -37,8 +37,8 @@ class FeatureStatus(Enum):
             return (0, 0, 0)
         elif self == FeatureStatus.Superseded:
             return (0 ,0, 0)
-        elif self == FeatureStatus.Historical:
-            raise NotImplementedError("Historical status not implemented")
+        elif self == FeatureStatus.Archived:
+            raise NotImplementedError("Archived status not implemented")
         else:
             raise NotImplementedError("Unknown status not implemented")
 

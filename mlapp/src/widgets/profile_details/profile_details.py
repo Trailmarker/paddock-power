@@ -54,7 +54,7 @@ class ProfileDetails(QWidget, FORM_CLASS):
                 self.selectedInfrastructure = None
                 self.refreshUi()
 
-            profile = self.selectedInfrastructure.getProfile()
+            profile = self.selectedInfrastructure.profile()
 
             if profile is None:
                 profile = Calculator.calculateProfile(
