@@ -98,3 +98,8 @@ def clearItem(item):
             if widget is not None:
                 widget.setParent(None)
                 del widget
+
+def staticinit(cls):
+    if getattr(cls, "__staticinit__", None):
+        cls.__staticinit__()
+    return cls

@@ -44,4 +44,4 @@ class ProfileCanvas(FigureCanvasQTAgg):
 
         figure.tight_layout()
 
-        super(ProfileCanvas, self).__init__(figure)
+        super().__init__(figure)

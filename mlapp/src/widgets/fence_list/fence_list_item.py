@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal, QSize, QState, QStateMachine
+from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QHBoxLayout, QLabel, QSizePolicy, QToolBar, QWidget
 
-from qgis.core import QgsRectangle
-from qgis.utils import iface
-
 from ...models.paddock_power_state import PaddockPowerState
-from ...spatial.feature.feature_status import FeatureStatus
-from ...spatial.feature.fence import Fence
+from ...spatial.features.feature_status import FeatureStatus
 from ...widgets.feature_status_label import FeatureStatusLabel
-from ...utils import qgsDebug
 
 
 class FenceListItem(QWidget):
@@ -29,7 +24,7 @@ class FenceListItem(QWidget):
 
         self.titleLabel = QLabel()
         self.titleLabel.setText(
-            f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
+            f"Fence {self.fence.buildOrder}: ({self.fence.featureLength} km)")
 
         self.statusLabel = FeatureStatusLabel(None)
 
@@ -40,8 +35,6 @@ class FenceListItem(QWidget):
                                         width: 20;
                                       }""")
         self.toolBar.setFixedHeight(30)
-        # self.toolBar.setSizePolicy(QSizePolicy(
-        #     QSizePolicy.Minimum, QSizePolicy.Minimum))
 
         self.undoPlanAction = QAction(QIcon(
             ':/plugins/mlapp/images/item-undo.png'), self.tr(u'Undo Plan Fence'), self)
@@ -50,11 +43,12 @@ class FenceListItem(QWidget):
         self.zoomAction = QAction(QIcon(
             ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(u'Zoom to Fence'), self)
 
-        self.undoPlanAction.triggered.connect(self.undoPlan.emit)
+        self.undoPlanAction.triggered.connect(self.fence.undoPlanFence)
         self.toolBar.addAction(self.undoPlanAction)
-        self.planAction.triggered.connect(self.plan.emit)
+        self.planAction.triggered.connect(self.fence.planFence)
         self.toolBar.addAction(self.planAction)
-        self.zoomAction.triggered.connect(self.zoomToFence)
+        self.zoomAction.triggered.connect(self.selectFence)
+        self.zoomAction.triggered.connect(self.fence.zoomToFeature)
         self.toolBar.addAction(self.zoomAction)
 
         self.layout = QHBoxLayout()
@@ -68,29 +62,7 @@ class FenceListItem(QWidget):
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.setLayout(self.layout)
 
-        # Set up state machine
-        self.machine = QStateMachine()
-
-        self.draftedState = QState()
-        self.plannedState = QState()
-
-        self.draftedState.addTransition(self.plan, self.plannedState)
-        self.plannedState.addTransition(self.undoPlan, self.draftedState)
-
-        self.machine.addState(self.draftedState)
-        self.machine.addState(self.plannedState)
-
-        self.machine.setInitialState(self.plannedState
-                                     if fence.status() == FeatureStatus.Planned
-                                     else self.draftedState)
-
-        self.plan.connect(self.planFence)
-        self.undoPlan.connect(self.undoPlanFence)
-
-        self.draftedState.entered.connect(self.refreshUi)
-        self.plannedState.entered.connect(self.refreshUi)
-
-        self.machine.start()
+        # self.fence.stateChanged.connect(self.refreshUi)
 
         self.refreshUi()
 
@@ -98,14 +70,14 @@ class FenceListItem(QWidget):
         self.statusLabel.setStatus(status)
 
     def refreshUi(self):
-        drafted = self.draftedState in self.machine.configuration()
+        """Refresh the UI based on the current state of the fence."""
+        status = self.fence.status
+        drafted = status == FeatureStatus.Drafted
 
-        self.setStatus(self.fence.status())
+        self.setStatus(status)
 
         self.titleLabel.setText(
-            f"Fence {self.fence.fenceBuildOrder()}: ({self.fence.featureLength()} km)")
-    
-        # qgsDebug(f"FenceListItem.refreshUi: titleLabel.font() = {str(self.titleLabel.font().toString())}")
+            f"Fence {self.fence.buildOrder}: ({self.fence.featureLength} km)")
 
         # Hide or show toolbar items
         self.undoPlanAction.setVisible(not drafted)
@@ -114,30 +86,16 @@ class FenceListItem(QWidget):
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
 
-    def planFence(self):
-        milestone = self.state.getMilestone()
-        if milestone is not None:
-            milestone.planFence(self.fence)
-
-    def undoPlanFence(self):
-        milestone = self.state.getMilestone()
-        if milestone is not None:
-            milestone.undoPlanFence(self.fence)
-
     def selectFence(self):
-        """Select this paddock."""
-        # self.collapse.setExpanded(True)
+        """Select this Fence."""
         milestone = self.state.getMilestone()
         if milestone is not None:
             milestone.setSelectedFence(self.fence)
 
     def zoomToFence(self, title):
-        """Select this paddock and zoom to it."""
+        """Select this Fence and zoom to it."""
         self.selectFence()
-        fenceExtent = QgsRectangle(self.fence.geometry().boundingBox())
-        fenceExtent.scale(1.5)  # Expand by 50%
-        iface.mapCanvas().setExtent(fenceExtent)
-        iface.mapCanvas().refresh()
+        self.fence.zoomToFeature()
 
     def sizeHint(self):
         """Return the size of the widget."""

@@ -18,7 +18,7 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(MilestoneToolBar, self).__init__(parent)
+        super().__init__(parent)
 
         self.setupUi(self)
 

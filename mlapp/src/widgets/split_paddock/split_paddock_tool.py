@@ -16,7 +16,7 @@ class SplitPaddockTool(PaddockPowerMapTool):
 
     def __init__(self, milestone):
 
-        super(SplitPaddockTool, self).__init__()
+        super().__init__()
 
         if not isinstance(milestone, Milestone):
             raise PaddockPowerError(

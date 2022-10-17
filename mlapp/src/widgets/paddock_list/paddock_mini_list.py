@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeature
-
 from ...models.paddock_power_error import PaddockPowerError
+from ...spatial.features.paddock import Paddock
 from .paddock_list_base import PaddockListBase
 
 
@@ -21,8 +20,8 @@ class PaddockMiniList(PaddockListBase):
             self.paddocks = []
             return
 
-        if not all(isinstance(paddock, QgsFeature) for paddock in paddocks):
+        if not all(isinstance(paddock, Paddock) for paddock in paddocks):
             raise PaddockPowerError(
-                "PaddockMiniList.setPaddocks: paddocks must be a list of QgsFeature objects")
+                "PaddockMiniList.setPaddocks: paddocks must be a list of Paddock objects")
         self.paddocks = paddocks
         self.refreshUi()

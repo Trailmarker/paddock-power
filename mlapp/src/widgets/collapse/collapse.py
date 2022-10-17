@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.widgets.feature_status_label import FeatureStatusLabel
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QAbstractAnimation, QParallelAnimationGroup, QPropertyAnimation, QSize, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QFrame, QHBoxLayout, QToolBar, QToolButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget
+
+from ...widgets.feature_status_label import FeatureStatusLabel
+
 
 class Collapse(QWidget):
     collapsed = pyqtSignal()
     expanded = pyqtSignal()
 
     def __init__(self, parent=None):
-        super(Collapse, self).__init__(parent)
+        super().__init__(parent)
 
         self.toggleButton = QToolButton(
             text="", checkable=True, checked=False

@@ -184,10 +184,7 @@
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel#fooBar {
-	color: red;
-	font: 8pt &quot;MS Shell Dlg 2&quot;;
-}</string>
+            <string notr="true"/>
            </property>
           </widget>
          </item>

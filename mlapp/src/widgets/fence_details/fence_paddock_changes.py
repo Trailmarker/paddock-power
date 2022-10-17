@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.feature.fence import Fence, asFence
+from ...spatial.features.fence import Fence
 from ...models.paddock_power_error import PaddockPowerError
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 
@@ -54,9 +54,6 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         self.clearFence()
 
         if fence is not None:
-            fence = asFence(fence)
-            milestone = self.state.getMilestone()
-            milestone.paddockLayer.updateFencePaddocks(fence)
             self.setFence(fence)
             self.refreshUi()
 
@@ -68,9 +65,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.plannedPaddockMiniList.clear()
         else:
             self.setVisible(True)
-            self.supersededPaddockMiniList.setPaddocks(
-                self.fence.supersededPaddocks)
-            self.plannedPaddockMiniList.setPaddocks(self.fence.plannedPaddocks)
+            self.supersededPaddockMiniList.setPaddocks(self.fence.supersededPaddocks())
+            self.plannedPaddockMiniList.setPaddocks(self.fence.plannedPaddocks())
 
     def clearFence(self):
         self.fence = None

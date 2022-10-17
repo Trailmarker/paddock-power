@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QObject
 
-from qgis.core import QgsFeature
 
-from ..spatial.feature.fence import FenceFeature
+from ..spatial.features.fence import Fence
+from ..spatial.features.paddock import Paddock
+from ..spatial.features.pipeline import Pipeline
 from ..widgets.fence_details.fence_selection import FenceSelection
 from ..widgets.paddock_details.paddock_selection import PaddockSelection
 from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
@@ -18,9 +19,9 @@ class PaddockPowerState(QObject, metaclass=Singleton):
     milestoneChanged = pyqtSignal(Milestone)
     milestonesUpdated = pyqtSignal(dict)
     projectChanged = pyqtSignal(Project)
-    selectedFenceChanged = pyqtSignal(QgsFeature)
-    selectedPaddockChanged = pyqtSignal(QgsFeature)
-    selectedPipelineChanged = pyqtSignal(QgsFeature)
+    selectedFenceChanged = pyqtSignal(Fence)
+    selectedPaddockChanged = pyqtSignal(Paddock)
+    selectedPipelineChanged = pyqtSignal(Pipeline)
     milestoneDataChanged = pyqtSignal()
     pluginUnloading = pyqtSignal()
 

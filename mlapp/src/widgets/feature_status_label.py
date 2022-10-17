@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.models.paddock_power_error import PaddockPowerError
-from mlapp.src.utils import qgsDebug
 
 from qgis.PyQt.QtWidgets import QLabel
 
-from ..spatial.feature.feature_status import FeatureStatus, toCssColour
-
+from ..models.paddock_power_error import PaddockPowerError
+from ..spatial.features.feature_status import FeatureStatus, toCssColour
+from ..utils import qgsDebug
 
 class FeatureStatusLabel(QLabel):
 

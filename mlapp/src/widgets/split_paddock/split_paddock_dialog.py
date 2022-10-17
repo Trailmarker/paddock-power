@@ -12,7 +12,7 @@ class SplitPaddockDialog(QDialog, FORM_CLASS):
     def __init__(self, splitPaddockTool, parent=None):
         """Constructor."""
 
-        super(QDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self.splitPaddockTool = splitPaddockTool

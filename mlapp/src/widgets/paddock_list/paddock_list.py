@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ...spatial.feature.feature_status import FeatureStatus
+from ...spatial.features.feature_status import FeatureStatus
 from ...models.paddock_power_state import PaddockPowerState
 from .paddock_list_base import PaddockListBase
 
@@ -8,7 +8,7 @@ class PaddockList(PaddockListBase):
     def __init__(self, parent=None):
         """Constructor."""
 
-        super(PaddockListBase, self).__init__(parent)
+        super().__init__(parent)
 
         self.state = PaddockPowerState()
 

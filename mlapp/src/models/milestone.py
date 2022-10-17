@@ -4,20 +4,19 @@ from os import path
 import processing
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from qgis.core import QgsFeature, QgsProject
+from qgis.core import QgsProject
 from qgis.utils import iface
 
-from ..spatial.feature.feature_status import FeatureStatus
-from ..spatial.feature.fence import Fence
-from ..spatial.feature.paddock import Paddock
-from ..spatial.feature.pipeline import Pipeline
-from ..spatial.layer.boundary_layer import BoundaryLayer
-from ..spatial.layer.fence_layer import FenceLayer
-from ..spatial.layer.paddock_layer import PaddockLayer
-from ..spatial.layer.paddock_power_vector_layer import PaddockPowerLayerSourceType
-from ..spatial.layer.pipeline_layer import PipelineLayer
-from ..spatial.layer.waterpoint_layer import WaterpointLayer
-from ..utils import guiError
+from ..spatial.features.fence import Fence
+from ..spatial.features.paddock import Paddock
+from ..spatial.features.pipeline import Pipeline
+from ..spatial.layers.boundary_layer import BoundaryLayer
+from ..spatial.layers.fence_layer import FenceLayer
+from ..spatial.layers.paddock_layer import PaddockLayer
+from ..spatial.layers.feature_layer import FeatureLayerSourceType
+from ..spatial.layers.pipeline_layer import PipelineLayer
+from ..spatial.layers.waterpoint_layer import WaterpointLayer
+from ..utils import guiError, qgsDebug
 
 from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 
@@ -26,16 +25,18 @@ from .paddock_power_error import PaddockPowerError
 
 class Milestone(QObject):
     # emit this signal when paddocks are updated
-    selectedFenceChanged = pyqtSignal(QgsFeature)
-    selectedPaddockChanged = pyqtSignal(QgsFeature)
-    selectedPipelineChanged = pyqtSignal(QgsFeature)
+    selectedFenceChanged = pyqtSignal(Fence)
+    selectedPaddockChanged = pyqtSignal(Paddock)
+    selectedPipelineChanged = pyqtSignal(Pipeline)
     milestoneDataChanged = pyqtSignal()
 
-    def __init__(self, milestoneName, gpkgFile):
-        super(Milestone, self).__init__()
+    def __init__(self, milestoneName, gpkgFile, elevationLayer):
+        super().__init__()
 
         self.milestoneName = milestoneName
         self.gpkgFile = gpkgFile
+        self.elevationLayer = elevationLayer
+
         self.currentTool = None
         self.isLoaded = False
 
@@ -45,14 +46,15 @@ class Milestone(QObject):
 
     def create(self):
         """Create this milestone in its GeoPackage."""
+
         # TODO these are not consistent
         # Create paddocks, pipeline, fence, waterpoints, boundary layers
         boundary = BoundaryLayer(layerName=f"{self.milestoneName} Boundary")
-        waterpoint = WaterpointLayer(
+        waterpoint = WaterpointLayer(self.elevationLayer,
             layerName=f"{self.milestoneName} Waterpoints")
-        pipeline = PipelineLayer(layerName=f"{self.milestoneName} Pipeline")
-        fence = FenceLayer(layerName=f"{self.milestoneName} Fence")
+        pipeline = PipelineLayer(self.elevationLayer, layerName=f"{self.milestoneName} Pipeline")
         paddock = PaddockLayer(layerName=f"{self.milestoneName} Paddocks")
+        fence = FenceLayer(paddock, self.elevationLayer, layerName=f"{self.milestoneName} Fence")
 
         # The 'Layers' parameter of the Package Layers tool ('native:package')
         # Note this is sensitive to order
@@ -76,20 +78,24 @@ class Milestone(QObject):
     def load(self):
         """Load this milestone its GeoPackage."""
         boundaryLayerName = f"{self.milestoneName} Boundary"
-        self.boundaryLayer = BoundaryLayer(sourceType=PaddockPowerLayerSourceType.File,
+        self.boundaryLayer = BoundaryLayer(sourceType=FeatureLayerSourceType.File,
                                            layerName=boundaryLayerName, gpkgFile=self.gpkgFile)
         waterpointLayerName = f"{self.milestoneName} Waterpoints"
-        self.waterpointLayer = WaterpointLayer(sourceType=PaddockPowerLayerSourceType.File,
+        self.waterpointLayer = WaterpointLayer(self.elevationLayer,
+                                               sourceType=FeatureLayerSourceType.File,
                                                layerName=waterpointLayerName, gpkgFile=self.gpkgFile)
         pipelineLayerName = f"{self.milestoneName} Pipeline"
-        self.pipelineLayer = PipelineLayer(sourceType=PaddockPowerLayerSourceType.File,
+        self.pipelineLayer = PipelineLayer(self.elevationLayer,
+                                           sourceType=FeatureLayerSourceType.File,
                                            layerName=pipelineLayerName, gpkgFile=self.gpkgFile)
-        fenceLayerName = f"{self.milestoneName} Fence"
-        self.fenceLayer = FenceLayer(sourceType=PaddockPowerLayerSourceType.File,
-                                     layerName=fenceLayerName, gpkgFile=self.gpkgFile)
         paddockLayerName = f"{self.milestoneName} Paddocks"
-        self.paddockLayer = PaddockLayer(sourceType=PaddockPowerLayerSourceType.File,
+        self.paddockLayer = PaddockLayer(sourceType=FeatureLayerSourceType.File,
                                          layerName=paddockLayerName, gpkgFile=self.gpkgFile)
+        fenceLayerName = f"{self.milestoneName} Fence"
+        self.fenceLayer = FenceLayer(self.paddockLayer,
+                                     self.elevationLayer,
+                                     sourceType=FeatureLayerSourceType.File,
+                                     layerName=fenceLayerName, gpkgFile=self.gpkgFile)
 
         self.connectLayerDataEvents()
 
@@ -195,68 +201,15 @@ class Milestone(QObject):
         self.selectedPipeline = pipeline
         self.selectedPipelineChanged.emit(self.selectedPipeline)
 
-    def draftFence(self, fence):
-        if not isinstance(fence, Fence):
-            raise PaddockPowerError(
-                "Milestone.draftFence: fence must be a Fence")
-
-        currentBuildOrder, _, _ = self.fenceLayer.getBuildOrder()
-
-        normalisedFenceLine, supersededPaddocks = self.paddockLayer.getCrossedPaddocks(
-            fence.geometry())
-
-        if normalisedFenceLine is None or normalisedFenceLine.isEmpty() or not supersededPaddocks:
-            guiError(
-                "The Fence you have sketched does not cross or touch any Paddocks.")
-            return
-
-        fence.setGeometry(normalisedFenceLine)
-        fence.setFenceBuildOrder(currentBuildOrder + 1)
-        fence.setStatus(FeatureStatus.Draft)
-        fence.recalculate()
-
-        self.fenceLayer.instantAddFeature(fence)
-        draftFence = self.fenceLayer.getFenceByBuildOrder(
-            fence.fenceBuildOrder())
-        return draftFence
-
     def planFence(self, fence):
         """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
            and a list of planned paddocks resulting from splitting the paddocks using the cropped fence geometry."""
 
-        if not isinstance(fence, Fence):
-            raise PaddockPowerError(
-                "Milestone.planFence: fence must be a Fence")
+        # Start editing all the related layers ...
 
-        _, lowestDraftBuildOrder, _ = self.fenceLayer.getBuildOrder()
-
-        if fence.fenceBuildOrder() > lowestDraftBuildOrder:
-            guiError(
-                "You must Plan your Drafted Fences from first to last according to Build Order.")
-            return
-
-        try:
-            self.paddockLayer.startEditing()
-            self.fenceLayer.startEditing()
-
-            supersededPaddocks, plannedPaddocks = self.paddockLayer.planPaddocks(
-                fence)
-
-            fence.setSupersededPaddocks(supersededPaddocks)
-            fence.setPlannedPaddocks(plannedPaddocks)
-            fence.setStatus(FeatureStatus.Planned)
-            fence.recalculate()
-            self.fenceLayer.updateFeature(fence)
-
-            self.fenceLayer.commitChanges()
-            self.paddockLayer.commitChanges()
-        except Exception as e:
-            self.fenceLayer.rollBack()
-            self.paddockLayer.rollBack()
-            raise PaddockPowerError(
-                f"Milestone.planFence: failed to plan fence {str(e)}")
-
-        return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+        fence.plan.emit()
+        #fence.upsert()
+        #return self.fenceLayer.getFenceByBuildOrder(fence.buildOrder)
 
     def undoPlanFence(self, fence):
         """Undo the Paddock changes created by a planned Fence and return the Fence to Draft status."""
@@ -266,7 +219,7 @@ class Milestone(QObject):
 
         _, _, highestPlannedBuildOrder = self.fenceLayer.getBuildOrder()
 
-        if fence.fenceBuildOrder() < highestPlannedBuildOrder:
+        if fence.buildOrder < highestPlannedBuildOrder:
             guiError(
                 "Undo your Planned Fences from last to first.")
             return
@@ -275,11 +228,9 @@ class Milestone(QObject):
             self.paddockLayer.startEditing()
             self.fenceLayer.startEditing()
 
-            self.paddockLayer.undoPlanPaddocks(fence)
-            fence.setStatus(FeatureStatus.Draft)
-            # fence.setSupersededPaddocks([])
-            fence.setPlannedPaddocks([])
-            self.fenceLayer.instantUpdateFeature(fence)
+            qgsDebug("Undoing planned fence …")
+
+            fence.undoPlanFence()
 
             self.fenceLayer.commitChanges
             self.paddockLayer.commitChanges()
@@ -289,7 +240,7 @@ class Milestone(QObject):
             raise PaddockPowerError(
                 f"Milestone.undoPlanFence: failed to undo fence {str(e)}")
 
-        return self.fenceLayer.getFenceByBuildOrder(fence.fenceBuildOrder())
+        return self.fenceLayer.getFenceByBuildOrder(fence.buildOrder)
 
     def disconnectAll(self):
         """Disconnect all signals from the milestone."""

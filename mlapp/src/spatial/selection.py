@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSlot
 
-from qgis.core import QgsFeature, QgsWkbTypes
+from qgis.core import QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
 from ..models.paddock_power_error import PaddockPowerError
+from .features.feature import Feature
 
 class Selection(QgsRubberBand):
 
@@ -39,7 +40,7 @@ class Selection(QgsRubberBand):
     def setSelectedFeature(self, feature):
         """Set the selection."""
 
-        if not isinstance(feature, QgsFeature):
+        if not isinstance(feature, Feature):
             raise PaddockPowerError(
                 "Selection.setSelection: feature must be a QgsFeature object")
 
@@ -53,7 +54,6 @@ class Selection(QgsRubberBand):
         if geometry is None:
             return
 
-        # self.setToGeometry(geometry, None)
         if self.wkbType == QgsWkbTypes.LineGeometry:
             self.setToGeometry(geometry, None)
         elif self.wkbType == QgsWkbTypes.PolygonGeometry:

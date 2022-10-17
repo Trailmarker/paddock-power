@@ -8,7 +8,7 @@ from qgis.PyQt.QtGui import QIcon
 class PaddockPowerMapTool(QgsMapTool):
 
     def __init__(self):
-        super(PaddockPowerMapTool, self).__init__(iface.mapCanvas())
+        super().__init__(iface.mapCanvas())
 
         self.canvas = iface.mapCanvas()
 

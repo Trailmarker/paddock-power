@@ -23,7 +23,7 @@ class PaddockListBase(QListWidget):
         for item in [self.item(i) for i in range(self.count())]:
             widget = self.itemWidget(item)
             item.setHidden(not filter.lower()
-                           in widget.paddock.featureName().lower())
+                           in widget.paddock.name.lower())
 
     def getPaddocks():
         """Get the paddocks."""
@@ -41,7 +41,7 @@ class PaddockListBase(QListWidget):
             return
 
         # Sort Paddocks alphabetically
-        paddocks.sort(key=lambda x: x.featureName())
+        paddocks.sort(key=lambda x: x.name)
 
         # Repopulate list since we have Paddocks
         for paddock in paddocks:

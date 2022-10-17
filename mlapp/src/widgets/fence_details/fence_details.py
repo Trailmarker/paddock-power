@@ -25,4 +25,4 @@ class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
     def refreshUi(self):
         """Show the Fence Details."""
         if self.fence is not None:
-            self.lengthText.setText(self.fence.featureLength())
+            self.lengthText.setText(self.fence.featureLength)

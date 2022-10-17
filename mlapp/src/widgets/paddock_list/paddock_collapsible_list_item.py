@@ -21,7 +21,7 @@ class PaddockCollapsibleListItem(QWidget):
     cancelEdit = pyqtSignal()
 
     def __init__(self, paddock, parent=None):
-        super(QWidget, self).__init__(parent)
+        super().__init__(parent)
 
         self.state = PaddockPowerState()
 
@@ -54,7 +54,8 @@ class PaddockCollapsibleListItem(QWidget):
             self.cancelEditAction, self.cancelEdit.emit)
         self.collapse.addToolBarAction(self.saveAction, self.save.emit)
         self.collapse.addToolBarAction(self.editAction, self.edit.emit)
-        self.collapse.addToolBarAction(self.zoomAction, self.zoomToPaddock)
+        self.collapse.addToolBarAction(self.zoomAction, self.selectPaddock)
+        self.collapse.addToolBarAction(self.zoomAction, self.paddock.zoomToFeature)
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
@@ -95,11 +96,11 @@ class PaddockCollapsibleListItem(QWidget):
     def refreshUi(self):
         editing = self.editState in self.machine.configuration()
 
-        self.setStatus(self.paddock.status())
+        self.setStatus(self.paddock.status)
 
         # Set title to paddock name with some details
         self.setTitle(
-            f"{self.paddock.featureName()} ({self.paddock.featureArea()} km², ?? AE)")
+            f"{self.paddock.name} ({self.paddock.featureArea} km², ?? AE)")
 
         # Hide or show forms
         self.paddockDetails.setVisible(not editing)
@@ -125,14 +126,6 @@ class PaddockCollapsibleListItem(QWidget):
         milestone = self.state.getMilestone()
         if milestone is not None:
             milestone.setSelectedPaddock(self.paddock)
-
-    def zoomToPaddock(self, title):
-        """Select this paddock and zoom to it."""
-        self.selectPaddock()
-        paddockExtent = QgsRectangle(self.paddock.geometry().boundingBox())
-        paddockExtent.scale(1.5)  # Expand by 50%
-        iface.mapCanvas().setExtent(paddockExtent)
-        iface.mapCanvas().refresh()
 
     def sizeHint(self):
         """Return the size of the widget."""

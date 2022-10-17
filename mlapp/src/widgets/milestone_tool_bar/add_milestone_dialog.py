@@ -22,7 +22,7 @@ class AddMilestoneDialog(QDialog, FORM_CLASS):
             raise PaddockPowerError(
                 "AddMilestoneDialog: project is not a Project")
 
-        super(QDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self.setWindowFlags(Qt.WindowStaysOnTopHint)

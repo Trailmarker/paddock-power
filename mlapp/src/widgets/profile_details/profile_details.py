@@ -5,9 +5,8 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget, QLabel
 
-from ...spatial.calculator import Calculator
-from ...spatial.feature.fence import Fence, asFence
-from ...spatial.feature.pipeline import Pipeline, asPipeline
+from ...spatial.features.fence import Fence
+from ...spatial.features.pipeline import Pipeline
 from ...models.paddock_power_error import PaddockPowerError
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
 from .profile_canvas import ProfileCanvas
@@ -20,14 +19,9 @@ class ProfileDetails(QWidget, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(QWidget, self).__init__(parent)
+        super().__init__(parent)
 
         self.setupUi(self)
-
-        self.fooBar = QLabel("FooBar")
-        self.fooBar.setObjectName("fooBar")
-
-        self.layout().addWidget(self.fooBar)
 
         self.selectedInfrastructure = None
         self.profileCanvas = None
@@ -48,17 +42,17 @@ class ProfileDetails(QWidget, FORM_CLASS):
             return
 
         if self.selectedInfrastructure is not None:
-            milestone, project = self.state.getMilestone(), self.state.getProject()
+            milestone = self.state.getMilestone()
 
             if milestone is None:
                 self.selectedInfrastructure = None
                 self.refreshUi()
+                return
+
+            if self.selectedInfrastructure.profile() is None:
+                self.selectedInfrastructure.recalculate()
 
             profile = self.selectedInfrastructure.profile()
-
-            if profile is None:
-                profile = Calculator.calculateProfile(
-                    self.selectedInfrastructure.geometry(), project.elevationLayer)
 
             useMetres = (profile.maximumDistance < 1000)
 
@@ -104,12 +98,12 @@ class ProfileDetails(QWidget, FORM_CLASS):
     @pyqtSlot()
     def onSelectedFenceChanged(self, fence):
         """Handle a change to the selected Fence."""
-        self.setSelectedInfrastructure(asFence(fence))
+        self.setSelectedInfrastructure(fence)
 
     @pyqtSlot()
     def onSelectedPipelineChanged(self, pipeline):
         """Handle a change to the selected Pipeline."""
-        self.setSelectedInfrastructure(asPipeline(pipeline))
+        self.setSelectedInfrastructure(pipeline)
 
     def setSelectedInfrastructure(self, infrastructure):
         """Set the selected Infrastructure."""

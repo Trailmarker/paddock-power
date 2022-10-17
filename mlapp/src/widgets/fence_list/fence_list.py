@@ -42,7 +42,7 @@ class FenceList(QListWidget):
         self.setVisible(True)
 
         # Sort Fences by Build Order
-        fences.sort(key=lambda x: x.fenceBuildOrder())
+        fences.sort(key=lambda x: x.buildOrder)
 
         # Repopulate list if we have Fences
         for fence in fences:

@@ -6,10 +6,10 @@ from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 from qgis.PyQt.QtWidgets import QDockWidget
 
 from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
-from ...spatial.feature.fence import makeFence
-from ...spatial.feature.feature_status import FeatureStatus
-from ...spatial.feature.pipeline import makePipeline
-from ...utils import guiError
+from ...spatial.features.fence import Fence
+from ...spatial.features.feature_status import FeatureStatus
+from ...spatial.features.pipeline import Pipeline
+from ...utils import guiError, qgsDebug
 from .sketch_line_tool import SketchLineTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -78,15 +78,14 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
 
     @pyqtSlot()
     def onSketchFenceFinished(self, sketchLine):
-        milestone, project = self.state.getMilestone(), self.state.getProject()
+        milestone = self.state.getMilestone()
 
-        fence = makeFence()
+        fence = milestone.fenceLayer.makeFeature()
+        qgsDebug(f"Created new Fence feature {fence.id()} {fence.status}")
         fence.setGeometry(sketchLine)
-        fence.recalculate(project.elevationLayer)
-
-        draftFence = milestone.draftFence(fence)
-        if draftFence is not None:
-            milestone.setSelectedFence(draftFence)
+        fence.draftFence()
+        
+        milestone.setSelectedFence(fence)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
@@ -102,13 +101,12 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
 
     @pyqtSlot()
     def onSketchPipelineFinished(self, sketchLine):
-        milestone, project = self.state.getMilestone(), self.state.getProject()
+        milestone = self.state.getMilestone()
 
-        pipeline = makePipeline()
+        pipeline = milestone.pipelineLayer.makeFeature()
         pipeline.setGeometry(sketchLine)
-        pipeline.recalculate(project.elevationLayer)
-        pipeline.setStatus(FeatureStatus.Planned)
 
+        pipeline.planPipeline()
         milestone.setSelectedPipeline(pipeline)
 
     def refreshUi(self):

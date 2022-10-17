@@ -6,14 +6,14 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsVectorLayer
 
 # -*- coding: utf-8 -*-
-from ..spatial.feature.boundary import Boundary
-from ..spatial.feature.waterpoint import Waterpoint
-from ..spatial.feature.pipeline import Pipeline
-from ..spatial.feature.fence import Fence
-from ..spatial.feature.paddock import Paddock
-from ..spatial.feature.land_system import LandSystem
-from ..spatial.layer.elevation_layer import ElevationLayer
-from ..spatial.layer.paddock_power_layer_source_type import PaddockPowerLayerSourceType
+from ..spatial.features.boundary import Boundary
+from ..spatial.features.waterpoint import Waterpoint
+from ..spatial.features.pipeline import Pipeline
+from ..spatial.features.fence import Fence
+from ..spatial.features.paddock import Paddock
+from ..spatial.features.land_system import LandSystem
+from ..spatial.layers.elevation_layer import ElevationLayer
+from ..spatial.layers.feature_layer_source_type import FeatureLayerSourceType
 from ..utils import resolveGeoPackageFile
 from .milestone import Milestone
 from .paddock_power_error import PaddockPowerError
@@ -30,7 +30,7 @@ class Project(QObject):
     milestoneChanged = pyqtSignal(Milestone)
 
     def __init__(self, gpkgFile=None):
-        super(Project, self).__init__()
+        super().__init__()
         self.milestones = {}
         self.milestone = None
 
@@ -78,7 +78,7 @@ class Project(QObject):
 
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
-        milestone = Milestone(milestoneName, self.gpkgFile)
+        milestone = Milestone(milestoneName, self.gpkgFile, self.elevationLayer)
         milestone.create()
 
         self.milestones[milestoneName] = milestone
@@ -122,6 +122,10 @@ class Project(QObject):
                 self.isLoaded = True
                 return
 
+            elevationLayerName = Project.findElevationLayer(self.gpkgFile)
+            if elevationLayerName is not None:
+                self.elevationLayer = ElevationLayer(elevationLayerName, self.gpkgFile)
+
             milestoneNames = Project.findMilestones(self.gpkgFile)
             milestoneNames.sort()
 
@@ -129,14 +133,9 @@ class Project(QObject):
             self.milestone = None
 
             for milestoneName in milestoneNames:
-                milestone = Milestone(milestoneName, self.gpkgFile)
+                milestone = Milestone(milestoneName, self.gpkgFile, self.elevationLayer)
                 self.milestones[milestoneName] = milestone
                 milestone.load()
-
-            elevationLayerName = Project.findElevationLayer(self.gpkgFile)
-            if elevationLayerName is not None:
-                self.elevationLayer = ElevationLayer(
-                    PaddockPowerLayerSourceType.File, elevationLayerName, self.gpkgFile)
 
             self.isLoaded = True
             self.milestonesUpdated.emit(self.milestones)
