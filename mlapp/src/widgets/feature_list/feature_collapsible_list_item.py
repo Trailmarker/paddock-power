@@ -6,11 +6,9 @@ from qgis.PyQt.QtWidgets import QAction, QSizePolicy, QVBoxLayout, QWidget
 from ...models.state import State
 from ..edit_state_machine import EditStateMachine
 from ..collapse.collapse import Collapse
-from ..paddock_details.paddock_details import PaddockDetails
-from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
 
 
-class PaddockCollapsibleListItem(QWidget, EditStateMachine):
+class FeatureCollapsibleListItem(QWidget, EditStateMachine):
     layoutRefreshNeeded = pyqtSignal()
 
     # Editing signals
@@ -18,21 +16,21 @@ class PaddockCollapsibleListItem(QWidget, EditStateMachine):
     save = pyqtSignal()
     cancelEdit = pyqtSignal()
 
-    def __init__(self, paddock, parent=None):
+    def __init__(self, feature, DetailsWidget, EditWidget, parent=None):
         super().__init__(parent)
 
         self.state = State()
 
-        self.paddock = paddock
-        self.paddockDetails = PaddockDetails(paddock)
-        self.paddockDetailsEdit = PaddockDetailsEdit(paddock)
+        self.feature = feature
+        self.featureDetails = DetailsWidget(feature)
+        self.featureEdit = EditWidget(feature)
 
         # Swap between view and edit layouts in the Collapse widget content area
         self.collapseLayout = QVBoxLayout()
         self.collapseLayout.setSpacing(0)
         self.collapseLayout.setContentsMargins(0, 0, 0, 0)
-        self.collapseLayout.addWidget(self.paddockDetails)
-        self.collapseLayout.addWidget(self.paddockDetailsEdit)
+        self.collapseLayout.addWidget(self.featureDetails)
+        self.collapseLayout.addWidget(self.featureEdit)
         self.collapseLayout.addStretch()
 
         self.collapse = Collapse(self)
@@ -53,7 +51,7 @@ class PaddockCollapsibleListItem(QWidget, EditStateMachine):
         self.collapse.addToolBarAction(self.saveAction, self.save.emit)
         self.collapse.addToolBarAction(self.editAction, self.edit.emit)
         self.collapse.addToolBarAction(self.zoomAction, self.selectPaddock)
-        self.collapse.addToolBarAction(self.zoomAction, self.paddock.zoomToFeature)
+        self.collapse.addToolBarAction(self.zoomAction, self.feature.zoomToFeature)
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
@@ -77,7 +75,7 @@ class PaddockCollapsibleListItem(QWidget, EditStateMachine):
         self.editState.addTransition(self.save, self.viewState)
         self.editState.addTransition(self.cancelEdit, self.viewState)
 
-        self.save.connect(self.paddockDetailsEdit.savePaddock)
+        self.save.connect(self.featureEdit.savePaddock)
 
         self.machine.addState(self.viewState)
         self.machine.addState(self.editState)
@@ -94,15 +92,15 @@ class PaddockCollapsibleListItem(QWidget, EditStateMachine):
     def refreshUi(self):
         editing = self.editState in self.machine.configuration()
 
-        self.setStatus(self.paddock.status)
+        self.setStatus(self.feature.status)
 
         # Set title to paddock name with some details
         self.setTitle(
-            f"{self.paddock.name} ({self.paddock.featureArea} km², ?? AE)")
+            f"{self.feature.name} ({self.feature.featureArea} km², ?? AE)")
 
         # Hide or show forms
-        self.paddockDetails.setVisible(not editing)
-        self.paddockDetailsEdit.setVisible(editing)
+        self.featureDetails.setVisible(not editing)
+        self.featureEdit.setVisible(editing)
 
         # Hide or show collapse toolbar items
         self.cancelEditAction.setVisible(editing)
@@ -123,7 +121,7 @@ class PaddockCollapsibleListItem(QWidget, EditStateMachine):
         # self.collapse.setExpanded(True)
         milestone = self.state.getMilestone()
         if milestone is not None:
-            milestone.setSelectedPaddock(self.paddock)
+            milestone.setSelectedPaddock(self.feature)
 
     def sizeHint(self):
         """Return the size of the widget."""

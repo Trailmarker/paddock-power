@@ -79,7 +79,6 @@ def deletes(feature, otherEdits=None):
 @addSchema(FeatureSchema)
 class Feature(QObject):
 
-    stateChanged = pyqtSignal()
     featuresProcessed = pyqtSignal(list)
 
     @classmethod
@@ -137,7 +136,6 @@ class Feature(QObject):
                 f"Feature.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
   
         self.featureLayer = featureLayer
-        # self.stateChanged.connect(lambda: self.featureLayer.featureStateChanged.emit(self))
 
     def __repr__(self):
         """Return a string representation of the Feature."""

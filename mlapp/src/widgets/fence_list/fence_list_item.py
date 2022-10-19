@@ -62,8 +62,6 @@ class FenceListItem(QWidget):
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.setLayout(self.layout)
 
-        # self.fence.stateChanged.connect(self.refreshUi)
-
         self.refreshUi()
 
     def setStatus(self, status):

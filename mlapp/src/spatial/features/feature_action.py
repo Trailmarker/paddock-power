@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
+from ...models.state_machine import StateMachineAction
 
 
-class FeatureAction(Enum):
+class FeatureAction(StateMachineAction):
     """Allowed transitions for a Paddock Power feature."""
     draft = "Draft"
     trash = "Trash"
@@ -14,5 +14,3 @@ class FeatureAction(Enum):
     undoSupersede = "Undo Superseding"
     archive = "Archive"
 
-    def __str__(self):
-        return self.value
