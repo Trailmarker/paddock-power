@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from .feature import addSchema
 from .line_feature import LineFeature
-from .schemas import PipelineSchema, addSchema
+from .schemas import PipelineSchema
 
 
 @addSchema(PipelineSchema)

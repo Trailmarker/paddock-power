@@ -113,14 +113,14 @@ PaddockSchema = CapacityFeatureSchema + [
 
 PipelineSchema = LineFeatureSchema
 
-BUFFER_DISTANCE= "Buffer Distance (km)"
+BUFFER_DISTANCE = "Buffer Distance (km)"
 WATERED_AREA = "Watered Area (km²)"
 
 WaterpointBufferSchema = AreaFeatureSchema + [
     Field(propertyName="bufferDistance", name=BUFFER_DISTANCE, type=QVariant.Double, typeName="Real",
-                len=0, prec=0, comment="", subType=QVariant.Invalid),
+          len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="wateredArea", name=WATERED_AREA, type=QVariant.Double,
-                typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
+          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
 ]
 
 WATERPOINT_TYPE = "Waterpoint Type"
@@ -132,39 +132,16 @@ WATERPOINT_END_MONTH = "Waterpoint End Month"
 
 WaterpointSchema = PointFeatureSchema + [
     Field(propertyName="waterpointType", name=WATERPOINT_TYPE, type=QVariant.String, typeName="String",
-            len=0, prec=0, comment="", subType=QVariant.Invalid,
-            domainType=WaterpointType),
+          len=0, prec=0, comment="", subType=QVariant.Invalid,
+          domainType=WaterpointType),
     Field(propertyName="reference", name=REFERENCE, type=QVariant.String,
-            typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
+          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="boreYield", name=BORE_YIELD, type=QVariant.Double,
-            typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
+          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="boreReportUrl", name=BORE_REPORT_URL, type=QVariant.String,
-            typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
+          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="waterpointStartMonth", name=WATERPOINT_START_MONTH, type=QVariant.String,
-            typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
+          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="waterpointEndMonth", name=WATERPOINT_END_MONTH, type=QVariant.String,
-            typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid)
+          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid)
 ]
-
-
-class addSchema:
-    def __init__(self, fields, wkbType=None):
-        # qgsDebug(f"addSchema.__init__ len(fields) = {len(fields)}, wkbType = {wkbType})")
-        self._fields = fields
-        self._wkbType = wkbType
-
-    def __call__(self, cls):
-        # qgsDebug("addSchema: " + cls.__name__)
-
-        for field in self._fields:
-            if field._propertyName is not None:
-                field.addFieldProperty(cls)
-
-        setattr(cls, "getSchema", classmethod(lambda cls: self._fields))
-        if self._wkbType is not None:
-            setattr(cls, "getWkbType", classmethod(lambda cls: self._wkbType))
-        
-        return cls
-
-
-

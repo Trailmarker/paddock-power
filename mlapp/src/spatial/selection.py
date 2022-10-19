@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import pyqtSlot
 from qgis.core import QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
-from ..models.paddock_power_error import PaddockPowerError
+from ..models.glitch import Glitch
 from .features.feature import Feature
 
 class Selection(QgsRubberBand):
@@ -41,7 +41,7 @@ class Selection(QgsRubberBand):
         """Set the selection."""
 
         if not isinstance(feature, Feature):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Selection.setSelection: feature must be a QgsFeature object")
 
         self.selectedFeature = feature
@@ -61,5 +61,5 @@ class Selection(QgsRubberBand):
 
     def refreshUi(self):
         """Refresh the Fence rubber band."""
-        self.updateGeometry(self.selectedFeature.geometry()
+        self.updateGeometry(self.selectedFeature.geometry
                            if self.selectedFeature is not None else None)

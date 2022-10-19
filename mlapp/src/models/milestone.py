@@ -16,11 +16,10 @@ from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.feature_layer import FeatureLayerSourceType
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import guiError, qgsDebug
 
 from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 
-from .paddock_power_error import PaddockPowerError
+from .glitch import Glitch
 
 
 class Milestone(QObject):
@@ -146,7 +145,7 @@ class Milestone(QObject):
     def deleteFromGeoPackage(self):
         """Delete this milestone from the GeoPackage file."""
         if not self.isLoaded:
-            raise PaddockPowerError(
+            raise Glitch(
                 "Milestone.deleteFromGeoPackage: cannot delete a milestone that is not loaded")
 
         def deleteLayerFromGeoPackage(layer):
@@ -166,7 +165,7 @@ class Milestone(QObject):
     def setTool(self, tool):
         """Set the current tool for this milestone."""
         if not isinstance(tool, PaddockPowerMapTool):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Milestone.setTool: tool must be a MilestoneMapTool")
 
         self.unsetTool()
@@ -182,21 +181,21 @@ class Milestone(QObject):
 
     def setSelectedFence(self, fence):
         if fence is not None and not isinstance(fence, Fence):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Milestone.setSelectedFence: fence must be a Fence")
         self.selectedFence = fence
         self.selectedFenceChanged.emit(self.selectedFence)
 
     def setSelectedPaddock(self, paddock):
         if paddock is not None and not isinstance(paddock, Paddock):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Milestone.setSelectedPaddock: paddock must be a Paddock")
         self.selectedPaddock = paddock
         self.selectedPaddockChanged.emit(self.selectedPaddock)
 
     def setSelectedPipeline(self, pipeline):
         if pipeline is not None and not isinstance(pipeline, Pipeline):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Milestone.setSelectedPipeline: pipeline must be a Pipeline")
         self.selectedPipeline = pipeline
         self.selectedPipelineChanged.emit(self.selectedPipeline)
@@ -214,31 +213,10 @@ class Milestone(QObject):
     def undoPlanFence(self, fence):
         """Undo the Paddock changes created by a planned Fence and return the Fence to Draft status."""
         if not isinstance(fence, Fence):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Milestone.undoFence: fence must be a Fence")
 
-        _, _, highestPlannedBuildOrder = self.fenceLayer.getBuildOrder()
-
-        if fence.buildOrder < highestPlannedBuildOrder:
-            guiError(
-                "Undo your Planned Fences from last to first.")
-            return
-
-        try:
-            self.paddockLayer.startEditing()
-            self.fenceLayer.startEditing()
-
-            qgsDebug("Undoing planned fence …")
-
-            fence.undoPlanFence()
-
-            self.fenceLayer.commitChanges
-            self.paddockLayer.commitChanges()
-        except Exception as e:
-            self.fenceLayer.rollBack()
-            self.paddockLayer.rollBack()
-            raise PaddockPowerError(
-                f"Milestone.undoPlanFence: failed to undo fence {str(e)}")
+        fence.undoPlanFence()
 
         return self.fenceLayer.getFenceByBuildOrder(fence.buildOrder)
 

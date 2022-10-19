@@ -6,7 +6,7 @@ from shapely.wkt import dumps
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsDistanceArea, QgsGeometry, QgsPoint, QgsPointXY, QgsProject, QgsRaster
 
-from ..models.paddock_power_error import PaddockPowerError
+from ..models.glitch import Glitch
 from .profile import Profile
 
 
@@ -29,7 +29,7 @@ class Calculator:
             return 0.0
 
         if not isinstance(point, QgsGeometry):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Calculator.calculateElevationAtPoint: point is not a QgsGeometry.")
 
         pointXY = point.asPoint()
@@ -41,11 +41,11 @@ class Calculator:
         """Calculate the length of a line."""
 
         if not isinstance(line, QgsGeometry):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Calculator.calculateLength: line is not a QgsGeometry.")
 
         if line.isMultipart():
-            raise PaddockPowerError(
+            raise Glitch(
                 "Calculator.calculateArea: Paddock Power should not be used with multi-part linestrings.")
 
         calculator = Calculator.QGIS_CALCULATOR
@@ -138,7 +138,7 @@ class Calculator:
         """Calculate the area of a polygon."""
 
         if not isinstance(polygon, QgsGeometry):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Calculator.calculateArea: polygon is not a QgsGeometry.")
 
         # if polygon.isMultipart():
@@ -154,7 +154,7 @@ class Calculator:
         """Calculate the perimeter of a polygon."""
 
         if not isinstance(polygon, QgsGeometry):
-            raise PaddockPowerError(
+            raise Glitch(
                 "Calculator.calculatePerimeter: polygon is not a QgsGeometry.")
 
         # if polygon.isMultipart():

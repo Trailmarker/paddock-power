@@ -6,8 +6,8 @@ from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
 from ...spatial.features.fence import Fence
-from ...models.paddock_power_error import PaddockPowerError
-from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
+from ...models.glitch import Glitch
+from ...models.state import State, connectStateListener
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_paddock_changes_base.ui')))
@@ -21,8 +21,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.state = PaddockPowerState()
-        connectPaddockPowerStateListener(self.state, self)
+        self.state = State()
+        connectStateListener(self.state, self)
 
         self.fence = None
 
@@ -65,8 +65,10 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.plannedPaddockMiniList.clear()
         else:
             self.setVisible(True)
-            self.supersededPaddockMiniList.setPaddocks(self.fence.supersededPaddocks())
-            self.plannedPaddockMiniList.setPaddocks(self.fence.plannedPaddocks())
+            supersededPaddocks, plannedPaddocks = self.fence.getSupersededAndPlannedPaddocks()
+
+            self.supersededPaddockMiniList.setPaddocks(supersededPaddocks)
+            self.plannedPaddockMiniList.setPaddocks(plannedPaddocks)
 
     def clearFence(self):
         self.fence = None
@@ -75,7 +77,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
 
     def setFence(self, fence):
         if fence is not None and not isinstance(fence, Fence):
-            raise PaddockPowerError(
+            raise Glitch(
                 "FencePaddockChangesWidget.setFence: fence must be a Fence")
 
         if fence is None:

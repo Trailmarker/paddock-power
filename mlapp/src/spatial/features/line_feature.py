@@ -3,8 +3,8 @@ from qgis.core import QgsWkbTypes
 
 from ..calculator import Calculator
 from ..layers.elevation_layer import ElevationLayer
-from .feature import Feature
-from .schemas import LineFeatureSchema, addSchema
+from .feature import Feature, addSchema
+from .schemas import LineFeatureSchema
 
 
 @addSchema(LineFeatureSchema, QgsWkbTypes.LineString)
@@ -27,7 +27,6 @@ class LineFeature(Feature):
 
     def recalculate(self):
         """Recalculate the length of this Pipeline."""
-        self._profile = Calculator.calculateProfile(
-            self.geometry(), self.elevationLayer)
+        self._profile = Calculator.calculateProfile(self.geometry, self.elevationLayer)
         length = round(self._profile.maximumDistance / 1000, 2)
         self.featureLength = length

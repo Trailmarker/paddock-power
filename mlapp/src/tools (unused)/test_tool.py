@@ -4,7 +4,7 @@ from qgis.gui import QgsIdentifyMenu, QgsMapTool, QgsMapToolIdentifyFeature
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 
-from ..models.milestone import Milestone, PaddockPowerError
+from ..models.milestone import Milestone, Glitch
 from ..utils import qgsDebug
 
 
@@ -13,7 +13,7 @@ class TestTool(QgsMapToolIdentifyFeature):
         super().__init__(canvas)
 
         if not isinstance(milestone, Milestone):
-            raise PaddockPowerError(
+            raise Glitch(
                 "TestTool.__init__: milestone is not a Milestone.")
 
         self.milestone = milestone

@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 
 from ...models.milestone import Milestone
-from ...models.paddock_power_error import PaddockPowerError
+from ...models.glitch import Glitch
 from ...widgets.paddock_power_map_tool import PaddockPowerMapTool
 
 
@@ -20,7 +20,7 @@ class SketchLineTool(PaddockPowerMapTool):
         super().__init__()
 
         if not isinstance(milestone, Milestone):
-            raise PaddockPowerError(
+            raise Glitch(
                 "SketchLineTool.__init__: milestone is not a Milestone.")
 
         self.milestone = milestone

@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QDialog
 
-from ...models.paddock_power_error import PaddockPowerError
+from ...models.glitch import Glitch
 from ...models.project import Project
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -17,9 +17,9 @@ class AddMilestoneDialog(QDialog, FORM_CLASS):
     def __init__(self, project, parent=None):
         """Constructor."""
         if project is None:
-            raise PaddockPowerError("AddMilestoneDialog: project is empty")
+            raise Glitch("AddMilestoneDialog: project is empty")
         if not isinstance(project, Project):
-            raise PaddockPowerError(
+            raise Glitch(
                 "AddMilestoneDialog: project is not a Project")
 
         super().__init__(parent)

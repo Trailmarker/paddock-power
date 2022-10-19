@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ...models.paddock_power_error import PaddockPowerError
+from ...models.glitch import Glitch
 from ...spatial.profile import Profile
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
@@ -12,7 +12,7 @@ class ProfileCanvas(FigureCanvasQTAgg):
     def __init__(self, profile):
 
         if not isinstance(profile, Profile):
-            raise PaddockPowerError(
+            raise Glitch(
                 "InfrastructureProfileCanvas.__init__: profile must be a Profile")
 
         useMetres = (profile.maximumDistance < 1000)

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-import contextlib
+from contextlib import contextmanager
 
 from qgis.core import QgsVectorLayer
 
-from ...models.paddock_power_error import PaddockPowerError
+from ...models.glitch import Glitch
 from ...utils import qgsDebug
 
 
-@contextlib.contextmanager
+@contextmanager
 def editAndCommit(*layers):
+    layers = set(layers)
+
     if not all(isinstance(layer, QgsVectorLayer) for layer in layers):
-        raise PaddockPowerError("editAndCommit: All layers must be QgsVectorLayers")
+        raise Glitch("editAndCommit: All layers must be QgsVectorLayers")
 
     if any(layer.isEditable() for layer in layers):
-        raise PaddockPowerError("editAndCommit: All layers must be in non-editable state")
+        raise Glitch("editAndCommit: All layers must be in non-editable state")
 
     try:
         for layer in layers:
@@ -34,13 +36,15 @@ def editAndCommit(*layers):
         raise e
 
 
-@contextlib.contextmanager
+@contextmanager
 def editAndRollBack(*layers):
+    layers = set(layers)
+
     if not all(isinstance(layer, QgsVectorLayer) for layer in layers):
-        raise PaddockPowerError("editAndRollBack: All layers must be QgsVectorLayers")
+        raise Glitch("editAndRollBack: All layers must be QgsVectorLayers")
 
     if any(layer.isEditable() for layer in layers):
-        raise PaddockPowerError("editAndRollBack: All layers must be in non-editable state")
+        raise Glitch("editAndRollBack: All layers must be in non-editable state")
 
     try:
         for layer in layers:
@@ -51,7 +55,7 @@ def editAndRollBack(*layers):
         yield
 
         for layer in layers:
-            layer.commitChanges()
+            layer.rollBack()
 
         qgsDebug("editAndRollBack: changes rolled back")
 

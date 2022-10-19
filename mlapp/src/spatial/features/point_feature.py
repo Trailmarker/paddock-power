@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-import imp
-from qgis.PyQt.QtCore import QVariant
-
 from qgis.core import QgsWkbTypes
 
 from ..calculator import Calculator
 from ..layers.elevation_layer import ElevationLayer
-from .feature import Feature
-from .schemas import PointFeatureSchema, addSchema
+from .feature import Feature, addSchema
+from .schemas import PointFeatureSchema
 
 
 @addSchema(PointFeatureSchema, QgsWkbTypes.Point)
@@ -24,6 +21,6 @@ class PointFeature(Feature):
 
     def recalculate(self):
         """Recalculate the longitude, latitude and elevation of the PointFeature."""
-        elevation = round(Calculator.calculateElevationAtPoint(self.geometry(), self.elevationLayer), 2)
+        elevation = round(Calculator.calculateElevationAtPoint(self.geometry, self.elevationLayer), 2)
         # TODO Latitude and Longitude
         self.featureElevation = elevation

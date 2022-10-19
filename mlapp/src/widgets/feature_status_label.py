@@ -2,9 +2,9 @@
 
 from qgis.PyQt.QtWidgets import QLabel
 
-from ..models.paddock_power_error import PaddockPowerError
+from ..models.glitch import Glitch
 from ..spatial.features.feature_status import FeatureStatus, toCssColour
-from ..utils import qgsDebug
+
 
 class FeatureStatusLabel(QLabel):
 
@@ -16,19 +16,13 @@ class FeatureStatusLabel(QLabel):
 
     def setStatus(self, status):
         if status is not None and not isinstance(status, FeatureStatus):
-            raise PaddockPowerError(
+            raise Glitch(
                 "FeatureStatusLabel.__init__: status must be a FeatureStatus")
 
         self.status = status
         self.refreshUi()
 
-    def refreshUi(self):
-        if self.status is None:
-            self.setVisible(False)
-            return
-
-        self.setVisible(True)
-
+    def refreshStylesheet(self):
         background = toCssColour(*self.status.toColour())
         foreground = toCssColour(*self.status.toForegroundColour())
 
@@ -41,4 +35,12 @@ class FeatureStatusLabel(QLabel):
                       f"}}\n")
 
         self.setStyleSheet(stylesheet)
+
+    def refreshUi(self):
+        if self.status is None:
+            self.setVisible(False)
+            return
+
+        self.setVisible(True)
+        self.refreshStylesheet()
         self.setText(self.status.name)

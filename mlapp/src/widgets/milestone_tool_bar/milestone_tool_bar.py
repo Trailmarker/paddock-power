@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
+from ...models.state import State, connectStateListener
 from ...utils import guiConfirm
 from .add_milestone_dialog import AddMilestoneDialog
 
@@ -22,8 +22,8 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.state = PaddockPowerState()
-        connectPaddockPowerStateListener(self.state, self)
+        self.state = State()
+        connectStateListener(self.state, self)
 
         self.addMilestoneButton.setIcon(
             QIcon(":/plugins/mlapp/images/new-milestone.png"))

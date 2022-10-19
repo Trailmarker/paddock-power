@@ -3,8 +3,7 @@ from enum import Enum
 
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
 
-from ...models.paddock_power_error import PaddockPowerError
-from ...utils import qgsDebug
+from ...models.glitch import Glitch
 
 
 class Field(QgsField):
@@ -64,7 +63,7 @@ class Field(QgsField):
         """Set the value of a domain-valued field. Should not be called directly."""
         def _setter(feature: QgsFeature, domainValue):
             if not isinstance(domainValue, self._domainType):
-                raise PaddockPowerError(f"{domainValue} must be a {self._domainType.__name__}")
+                raise Glitch(f"{domainValue} must be a {self._domainType.__name__}")
             feature._qgsFeature.setAttribute(self.name(), domainValue.name)
         return _setter
 
@@ -84,8 +83,6 @@ class Field(QgsField):
 
     def addFieldProperty(self, cls):
         """Add a Python property to a Feature class for this Field."""
-        # qgsDebug(f"Adding property {self._propertyName} to {cls.__name__}")
-
         getterName = f"_{self._propertyName}"
         setterName = f"_set{self._propertyName.capitalize()}"
 

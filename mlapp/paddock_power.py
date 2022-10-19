@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 import os.path
-from qgis.core import QgsApplication, QgsProject
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
+
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+
+from qgis.core import QgsApplication, QgsProject
 from qgis.utils import iface
 
 # Initialize Qt resources from file resources.py
 from .resources_rc import *
 
 # Import the code for the dialog(s), dock widget(s) and processing provider
-from .src.models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
+from .src.models.state import State, connectStateListener
 from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
 from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
 from .src.provider import Provider
@@ -47,13 +49,13 @@ class PaddockPower:
         # Must be set in initGui() to survive plugin reloads
         self.firstStart = None
 
-        self.state = PaddockPowerState()
-        connectPaddockPowerStateListener(self.state, self.state)
+        self.state = State()
+        connectStateListener(self.state, self.state)
         self.state.initSelections(iface.mapCanvas())
         self.state.detectProject()
 
         QgsProject.instance().cleared.connect(self.state.clearProject)
-        QgsProject.instance().readProject.connect(self.state.detectProject)
+        QgsProject.instance().readProject.connect(lambda _: self.state.detectProject())
 
         self.infrastructureViewIsActive = False
         self.infrastructureView = None

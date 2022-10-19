@@ -7,32 +7,57 @@ from qgis.core import Qgis, QgsMessageLog, QgsProject
 from qgis.PyQt.QtCore import pyqtSignal
 
 
+PLUGIN_NAME = "MLA Paddock Power"
+
+
+def formatMessage(message):
+    if isinstance(message, str):
+        return message
+    elif isinstance(message, list):
+        if not message:
+            return "An unknown error occurred."
+        elif len(message) == 1:
+            return message[0]
+        return "".join([
+            "<ul>",
+            "".join([f"<li>{item}</li>" for item in message]),
+            "</ul>"
+        ])
+
+
+def qgsDebug(message, tag=PLUGIN_NAME, level=Qgis.Info):
+    """Print a debug message."""
+    if isinstance(message, str):
+        QgsMessageLog.logMessage(message, tag, level)
+    elif isinstance(message, list):
+        for m in message:
+            QgsMessageLog.logMessage(m, tag, level)
+
+
 def guiInformation(message):
     """Show an info message box."""
-    QMessageBox.information(None, "NAFI Burnt Areas Mapping", message)
+    QMessageBox.information(None, f"{PLUGIN_NAME} | Information", formatMessage(message))
+    qgsDebug(message, level=Qgis.Info)
 
 
 def guiError(message):
     """Show an error message box."""
-    QMessageBox.critical(None, "NAFI Burnt Areas Mapping", message)
+    QMessageBox.critical(None, f"{PLUGIN_NAME} | Error", formatMessage(message))
+    qgsDebug(message, level=Qgis.Critical)
 
 
 def guiWarning(message):
     """Show a warning message box."""
-    QMessageBox.warning(None, "NAFI Burnt Areas Mapping", message)
+    QMessageBox.warning(None, f"{PLUGIN_NAME} | Warning", formatMessage(message))
+    qgsDebug(message, level=Qgis.Warning)
 
 
 def guiConfirm(question="Are you sure?", title=None):
     """Show a confirmation dialog."""
     if title is None:
-        title = "MLA Paddock Power"
-    return QMessageBox.question(None, title, question, QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
-
-
-def qgsDebug(message, tag="", level=Qgis.Info):
-    """Print a debug message."""
-    QgsMessageLog.logMessage(
-        message, tag=tag, level=level)
+        title = PLUGIN_NAME
+    return QMessageBox.question(None, title, question, QMessageBox.Yes |
+                                QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
 
 
 def resolvePluginPath(relative, base=None):
@@ -51,22 +76,24 @@ def resolveProjectFile():
     if projectFilePath is None or projectFilePath == '':
         raise Exception(
             "Save the current QGIS session as your Paddock Power project before continuing.")
-        return None
     return projectFilePath
 
 
 def resolveGeoPackageFile(projectFilePath=None):
     """Get where the current Paddock Power GeoPackage should be."""
-    if projectFilePath is None:
-        projectFilePath = resolveProjectFile()
-    if projectFilePath is None:
-        return None
-    return f"{path.splitext(projectFilePath)[0]}.gpkg"
+    projectFilePath = projectFilePath or resolveProjectFile()
+    return f"{path.splitext(projectFilePath)[0]}.gpkg" if projectFilePath else None
 
 
 def resolveStylePath(styleName):
     """Resolve the path of a style file packaged with the plugin."""
     relative = f"styles\\{styleName}.qml"
+    return resolvePluginPath(relative)
+
+
+def resolveComponentStylesheet(componentType):
+    """Resolve the path of the component stylesheet file packaged with the plugin."""
+    relative = "stylesheets\\{componentType.__name__}.qss"
     return resolvePluginPath(relative)
 
 
@@ -98,6 +125,7 @@ def clearItem(item):
             if widget is not None:
                 widget.setParent(None)
                 del widget
+
 
 def staticinit(cls):
     if getattr(cls, "__staticinit__", None):

@@ -7,8 +7,8 @@ from qgis.PyQt.QtWidgets import QWidget, QLabel
 
 from ...spatial.features.fence import Fence
 from ...spatial.features.pipeline import Pipeline
-from ...models.paddock_power_error import PaddockPowerError
-from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
+from ...models.glitch import Glitch
+from ...models.state import State, connectStateListener
 from .profile_canvas import ProfileCanvas
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -26,8 +26,8 @@ class ProfileDetails(QWidget, FORM_CLASS):
         self.selectedInfrastructure = None
         self.profileCanvas = None
 
-        self.state = PaddockPowerState()
-        connectPaddockPowerStateListener(self.state, self)
+        self.state = State()
+        connectStateListener(self.state, self)
 
         self.refreshUi()
 
@@ -108,7 +108,7 @@ class ProfileDetails(QWidget, FORM_CLASS):
     def setSelectedInfrastructure(self, infrastructure):
         """Set the selected Infrastructure."""
         if not isinstance(infrastructure, Fence) and not isinstance(infrastructure, Pipeline):
-            raise PaddockPowerError(
+            raise Glitch(
                 "InfrastructureViewDockWidget.setSelectedInfrastructure: infrastructure is not a Fence or Pipeline")
         self.selectedInfrastructure = infrastructure
 

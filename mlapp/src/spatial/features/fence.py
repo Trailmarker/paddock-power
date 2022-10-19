@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint
 
-from ...models.paddock_power_error import PaddockPowerError
+from ...models.glitch import Glitch, glitchy
 from ...utils import qgsDebug
-from ..layers.edit_context import editAndRollBack
 from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
-from .feature_status import FeatureStatus
+from .feature import FeatureAction, FeatureStatus, addSchema, actionHandler, editAndRollBack, gatherEdits, persistEdits, upserts
 from .line_feature import LineFeature
-from .schemas import FenceSchema, addSchema, BUILD_FENCE
+from .schemas import FenceSchema, BUILD_FENCE
 
 
 @addSchema(FenceSchema)
@@ -27,97 +26,123 @@ class Fence(LineFeature):
         self._supersededPaddocks = []
         self._plannedPaddocks = []
 
+    @glitchy()
     def getCrossedPaddocks(self):
         """Get a tuple representing the restriction of this Fence to only Paddocks it completely crosses,
            and the Paddocks that are completely crossed by the specified line."""
 
-        fenceLine = self.geometry()
+        qgsDebug(f"Fence.getCrossedPaddocks: {self.id}")
+
+        fenceLine = self.geometry
 
         # We are only interested in Paddocks that are current
         existingAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
-            FeatureStatus.Existing, FeatureStatus.Planned)
+            FeatureStatus.Built, FeatureStatus.Planned)
 
-        intersects = [p for p in existingAndPlannedPaddocks if fenceLine.intersects(p.geometry())]
+        qgsDebug(f"Fence.getCrossedPaddocks: {len(existingAndPlannedPaddocks)} Built or Planned Paddocks")
 
-        # qgsDebug(f"[p.name for p in intersects] = {[p.name() for p in intersects]}")
+        qgsDebug(f"Fence.getCrossedPaddocks: fenceLine.__class__.__name__ = {fenceLine.__class__.__name__}")
+        qgsDebug(f"Fence.getCrossedPaddocks: fenceLine = {fenceLine.asWkt()}")
+
+        paddockGeometries = [p.geometry.asWkt() for p in existingAndPlannedPaddocks]
+
+        qgsDebug(f"Fence.getCrossedPaddocks: {str(paddockGeometries)} Paddock Geometries")
+
+        intersects = [p for p in existingAndPlannedPaddocks if fenceLine.intersects(p.geometry)]
+
+        qgsDebug(f"[p.name for p in intersects] = {[p.name for p in intersects]}")
 
         # Find the existing paddocks crossed by the fence line that will be superseded
         crossedPaddocks = []
         for paddock in intersects:
-            polygon = paddock.geometry().asMultiPolygon()
+            polygon = paddock.geometry.asMultiPolygon()
             boundaryLine = QgsGeometry.fromMultiPolylineXY(polygon[0])
             intersection = boundaryLine.intersection(fenceLine)
             if intersection.isMultipart():
-                # qgsDebug("Found a fully crossed paddock")
+                qgsDebug("Found a fully crossed paddock")
                 # Deep copy the crossed paddocks
                 crossedPaddocks.append(self.paddockLayer.makeFeature(paddock))
 
-        # qgsDebug(f"[p.name for p in crossedPaddocks] = {[p.name() for p in crossedPaddocks]}")
+        qgsDebug(f"[p.name for p in crossedPaddocks] = {[p.name for p in crossedPaddocks]}")
 
         # Crop the fence line to these superseded paddocks - no loose ends
-        allCrossed = QgsGeometry.unaryUnion(
-            f.geometry() for f in crossedPaddocks)
+        allCrossed = QgsGeometry.unaryUnion(p.geometry for p in crossedPaddocks)
         allCrossedBuffered = allCrossed.buffer(5.0, 10)
         normalisedFenceLine = fenceLine.intersection(allCrossedBuffered)
 
         if normalisedFenceLine.isEmpty():
-            # qgsDebug("getCrossedPaddocks: normalisedFenceLine is empty")
+            qgsDebug("getCrossedPaddocks: normalisedFenceLine is empty")
             return normalisedFenceLine, []
 
         # If this leaves the fence line multipart, reduce it to a single part
         if normalisedFenceLine.isMultipart():
-            # qgsDebug("getCrossedPaddocks: normalisedFenceLine is multipart")
+            qgsDebug("getCrossedPaddocks: normalisedFenceLine is multipart")
             normalisedFenceLine = normalisedFenceLine.combine()
 
         if normalisedFenceLine.isMultipart():
-            raise PaddockPowerError(
+            raise Glitch(
                 "Fence.analyseFence: fence line is still multipart")
 
         return normalisedFenceLine, crossedPaddocks
 
+    @glitchy()
+    def getSupersededAndPlannedPaddocks(self):
+        """Get the Paddocks with the specified Build Order."""
+
+        if self.status == FeatureStatus.Drafted:
+            return self.getCrossedPaddocks(), []
+
+        buildOrder = self.buildOrder
+
+        if buildOrder <= 0:
+            raise Glitch(
+                "Fence.getSupersededAndPlannedPaddocks: buildOrder must be a positive integer")
+
+        buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {buildOrder}')
+
+        paddocks = list(self.paddockLayer.getFeatures(request=buildFenceRequest))
+
+        return ([f for f in paddocks if f.status in [FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded]],
+                [f for f in paddocks if f.status == FeatureStatus.Planned])
+
+    @persistEdits
+    @actionHandler(FeatureAction.draft)
     def draftFence(self):
         """Draft a Fence."""
 
-        self.draft.emit()
+        currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
 
-        try:
-            currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
+        normalisedFenceLine, supersededPaddocks = self.getCrossedPaddocks()
 
-            normalisedFenceLine, supersededPaddocks = self.getCrossedPaddocks()
+        if normalisedFenceLine is None or normalisedFenceLine.isEmpty() or not supersededPaddocks:
+            raise Glitch("The specified Fence does not cross or touch any Paddocks.")
 
-            if normalisedFenceLine is None or normalisedFenceLine.isEmpty() or not supersededPaddocks:
-                raise PaddockPowerError("The specified Fence does not cross or touch any Paddocks.")
+        self.geometry = normalisedFenceLine
+        self.buildOrder = currentBuildOrder + 1
 
-            self.setGeometry(normalisedFenceLine)
-            self.buildOrder = currentBuildOrder + 1
-            self.recalculate()
-            self.upsert()
-        except BaseException:
-            self.undoDraft.emit()
-            raise
+        return upserts(self)
 
-
-    def onPlan(self):
+    @persistEdits
+    @actionHandler(FeatureAction.plan)
+    def planFence(self):
         """Plan the Paddocks that would be altered after building this Fence."""
-        qgsDebug(f"Fence.onPlan: {self._debugStateMachine()}")
 
-        self._supersededPaddocks = []
-        self._plannedPaddocks = []
+        edits = gatherEdits()
 
         with editAndRollBack(self.paddockLayer):
-        
+
             _, lowestDraftBuildOrder, _ = self.featureLayer.getBuildOrder()
 
             if self.buildOrder > lowestDraftBuildOrder:
-                raise PaddockPowerError(
+                raise Glitch(
                     "You must Plan your Drafted Fences from first to last according to Build Order.")
 
             if self.buildOrder <= 0:
-                raise PaddockPowerError("Fence must have a positive Build Order to be Planned")
+                raise Glitch("Fence must have a positive Build Order to be Planned")
 
             _, supersededPaddocks = self.getCrossedPaddocks()
 
-            fenceLine = self.geometry()
+            fenceLine = self.geometry
             polyline = fenceLine.asPolyline()
             points = [QgsPoint(p.x(), p.y()) for p in polyline]
             splitLine = QgsLineString(points)
@@ -125,9 +150,7 @@ class Fence(LineFeature):
             self.paddockLayer.splitFeatures(splitLine, False, False)
 
             existingAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
-                FeatureStatus.Existing, FeatureStatus.Planned)
-
-            plannedPaddocks = []
+                FeatureStatus.Built, FeatureStatus.Planned)
 
             for crossedPaddock in supersededPaddocks:
                 crossedPaddockName = crossedPaddock.name
@@ -138,87 +161,36 @@ class Fence(LineFeature):
 
                 for i, splitPaddock in enumerate(splitPaddocks):
                     # If this is one of the 'crossed' paddocks after the split, add, don't update
-                    creatingNewPaddock = splitPaddock.id() == crossedPaddock.id()
+                    creatingNewPaddock = splitPaddock.id == crossedPaddock.id
 
                     if creatingNewPaddock:
                         # Try to create an entirely new Paddock feature
                         # Conflicts get quite weird here
                         splitPaddock = self.paddockLayer.copyFeature(splitPaddock)
 
-                    defaultName = crossedPaddockName + ' ' + \
-                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
+                    defaultName = crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
 
                     splitPaddock.name = defaultName
-                    splitPaddock.planPaddock(self)
-                    plannedPaddocks.append(splitPaddock)
+                    edits = gatherEdits(edits, splitPaddock.planPaddock(self))
 
             for paddock in supersededPaddocks:
-                paddock.supersedePaddock(self)
+                edits = gatherEdits(edits, paddock.supersedePaddock(self))
 
-            self._supersededPaddocks, self._plannedPaddocks = supersededPaddocks, plannedPaddocks
+        # self.paddockLayer now rolls back
+        return upserts(self, edits)
 
-
-        self.featuresProcessed.emit([self] + self._supersededPaddocks + self._plannedPaddocks)
-
-    
-
-
+    @persistEdits
+    @actionHandler(FeatureAction.undoPlan)
     def undoPlanFence(self):
         """Undo the plan of Paddocks implied by a Fence."""
+        edits = gatherEdits()
 
-        qgsDebug(f"Fence.undoPlanFence: {self._debugStateMachine()}")
+        supersededPaddocks, plannedPaddocks = self.getSupersededAndPlannedPaddocks()
 
-        # self.calculateSupersededAndPlannedPaddocks()
+        for paddock in supersededPaddocks:
+            edits = gatherEdits(edits, paddock.undoSupersedePaddock())
 
-        #qgsDebug(f"self._supersededPaddocks = {self._supersededPaddocks}")
+        for paddock in plannedPaddocks:
+            edits = gatherEdits(edits, paddock.undoPlanPaddock())
 
-        self.undoPlan.emit()
-
-        qgsDebug(f"Fence.undoPlanFence after undoPlan.emit(): {self._debugStateMachine()}")
-
-        # for paddock in self.supersededPaddocks():
-        #     # Could be a few issues here …
-        #     paddock.undoSupersedePaddock(self)
-        #     paddock.upsert(paddock)
-
-        # for paddock in self.plannedPaddocks():
-        #     paddock.delete()
-
-        self.upsert()
-
-    def calculateSupersededAndPlannedPaddocks(self):
-        """Get the Paddocks with the specified Build Order."""
-
-        if self.status == FeatureStatus.Drafted:
-            _, self._supersededPaddocks = self.getCrossedPaddocks()
-            self._plannedPaddocks = []
-            return
-
-        buildOrder = self.buildOrder
-
-        if buildOrder <= 0:
-            raise PaddockPowerError(
-                "Fence.getSupersededAndPlannedPaddocks: buildOrder must be a positive integer")
-
-        buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {buildOrder}')
-
-        paddocks = list(self.paddockLayer.getFeatures(request=buildFenceRequest))
-
-        self._supersededPaddocks = [
-            f for f in paddocks if f.status in [
-                FeatureStatus.PlannedSuperseded,
-                FeatureStatus.ExistingSuperseded]]
-        self._plannedPaddocks = [f for f in paddocks if f.status == FeatureStatus.Planned]
-
-    def recalculate(self):
-        """Recalculate both profile data and the related Paddocks."""
-        super().recalculate()
-        self.calculateSupersededAndPlannedPaddocks()
-
-    def supersededPaddocks(self):
-        """Return a list of paddocks that will be or have been Superseded by this Fence."""
-        return self._supersededPaddocks
-
-    def plannedPaddocks(self):
-        """Return a list of paddocks that will be or have been Planned by this Fence."""
-        return self._plannedPaddocks
+        return upserts(self, edits)

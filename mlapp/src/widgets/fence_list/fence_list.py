@@ -2,7 +2,7 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
 
-from ...models.paddock_power_state import PaddockPowerState
+from ...models.state import State
 from .fence_list_item import FenceListItem
 
 
@@ -17,7 +17,7 @@ class FenceList(QListWidget):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
-        self.state = PaddockPowerState()
+        self.state = State()
         self.state.milestoneChanged.connect(self.refreshUi)
         self.state.milestoneDataChanged.connect(self.refreshUi)
 

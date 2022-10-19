@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from .feature import addSchema
 from .point_feature import PointFeature
-from .schemas import WaterpointSchema, addSchema
+from .schemas import WaterpointSchema
 
 
 @addSchema(WaterpointSchema)

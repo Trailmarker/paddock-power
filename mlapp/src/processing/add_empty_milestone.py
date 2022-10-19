@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import path
-from ..models.paddock_power_error import PaddockPowerError
+from ..models.glitch import Glitch
 
 import processing
 from qgis.core import (QgsProcessingAlgorithm,
@@ -43,7 +43,7 @@ class AddEmptyMilestone(QgsProcessingAlgorithm):
             outputs[self.NEW_MILESTONE_OUTPUT] = milestone
             results[self.NEW_MILESTONE_OUTPUT] = milestone
 
-        except PaddockPowerError as ppe:
+        except Glitch as ppe:
             model_feedback.reportError(str(ppe))
 
         return results

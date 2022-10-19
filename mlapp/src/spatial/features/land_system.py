@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from .capacity_feature import CapacityFeature
-from .schemas import LandSystemSchema, addSchema
+from .feature import addSchema
+from .schemas import LandSystemSchema
 
 
 @addSchema(LandSystemSchema)

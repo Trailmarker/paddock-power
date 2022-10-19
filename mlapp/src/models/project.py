@@ -16,7 +16,7 @@ from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.feature_layer_source_type import FeatureLayerSourceType
 from ..utils import resolveGeoPackageFile
 from .milestone import Milestone
-from .paddock_power_error import PaddockPowerError
+from .glitch import Glitch
 
 
 class Project(QObject):
@@ -47,11 +47,11 @@ class Project(QObject):
     def validateMilestoneName(self, milestoneName):
         """Validate a Milestone name."""
         if not milestoneName:
-            raise PaddockPowerError(
+            raise Glitch(
                 "Project.getMilestone: Milestone name is empty.")
 
         if milestoneName not in self.milestones:
-            raise PaddockPowerError(
+            raise Glitch(
                 f"Project.getMilestone: Milestone '{milestoneName}' does not exist.")
 
     def getMilestone(self, milestoneName):
@@ -98,7 +98,7 @@ class Project(QObject):
         self.validateMilestoneName(milestoneName)
 
         if not self.gpkgFile:
-            raise PaddockPowerError(
+            raise Glitch(
                 "Project.deleteMilestone: Project has no GeoPackage file yet.")
 
         milestone = self.milestones.pop(milestoneName, None)
@@ -173,7 +173,7 @@ class Project(QObject):
 
         layers = QgsVectorLayer(path=gpkgFile, providerLib="ogr")
         if not layers.isValid():
-            raise PaddockPowerError(
+            raise Glitch(
                 f"Project.findMilestones: error loading Paddock Power GeoPackage at {gpkgFile}")
 
         layerNames = [l.split('!!::!!')[1]
@@ -208,5 +208,5 @@ class Project(QObject):
         elif len(grids) == 1:
             return grids[0][0]
         else:
-            raise PaddockPowerError(
+            raise Glitch(
                 f"Project.findElevationLayer: multiple elevation layers found in {gpkgFile}")

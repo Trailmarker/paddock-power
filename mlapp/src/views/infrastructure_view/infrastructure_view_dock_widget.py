@@ -5,11 +5,8 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 from qgis.PyQt.QtWidgets import QDockWidget
 
-from ...models.paddock_power_state import PaddockPowerState, connectPaddockPowerStateListener
-from ...spatial.features.fence import Fence
-from ...spatial.features.feature_status import FeatureStatus
-from ...spatial.features.pipeline import Pipeline
-from ...utils import guiError, qgsDebug
+from ...models.glitch import Glitch
+from ...models.state import State, connectStateListener
 from .sketch_line_tool import SketchLineTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -31,8 +28,8 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         # self.selectInfrastructureLineButton.setIcon(
         #     QIcon(":/plugins/mlapp/images/new-split-paddock.png"))
 
-        self.state = PaddockPowerState()
-        connectPaddockPowerStateListener(self.state, self)
+        self.state = State()
+        connectStateListener(self.state, self)
 
         self.sketchFenceButton.clicked.connect(
             self.sketchFence)
@@ -68,8 +65,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         milestone = self.state.getMilestone()
 
         if milestone is None:
-            guiError(
-                "Please set the current Milestone before using the Sketch Line tool.")
+            raise Glitch("Please set the current Milestone before using the Sketch Line tool.")
         else:
             tool = SketchLineTool(milestone)
             tool.sketchFinished.connect(
@@ -81,8 +77,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         milestone = self.state.getMilestone()
 
         fence = milestone.fenceLayer.makeFeature()
-        qgsDebug(f"Created new Fence feature {fence.id()} {fence.status}")
-        fence.setGeometry(sketchLine)
+        fence.geometry = sketchLine
         fence.draftFence()
         
         milestone.setSelectedFence(fence)
@@ -92,8 +87,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         milestone = self.state.getMilestone()
 
         if milestone is None:
-            guiError(
-                "Please set the current Milestone before using the Sketch Line tool.")
+            raise Glitch("Please set the current Milestone before using the Sketch Line tool.")
         else:
             tool = SketchLineTool(milestone)
             tool.sketchFinished.connect(self.onSketchPipelineFinished)
@@ -104,7 +98,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         milestone = self.state.getMilestone()
 
         pipeline = milestone.pipelineLayer.makeFeature()
-        pipeline.setGeometry(sketchLine)
+        pipeline.geometry = sketchLine
 
         pipeline.planPipeline()
         milestone.setSelectedPipeline(pipeline)

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from numpy import isin
 from qgis.core import QgsFeatureRequest
 
-from ...utils import guiError
+from ...models.glitch import Glitch
 from ..features.feature_status import FeatureStatus
 from ..features.fence import Fence
 from .elevation_layer import ElevationLayer
@@ -59,7 +58,6 @@ class FenceLayer(FeatureLayer):
             return None
 
         if len(fences) > 1:
-            guiError(
-                f"Integrity problem: your Project has multiple Fences with Build Order {buildOrder}")
+            raise Glitch(f"Integrity problem: your Project has multiple Fences with Build Order {buildOrder}")
 
         return fences[0]

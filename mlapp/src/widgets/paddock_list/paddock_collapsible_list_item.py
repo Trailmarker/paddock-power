@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QAction, QSizePolicy, QVBoxLayout, QWidget
 from qgis.core import QgsRectangle
 from qgis.utils import iface
 
-from ...models.paddock_power_state import PaddockPowerState
+from ...models.state import State
 from ..collapse.collapse import Collapse
 from ..paddock_details.paddock_details import PaddockDetails
 from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
@@ -23,7 +23,7 @@ class PaddockCollapsibleListItem(QWidget):
     def __init__(self, paddock, parent=None):
         super().__init__(parent)
 
-        self.state = PaddockPowerState()
+        self.state = State()
 
         self.paddock = paddock
         self.paddockDetails = PaddockDetails(paddock)

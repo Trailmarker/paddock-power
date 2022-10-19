@@ -2,7 +2,7 @@
 
 from qgis.core import QgsRasterLayer
 
-from ...models.paddock_power_error import PaddockPowerError
+from ...models.glitch import Glitch
 
 
 class ElevationLayer(QgsRasterLayer):
@@ -20,7 +20,7 @@ class ElevationLayer(QgsRasterLayer):
     def addToMap(self, group):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
         if group is None:
-            raise PaddockPowerError(
+            raise Glitch(
                 "PaddockPowerElevationLayer.addToMap: the layer group is not present")
 
         node = group.findLayer(self.id())

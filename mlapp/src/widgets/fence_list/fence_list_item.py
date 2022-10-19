@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QHBoxLayout, QLabel, QSizePolicy, QToolBar, QWidget
 
-from ...models.paddock_power_state import PaddockPowerState
+from ...models.state import State
 from ...spatial.features.feature_status import FeatureStatus
 from ...widgets.feature_status_label import FeatureStatusLabel
 
@@ -18,7 +18,7 @@ class FenceListItem(QWidget):
     def __init__(self, fence, parent=None):
         super().__init__(parent)
 
-        self.state = PaddockPowerState()
+        self.state = State()
 
         self.fence = fence
 
@@ -43,9 +43,9 @@ class FenceListItem(QWidget):
         self.zoomAction = QAction(QIcon(
             ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(u'Zoom to Fence'), self)
 
-        self.undoPlanAction.triggered.connect(self.fence.undoPlanFence)
+        self.undoPlanAction.triggered.connect(lambda _: self.fence.undoPlanFence())
         self.toolBar.addAction(self.undoPlanAction)
-        self.planAction.triggered.connect(self.fence.planFence)
+        self.planAction.triggered.connect(lambda _: self.fence.planFence())
         self.toolBar.addAction(self.planAction)
         self.zoomAction.triggered.connect(self.selectFence)
         self.zoomAction.triggered.connect(self.fence.zoomToFeature)

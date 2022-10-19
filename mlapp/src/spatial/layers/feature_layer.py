@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import QVariant, pyqtSignal
 
 from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
 
-from ...models.paddock_power_error import PaddockPowerError
+from ...models.glitch import Glitch
 from ...utils import resolveStylePath, qgsDebug
 from ..features.feature import Feature
 from .feature_layer_source_type import FeatureLayerSourceType
@@ -72,11 +72,11 @@ class FeatureLayer(QgsVectorLayer):
     def copyTo(self, otherLayer):
         """Copy all features in this layer to another layer."""
         if otherLayer is None:
-            raise PaddockPowerError(
+            raise Glitch(
                 "VectorLayer.copyTo: the target layer is not present")
 
         if self.featureType() != otherLayer.getLayerType():
-            raise PaddockPowerError(
+            raise Glitch(
                 f"Cannot copy features from {self.featureType().name} to {otherLayer.getLayerType().name}")
 
         otherLayer.startEditing()
@@ -86,7 +86,7 @@ class FeatureLayer(QgsVectorLayer):
     def addToMap(self, group):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
         if group is None:
-            raise PaddockPowerError(
+            raise Glitch(
                 "VectorLayer.addToMap: the layer group is not present")
 
         node = group.findLayer(self.id())
@@ -96,7 +96,7 @@ class FeatureLayer(QgsVectorLayer):
     def _unwrapQgsFeature(self, feature):
         """Unwrap a Feature into a QgsFeature."""
         if not isinstance(feature, self.featureType):
-            raise PaddockPowerError(
+            raise Glitch(
                 f"VectorLayer.__unwrapQgsFeature: the feature is not a {self.featureType.__name__}")
         return feature._qgsFeature
 
@@ -113,7 +113,7 @@ class FeatureLayer(QgsVectorLayer):
     def copyFeature(self, feature):
         """Copy a Feature from this layer to the clipboard."""
         if not isinstance(feature, self.featureType):
-            raise PaddockPowerError(
+            raise Glitch(
                 "{self.__class__.__name__}.copyFeature: the incoming feature is not a {self.featureType.__name__}")
 
         qgsFeature = self._unwrapQgsFeature(feature)
@@ -121,12 +121,11 @@ class FeatureLayer(QgsVectorLayer):
         copyQgsFeature = self._unwrapQgsFeature(copyFeature)
         copyQgsFeature.setAttributes(qgsFeature.attributes())
         copyQgsFeature.setGeometry(qgsFeature.geometry())
-        copyFeature.setId()
+        copyFeature.clearId()
         return copyFeature
 
     def addFeature(self, feature):
         """Add a feature to the layer."""
-        feature.setId()
         super().addFeature(self._unwrapQgsFeature(feature))
 
     def updateFeature(self, feature):
@@ -135,7 +134,7 @@ class FeatureLayer(QgsVectorLayer):
 
     def deleteFeature(self, feature):
         """Delete a feature from the layer."""
-        super().deleteFeature(feature.id())
+        super().deleteFeature(feature.id)
 
     def getFeatures(self, request=None):
         """Get the features in this layer."""
@@ -143,7 +142,7 @@ class FeatureLayer(QgsVectorLayer):
             return self._wrapQgsFeatures(super().getFeatures())
 
         if not isinstance(request, QgsFeatureRequest):
-            raise PaddockPowerError(
+            raise Glitch(
                 "VectorLayer.getFeatures: the request is not a QgsRequest")
 
         return self._wrapQgsFeatures(super().getFeatures(request))
@@ -154,41 +153,10 @@ class FeatureLayer(QgsVectorLayer):
             return self.getFeatures(request)
         return [f for f in self.getFeatures(request) if f.status in statuses]
 
-    def whileEditing(self, func):
-        """Run a function with the layer in edit mode."""
-        isEditing = self.isEditable()
-
-        try:
-            if not isEditing:
-                qgsDebug(f"{self.__class__.__name__}.whileEditing: starting an instant edit session")
-                self.startEditing()
-                func()
-                self.commitChanges()
-                qgsDebug(f"{self.__class__.__name__}.whileEditing: closing instant edit session")
-            else:
-                func()
-        except Exception as e:
-            self.rollBack()
-            raise PaddockPowerError(
-                f"VectorLayer.whileEditing: an exception occurred {str(e)}")
-        finally:
-            newIsEditing = self.isEditable()
-            if isEditing and not newIsEditing:
-                self.startEditing()
-            else: 
-                self.rollBack()
-
     def featureCount(self):
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
 
-    def instantAddFeature(self, feature):
-        """Start editing, add a Feature and commt the changes."""
-        self.whileEditing(lambda: self.addFeature(feature))
-
-    def instantUpdateFeature(self, feature):
-        """Start editing, update a Feature and commt the changes."""
-        self.whileEditing(lambda: self.updateFeature(feature))
 
 
 # Helper functions - used to convert QgsField objects to code in the console as below

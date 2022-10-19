@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QObject
-
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
@@ -8,14 +7,17 @@ from ..spatial.features.pipeline import Pipeline
 from ..widgets.fence_details.fence_selection import FenceSelection
 from ..widgets.paddock_details.paddock_selection import PaddockSelection
 from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
-from ..utils import resolveGeoPackageFile, qgsDebug
+from ..utils import resolveGeoPackageFile, PLUGIN_NAME
 from .milestone import Milestone
-from .paddock_power_error import PaddockPowerError
+from .glitch import Glitch, glitchy
+from .glitch_hook import GlitchHook
 from .project import Project
 from .singleton import Singleton
 
 
-class PaddockPowerState(QObject, metaclass=Singleton):
+class State(GlitchHook, metaclass=Singleton):
+    PLUGIN_NAME = "MLA Paddock Power"
+
     milestoneChanged = pyqtSignal(Milestone)
     milestonesUpdated = pyqtSignal(dict)
     projectChanged = pyqtSignal(Project)
@@ -23,7 +25,6 @@ class PaddockPowerState(QObject, metaclass=Singleton):
     selectedPaddockChanged = pyqtSignal(Paddock)
     selectedPipelineChanged = pyqtSignal(Pipeline)
     milestoneDataChanged = pyqtSignal()
-    pluginUnloading = pyqtSignal()
 
     project = None
 
@@ -35,25 +36,19 @@ class PaddockPowerState(QObject, metaclass=Singleton):
         self.paddockSelection = None
         self.pipelineSelection = None
 
+    @glitchy(f"An exception occurred while trying to detect an {PLUGIN_NAME} project.")
     def detectProject(self):
         """Detect a Paddock Power project in the current QGIS project."""
         if self.project is None:
-            try:
-                gpkgFile = resolveGeoPackageFile()
-                if gpkgFile is not None:
-                    milestones = Project.findMilestones(gpkgFile)
-                    if milestones:
-                        # qgsDebug(
-                        #     f"PaddockPowerState.detectProject: detected project with {len(milestones)} milestones in {gpkgFile}")
-                        project = Project(gpkgFile)
-                        self.setProject(project)
-                        return
-            except Exception as e:
-                qgsDebug(
-                    "PaddockPowerState.detectProject: exception occurred while detecting project.")
-                qgsDebug(str(e))
-                pass
-            # qgsDebug("PaddockPowerState.detectProject: no project detected.")
+            gpkgFile = resolveGeoPackageFile()
+            if gpkgFile is not None:
+                milestones = Project.findMilestones(gpkgFile)
+                if milestones:
+                    # qgsDebug(
+                    #     f"State.detectProject: detected project with {len(milestones)} milestones in {gpkgFile}")
+                    project = Project(gpkgFile)
+                    self.setProject(project)
+                    return
         else:
             self.refreshProject()
 
@@ -94,8 +89,8 @@ class PaddockPowerState(QObject, metaclass=Singleton):
     def setProject(self, project):
         """Set the current Project."""
         if not isinstance(project, Project):
-            raise PaddockPowerError(
-                "PaddockPowerState.setProject: project is not a Project.")
+            raise Glitch(
+                "State.setProject: project is not a Project.")
 
         if self.project is not None:
             self.project.removeFromMap()
@@ -107,14 +102,14 @@ class PaddockPowerState(QObject, metaclass=Singleton):
     def setMilestone(self, milestone):
         """Set the current Project."""
         if not isinstance(milestone, Milestone):
-            raise PaddockPowerError(
-                "PaddockPowerState.setMilestone: milestone is not a Milestone.")
+            raise Glitch(
+                "State.setMilestone: milestone is not a Milestone.")
 
         if self.project is not None:
             self.project.setMilestone(milestone)
         else:
-            raise PaddockPowerError(
-                "PaddockPowerState.setMilestone: there is no current Project.")
+            raise Glitch(
+                "State.setMilestone: there is no current Project.")
 
     def initSelections(self, canvas):
         """Initialize the selections."""
@@ -164,7 +159,7 @@ class PaddockPowerState(QObject, metaclass=Singleton):
                 lambda: self.milestoneDataChanged.emit())
 
 
-def connectPaddockPowerStateListener(state, listener):
+def connectStateListener(state, listener):
     """Connect a listener to the Paddock Power state."""
     if listener is not None:
         if hasattr(listener, "onMilestoneChanged") and callable(listener.onMilestoneChanged):

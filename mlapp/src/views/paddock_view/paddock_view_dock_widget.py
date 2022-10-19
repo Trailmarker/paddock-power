@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QDockWidget
 
-from ...models.paddock_power_state import PaddockPowerState
+from ...models.state import State
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_view_dock_widget_base.ui')))
@@ -21,7 +21,7 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.state = PaddockPowerState()
+        self.state = State()
 
         self.paddockFilterLineEdit.textChanged.connect(
             self.onPaddockFilterChanged)

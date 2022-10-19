@@ -44,7 +44,7 @@
       <item>
        <widget class="QToolButton" name="sketchFenceButton">
         <property name="toolTip">
-         <string>Sketch Fence …</string>
+         <string>Sketch a Fence …</string>
         </property>
         <property name="text">
          <string/>
@@ -58,7 +58,7 @@
       <item>
        <widget class="QToolButton" name="selectFenceButton">
         <property name="toolTip">
-         <string>Select Existing Fence …</string>
+         <string>Select a Fence …</string>
         </property>
         <property name="text">
          <string/>
@@ -72,7 +72,7 @@
       <item>
        <widget class="QToolButton" name="selectPipelineButton">
         <property name="toolTip">
-         <string>Sketch Pipeline …</string>
+         <string>Sketch a Pipeline …</string>
         </property>
         <property name="text">
          <string/>
@@ -86,7 +86,7 @@
       <item>
        <widget class="QToolButton" name="sketchPipelineButton">
         <property name="toolTip">
-         <string>Select Existing Pipeline …</string>
+         <string>Select a Pipeline …</string>
         </property>
         <property name="text">
          <string/>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...spatial.features.feature_status import FeatureStatus
-from ...models.paddock_power_state import PaddockPowerState
+from ...models.state import State
 from .paddock_list_base import PaddockListBase
 
 
@@ -10,7 +10,7 @@ class PaddockList(PaddockListBase):
 
         super().__init__(parent)
 
-        self.state = PaddockPowerState()
+        self.state = State()
 
         # refreshUi is implemented in PaddockListBase
         self.state.milestoneChanged.connect(self.refreshUi)
@@ -21,4 +21,4 @@ class PaddockList(PaddockListBase):
     def getPaddocks(self):
         """Get the paddocks."""
         milestone = self.state.getMilestone()
-        return [paddock for paddock in milestone.paddockLayer.getFeaturesByStatus(FeatureStatus.Existing, FeatureStatus.Planned)] if milestone is not None else None
+        return [paddock for paddock in milestone.paddockLayer.getFeaturesByStatus(FeatureStatus.Built, FeatureStatus.Planned)] if milestone is not None else None

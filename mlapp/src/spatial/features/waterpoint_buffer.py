@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from .area_feature import AreaFeature
-from .schemas import WaterpointBufferSchema, addSchema
+from .feature import addSchema
+from .schemas import WaterpointBufferSchema
 
 
 @addSchema(WaterpointBufferSchema)

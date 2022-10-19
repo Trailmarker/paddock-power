@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import path
-from ..models.paddock_power_error import PaddockPowerError
+from ..models.glitch import Glitch
 
 import processing
 from qgis.core import (QgsProcessingAlgorithm,
@@ -37,7 +37,7 @@ class DeleteMilestone(QgsProcessingAlgorithm):
                 project.load()
                 project.deleteMilestone(milestoneName)
 
-        except PaddockPowerError as ppe:
+        except Glitch as ppe:
             model_feedback.reportError(str(ppe))
 
         return results

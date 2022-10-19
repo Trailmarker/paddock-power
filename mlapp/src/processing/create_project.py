@@ -5,7 +5,7 @@ from qgis.core import (QgsProcessing, QgsProcessingAlgorithm,
                        QgsProcessingParameterFile,
                        QgsProcessingParameterString)
 
-from ..models.paddock_power_error import PaddockPowerError
+from ..models.glitch import Glitch
 from ..models.project import Project
 from ..utils import resolveGeoPackageFile
 
@@ -42,7 +42,7 @@ class CreateProject(QgsProcessingAlgorithm):
             outputs[self.NEW_MILESTONE_OUTPUT] = milestone
             results[self.NEW_MILESTONE_OUTPUT] = milestone
 
-        except PaddockPowerError as ppe:
+        except Glitch as ppe:
             model_feedback.reportError(str(ppe))
 
         return results
