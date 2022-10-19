@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsWkbTypes
-
 from ..calculator import Calculator
 from ..layers.elevation_layer import ElevationLayer
-from .feature import Feature, addSchema
+from .feature import Feature
 from .schemas import LineFeatureSchema
 
 
-@addSchema(LineFeatureSchema, QgsWkbTypes.LineString)
+@LineFeatureSchema.addSchema()
 class LineFeature(Feature):
 
     def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):

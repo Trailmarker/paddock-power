@@ -9,7 +9,7 @@ from ..widgets.paddock_details.paddock_selection import PaddockSelection
 from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
 from ..utils import resolveGeoPackageFile, PLUGIN_NAME
 from .milestone import Milestone
-from .glitch import Glitch, glitchy
+from .glitch import Glitch
 from .glitch_hook import GlitchHook
 from .project import Project
 from .singleton import Singleton
@@ -36,7 +36,7 @@ class State(GlitchHook, metaclass=Singleton):
         self.paddockSelection = None
         self.pipelineSelection = None
 
-    @glitchy(f"An exception occurred while trying to detect an {PLUGIN_NAME} project.")
+    @Glitch.glitchy(f"An exception occurred while trying to detect an {PLUGIN_NAME} project.")
     def detectProject(self):
         """Detect a Paddock Power project in the current QGIS project."""
         if self.project is None:

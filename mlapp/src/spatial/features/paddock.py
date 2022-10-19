@@ -1,32 +1,33 @@
 # -*- coding: utf-8 -*-
 from .capacity_feature import CapacityFeature
-from .feature import FeatureAction, actionHandler, addSchema, deletes, upserts
+from .edits import Edits
+from .feature import FeatureAction
 from .schemas import PaddockSchema
 
 
-@addSchema(PaddockSchema)
+@PaddockSchema.addSchema()
 class Paddock(CapacityFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-    @actionHandler(FeatureAction.plan)
+    @FeatureAction.handler(FeatureAction.plan)
     def planPaddock(self, fence):
         self.buildFence = fence
-        return upserts(self)
+        return Edits.upsert(self)
 
-    @actionHandler(FeatureAction.undoPlan)
+    @FeatureAction.handler(FeatureAction.undoPlan)
     def undoPlanPaddock(self):
         self.buildFence = None
-        return deletes(self)
+        return Edits.delete(self)
 
-    @actionHandler(FeatureAction.supersede)
+    @FeatureAction.handler(FeatureAction.supersede)
     def supersedePaddock(self, fence):
         self.buildFence = fence.buildOrder
-        return upserts(self)
+        return Edits.upsert(self)
 
-    @actionHandler(FeatureAction.undoSupersede)
+    @FeatureAction.handler(FeatureAction.undoSupersede)
     def undoSupersedePaddock(self):
         self.buildFence = None
-        return upserts(self)
+        return Edits.upsert(self)

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
-from ..utils import guiError
+from qgis.core import Qgis
+
+from ..utils import guiError, qgsDebug
 
 
 class Glitch(Exception):
@@ -48,26 +50,26 @@ class Glitch(Exception):
         """Display a GUI message for this glitch."""
         glitch.show()
 
+    @staticmethod
+    @contextmanager
+    def glitches(message=None):
+        """Catch and report Glitches."""
+        try:
+            yield
+        except Glitch as g:
+            if message is not None:
+                raise Glitch(g, message)
+            else:
+                raise
+        except BaseException as e:
+            raise Glitch(e, message)
 
-@contextmanager
-def glitches(message=None):
-    """Catch and report Glitches."""
-    try:
-        yield
-    except Glitch as g:
-        if message is not None:
-            raise Glitch(g, message)
-        else:
-            raise
-    except BaseException as e:
-        raise Glitch(e, message)
-
-
-def glitchy(message=None):
-    """Catch and report Glitches adding an optional extra message for context."""
-    def makeGlitchy(func):
-        def funcWithGlitches(*args, **kwargs):
-            with glitches(message):
-                return func(*args, **kwargs)
-        return funcWithGlitches
-    return makeGlitchy
+    @staticmethod
+    def glitchy(message=None):
+        """Catch and report Glitches adding an optional extra message for context."""
+        def makeGlitchy(func):
+            def funcWithGlitches(*args, **kwargs):
+                with Glitch.glitches(message):
+                    return func(*args, **kwargs)
+            return funcWithGlitches
+        return makeGlitchy

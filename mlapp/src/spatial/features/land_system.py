@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from .capacity_feature import CapacityFeature
-from .feature import addSchema
 from .schemas import LandSystemSchema
 
 
-@addSchema(LandSystemSchema)
+@LandSystemSchema.addSchema()
 class LandSystem(CapacityFeature):
 
     def __init__(self, featureLayer, existingFeature=None):

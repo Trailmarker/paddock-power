@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint
 
-from ...models.glitch import Glitch, glitchy
+from ...models.glitch import Glitch
 from ...utils import qgsDebug
 from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
-from .feature import FeatureAction, FeatureStatus, addSchema, actionHandler, editAndRollBack, gatherEdits, persistEdits, upserts
+from .edits import Edits
+from .feature import FeatureAction
+from .feature_status import FeatureStatus
 from .line_feature import LineFeature
 from .schemas import FenceSchema, BUILD_FENCE
 
 
-@addSchema(FenceSchema)
+@FenceSchema.addSchema()
 class Fence(LineFeature):
 
     def __init__(self, featureLayer, paddockLayer: PaddockLayer,
@@ -26,7 +28,7 @@ class Fence(LineFeature):
         self._supersededPaddocks = []
         self._plannedPaddocks = []
 
-    @glitchy()
+    @Glitch.glitchy()
     def getCrossedPaddocks(self):
         """Get a tuple representing the restriction of this Fence to only Paddocks it completely crosses,
            and the Paddocks that are completely crossed by the specified line."""
@@ -85,7 +87,7 @@ class Fence(LineFeature):
 
         return normalisedFenceLine, crossedPaddocks
 
-    @glitchy()
+    @Glitch.glitchy()
     def getSupersededAndPlannedPaddocks(self):
         """Get the Paddocks with the specified Build Order."""
 
@@ -105,8 +107,8 @@ class Fence(LineFeature):
         return ([f for f in paddocks if f.status in [FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded]],
                 [f for f in paddocks if f.status == FeatureStatus.Planned])
 
-    @persistEdits
-    @actionHandler(FeatureAction.draft)
+    @Edits.persistEdits
+    @FeatureAction.handler(FeatureAction.draft)
     def draftFence(self):
         """Draft a Fence."""
 
@@ -120,16 +122,16 @@ class Fence(LineFeature):
         self.geometry = normalisedFenceLine
         self.buildOrder = currentBuildOrder + 1
 
-        return upserts(self)
+        return Edits.upsert(self)
 
-    @persistEdits
-    @actionHandler(FeatureAction.plan)
+    @Edits.persistEdits
+    @FeatureAction.handler(FeatureAction.plan)
     def planFence(self):
         """Plan the Paddocks that would be altered after building this Fence."""
 
-        edits = gatherEdits()
+        edits = Edits()
 
-        with editAndRollBack(self.paddockLayer):
+        with Edits.editAndRollBack(self.paddockLayer):
 
             _, lowestDraftBuildOrder, _ = self.featureLayer.getBuildOrder()
 
@@ -171,26 +173,31 @@ class Fence(LineFeature):
                     defaultName = crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
 
                     splitPaddock.name = defaultName
-                    edits = gatherEdits(edits, splitPaddock.planPaddock(self))
+                    splitPaddock.recalculate()
+                    # Note this is set explicitly to Drafted because 
+                    # the Paddock is derived in a dodgy way using splitFeatures
+                    splitPaddock.status = FeatureStatus.Drafted
+                    edits.editBefore(splitPaddock.planPaddock(self))
+
 
             for paddock in supersededPaddocks:
-                edits = gatherEdits(edits, paddock.supersedePaddock(self))
+                edits.editBefore(paddock.supersedePaddock(self))
 
         # self.paddockLayer now rolls back
-        return upserts(self, edits)
+        return Edits.upsert(self).editAfter(edits)
 
-    @persistEdits
-    @actionHandler(FeatureAction.undoPlan)
+    @Edits.persistEdits
+    @FeatureAction.handler(FeatureAction.undoPlan)
     def undoPlanFence(self):
         """Undo the plan of Paddocks implied by a Fence."""
-        edits = gatherEdits()
+        edits = Edits()
 
         supersededPaddocks, plannedPaddocks = self.getSupersededAndPlannedPaddocks()
 
         for paddock in supersededPaddocks:
-            edits = gatherEdits(edits, paddock.undoSupersedePaddock())
+            edits = edits.editBefore(paddock.undoSupersedePaddock())
 
         for paddock in plannedPaddocks:
-            edits = gatherEdits(edits, paddock.undoPlanPaddock())
+            edits = edits.editBefore(edits, paddock.undoPlanPaddock())
 
-        return upserts(self, edits)
+        return Edits.upsert(self).editAfter(edits)

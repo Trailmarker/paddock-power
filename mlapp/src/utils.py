@@ -37,19 +37,19 @@ def qgsDebug(message, tag=PLUGIN_NAME, level=Qgis.Info):
 def guiInformation(message):
     """Show an info message box."""
     QMessageBox.information(None, f"{PLUGIN_NAME} | Information", formatMessage(message))
-    qgsDebug(message, level=Qgis.Info)
+    # qgsDebug(message, level=Qgis.Info)
 
 
 def guiError(message):
     """Show an error message box."""
     QMessageBox.critical(None, f"{PLUGIN_NAME} | Error", formatMessage(message))
-    qgsDebug(message, level=Qgis.Critical)
+    # qgsDebug(message, level=Qgis.Critical)
 
 
 def guiWarning(message):
     """Show a warning message box."""
     QMessageBox.warning(None, f"{PLUGIN_NAME} | Warning", formatMessage(message))
-    qgsDebug(message, level=Qgis.Warning)
+    # qgsDebug(message, level=Qgis.Warning)
 
 
 def guiConfirm(question="Are you sure?", title=None):

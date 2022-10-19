@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from .feature import addSchema
 from .line_feature import LineFeature
 from .schemas import PipelineSchema
 
 
-@addSchema(PipelineSchema)
+@PipelineSchema.addSchema()
 class Pipeline(LineFeature):
 
     def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):

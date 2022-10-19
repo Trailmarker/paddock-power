@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from .area_feature import AreaFeature
-from .feature import addSchema
 from .schemas import WaterpointBufferSchema
 
 
-@addSchema(WaterpointBufferSchema)
+@WaterpointBufferSchema.addSchema()
 class WaterpointBuffer(AreaFeature):
 
     def __init__(self, featureLayer, existingFeature=None):

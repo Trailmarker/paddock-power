@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from .feature import addSchema
 from .point_feature import PointFeature
 from .schemas import WaterpointSchema
 
 
-@addSchema(WaterpointSchema)
+@WaterpointSchema.addSchema()
 class Waterpoint(PointFeature):
 
     def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):

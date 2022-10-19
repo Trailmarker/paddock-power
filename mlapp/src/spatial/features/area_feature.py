@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsWkbTypes
-
 from ..calculator import Calculator
-from .feature import Feature, addSchema
+from .feature import Feature
 from .schemas import AreaFeatureSchema
 
 
-@addSchema(AreaFeatureSchema, QgsWkbTypes.MultiPolygon)
+@AreaFeatureSchema.addSchema()
 class AreaFeature(Feature):
 
     def __init__(self, featureLayer, existingFeature=None):

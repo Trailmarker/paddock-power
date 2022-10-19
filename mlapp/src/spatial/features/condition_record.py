@@ -3,11 +3,10 @@ from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_layer import PaddockLayer
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from .capacity_feature import CapacityFeature
-from .feature import addSchema
 from .schemas import ConditionRecordSchema
 
 
-@addSchema(ConditionRecordSchema)
+@ConditionRecordSchema.addSchema()
 class ConditionRecord(CapacityFeature):
 
     def __init__(self, featureLayer, paddockLayer: PaddockLayer, landSystemLayer: LandSystemLayer,
