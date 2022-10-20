@@ -18,10 +18,9 @@ class FeatureMiniList(FeatureListBase):
         """Set the paddocks."""
         if not features:
             self.features = []
-            return
-
-        if not all(isinstance(feature, Feature) for feature in features):
+        elif not isinstance(features, list) or not all(isinstance(feature, Feature) for feature in features):
             raise Glitch(
                 "The content passed to a Feature mini-list should be a list of Features")
-        self.features = features
+        else:
+            self.features = features
         self.refreshUi()

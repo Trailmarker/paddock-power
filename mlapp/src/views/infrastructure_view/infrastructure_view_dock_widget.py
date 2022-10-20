@@ -21,6 +21,9 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         """Constructor."""
         super().__init__(parent)
 
+        self.state = State(detectProject=True)
+        self.state.detectProject()
+
         self.setupUi(self)
 
         # self.sketchInfrastructureLineButton.setIcon(
@@ -28,7 +31,6 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         # self.selectInfrastructureLineButton.setIcon(
         #     QIcon(":/plugins/mlapp/images/new-split-paddock.png"))
 
-        self.state = State()
         connectStateListener(self.state, self)
 
         self.sketchFenceButton.clicked.connect(
@@ -72,8 +74,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     def onSketchFenceFinished(self, sketchLine):
         milestone = self.state.getMilestone()
 
-        fence = milestone.fenceLayer.makeFeature()
-        fence.geometry = sketchLine
+        fence = milestone.fenceLayer.makeFeatureFromGeometry(sketchLine)
         fence.draftFence()
         
         milestone.setSelectedFeature(fence)
@@ -93,8 +94,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     def onSketchPipelineFinished(self, sketchLine):
         milestone = self.state.getMilestone()
 
-        pipeline = milestone.pipelineLayer.makeFeature()
-        pipeline.geometry = sketchLine
+        pipeline = milestone.pipelineLayer.makeFeatureFromGeometry(sketchLine)
 
         pipeline.planPipeline()
         milestone.setSelectedFeature(pipeline)

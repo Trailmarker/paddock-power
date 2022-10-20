@@ -19,9 +19,10 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         """Constructor."""
         super().__init__(parent)
 
-        self.setupUi(self)
-
         self.state = State()
+        self.state.detectProject()
+
+        self.setupUi(self)
 
         self.paddockFilterLineEdit.textChanged.connect(
             self.onPaddockFilterChanged)

@@ -71,7 +71,9 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.plannedPaddockMiniList.setFeatures(plannedPaddocks)
 
     def clearFence(self):
-        self.fence = None
+        if self.fence is not None:
+            self.fence.stateChanged.disconnect(self.refreshUi)
+            self.fence = None
         self.supersededPaddocks = []
         self.plannedPaddocks = []
 
@@ -84,3 +86,4 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.clearFence()
 
         self.fence = fence
+        self.fence.stateChanged.connect(self.refreshUi)

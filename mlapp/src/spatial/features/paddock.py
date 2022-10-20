@@ -14,7 +14,7 @@ class Paddock(CapacityFeature):
 
     @FeatureAction.plan.handler()
     def planPaddock(self, fence):
-        self.buildFence = fence
+        self.buildFence = fence.buildOrder
         return Edits.upsert(self)
 
     @FeatureAction.undoPlan.handler()

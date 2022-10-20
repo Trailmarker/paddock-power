@@ -83,6 +83,13 @@ class Edits:
                 for feature in edits.upserts:
                     feature.upsert()
                 for feature in edits.deletes:
-                    feature.delete()
+                    feature.delete()                
+
+            # Signal updates to the rest of the system - TODO?
+            for feature in edits.upserts:
+                feature.stateChanged.emit(feature.status)
+            for feature in edits.deletes:
+                feature.stateChanged.emit(feature.status)
+
             return None
         return methodWithPersistEdits

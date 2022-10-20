@@ -14,6 +14,8 @@ from .schemas import FeatureSchema
 
 @FeatureSchema.addSchema()
 class Feature(QObject, FeatureStateMachine):
+    # featurePersisted = pyqtSignal(int)
+    # featureUpdated = pyqtSignal(int)
 
     @classmethod
     def displayName(cls):
@@ -87,6 +89,9 @@ class Feature(QObject, FeatureStateMachine):
 
     def upsert(self):
         """Add or update the Feature in the FeatureLayer."""
+        # TODO inefficient
+        self.recalculate()
+        
         if (self.id >= 0):
             self.featureLayer.updateFeature(self)
         else:
@@ -116,6 +121,7 @@ class Feature(QObject, FeatureStateMachine):
     def clearId(self):
         """Set or the Feature's id."""
         self.id = -1
+        self._qgsFeature.setAttribute('fid', self.id)
 
     @property
     def geometry(self):

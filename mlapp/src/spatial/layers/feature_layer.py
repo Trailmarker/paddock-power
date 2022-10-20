@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QVariant, pyqtSignal
 
-from qgis.core import QgsCategorizedSymbolRenderer, QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFeatureRequest, QgsGeometry, QgsProject, QgsVectorLayer, QgsWkbTypes
 
 from ...models.glitch import Glitch
 from ...utils import resolveStylePath, qgsDebug
@@ -175,11 +175,23 @@ class FeatureLayer(QgsVectorLayer):
         """Make a new Feature in this layer."""
         return self.wrapFeature(existingFeature)
 
+    def makeFeatureFromGeometry(self, geometry):
+        """Make a new Feature from a geometry."""
+        if not isinstance(geometry, QgsGeometry):
+            raise Glitch(
+                "You can't use a {self.__class__.__name__} to draft a {self.featureType.__name__} from a geometry that isn't a QgsGeometry")
+        if geometry.wkbType() != self.wkbType():
+            raise Glitch(
+                "You're using an incompatible kind of geometry with a {self.__class__.__name__}")
+        feature = self.makeFeature()
+        feature.geometry = geometry
+        return feature
+
     def copyFeature(self, feature):
         """Copy a Feature from this layer to the clipboard."""
         if not isinstance(feature, self.featureType):
             raise Glitch(
-                "{self.__class__.__name__}.copyFeature: the incoming feature is not a {self.featureType.__name__}")
+                "You can't use a {self.__class__.__name__} to copy an object that isn't a {self.featureType.__name__}")
 
         qgsFeature = self._unwrapQgsFeature(feature)
         copyFeature = self.makeFeature()

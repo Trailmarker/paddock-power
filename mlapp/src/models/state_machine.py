@@ -11,6 +11,11 @@ from .qt_meta import QtMeta
 
 
 class StateMachineEnum(Enum):
+    def match(self, *statuses):
+        """Return True if a provided StateMachineStatus or string matches this status.
+            Note Enum values are tested by identity, so this became necessary."""
+        return self.value in [s.value if isinstance(s, StateMachineEnum) else str(s) for s in statuses]
+
     def __format__(self, _):
         return self.value
 
@@ -19,11 +24,7 @@ class StateMachineEnum(Enum):
 
 
 class StateMachineStatus(StateMachineEnum):
-
-    def match(self, *statuses):
-        """Return True if a provided StateMachineStatus or string matches this status.
-            Note Enum values are tested by identity, so this became necessary."""
-        return self.name in [s.name if isinstance(s, StateMachineStatus) else str(s) for s in statuses]
+    pass
 
 
 def actionHandler(action, method):
@@ -75,7 +76,7 @@ class StateMachine(ABC, metaclass=QtMeta):
 
     def allPermitted(self):
         """Return a list of all enabled actions for the current status."""
-        return [action for (status, action) in self.transitions if status == self.status]
+        return [action for (status, action) in self.transitions if status.match(self.status)]
 
     def doAction(self, action):
         if self.isPermitted(action):

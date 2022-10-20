@@ -4,6 +4,7 @@ from qgis.PyQt.QtWidgets import QHBoxLayout, QLabel, QSizePolicy, QWidget
 
 from ...models.state import State
 from ...spatial.features.feature_action import FeatureAction
+from ...utils import qgsDebug
 from ..feature_status_label import FeatureStatusLabel
 from .feature_tool_bar import FeatureToolBar
 
@@ -58,6 +59,7 @@ class FeatureListItem(QWidget):
         """Refresh the UI based on the current state of the fence."""
         self.statusLabel.setStatus(self.feature.status)
         self.titleLabel.setText(self.feature.title)
+        self.toolBar.refreshUi()
 
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()

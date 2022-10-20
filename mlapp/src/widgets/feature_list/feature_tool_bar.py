@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QSize, pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QHBoxLayout, QSizePolicy, QToolBar
+from qgis.PyQt.QtWidgets import QAction, QToolBar
 
 from ...models.state import State
+from ...utils import qgsDebug
+
+
+class FeatureToolBarAction(QAction):
+    def __init__(self, featureAction, icon, text, callback, parent=None):
+        super().__init__(icon, text, parent)
+
+        self.featureAction = featureAction
+        self.triggered.connect(callback)
 
 
 class FeatureToolBar(QToolBar):
     layoutRefreshNeeded = pyqtSignal()
-
-    # Editing signals
-    plan = pyqtSignal()
-    undoPlan = pyqtSignal()
 
     def __init__(self, feature, parent=None):
         super().__init__(parent)
@@ -19,7 +24,8 @@ class FeatureToolBar(QToolBar):
         self.state = State()
 
         self.feature = feature
-        self.featureActions = {}
+        self.zoomAction = False
+        self.featureActions = []
 
         self.setStyleSheet("""QToolBar { padding: 0; }
                                       QToolButton::indicator {
@@ -27,34 +33,37 @@ class FeatureToolBar(QToolBar):
                                         width: 20;
                                       }""")
         self.setFixedHeight(30)
-        
+
         self.feature.stateChanged.connect(self.refreshUi)
 
         self.refreshUi()
 
-    def addFeatureAction(self, action, icon, callback):
+    def addFeatureAction(self, featureAction, icon, callback):
         """Add a feature action to the toolbar."""
-        featureAction = QAction(QIcon(icon), f"{action} {self.feature.displayName()}", self)
-        featureAction.triggered.connect(callback)
-        self.featureActions[action] = featureAction
-        self.addAction(featureAction)
+        text = f"{featureAction} {self.feature.displayName()}"
+        action = FeatureToolBarAction(featureAction, QIcon(icon), text, callback, self)
+        self.featureActions.append(action)
 
     def addZoomAction(self):
-        self.zoomAction = QAction(QIcon(
-            ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(u'Zoom to Fence'), self)
-
-        self.zoomAction.triggered.connect(self.selectFeature)
-        self.addAction(self.zoomAction)
-
+        self.zoomAction = True
    
     def refreshUi(self):
         """Refresh the UI based on the current state of the fence."""
 
+        self.clear()
+
         permitted = self.feature.allPermitted()
 
-        # Hide or show Feature actions
-        for (action, featureAction) in self.featureActions.items():
-            featureAction.setVisible(action in permitted)
+        permittedFeatureActions = [a for a in self.featureActions if a.featureAction.match(*permitted)]
+
+        for action in permittedFeatureActions:
+            self.addAction(action)
+
+        if self.zoomAction:
+            self.zoomAction = QAction(QIcon(
+                ':/plugins/mlapp/images/paddock-zoom.png'), f"Zoom to {self.feature.displayName()}", self)
+            self.zoomAction.triggered.connect(self.selectFeature)
+            self.addAction(self.zoomAction)
 
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
@@ -69,5 +78,3 @@ class FeatureToolBar(QToolBar):
         """Select this Fence and zoom to it."""
         self.selectFeature()
         self.feature.zoomToFeature()
-
-  

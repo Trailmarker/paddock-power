@@ -27,13 +27,16 @@ class State(GlitchHook, metaclass=Singleton):
 
     project = None
 
-    def __init__(self):
+    def __init__(self, detectProject=False):
         super().__init__()
 
         self.selectionsInitialised = False
         self.fenceSelection = None
         self.paddockSelection = None
         self.pipelineSelection = None
+
+        if detectProject:
+            self.detectProject()
 
     @Glitch.glitchy(f"An exception occurred while trying to detect an {PLUGIN_NAME} project.")
     def detectProject(self):

@@ -38,28 +38,24 @@ class Fence(LineFeature):
         """Get a tuple representing the restriction of this Fence to only Paddocks it completely crosses,
            and the Paddocks that are completely crossed by the specified line."""
 
-        qgsDebug(f"Fence.getCrossedPaddocks: {self.id}")
+        # qgsDebug(f"Fence.getCrossedPaddocks: {self.id}")
 
         fenceLine = self.geometry
 
         # We are only interested in Paddocks that are current
-        existingAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
+        builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
             FeatureStatus.Built, FeatureStatus.Planned)
 
-        qgsDebug(f"Fence.getCrossedPaddocks: {len(existingAndPlannedPaddocks)} Built or Planned Paddocks")
+        # qgsDebug(f"Fence.getCrossedPaddocks: {len(builtAndPlannedPaddocks)} Built or Planned Paddocks")
 
-        qgsDebug(f"Fence.getCrossedPaddocks: fenceLine.__class__.__name__ = {fenceLine.__class__.__name__}")
-        qgsDebug(f"Fence.getCrossedPaddocks: fenceLine = {fenceLine.asWkt()}")
+        # qgsDebug(f"Fence.getCrossedPaddocks: fenceLine.__class__.__name__ = {fenceLine.__class__.__name__}")
+        # qgsDebug(f"Fence.getCrossedPaddocks: fenceLine = {fenceLine.asWkt()}")
 
-        paddockGeometries = [p.geometry.asWkt() for p in existingAndPlannedPaddocks]
+        intersects = [p for p in builtAndPlannedPaddocks if fenceLine.intersects(p.geometry)]
 
-        qgsDebug(f"Fence.getCrossedPaddocks: {str(paddockGeometries)} Paddock Geometries")
+        # qgsDebug(f"[p for p in intersects] = {str([p for p in intersects])}")
 
-        intersects = [p for p in existingAndPlannedPaddocks if fenceLine.intersects(p.geometry)]
-
-        qgsDebug(f"[p.name for p in intersects] = {[p.name for p in intersects]}")
-
-        # Find the existing paddocks crossed by the fence line that will be superseded
+        # Find the Built paddocks crossed by the fence line that will be superseded
         crossedPaddocks = []
         for paddock in intersects:
             polygon = paddock.geometry.asMultiPolygon()
@@ -67,10 +63,7 @@ class Fence(LineFeature):
             intersection = boundaryLine.intersection(fenceLine)
             if intersection.isMultipart():
                 qgsDebug("Found a fully crossed paddock")
-                # Deep copy the crossed paddocks
-                crossedPaddocks.append(self.paddockLayer.makeFeature(paddock))
-
-        qgsDebug(f"[p.name for p in crossedPaddocks] = {[p.name for p in crossedPaddocks]}")
+                crossedPaddocks.append(paddock)
 
         # Crop the fence line to these superseded paddocks - no loose ends
         allCrossed = QgsGeometry.unaryUnion(p.geometry for p in crossedPaddocks)
@@ -79,18 +72,25 @@ class Fence(LineFeature):
 
         if normalisedFenceLine.isEmpty():
             qgsDebug("getCrossedPaddocks: normalisedFenceLine is empty")
-            return normalisedFenceLine, []
+            return [], []
 
-        # If this leaves the fence line multipart, reduce it to a single part
         if normalisedFenceLine.isMultipart():
             qgsDebug("getCrossedPaddocks: normalisedFenceLine is multipart")
-            normalisedFenceLine = normalisedFenceLine.combine()
+            return [line for line in normalisedFenceLine.asGeometryCollection()], crossedPaddocks
 
-        if normalisedFenceLine.isMultipart():
-            raise Glitch(
-                "Fence.analyseFence: fence line is still multipart")
+        qgsDebug("getCrossedPaddocks: normalisedFenceLine is singlepart")
+        return [normalisedFenceLine], crossedPaddocks
 
-        return normalisedFenceLine, crossedPaddocks
+        # # This can still happen, for example if a Fence is split across two separate Paddocks
+        # if normalisedFenceLine.isMultipart():
+        #     qgsDebug("getCrossedPaddocks: normalisedFenceLine is multipart")
+        #     # normalisedFenceLine = normalisedFenceLine.combine()
+        #     if normalisedFenceLine.isMultipart():
+        #         for part in normalisedFenceLine.asGeometryCollection():
+        #             qgsDebug(f"getCrossedPaddocks: part = {part.asWkt()}")
+
+        #         raise Glitch(
+        #             "Fence.analyseFence: fence line is still multipart")
 
     @Glitch.glitchy()
     def getSupersededAndPlannedPaddocks(self):
@@ -102,6 +102,8 @@ class Fence(LineFeature):
 
         buildOrder = self.buildOrder
 
+        qgsDebug(f"Fence.getSupersededAndPlannedPaddocks: buildOrder = {buildOrder}")
+
         if buildOrder <= 0:
             raise Glitch(
                 "Fence.getSupersededAndPlannedPaddocks: buildOrder must be a positive integer")
@@ -110,6 +112,8 @@ class Fence(LineFeature):
 
         paddocks = list(self.paddockLayer.getFeatures(request=buildFenceRequest))
 
+        qgsDebug(f"Fence.getSupersededAndPlannedPaddocks: {str(paddocks)} with Build Fence {buildOrder}")
+
         return ([f for f in paddocks if f.status.match(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded)],
                 [f for f in paddocks if f.status == FeatureStatus.Planned])
 
@@ -117,18 +121,28 @@ class Fence(LineFeature):
     @FeatureAction.draft.handler()
     def draftFence(self):
         """Draft a Fence."""
+        edits = Edits()
 
-        currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
+        normalisedFenceLines, supersededPaddocks = self.getCrossedPaddocks()
 
-        normalisedFenceLine, supersededPaddocks = self.getCrossedPaddocks()
+        if normalisedFenceLines is None or not supersededPaddocks:
+            raise Glitch("The specified Fence does not cross or touch any Built or Planned Paddocks.")
 
-        if normalisedFenceLine is None or normalisedFenceLine.isEmpty() or not supersededPaddocks:
-            raise Glitch("The specified Fence does not cross or touch any Paddocks.")
+        if len(normalisedFenceLines) > 1:
+            normalisedFenceLine, *normalisedFenceLines = normalisedFenceLines
+
+            for fenceLine in normalisedFenceLines:
+                extraFence = self.featureLayer.makeFeatureFromGeometry(fenceLine)
+                edits = edits.editAfter(extraFence.draftFence())
+        else:
+            normalisedFenceLine = normalisedFenceLines[0]
 
         self.geometry = normalisedFenceLine
+
+        currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
         self.buildOrder = currentBuildOrder + 1
 
-        return Edits.upsert(self)
+        return Edits.upsert(self).editBefore(edits)
 
     @Edits.persistEdits
     @FeatureAction.plan.handler()
@@ -155,38 +169,36 @@ class Fence(LineFeature):
             points = [QgsPoint(p.x(), p.y()) for p in polyline]
             splitLine = QgsLineString(points)
 
+            builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
+                FeatureStatus.Built, FeatureStatus.Planned)
+
             self.paddockLayer.splitFeatures(splitLine, False, False)
 
-            existingAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
+            builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
                 FeatureStatus.Built, FeatureStatus.Planned)
 
             for crossedPaddock in supersededPaddocks:
                 crossedPaddockName = crossedPaddock.name
 
-                # Derive the split paddocks
-                splitPaddocks = [f for f in existingAndPlannedPaddocks
+                # Deep copy all split paddocks
+                splitPaddocks = [self.paddockLayer.copyFeature(f)
+                                 for f in builtAndPlannedPaddocks
                                  if f.name == crossedPaddockName]
 
                 for i, splitPaddock in enumerate(splitPaddocks):
-                    # If this is one of the 'crossed' paddocks after the split, add, don't update
-                    creatingNewPaddock = splitPaddock.id == crossedPaddock.id
-
-                    if creatingNewPaddock:
-                        # Try to create an entirely new Paddock feature
-                        # Conflicts get quite weird here
-                        splitPaddock = self.paddockLayer.copyFeature(splitPaddock)
-
                     defaultName = crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
-
                     splitPaddock.name = defaultName
-                    splitPaddock.recalculate()
                     # Note this is set explicitly to Drafted because
                     # the Paddock is derived in a dodgy way using splitFeatures
                     splitPaddock.status = FeatureStatus.Drafted
+                    splitPaddock.recalculate()
                     edits.editBefore(splitPaddock.planPaddock(self))
 
-            for paddock in supersededPaddocks:
-                edits.editBefore(paddock.supersedePaddock(self))
+        _, supersededPaddocks = self.getCrossedPaddocks()
+
+        for paddock in supersededPaddocks:
+            paddock.recalculate()
+            edits.editBefore(paddock.supersedePaddock(self))
 
         # self.paddockLayer now rolls back
         return Edits.upsert(self).editAfter(edits)
@@ -199,10 +211,13 @@ class Fence(LineFeature):
 
         supersededPaddocks, plannedPaddocks = self.getSupersededAndPlannedPaddocks()
 
+        qgsDebug(f"supersededPaddocks = {str(supersededPaddocks)}")
+        qgsDebug(f"plannedPaddocks = {str(plannedPaddocks)}")
+
         for paddock in supersededPaddocks:
             edits = edits.editBefore(paddock.undoSupersedePaddock())
 
         for paddock in plannedPaddocks:
-            edits = edits.editBefore(edits, paddock.undoPlanPaddock())
+            edits = edits.editBefore(paddock.undoPlanPaddock())
 
         return Edits.upsert(self).editAfter(edits)
