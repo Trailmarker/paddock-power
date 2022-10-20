@@ -34,7 +34,7 @@ class FeatureToolBar(QToolBar):
 
     def addFeatureAction(self, action, icon, callback):
         """Add a feature action to the toolbar."""
-        featureAction = QAction(QIcon(icon), f"{action} {self.feature.featureTypeDisplayName()}", self)
+        featureAction = QAction(QIcon(icon), f"{action} {self.feature.displayName()}", self)
         featureAction.triggered.connect(callback)
         self.featureActions[action] = featureAction
         self.addAction(featureAction)

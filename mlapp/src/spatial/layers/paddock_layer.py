@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from ..features.paddock import Paddock
+
 from .feature_layer import FeatureLayerSourceType, FeatureLayer
+# from .renderers import fillStatusCategoryRenderer
 
 
 class PaddockLayer(FeatureLayer):
@@ -15,3 +17,5 @@ class PaddockLayer(FeatureLayer):
                          layerName,
                          gpkgFile,
                          styleName=PaddockLayer.STYLE)
+
+        # self.setRenderer(fillStatusCategoryRenderer())

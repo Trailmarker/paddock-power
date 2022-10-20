@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QVariant, pyqtSignal
 
-from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
 
 from ...models.glitch import Glitch
 from ...utils import resolveStylePath, qgsDebug
 from ..features.feature import Feature
+from ..features.feature_status import FeatureStatus
 from .feature_layer_source_type import FeatureLayerSourceType
 
 # Couple of lookup dictionaries (locally useful only)
@@ -20,18 +21,45 @@ PADDOCK_POWER_EPSG = 7845
 
 
 class FeatureLayer(QgsVectorLayer):
-    featureStateChanged = pyqtSignal(Feature)
+    displayFilterChanged = pyqtSignal(list)
+
+    def __new__(cls, *args, **kwargs):
+
+        sourceType = kwargs.get('sourceType', None)
+        gpkgFile = kwargs.get('gpkgFile', None)
+        layerName = kwargs.get('layerName', None)
+
+        if sourceType == FeatureLayerSourceType.Detect:
+            gpkgUrl = f"{gpkgFile}|layername={layerName}"
+
+            for layer in QgsProject.instance().mapLayers().values():
+
+                if layer.source() == gpkgUrl:
+                    qgsDebug(f"{cls.__name__}.__new__: Coercing existing QgsVectorLayer {layer.name()}")
+                    QgsProject.instance().removeMapLayer(layer.id())
+                    layer.setName(layerName)
+                    layer.__class__ = cls
+                    return layer
+
+        return super().__new__(cls)
+
+    def __new__(cls, *args, **kwargs):
+        """Create a new FeatureLayer, or return an existing one if it already exists."""
+        return super().__new__(cls, *args, **kwargs)
 
     def __init__(self, featureType=Feature, sourceType=FeatureLayerSourceType.Memory, layerName=None,
                  gpkgFile=None, styleName=None):
         """Create a new Paddock Power vector layer."""
 
-        self.featureType = featureType
+        qgsDebug("FeatureLayer.__init__")
+
+        self._featureType = featureType
         self.wrapFeature = lambda existingFeature: featureType(self, existingFeature)
 
         wkbType = featureType.getWkbType()
         schema = featureType.getSchema()
 
+        # If we didn't get an already initialised FeatureLayer from the custom __new__ above …
         if sourceType == FeatureLayerSourceType.Memory:
             assert(layerName is not None)
             assert(wkbType is not None)
@@ -46,7 +74,7 @@ class FeatureLayer(QgsVectorLayer):
             self.dataProvider().addAttributes(schema)
             self.commitChanges()
 
-        elif sourceType == FeatureLayerSourceType.File:
+        elif sourceType in [FeatureLayerSourceType.Detect, FeatureLayerSourceType.File]:
             assert(layerName is not None)
             assert(gpkgFile is not None)
 
@@ -65,9 +93,47 @@ class FeatureLayer(QgsVectorLayer):
             self.setEditorWidgetSetup(fieldIndex, field.editorWidgetSetup())
             self.setDefaultValueDefinition(fieldIndex, field.defaultValueDefinition())
 
+        self._displayFilter = [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
+        self._applyDisplayFilter(self._displayFilter)
+        self.writeCustomSymbology.connect(self._refreshDisplayFilterFromRenderer)
+
+    @property
     def featureType(self):
-        """Get the Paddock Power layer type."""
-        return self.featureType
+        """The Paddock Power Feature type for this layer."""
+        return self._featureType
+
+    @property
+    def displayFilter(self):
+        """The display layer for this layer."""
+        return self._displayFilter
+
+    @displayFilter.setter
+    def displayFilter(self, filter):
+        """Set the display filter for this layer."""
+        if self._displayFilter != filter:
+            self._displayFilter = filter
+            self.displayFilterChanged.emit(self.displayFilter)
+            self._applyDisplayFilter(filter)
+
+    def _applyDisplayFilter(self, filter):
+        """Toggle the display of a renderer category."""
+        renderer = self.renderer()
+        if isinstance(renderer, QgsCategorizedSymbolRenderer) and renderer.classAttribute() == 'Status':
+            displayed = [status.name for status in filter]
+            categories = renderer.categories()
+            for category in categories:
+                category.setRenderState(category.value() in displayed)
+            self.setRenderer(QgsCategorizedSymbolRenderer('Status', categories))
+            self.triggerRepaint()
+
+    def _refreshDisplayFilterFromRenderer(self):
+        """Refresh the display filter from the renderer."""
+        qgsDebug("FeatureLayer._refreshDisplayFilterFromRenderer")
+        renderer = self.renderer()
+        if isinstance(renderer, QgsCategorizedSymbolRenderer) and renderer.classAttribute() == 'Status':
+            values = [category.value() for category in renderer.categories() if category.renderState()]
+            statuses = [status for status in FeatureStatus if status.match(*values)]
+            self.displayFilter = statuses
 
     def copyTo(self, otherLayer):
         """Copy all features in this layer to another layer."""
@@ -75,9 +141,9 @@ class FeatureLayer(QgsVectorLayer):
             raise Glitch(
                 "VectorLayer.copyTo: the target layer is not present")
 
-        if self.featureType() != otherLayer.getLayerType():
+        if self.featureType != otherLayer.featureType:
             raise Glitch(
-                f"Cannot copy features from {self.featureType().name} to {otherLayer.getLayerType().name}")
+                f"Cannot copy features from {self.featureType.displayName()} to {otherLayer.featureType.displayName()}")
 
         otherLayer.startEditing()
         otherLayer.dataProvider().addFeatures(self.getFeatures())
@@ -92,6 +158,7 @@ class FeatureLayer(QgsVectorLayer):
         node = group.findLayer(self.id())
         if node is None:
             group.addLayer(self)
+            QgsProject.instance().addMapLayer(self, False)
 
     def _unwrapQgsFeature(self, feature):
         """Unwrap a Feature into a QgsFeature."""
@@ -151,12 +218,11 @@ class FeatureLayer(QgsVectorLayer):
         """Get the features in this layer filtered by one or more FeatureStatus values."""
         if not statuses:
             return self.getFeatures(request)
-        return [f for f in self.getFeatures(request) if f.status in statuses]
+        return [f for f in self.getFeatures(request) if f.status.match(*statuses)]
 
     def featureCount(self):
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
-
 
 
 # Helper functions - used to convert QgsField objects to code in the console as below

@@ -23,8 +23,8 @@ class FenceLayer(FeatureLayer):
                          gpkgFile,
                          styleName=FenceLayer.STYLE)
 
-        assert isinstance(paddockLayer, PaddockLayer)
-        assert isinstance(elevationLayer, ElevationLayer)
+        # assert isinstance(paddockLayer, PaddockLayer)
+        # assert isinstance(elevationLayer, ElevationLayer)
 
         self.paddockLayer = paddockLayer
 

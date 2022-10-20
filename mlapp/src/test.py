@@ -1,34 +1,70 @@
 # -*- coding: utf-8 -*-
-from functools import partialmethod
+import inspect
 
-def decorate(text):
-    def wrapper(method):
-        def func(*args, **kwargs):
-            print(f"{text}!")
-            return method(*args, **kwargs)
-        return func
-    return wrapper
+from qgis.core import QgsProject
 
-def decorate2(text):
-    def wrapper(method):
-        def func(*args, **kwargs):
-            print(f"{text}!")
-            return partialmethod(method)
-        return func
-    return wrapper
+from .utils import qgsDebug
+from .spatial.layers.feature_layer_source_type import FeatureLayerSourceType
+from .spatial.layers.paddock_layer import PaddockLayer
+
+def makePaddockLayer():
+
+    paddockLayerName = f"Current Paddocks"
+    gpkgFile="C:/Users/tom.lynch/dev/trm/paddock-power-data/Mathison-0.9/Mathison - Clean/Mathison - Testing.gpkg"
+
+    paddockLayer = PaddockLayer(sourceType=FeatureLayerSourceType.Detect, layerName=paddockLayerName, gpkgFile=gpkgFile)
+    QgsProject.instance().addMapLayer(paddockLayer, False)
+    return paddockLayer
+
+class A:
+    def __new__(cls, *args, **kwargs):
+        qgsDebug("A.__new__")
+
+        qgsDebug(f"inspect.getmembers(cls): {inspect.getmembers(cls)}")
+
+        qgsDebug(f"args: {str(args)}")
+        qgsDebug(f"kwargs: {str(kwargs)}")
+
+        return super().__new__(cls)
+
+    @classmethod
+    def doNothing(cls):
+        pass
+
+    def __init__(self, a, b):
+        qgsDebug(f"A.__init__(a={a}, b={b})")
+
+        self.a = a
+        self.b = b
+
+# Tom = A("Tom", "Lynch")
+
+class B(A):
+    def __new__(cls, *args, **kwargs):
+        qgsDebug("B.__new__")
+
+        qgsDebug(f"inspect.getmembers(cls): {inspect.getmembers(cls)}")
+
+        qgsDebug(f"args: {str(args)}")
+        qgsDebug(f"kwargs: {str(kwargs)}")
+
+        # if args[0] == "Tom":
+        #     return Tom
+
+        return super().__new__(cls, *args, **kwargs)
+
+    @classmethod
+    def alsoDoNothing(cls):
+        pass
+
+    def __init__(self, a, b, c):
+        qgsDebug(f"B.__init__(a={a}, b={b}, c={c})")
 
 
-class Test:
+        qgsDebug(f"inspect.getmembers(self): {inspect.getmembers(self)}")
 
-    @decorate("Bar")
-    def foo(self):
-        print("Foo!")
+        super().__init__(a, b)
+        self.c = c
 
-    def baz(self):
-        print("Baz!")
+# Tommo = B("Tom", "Eitelhuber", "Moore")
 
-    baz = decorate("Qux")(baz)
-
-    @decorate2("Bam")
-    def boom(self):
-        print("Boom!")

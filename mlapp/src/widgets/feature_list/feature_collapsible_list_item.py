@@ -32,15 +32,15 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.collapse.setContentLayout(self.collapseLayout)
 
         self.cancelEditAction = QAction(QIcon(
-            ':/plugins/mlapp/images/item-undo.png'), f"Cancel Editing {feature.featureTypeDisplayName()}", self)
+            ':/plugins/mlapp/images/item-undo.png'), f"Cancel Editing {feature.displayName()}", self)
         self.saveAction = QAction(
-            QIcon(':/plugins/mlapp/images/item-save.png'), f"Save Changes to {feature.featureTypeDisplayName()}", self)
+            QIcon(':/plugins/mlapp/images/item-save.png'), f"Save Changes to {feature.displayName()}", self)
         self.editAction = QAction(
-            QIcon(':/plugins/mlapp/images/item-edit.png'), (f"Edit a{feature.featureTypeDisplayName()}"), self)
+            QIcon(':/plugins/mlapp/images/item-edit.png'), (f"Edit a{feature.displayName()}"), self)
         self.zoomAction = QAction(QIcon(
-            ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(f"Zoom to {feature.featureTypeDisplayName()}"), self)
+            ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(f"Zoom to {feature.displayName()}"), self)
         # self.selectAction = QAction(QIcon(
-        #     ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(f"Select {feature.featureTypeDisplayName()}"), self)
+        #     ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(f"Select {feature.displayName()}"), self)
 
         self.collapse.addToolBarAction(self.cancelEditAction, lambda: self.cancelEditItem())
         self.collapse.addToolBarAction(self.saveAction, lambda: self.saveItem())

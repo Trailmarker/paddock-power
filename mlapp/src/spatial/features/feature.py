@@ -16,14 +16,9 @@ from .schemas import FeatureSchema
 class Feature(QObject, FeatureStateMachine):
 
     @classmethod
-    def featureTypeName(cls):
-        """Return the Feature's type name."""
-        return cls.__name__
-
-    @classmethod
-    def featureTypeDisplayName(cls):
+    def displayName(cls):
         """Return the display name of the Feature."""
-        matches = finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', cls.featureTypeName())
+        matches = finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', cls.__name__)
         return " ".join(m.group(0) for m in matches)
 
     @classmethod

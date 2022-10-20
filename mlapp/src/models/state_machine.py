@@ -19,7 +19,11 @@ class StateMachineEnum(Enum):
 
 
 class StateMachineStatus(StateMachineEnum):
-    pass
+
+    def match(self, *statuses):
+        """Return True if a provided StateMachineStatus or string matches this status.
+            Note Enum values are tested by identity, so this became necessary."""
+        return self.name in [s.name if isinstance(s, StateMachineStatus) else str(s) for s in statuses]
 
 
 def actionHandler(action, method):

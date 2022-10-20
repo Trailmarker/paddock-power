@@ -93,23 +93,23 @@ class Milestone(QObject):
     def load(self):
         """Load this milestone its GeoPackage."""
         boundaryLayerName = f"{self.milestoneName} Boundary"
-        self.boundaryLayer = BoundaryLayer(sourceType=FeatureLayerSourceType.File,
+        self.boundaryLayer = BoundaryLayer(sourceType=FeatureLayerSourceType.Detect,
                                            layerName=boundaryLayerName, gpkgFile=self.gpkgFile)
         waterpointLayerName = f"{self.milestoneName} Waterpoints"
         self.waterpointLayer = WaterpointLayer(self.elevationLayer,
-                                               sourceType=FeatureLayerSourceType.File,
+                                               sourceType=FeatureLayerSourceType.Detect,
                                                layerName=waterpointLayerName, gpkgFile=self.gpkgFile)
         pipelineLayerName = f"{self.milestoneName} Pipeline"
         self.pipelineLayer = PipelineLayer(self.elevationLayer,
-                                           sourceType=FeatureLayerSourceType.File,
+                                           sourceType=FeatureLayerSourceType.Detect,
                                            layerName=pipelineLayerName, gpkgFile=self.gpkgFile)
         paddockLayerName = f"{self.milestoneName} Paddocks"
-        self.paddockLayer = PaddockLayer(sourceType=FeatureLayerSourceType.File,
+        self.paddockLayer = PaddockLayer(sourceType=FeatureLayerSourceType.Detect,
                                          layerName=paddockLayerName, gpkgFile=self.gpkgFile)
         fenceLayerName = f"{self.milestoneName} Fence"
         self.fenceLayer = FenceLayer(self.paddockLayer,
                                      self.elevationLayer,
-                                     sourceType=FeatureLayerSourceType.File,
+                                     sourceType=FeatureLayerSourceType.Detect,
                                      layerName=fenceLayerName, gpkgFile=self.gpkgFile)
 
         self.connectLayerDataEvents()

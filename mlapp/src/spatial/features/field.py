@@ -52,7 +52,7 @@ class Field(QgsField):
         """Make a gette for the value of a domain-valued field. Should not be called directly."""
         def _getter(feature: QgsFeature):
             try:
-                return self._domainType(str(feature._qgsFeature[self.name()]))
+                return self._domainType[str(feature._qgsFeature[self.name()])]
             except BaseException:
                 if self._defaultValue is not None and isinstance(self._defaultValue, self._domainType):
                     feature._qgsFeature.setAttribute(self.name(), self._defaultValue.name)

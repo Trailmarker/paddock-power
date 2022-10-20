@@ -2,9 +2,9 @@
 
 from qgis.PyQt.QtWidgets import QLabel
 
+from ..models.colors import toCssColour
 from ..models.glitch import Glitch
-from ..spatial.features.feature_status import FeatureStatus, toCssColour
-
+from ..spatial.features.feature_status import FeatureStatus
 
 class FeatureStatusLabel(QLabel):
 
@@ -43,4 +43,4 @@ class FeatureStatusLabel(QLabel):
 
         self.setVisible(True)
         self.refreshStylesheet()
-        self.setText(self.status.name)
+        self.setText(str(self.status))

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+import inspect
 import os
 from os import path
 
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsMessageLog, QgsProject
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal, pyqtBoundSignal
 
 
 PLUGIN_NAME = "MLA Paddock Power"
@@ -102,11 +103,20 @@ def getSignals(source):
     """Get the signals of an object."""
     cls = source if isinstance(source, type) else type(source)
     signal = type(pyqtSignal())
+
+    signals = []
     for subcls in cls.mro():
         clsname = f'{subcls.__module__}.{subcls.__name__}'
+
         for key, value in sorted(vars(subcls).items()):
             if isinstance(value, signal):
-                print(f'{key} [{clsname}]')
+                signals.append((key, clsname, value))
+    return signals
+
+
+def getBoundSignals(obj):
+    signal = pyqtBoundSignal
+    return [(key, value) for (key, value) in inspect.getmembers(obj) if isinstance(value, signal)]
 
 
 def clearItem(item):

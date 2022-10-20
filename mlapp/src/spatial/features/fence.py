@@ -110,7 +110,7 @@ class Fence(LineFeature):
 
         paddocks = list(self.paddockLayer.getFeatures(request=buildFenceRequest))
 
-        return ([f for f in paddocks if f.status in [FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded]],
+        return ([f for f in paddocks if f.status.match(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded)],
                 [f for f in paddocks if f.status == FeatureStatus.Planned])
 
     @Edits.persistEdits

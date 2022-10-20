@@ -8,7 +8,7 @@ from ..spatial.features.pipeline import Pipeline
 from ..widgets.fence_details.fence_selection import FenceSelection
 from ..widgets.paddock_details.paddock_selection import PaddockSelection
 from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
-from ..utils import resolveGeoPackageFile, PLUGIN_NAME
+from ..utils import qgsDebug, resolveGeoPackageFile, PLUGIN_NAME
 from .milestone import Milestone
 from .glitch import Glitch
 from .glitch_hook import GlitchHook
@@ -43,8 +43,8 @@ class State(GlitchHook, metaclass=Singleton):
             if gpkgFile is not None:
                 milestones = Project.findMilestones(gpkgFile)
                 if milestones:
-                    # qgsDebug(
-                    #     f"State.detectProject: detected project with {len(milestones)} milestones in {gpkgFile}")
+                    qgsDebug(
+                        f"State.detectProject: detected project with {len(milestones)} milestones in {gpkgFile}")
                     project = Project(gpkgFile)
                     self.setProject(project)
                     return
