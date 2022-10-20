@@ -9,3 +9,8 @@ class Pipeline(LineFeature):
     def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):
         """Create a new LineFeature."""
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
+
+    @property
+    def isInfrastructure(self):
+        """Return True for Pipeline."""
+        return True

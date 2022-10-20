@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QObject
+from re import finditer
 
 from qgis.core import QgsFeature, QgsFields, QgsRectangle
 from qgis.utils import iface
@@ -13,6 +14,17 @@ from .schemas import FeatureSchema
 
 @FeatureSchema.addSchema()
 class Feature(QObject, FeatureStateMachine):
+
+    @classmethod
+    def featureTypeName(cls):
+        """Return the Feature's type name."""
+        return cls.__name__
+
+    @classmethod
+    def featureTypeDisplayName(cls):
+        """Return the display name of the Feature."""
+        matches = finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', cls.featureTypeName())
+        return " ".join(m.group(0) for m in matches)
 
     @classmethod
     def getWkbType(cls):
@@ -124,8 +136,19 @@ class Feature(QObject, FeatureStateMachine):
         """Recalculate derived data about the Feature."""
         pass
 
+    @property
+    def isInfrastructure(self):
+        """Return True if the Feature is infrastructure."""
+        return False
+
+    @property
+    def title(self):
+        """Return the Feature's title."""
+        f"{self.name}"
+
+
     @Edits.persistEdits
-    @FeatureAction.handler(FeatureAction.trash)
+    @FeatureAction.trash.handler()
     def trashFeature(self):
         """Trash a Draft Feature."""
         return Edits.delete(self)

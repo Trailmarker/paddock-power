@@ -20,7 +20,7 @@ def formatMessage(message):
             return message[0]
         return "".join([
             "<ul>",
-            "".join([f"<li>{item}</li>" for item in message]),
+            "".join(f"<li>{item}</li>" for item in message),
             "</ul>"
         ])
 

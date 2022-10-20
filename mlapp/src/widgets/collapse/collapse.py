@@ -95,7 +95,7 @@ class Collapse(QWidget):
         if checked != expanded:
             self.toggleButton.toggle()
 
-    def setStatus(self, status):
+    def setFeatureStatus(self, status):
         self.statusLabel.setStatus(status)
 
     def setTitle(self, title):

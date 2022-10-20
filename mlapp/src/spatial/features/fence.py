@@ -19,14 +19,19 @@ class Fence(LineFeature):
                  elevationLayer: ElevationLayer = None, existingFeature=None):
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
 
-        assert featureLayer.__class__.__name__ == "FenceLayer", f"featureLayer must be a FenceLayer, not {featureLayer.__class__.__name__}"
-        assert isinstance(
-            paddockLayer, PaddockLayer), f"paddockLayer must be a PaddockLayer, not {paddockLayer.__class__.__name__}"
-
         self.paddockLayer = paddockLayer
 
         self._supersededPaddocks = []
         self._plannedPaddocks = []
+
+    @property
+    def title(self):
+        return f"Fence {self.buildOrder}: ({self.featureLength} km)"
+
+    @property
+    def isInfrastructure(self):
+        """Return True for Fence."""
+        return True
 
     @Glitch.glitchy()
     def getCrossedPaddocks(self):
@@ -92,7 +97,8 @@ class Fence(LineFeature):
         """Get the Paddocks with the specified Build Order."""
 
         if self.status == FeatureStatus.Drafted:
-            return self.getCrossedPaddocks(), []
+            _, crossedPaddocks = self.getCrossedPaddocks()
+            return crossedPaddocks, []
 
         buildOrder = self.buildOrder
 
@@ -108,7 +114,7 @@ class Fence(LineFeature):
                 [f for f in paddocks if f.status == FeatureStatus.Planned])
 
     @Edits.persistEdits
-    @FeatureAction.handler(FeatureAction.draft)
+    @FeatureAction.draft.handler()
     def draftFence(self):
         """Draft a Fence."""
 
@@ -125,7 +131,7 @@ class Fence(LineFeature):
         return Edits.upsert(self)
 
     @Edits.persistEdits
-    @FeatureAction.handler(FeatureAction.plan)
+    @FeatureAction.plan.handler()
     def planFence(self):
         """Plan the Paddocks that would be altered after building this Fence."""
 
@@ -174,11 +180,10 @@ class Fence(LineFeature):
 
                     splitPaddock.name = defaultName
                     splitPaddock.recalculate()
-                    # Note this is set explicitly to Drafted because 
+                    # Note this is set explicitly to Drafted because
                     # the Paddock is derived in a dodgy way using splitFeatures
                     splitPaddock.status = FeatureStatus.Drafted
                     edits.editBefore(splitPaddock.planPaddock(self))
-
 
             for paddock in supersededPaddocks:
                 edits.editBefore(paddock.supersedePaddock(self))
@@ -187,7 +192,7 @@ class Fence(LineFeature):
         return Edits.upsert(self).editAfter(edits)
 
     @Edits.persistEdits
-    @FeatureAction.handler(FeatureAction.undoPlan)
+    @FeatureAction.undoPlan.handler()
     def undoPlanFence(self):
         """Undo the plan of Paddocks implied by a Fence."""
         edits = Edits()

@@ -3,7 +3,9 @@ from enum import Enum
 
 from qgis.PyQt.QtGui import QColor
 
-class FeatureStatus(Enum):
+from ...models.state_machine import StateMachineStatus
+
+class FeatureStatus(StateMachineStatus):
     """Allowed statuses for a Paddock Power feature."""
     Drafted = "Drafted"
     Planned = "Planned"
@@ -12,9 +14,6 @@ class FeatureStatus(Enum):
     BuiltSuperseded = "Superseded (was Built)"
     Archived = "Archived"
     Undefined = "Undefined"
-
-    def __str__(self):
-        return self.value
 
     def toColour(self):
         """Get the colour associated with this status."""

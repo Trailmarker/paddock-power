@@ -7,6 +7,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsProject
 from qgis.utils import iface
 
+from ..spatial.features.feature import Feature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
 from ..spatial.features.pipeline import Pipeline
@@ -23,10 +24,8 @@ from .glitch import Glitch
 
 
 class Milestone(QObject):
-    # emit this signal when paddocks are updated
-    selectedFenceChanged = pyqtSignal(Fence)
-    selectedPaddockChanged = pyqtSignal(Paddock)
-    selectedPipelineChanged = pyqtSignal(Pipeline)
+    # emit this signal when a selected Feature is updated
+    selectedFeatureChanged = pyqtSignal(Feature)
     milestoneDataChanged = pyqtSignal()
 
     def __init__(self, milestoneName, gpkgFile, elevationLayer):
@@ -39,9 +38,26 @@ class Milestone(QObject):
         self.currentTool = None
         self.isLoaded = False
 
-        self.selectedFence = None
-        self.selectedPaddock = None
-        self.selectedPipeline = None
+        self.selectedFeatures = {
+            Fence: None,
+            Paddock: None,
+            Pipeline: None
+        }
+
+    @property
+    def selectedFence(self):
+        """Get the currently selected fence."""
+        return self.selectedFeatures[Fence]
+
+    @property
+    def selectedPaddock(self):
+        """Get the currently selected paddock."""
+        return self.selectedFeatures[Paddock]
+
+    @property
+    def selectedPipeline(self):
+        """Get the currently selected pipeline."""
+        return self.selectedFeatures[Pipeline]
 
     def create(self):
         """Create this milestone in its GeoPackage."""
@@ -179,50 +195,14 @@ class Milestone(QObject):
             iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
 
-    def setSelectedFence(self, fence):
-        if fence is not None and not isinstance(fence, Fence):
+    def setSelectedFeature(self, feature):
+        if feature is not None and not isinstance(feature, Feature):
             raise Glitch(
-                "Milestone.setSelectedFence: fence must be a Fence")
-        self.selectedFence = fence
-        self.selectedFenceChanged.emit(self.selectedFence)
-
-    def setSelectedPaddock(self, paddock):
-        if paddock is not None and not isinstance(paddock, Paddock):
-            raise Glitch(
-                "Milestone.setSelectedPaddock: paddock must be a Paddock")
-        self.selectedPaddock = paddock
-        self.selectedPaddockChanged.emit(self.selectedPaddock)
-
-    def setSelectedPipeline(self, pipeline):
-        if pipeline is not None and not isinstance(pipeline, Pipeline):
-            raise Glitch(
-                "Milestone.setSelectedPipeline: pipeline must be a Pipeline")
-        self.selectedPipeline = pipeline
-        self.selectedPipelineChanged.emit(self.selectedPipeline)
-
-    def planFence(self, fence):
-        """Return a tuple consisting of a normalised fence geometry, a list of superseded paddocks 'fully crossed' by the cropped fence geometry,
-           and a list of planned paddocks resulting from splitting the paddocks using the cropped fence geometry."""
-
-        # Start editing all the related layers ...
-
-        fence.plan.emit()
-        #fence.upsert()
-        #return self.fenceLayer.getFenceByBuildOrder(fence.buildOrder)
-
-    def undoPlanFence(self, fence):
-        """Undo the Paddock changes created by a planned Fence and return the Fence to Draft status."""
-        if not isinstance(fence, Fence):
-            raise Glitch(
-                "Milestone.undoFence: fence must be a Fence")
-
-        fence.undoPlanFence()
-
-        return self.fenceLayer.getFenceByBuildOrder(fence.buildOrder)
-
+                "You can't select an object that is not a Feature")
+        self.selectedFeatures[type(feature)] = feature
+        self.selectedFeatureChanged.emit(feature)
+  
     def disconnectAll(self):
         """Disconnect all signals from the milestone."""
-        self.selectedFenceChanged.disconnect()
-        self.selectedPaddockChanged.disconnect()
-        self.selectedPipelineChanged.disconnect()
+        self.selectedFeatureChanged.disconnect()
         self.milestoneDataChanged.disconnect()

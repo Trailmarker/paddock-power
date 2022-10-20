@@ -12,10 +12,6 @@ class LineFeature(Feature):
         """Create a new LineFeature."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-        assert featureLayer.__class__.__name__ == "FenceLayer", f"featureLayer must be a FenceLayer, not {featureLayer.__class__.__name__}"
-        assert elevationLayer is None or isinstance(
-            elevationLayer, ElevationLayer), "elevationLayer must be an ElevationLayer"
-
         self.elevationLayer = elevationLayer
         self._profile = None
         # self.recalculate()

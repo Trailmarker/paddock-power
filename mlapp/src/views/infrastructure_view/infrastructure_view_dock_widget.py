@@ -53,11 +53,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         self.refreshUi()
 
     @pyqtSlot()
-    def onSelectedFenceChanged(self, _):
-        self.refreshUi()
-
-    @pyqtSlot()
-    def onSelectedPipelineChanged(self, _):
+    def onSelectedFeatureChanged(self, _):
         self.refreshUi()
 
     def sketchFence(self):
@@ -80,7 +76,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         fence.geometry = sketchLine
         fence.draftFence()
         
-        milestone.setSelectedFence(fence)
+        milestone.setSelectedFeature(fence)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
@@ -101,7 +97,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         pipeline.geometry = sketchLine
 
         pipeline.planPipeline()
-        milestone.setSelectedPipeline(pipeline)
+        milestone.setSelectedFeature(pipeline)
 
     def refreshUi(self):
         """Show the Infrastructure Profile."""

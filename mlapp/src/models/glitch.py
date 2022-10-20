@@ -44,6 +44,8 @@ class Glitch(Exception):
         glitchMessages = [g for g in self.__glitches] or ["An unknown error occurred."]
         glitchMessages.reverse()
         guiError(glitchMessages)
+        qgsDebug(glitchMessages, level=Qgis.Critical)
+        qgsDebug(self, level=Qgis.Critical)
 
     @staticmethod
     def popup(glitch):

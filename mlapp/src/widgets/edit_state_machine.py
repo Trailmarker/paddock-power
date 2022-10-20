@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 
-from ..models.state_machine import StateMachine
+from ..models.state_machine import StateMachine, StateMachineAction, StateMachineStatus
 
 
-class EditStatus(Enum):
+class EditStatus(StateMachineStatus):
     Viewing = "Viewing"
     Editing = "Editing"
 
 
-class EditAction(Enum):
+class EditAction(StateMachineAction):
     edit = "Edit"
     save = "Save"
-    cancel = "Cancel"
+    cancelEdit = "Cancel"
 
 
 class EditStateMachine(StateMachine):
@@ -23,7 +23,7 @@ class EditStateMachine(StateMachine):
     __TRANSITIONS = {
         (EditStatus.Viewing, EditAction.edit): EditStatus.Editing,
         (EditStatus.Editing, EditAction.save): EditStatus.Viewing,
-        (EditStatus.Editing, EditAction.cancel): EditStatus.Viewing
+        (EditStatus.Editing, EditAction.cancelEdit): EditStatus.Viewing
     }
 
     @property

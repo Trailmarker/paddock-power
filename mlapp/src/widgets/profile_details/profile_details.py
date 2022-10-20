@@ -96,14 +96,10 @@ class ProfileDetails(QWidget, FORM_CLASS):
         self.refreshUi()
 
     @pyqtSlot()
-    def onSelectedFenceChanged(self, fence):
+    def onSelectedFeatureChanged(self, feature):
         """Handle a change to the selected Fence."""
-        self.setSelectedInfrastructure(fence)
-
-    @pyqtSlot()
-    def onSelectedPipelineChanged(self, pipeline):
-        """Handle a change to the selected Pipeline."""
-        self.setSelectedInfrastructure(pipeline)
+        if feature.isInfrastructure:
+            self.setSelectedInfrastructure(feature)
 
     def setSelectedInfrastructure(self, infrastructure):
         """Set the selected Infrastructure."""

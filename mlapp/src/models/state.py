@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 
+from ..spatial.features.feature import Feature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
 from ..spatial.features.pipeline import Pipeline
@@ -21,9 +22,7 @@ class State(GlitchHook, metaclass=Singleton):
     milestoneChanged = pyqtSignal(Milestone)
     milestonesUpdated = pyqtSignal(dict)
     projectChanged = pyqtSignal(Project)
-    selectedFenceChanged = pyqtSignal(Fence)
-    selectedPaddockChanged = pyqtSignal(Paddock)
-    selectedPipelineChanged = pyqtSignal(Pipeline)
+    selectedFeatureChanged = pyqtSignal(Feature)
     milestoneDataChanged = pyqtSignal()
 
     project = None
@@ -68,16 +67,6 @@ class State(GlitchHook, metaclass=Singleton):
             return self.project.milestone
         else:
             return None
-
-    def getSelectedFence(self):
-        """Get the selected Fence."""
-        if self.project is not None and self.project.milestone is not None:
-            return self.project.milestone.selectedFence
-
-    def getSelectedPaddock(self):
-        """Get the selected Paddock."""
-        if self.project is not None and self.project.milestone is not None:
-            return self.project.milestone.selectedPaddock
 
     def clearProject(self):
         """Clear the current Project, for example if the current QGIS project is closed."""
@@ -128,12 +117,18 @@ class State(GlitchHook, metaclass=Singleton):
             self.milestoneChanged.connect(
                 lambda _: selection.clearSelectedFeature)
 
-        self.selectedPaddockChanged.connect(
-            self.paddockSelection.setSelectedFeature)
-        self.selectedPipelineChanged.connect(
-            self.pipelineSelection.setSelectedFeature)
-        self.selectedFenceChanged.connect(
-            self.fenceSelection.setSelectedFeature)
+        self.selectedFeatureChanged.connect(lambda f:
+            self.onSelectedFeatureChanged(f))
+
+    @pyqtSlot()
+    def onSelectedFeatureChanged(self, feature):
+        """Handle a change in the selected feature."""
+        if isinstance(feature, Fence):
+            self.fenceSelection.setSelectedFeature(feature)
+        elif isinstance(feature, Paddock):
+            self.paddockSelection.setSelectedFeature(feature)
+        elif isinstance(feature, Pipeline):
+            self.pipelineSelection.setSelectedFeature(feature)
 
     @pyqtSlot()
     def onProjectChanged(self, project):
@@ -149,14 +144,8 @@ class State(GlitchHook, metaclass=Singleton):
     def onMilestoneChanged(self, milestone):
         """Handle a change in the current Paddock Power milestone."""
         if self.project.milestone is not None:
-            self.project.milestone.selectedFenceChanged.connect(
-                lambda f: self.selectedFenceChanged.emit(f))
-            self.project.milestone.selectedPaddockChanged.connect(
-                lambda p: self.selectedPaddockChanged.emit(p))
-            self.project.milestone.selectedPipelineChanged.connect(
-                lambda p: self.selectedPipelineChanged.emit(p))
-            self.project.milestone.milestoneDataChanged.connect(
-                lambda: self.milestoneDataChanged.emit())
+            self.project.milestone.selectedFeatureChanged.connect(
+                lambda f: self.selectedFeatureChanged.emit(f))
 
 
 def connectStateListener(state, listener):
@@ -171,15 +160,9 @@ def connectStateListener(state, listener):
         if hasattr(listener, "onProjectChanged") and callable(listener.onProjectChanged):
             state.projectChanged.connect(
                 lambda p: listener.onProjectChanged(p))
-        if hasattr(listener, "onSelectedFenceChanged") and callable(listener.onSelectedFenceChanged):
-            state.selectedFenceChanged.connect(
-                lambda f: listener.onSelectedFenceChanged(f))
-        if hasattr(listener, "onSelectedPaddockChanged") and callable(listener.onSelectedPaddockChanged):
-            state.selectedPaddockChanged.connect(
-                lambda p: listener.onSelectedPaddockChanged(p))
-        if hasattr(listener, "onSelectedPipelineChanged") and callable(listener.onSelectedPipelineChanged):
-            state.selectedPipelineChanged.connect(
-                lambda p: listener.onSelectedPipelineChanged(p))
+        if hasattr(listener, "onSelectedFeatureChanged") and callable(listener.onSelectedFeatureChanged):
+            state.selectedFeatureChanged.connect(
+                lambda f: listener.onSelectedFeatureChanged(f))
         if hasattr(listener, "onMilestoneDataChanged") and callable(listener.onMilestoneDataChanged):
             state.milestoneDataChanged.connect(
                 lambda: listener.onMilestoneDataChanged())

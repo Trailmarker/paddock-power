@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
 from ...models.glitch import Glitch
-from ...spatial.features.paddock import Paddock
+from ...spatial.features.feature import Feature
 from .feature_list_base import FeatureListBase
 
 
 class FeatureMiniList(FeatureListBase):
-    def __init__(self, parent=None):
+    def __init__(self, listItemFactory, parent=None):
         """Constructor."""
-        super().__init__(parent)
-        self.paddocks = []
+        super().__init__(listItemFactory, parent)
+        self.features = []
 
     def getFeatures(self):
         """Get the paddocks."""
-        return self.paddocks
+        return self.features
 
-    def setPaddocks(self, paddocks):
+    def setFeatures(self, features):
         """Set the paddocks."""
-        if paddocks is None:
-            self.paddocks = []
+        if not features:
+            self.features = []
             return
 
-        if not all(isinstance(paddock, Paddock) for paddock in paddocks):
+        if not all(isinstance(feature, Feature) for feature in features):
             raise Glitch(
-                "The content passed to a Paddock mini-list should be a list of Paddocks")
-        self.paddocks = paddocks
+                "The content passed to a Feature mini-list should be a list of Features")
+        self.features = features
         self.refreshUi()

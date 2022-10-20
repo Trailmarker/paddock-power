@@ -1,39 +1,48 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractproperty
 from enum import Enum
+from functools import partial
+
+from qgis.PyQt.QtCore import pyqtSignal
 
 from ..models.glitch import Glitch
 from ..utils import qgsDebug
 from .qt_meta import QtMeta
 
-class StateMachineAction(Enum):
-    
-    @classmethod
-    def handler(actionType, action):
-        """Decorator that takes a method on a Feature, and returns a method that instead raises an exception if the
-        Feature's current status means {action} is not permitted, and otherwise calls the original method, updates
-        the Feature's status, and returns the result of the original method."""
-        
-        if not isinstance(action, actionType):
-            raise Glitch(f"Can't make an actionHandler({actionType.__class__.__name__}) for {action}, because it's not a {actionType.__class__.__name__}")
 
-        def makeActionHandler(func):
-            def handlerWithTryAction(machine: StateMachine, *args, **kwargs):
-                if machine.isPermitted(action):
-                    message = f"An error happened trying to {action} a {machine}"
-                    result = ((Glitch.glitchy(message))(func))(machine, *args, **kwargs)
-                    machine.doAction(action)
-                    return result
-                else:
-                    raise Glitch(f"You can't {action} a {machine}, because it is {machine.status}")
-            return handlerWithTryAction
-        return makeActionHandler
+class StateMachineEnum(Enum):
+    def __format__(self, _):
+        return self.value
 
     def __str__(self):
         return self.value
 
 
+class StateMachineStatus(StateMachineEnum):
+    pass
+
+
+def actionHandler(action, method):
+    def wrapper(machine, *args, **kwargs):
+        if machine.isPermitted(action):
+            message = f"An error happened trying to {action} a {machine}"
+            result = ((Glitch.glitchy(message))(method))(machine, *args, **kwargs)
+            machine.doAction(action)
+            return result
+        else:
+            raise Glitch(
+                f"This {machine} can't handle the action {action} using the handler {method.__name__}, because it's in {machine.status} state")
+    return wrapper
+
+
+class StateMachineAction(StateMachineEnum):
+    def handler(self):
+        return partial(actionHandler, self)
+
+
 class StateMachine(ABC, metaclass=QtMeta):
+    stateChanged = pyqtSignal(object)
+
     @abstractproperty
     def transitions(self):
         pass
@@ -67,9 +76,11 @@ class StateMachine(ABC, metaclass=QtMeta):
     def doAction(self, action):
         if self.isPermitted(action):
             newStatus = self.transitions[(self.status, action)]
-            qgsDebug(f"{self.__class__.__name__}: {self.status} → {action} → {newStatus}")
+            qgsDebug(f"{self}: {self.status} → {action} → {newStatus}")
             self.status = newStatus
+            self.stateChanged.emit(self.status)
         else:
+            qgsDebug(f"{self}: {self.status} → {action} → {newStatus} not permitted")
             raise Glitch(f"An error happened trying to {action} a {self}")
 
     def __repr__(self):
@@ -79,4 +90,3 @@ class StateMachine(ABC, metaclass=QtMeta):
     def __str__(self):
         """Convert the EditStateMachine to a string representation."""
         return repr(self)
-

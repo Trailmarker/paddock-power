@@ -2,15 +2,15 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
 
-from .feature_collapsible_list_item import FeatureCollapsibleListItem
-
 
 class FeatureListBase(QListWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, listItemFactory, parent=None):
         """Constructor."""
-
         super().__init__(parent)
+
+        self.featureListItemFactory = listItemFactory
+
         self.setFrameStyle(QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -25,27 +25,27 @@ class FeatureListBase(QListWidget):
             item.setHidden(not filter.lower()
                            in widget.paddock.name.lower())
 
-    def getPaddocks():
+    def getFeatures():
         """Get the paddocks."""
         raise NotImplementedError(
-            "getPaddocks() must be implemented in a subclass")
+            "getFeatures() must be implemented in a subclass")
 
     def refreshUi(self):
         """Show the Paddock List."""
         # Initially clear the list
         self.clear()
 
-        paddocks = self.getPaddocks()
+        features = self.getFeatures()
 
-        if not paddocks:
+        if not features:
             return
 
         # Sort Paddocks alphabetically
-        paddocks.sort(key=lambda x: x.name)
+        features.sort(key=lambda x: x.name)
 
         # Repopulate list since we have Paddocks
-        for paddock in paddocks:
-            widget = FeatureCollapsibleListItem(paddock)
+        for feature in features:
+            widget = self.featureListItemFactory(feature)
             item = QListWidgetItem(self)
             item.setSizeHint(widget.sizeHint())
 

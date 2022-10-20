@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal, QSize, QState, QStateMachine
+from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QSizePolicy, QVBoxLayout, QWidget
 
 from ...models.state import State
-from ..edit_state_machine import EditStateMachine
+from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..collapse.collapse import Collapse
 
 
 class FeatureCollapsibleListItem(QWidget, EditStateMachine):
     layoutRefreshNeeded = pyqtSignal()
-
-    # Editing signals
-    edit = pyqtSignal()
-    save = pyqtSignal()
-    cancelEdit = pyqtSignal()
 
     def __init__(self, feature, DetailsWidget, EditWidget, parent=None):
         super().__init__(parent)
@@ -37,20 +32,20 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.collapse.setContentLayout(self.collapseLayout)
 
         self.cancelEditAction = QAction(QIcon(
-            ':/plugins/mlapp/images/item-undo.png'), self.tr(u'Cancel Editing Paddock'), self)
+            ':/plugins/mlapp/images/item-undo.png'), f"Cancel Editing {feature.featureTypeDisplayName()}", self)
         self.saveAction = QAction(
-            QIcon(':/plugins/mlapp/images/item-save.png'), self.tr(u'Save Changes to Paddock'), self)
+            QIcon(':/plugins/mlapp/images/item-save.png'), f"Save Changes to {feature.featureTypeDisplayName()}", self)
         self.editAction = QAction(
-            QIcon(':/plugins/mlapp/images/item-edit.png'), self.tr(u'Edit Paddock'), self)
+            QIcon(':/plugins/mlapp/images/item-edit.png'), (f"Edit a{feature.featureTypeDisplayName()}"), self)
         self.zoomAction = QAction(QIcon(
-            ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(u'Zoom to Paddock'), self)
+            ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(f"Zoom to {feature.featureTypeDisplayName()}"), self)
+        # self.selectAction = QAction(QIcon(
+        #     ':/plugins/mlapp/images/paddock-zoom.png'), self.tr(f"Select {feature.featureTypeDisplayName()}"), self)
 
-        # self.collapse.addToolBarAction(QAction(QIcon(':/plugins/mlapp/images/paddock.png'), self.tr(u'Select Paddock'), self), self.selectPaddock)
-        self.collapse.addToolBarAction(
-            self.cancelEditAction, self.cancelEdit.emit)
-        self.collapse.addToolBarAction(self.saveAction, self.save.emit)
-        self.collapse.addToolBarAction(self.editAction, self.edit.emit)
-        self.collapse.addToolBarAction(self.zoomAction, self.selectPaddock)
+        self.collapse.addToolBarAction(self.cancelEditAction, lambda: self.cancelEditItem())
+        self.collapse.addToolBarAction(self.saveAction, lambda: self.saveItem())
+        self.collapse.addToolBarAction(self.editAction, lambda: self.editItem())
+        self.collapse.addToolBarAction(self.zoomAction, self.selectFeature)
         self.collapse.addToolBarAction(self.zoomAction, self.feature.zoomToFeature)
 
         layout = QVBoxLayout()
@@ -65,63 +60,54 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.collapse.collapsed.connect(self.layoutRefreshNeeded.emit)
         self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
-        # Set up state machine
-        self.machine = QStateMachine()
-
-        self.viewState = QState()
-        self.editState = QState()
-
-        self.viewState.addTransition(self.edit, self.editState)
-        self.editState.addTransition(self.save, self.viewState)
-        self.editState.addTransition(self.cancelEdit, self.viewState)
-
-        self.save.connect(self.featureEdit.savePaddock)
-
-        self.machine.addState(self.viewState)
-        self.machine.addState(self.editState)
-        self.machine.setInitialState(self.viewState)
-
-        self.viewState.entered.connect(self.refreshUi)
-        self.editState.entered.connect(self.refreshUi)
-        self.editState.entered.connect(self.collapse.setExpanded)
-
-        self.machine.start()
+        self.stateChanged.connect(self.refreshUi)
 
         self.refreshUi()
 
-    def refreshUi(self):
-        editing = self.editState in self.machine.configuration()
+    @EditAction.edit.handler()
+    def editItem(self):
+        self.collapse.setExpanded(True)
 
-        self.setStatus(self.feature.status)
+    @EditAction.save.handler()
+    def saveItem(self):
+        self.featureEdit.savePaddock()
+        pass
+
+    @EditAction.cancelEdit.handler()
+    def cancelEditItem(self):
+        pass
+
+    def refreshUi(self):
+        self.collapse.setFeatureStatus(self.feature.status)
 
         # Set title to paddock name with some details
         self.setTitle(
             f"{self.feature.name} ({self.feature.featureArea} km², ?? AE)")
 
+        permitted = self.allPermitted()
+
         # Hide or show forms
+        editing = self.status == EditStatus.Editing
         self.featureDetails.setVisible(not editing)
         self.featureEdit.setVisible(editing)
 
         # Hide or show collapse toolbar items
-        self.cancelEditAction.setVisible(editing)
-        self.saveAction.setVisible(editing)
-        self.editAction.setVisible(not editing)
+        self.cancelEditAction.setVisible(EditAction.cancelEdit in permitted)
+        self.saveAction.setVisible(EditAction.save in permitted)
+        self.editAction.setVisible(EditAction.edit in permitted)
 
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
 
-    def setStatus(self, status):
-        self.collapse.setStatus(status)
-
     def setTitle(self, title):
         self.collapse.setTitle(title)
 
-    def selectPaddock(self):
+    def selectFeature(self):
         """Select this paddock."""
         # self.collapse.setExpanded(True)
         milestone = self.state.getMilestone()
         if milestone is not None:
-            milestone.setSelectedPaddock(self.feature)
+            milestone.setSelectedFeature(self.feature)
 
     def sizeHint(self):
         """Return the size of the widget."""

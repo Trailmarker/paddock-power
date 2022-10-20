@@ -146,7 +146,7 @@
         </property>
         <layout class="QVBoxLayout" name="fencesVerticalLayout">
          <item>
-          <widget class="FenceList" name="fenceList"/>
+          <widget class="FenceLayerList" name="fenceList"/>
          </item>
         </layout>
        </widget>
@@ -248,9 +248,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>FenceList</class>
+   <class>FenceLayerList</class>
    <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/fence_list/fence_list</header>
+   <header>mlapp/src/widgets/fence_list/fence_layer_list</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -12,22 +12,22 @@ class Paddock(CapacityFeature):
         """Create a new Paddock."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-    @FeatureAction.handler(FeatureAction.plan)
+    @FeatureAction.plan.handler()
     def planPaddock(self, fence):
         self.buildFence = fence
         return Edits.upsert(self)
 
-    @FeatureAction.handler(FeatureAction.undoPlan)
+    @FeatureAction.undoPlan.handler()
     def undoPlanPaddock(self):
         self.buildFence = None
         return Edits.delete(self)
 
-    @FeatureAction.handler(FeatureAction.supersede)
+    @FeatureAction.supersede.handler()
     def supersedePaddock(self, fence):
         self.buildFence = fence.buildOrder
         return Edits.upsert(self)
 
-    @FeatureAction.handler(FeatureAction.undoSupersede)
+    @FeatureAction.undoSupersede.handler()
     def undoSupersedePaddock(self):
         self.buildFence = None
         return Edits.upsert(self)

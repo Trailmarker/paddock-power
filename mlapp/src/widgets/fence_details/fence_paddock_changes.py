@@ -38,22 +38,22 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     def onMilestoneChanged(self, milestone):
         """Handle a change in the current Paddock Power milestone."""
         self.clearFence()
-        self.refreshUi()
+
+        if milestone is not None:
+            self.onSelectedFeatureChanged(milestone.selectedFence)
 
     @pyqtSlot()
     def onMilestoneDataChanged(self):
         """Handle a change to the underlying Milestone data."""
-        self.clearFence()
-
-        milestone = self.state.getMilestone()
-        self.onSelectedFenceChanged(milestone.selectedFence)
+        fence = self.state.getMilestone().selectedFence
+        self.onSelectedFeatureChanged(fence)        
 
     @pyqtSlot()
-    def onSelectedFenceChanged(self, fence):
+    def onSelectedFeatureChanged(self, fence):
         """Handle a change in the selected fence."""
         self.clearFence()
 
-        if fence is not None:
+        if fence is not None and isinstance(fence, Fence):
             self.setFence(fence)
             self.refreshUi()
 
@@ -67,8 +67,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.setVisible(True)
             supersededPaddocks, plannedPaddocks = self.fence.getSupersededAndPlannedPaddocks()
 
-            self.supersededPaddockMiniList.setPaddocks(supersededPaddocks)
-            self.plannedPaddockMiniList.setPaddocks(plannedPaddocks)
+            self.supersededPaddockMiniList.setFeatures(supersededPaddocks)
+            self.plannedPaddockMiniList.setFeatures(plannedPaddocks)
 
     def clearFence(self):
         self.fence = None
