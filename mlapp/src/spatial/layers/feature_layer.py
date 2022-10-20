@@ -51,8 +51,6 @@ class FeatureLayer(QgsVectorLayer):
                  gpkgFile=None, styleName=None):
         """Create a new Paddock Power vector layer."""
 
-        qgsDebug("FeatureLayer.__init__")
-
         self._featureType = featureType
         self.wrapFeature = lambda existingFeature: featureType(self, existingFeature)
 
