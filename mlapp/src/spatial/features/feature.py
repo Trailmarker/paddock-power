@@ -153,3 +153,4 @@ class Feature(QObject, FeatureStateMachine):
     def trashFeature(self):
         """Trash a Draft Feature."""
         return Edits.delete(self)
+

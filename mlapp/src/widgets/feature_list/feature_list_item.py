@@ -51,8 +51,6 @@ class FeatureListItem(QWidget):
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.setLayout(self.layout)
 
-        self.feature.stateChanged.connect(self.refreshUi)
-
         self.refreshUi()
 
     def refreshUi(self):
@@ -71,3 +69,4 @@ class FeatureListItem(QWidget):
         hint = QSize(self.layout.sizeHint().width(),
                      self.layout.sizeHint().height())
         return hint
+

@@ -3,7 +3,7 @@ from os import path
 
 import processing
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 from qgis.core import QgsProject
 from qgis.utils import iface
 
@@ -17,6 +17,8 @@ from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.feature_layer import FeatureLayerSourceType
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
+
+from ..utils import qgsDebug
 
 from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 
@@ -120,7 +122,8 @@ class Milestone(QObject):
         """Connect to layer data changed events."""
         # TODO self.boundaryLayer, self.waterpointLayer, 
         for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer]:
-            layer.afterCommitChanges.connect(self.milestoneDataChanged)
+            layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
+            layer.afterCommitChanges.connect(lambda: self.milestoneDataChanged.emit)
 
     def findGroup(self):
         """Find this milestone's group in the Layers panel."""
@@ -201,7 +204,15 @@ class Milestone(QObject):
                 "You can't select an object that is not a Feature")
         self.selectedFeatures[type(feature)] = feature
         self.selectedFeatureChanged.emit(feature)
-  
+
+    @pyqtSlot()
+    def onLayerSelectionChanged(self, layer, selection):
+        if len(selection) == 1:
+            feature = layer.getFeatureById(selection[0])
+            qgsDebug(f"onLayerSelectionChanged: {feature or 'None'}")
+            if feature is not None:
+                self.setSelectedFeature(feature)
+
     def disconnectAll(self):
         """Disconnect all signals from the milestone."""
         self.selectedFeatureChanged.disconnect()

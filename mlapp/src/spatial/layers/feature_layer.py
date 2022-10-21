@@ -213,6 +213,14 @@ class FeatureLayer(QgsVectorLayer):
         """Delete a feature from the layer."""
         super().deleteFeature(feature.id)
 
+    def getFeatureById(self, id):
+        """Get a feature by its ID."""
+        qgsFeature = super().getFeature(id)
+
+        if qgsFeature is not None:
+            feature = self.wrapFeature(qgsFeature)
+            return feature if feature.status.match(*self.displayFilter) else None
+
     def getFeatures(self, request=None):
         """Get the features in this layer."""
         if request is None:
