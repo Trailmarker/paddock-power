@@ -42,8 +42,16 @@ class Glitch(Exception):
     def show(self):
         """Display a GUI message for this glitch."""
         glitchMessages = [g for g in self.__glitches] or ["An unknown error occurred."]
-        glitchMessages.reverse()
-        guiError(glitchMessages)
+
+        guiMessages = glitchMessages
+
+        if len(glitchMessages) > 5:
+            guiMessages = glitchMessages[:5]
+            guiMessages.append("Several errors occurred")
+            guiMessages.insert(0, "...")
+
+        guiMessages.reverse()
+        guiError(guiMessages)
         qgsDebug(glitchMessages, level=Qgis.Critical)
         qgsDebug(self, level=Qgis.Critical)
 

@@ -71,14 +71,14 @@ class Fence(LineFeature):
         normalisedFenceLine = fenceLine.intersection(allCrossedBuffered)
 
         if normalisedFenceLine.isEmpty():
-            qgsDebug("getCrossedPaddocks: normalisedFenceLine is empty")
+            # qgsDebug("getCrossedPaddocks: normalisedFenceLine is empty")
             return [], []
 
         if normalisedFenceLine.isMultipart():
-            qgsDebug("getCrossedPaddocks: normalisedFenceLine is multipart")
+            # qgsDebug("getCrossedPaddocks: normalisedFenceLine is multipart")
             return [line for line in normalisedFenceLine.asGeometryCollection()], crossedPaddocks
 
-        qgsDebug("getCrossedPaddocks: normalisedFenceLine is singlepart")
+        # qgsDebug("getCrossedPaddocks: normalisedFenceLine is singlepart")
         return [normalisedFenceLine], crossedPaddocks
 
         # # This can still happen, for example if a Fence is split across two separate Paddocks
@@ -102,7 +102,7 @@ class Fence(LineFeature):
 
         buildOrder = self.buildOrder
 
-        qgsDebug(f"Fence.getSupersededAndPlannedPaddocks: buildOrder = {buildOrder}")
+        # qgsDebug(f"Fence.getSupersededAndPlannedPaddocks: buildOrder = {buildOrder}")
 
         if buildOrder <= 0:
             raise Glitch(
@@ -112,7 +112,7 @@ class Fence(LineFeature):
 
         paddocks = list(self.paddockLayer.getFeatures(request=buildFenceRequest))
 
-        qgsDebug(f"Fence.getSupersededAndPlannedPaddocks: {str(paddocks)} with Build Fence {buildOrder}")
+        # qgsDebug(f"Fence.getSupersededAndPlannedPaddocks: {str(paddocks)} with Build Fence {buildOrder}")
 
         return ([f for f in paddocks if f.status.match(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded)],
                 [f for f in paddocks if f.status == FeatureStatus.Planned])
@@ -211,8 +211,8 @@ class Fence(LineFeature):
 
         supersededPaddocks, plannedPaddocks = self.getSupersededAndPlannedPaddocks()
 
-        qgsDebug(f"supersededPaddocks = {str(supersededPaddocks)}")
-        qgsDebug(f"plannedPaddocks = {str(plannedPaddocks)}")
+        # qgsDebug(f"supersededPaddocks = {str(supersededPaddocks)}")
+        # qgsDebug(f"plannedPaddocks = {str(plannedPaddocks)}")
 
         for paddock in supersededPaddocks:
             edits = edits.editBefore(paddock.undoSupersedePaddock())
