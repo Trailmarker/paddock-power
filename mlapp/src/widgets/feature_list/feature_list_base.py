@@ -17,21 +17,21 @@ class FeatureListBase(QListWidget):
         self.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
     def filterByName(self, filter):
-        """Filter the paddock list by name."""
+        """Filter the Feature list by name."""
         if filter is None:
             return
         for item in [self.item(i) for i in range(self.count())]:
             widget = self.itemWidget(item)
             item.setHidden(not filter.lower()
-                           in widget.paddock.name.lower())
+                           in widget.feature.name.lower())
 
     def getFeatures():
-        """Get the paddocks."""
+        """Get the Features."""
         raise NotImplementedError(
             "getFeatures() must be implemented in a subclass")
 
     def refreshUi(self):
-        """Show the Paddock List."""
+        """Show the Feature List."""
         # Initially clear the list
         self.clear()
 
@@ -40,10 +40,10 @@ class FeatureListBase(QListWidget):
         if not features:
             return
 
-        # Sort Paddocks alphabetically
+        # Sort Features alphabetically
         features.sort(key=lambda x: x.name)
 
-        # Repopulate list since we have Paddocks
+        # Repopulate list since we have Features
         for feature in features:
             widget = self.featureListItemFactory(feature)
             item = QListWidgetItem(self)

@@ -125,6 +125,7 @@ class Project(QObject):
             elevationLayerName = Project.findElevationLayer(self.gpkgFile)
             if elevationLayerName is not None:
                 self.elevationLayer = ElevationLayer(elevationLayerName, self.gpkgFile)
+                self.elevationLayer.addToMap(None)
 
             milestoneNames = Project.findMilestones(self.gpkgFile)
             milestoneNames.sort()

@@ -17,3 +17,5 @@ class ConditionRecord(CapacityFeature):
         self.paddockLayer = paddockLayer
         self.landSystemLayer = landSystemLayer
         self.waterpointBufferLayer = waterpointBufferLayer
+
+    

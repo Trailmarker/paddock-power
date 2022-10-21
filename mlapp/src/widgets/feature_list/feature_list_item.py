@@ -4,7 +4,6 @@ from qgis.PyQt.QtWidgets import QHBoxLayout, QLabel, QSizePolicy, QWidget
 
 from ...models.state import State
 from ...spatial.features.feature_action import FeatureAction
-from ...utils import qgsDebug
 from ..feature_status_label import FeatureStatusLabel
 from .feature_tool_bar import FeatureToolBar
 
@@ -38,6 +37,10 @@ class FeatureListItem(QWidget):
             FeatureAction.plan,
             ':/plugins/mlapp/images/item-edit.png',
             lambda _: self.feature.planFence())
+        self.toolBar.addFeatureAction(
+            FeatureAction.plan,
+            ':/plugins/mlapp/images/delete-milestone.png',
+            lambda _: self.feature.trashFeature())
         self.toolBar.addZoomAction()
 
         self.layout = QHBoxLayout()

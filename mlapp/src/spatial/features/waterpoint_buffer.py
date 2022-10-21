@@ -14,3 +14,4 @@ class WaterpointBuffer(AreaFeature):
         """Recalculate stats for this Waterpoint Buffer"""
         # TODO
         pass
+

@@ -180,9 +180,9 @@ class FeatureLayer(QgsVectorLayer):
         if not isinstance(geometry, QgsGeometry):
             raise Glitch(
                 "You can't use a {self.__class__.__name__} to draft a {self.featureType.__name__} from a geometry that isn't a QgsGeometry")
-        if geometry.wkbType() != self.wkbType():
-            raise Glitch(
-                "You're using an incompatible kind of geometry with a {self.__class__.__name__}")
+        # if geometry.wkbType() != self.wkbType():
+        #     raise Glitch(
+        #         "You're using an incompatible kind of geometry with a {self.__class__.__name__}")
         feature = self.makeFeature()
         feature.geometry = geometry
         return feature

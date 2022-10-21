@@ -12,6 +12,13 @@ class Paddock(CapacityFeature):
         """Create a new Paddock."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
+    @FeatureAction.draft.handler()
+    def draftPaddock(self, geometry, name):
+        """Draft a Paddock."""
+        self.name = name
+        self.geometry = geometry
+        return Edits.upsert(self)
+
     @FeatureAction.plan.handler()
     def planPaddock(self, fence):
         self.buildFence = fence.buildOrder

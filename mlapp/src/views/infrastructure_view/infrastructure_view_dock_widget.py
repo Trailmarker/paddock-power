@@ -74,10 +74,10 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     def onSketchFenceFinished(self, sketchLine):
         milestone = self.state.getMilestone()
 
-        fence = milestone.fenceLayer.makeFeatureFromGeometry(sketchLine)
-        fence.draftFence()
+        fence = milestone.fenceLayer.makeFeature()    
+        fence.draftFence(sketchLine)
         
-        milestone.setSelectedFeature(fence)
+        # milestone.setSelectedFeature(fence)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
@@ -94,8 +94,8 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     def onSketchPipelineFinished(self, sketchLine):
         milestone = self.state.getMilestone()
 
-        pipeline = milestone.pipelineLayer.makeFeatureFromGeometry(sketchLine)
-
+        pipeline = milestone.pipelineLayer.makeFeature()
+        pipeline.draftPipeline(sketchLine)
         pipeline.planPipeline()
         milestone.setSelectedFeature(pipeline)
 

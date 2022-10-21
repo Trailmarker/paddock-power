@@ -30,8 +30,8 @@ class StateMachineStatus(StateMachineEnum):
 def actionHandler(action, method):
     def wrapper(machine, *args, **kwargs):
         if machine.isPermitted(action):
-            message = f"An error happened trying to {action} a {machine}"
-            result = ((Glitch.glitchy(message))(method))(machine, *args, **kwargs)
+            # message = f"An error happened trying to {action} a {machine}"
+            result = ((Glitch.glitchy())(method))(machine, *args, **kwargs)
             machine.doAction(action)
             return result
         else:
@@ -86,7 +86,7 @@ class StateMachine(ABC, metaclass=QtMeta):
             self.stateChanged.emit(self.status)
         else:
             qgsDebug(f"{self}: {self.status} → {action} → {newStatus} not permitted")
-            raise Glitch(f"An error happened trying to {action} a {self}")
+            # raise Glitch(f"An error happened trying to {action} a {self}")
 
     def __repr__(self):
         """Return a string representation of the EditStateMachine."""

@@ -66,13 +66,17 @@ class Glitch(Exception):
         """Catch and report Glitches."""
         try:
             yield
+        except DeprecationWarning as d:
+            qgsDebug(f"Suppressing DeprecationWarning: {d}")
+            return
         except Glitch as g:
             if message is not None:
-                raise Glitch(g, message)
+                raise Glitch(message) from g
             else:
-                raise
+                raise g
         except BaseException as e:
-            raise Glitch(e, message)
+            raise
+            # raise Glitch(message) from e
 
     @staticmethod
     def glitchy(message=None):
