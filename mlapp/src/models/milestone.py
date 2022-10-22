@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import path
+from mlapp.src.spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 
 import processing
 
@@ -14,7 +15,6 @@ from ..spatial.features.pipeline import Pipeline
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
-from ..spatial.layers.feature_layer import FeatureLayerSourceType
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
 
@@ -37,6 +37,24 @@ class Milestone(QObject):
         self.gpkgFile = gpkgFile
         self.elevationLayer = elevationLayer
 
+        boundaryLayerName = f"{self.milestoneName} Boundary"
+        self.boundaryLayer = BoundaryLayer(gpkgFile, boundaryLayerName)
+        waterpointBufferLayerName = f"{self.milestoneName} Waterpoint Buffers"
+        self.waterpointBufferLayer = WaterpointBufferLayer(gpkgFile, waterpointBufferLayerName)
+        waterpointLayerName = f"{self.milestoneName} Waterpoints"
+        self.waterpointLayer = WaterpointLayer(gpkgFile, waterpointLayerName,
+                                               waterpointBufferLayer=self.waterpointBufferLayer,
+                                               elevationLayer=self.elevationLayer)
+        pipelineLayerName = f"{self.milestoneName} Pipeline"
+        self.pipelineLayer = PipelineLayer(gpkgFile, pipelineLayerName,
+                                           elevationLayer=self.elevationLayer)
+        paddockLayerName = f"{self.milestoneName} Paddocks"
+        self.paddockLayer = PaddockLayer(gpkgFile, paddockLayerName)
+        fenceLayerName = f"{self.milestoneName} Fence"
+        self.fenceLayer = FenceLayer(gpkgFile, fenceLayerName,
+                                     paddockLayer=self.paddockLayer,
+                                     elevationLayer=self.elevationLayer)
+        
         self.currentTool = None
         self.isLoaded = False
 
@@ -45,6 +63,8 @@ class Milestone(QObject):
             Paddock: None,
             Pipeline: None
         }
+
+        self.connectLayerDataEvents()
 
     @property
     def selectedFence(self):
@@ -60,63 +80,6 @@ class Milestone(QObject):
     def selectedPipeline(self):
         """Get the currently selected pipeline."""
         return self.selectedFeatures[Pipeline]
-
-    def create(self):
-        """Create this milestone in its GeoPackage."""
-
-        # TODO these are not consistent
-        # Create paddocks, pipeline, fence, waterpoints, boundary layers
-        boundary = BoundaryLayer(layerName=f"{self.milestoneName} Boundary")
-        waterpoint = WaterpointLayer(self.elevationLayer,
-            layerName=f"{self.milestoneName} Waterpoints")
-        pipeline = PipelineLayer(self.elevationLayer, layerName=f"{self.milestoneName} Pipeline")
-        paddock = PaddockLayer(layerName=f"{self.milestoneName} Paddocks")
-        fence = FenceLayer(paddock, self.elevationLayer, layerName=f"{self.milestoneName} Fence")
-
-        # The 'Layers' parameter of the Package Layers tool ('native:package')
-        # Note this is sensitive to order
-        layers = [boundary, waterpoint, pipeline, fence, paddock]
-
-        # Add milestone to GeoPackage using the Package Layers tool
-        params = {
-            'LAYERS': layers,
-            # 'OUTPUT': parameters['ProjectName'],
-            'OVERWRITE': not path.exists(self.gpkgFile),
-            'SAVE_STYLES': False,
-            'OUTPUT': self.gpkgFile
-        }
-
-        processing.run(
-            'native:package', params)
-
-        # Load the required layers for this milestone from the source
-        self.load()
-
-    def load(self):
-        """Load this milestone its GeoPackage."""
-        boundaryLayerName = f"{self.milestoneName} Boundary"
-        self.boundaryLayer = BoundaryLayer(sourceType=FeatureLayerSourceType.Detect,
-                                           layerName=boundaryLayerName, gpkgFile=self.gpkgFile)
-        waterpointLayerName = f"{self.milestoneName} Waterpoints"
-        self.waterpointLayer = WaterpointLayer(self.elevationLayer,
-                                               sourceType=FeatureLayerSourceType.Detect,
-                                               layerName=waterpointLayerName, gpkgFile=self.gpkgFile)
-        pipelineLayerName = f"{self.milestoneName} Pipeline"
-        self.pipelineLayer = PipelineLayer(self.elevationLayer,
-                                           sourceType=FeatureLayerSourceType.Detect,
-                                           layerName=pipelineLayerName, gpkgFile=self.gpkgFile)
-        paddockLayerName = f"{self.milestoneName} Paddocks"
-        self.paddockLayer = PaddockLayer(sourceType=FeatureLayerSourceType.Detect,
-                                         layerName=paddockLayerName, gpkgFile=self.gpkgFile)
-        fenceLayerName = f"{self.milestoneName} Fence"
-        self.fenceLayer = FenceLayer(self.paddockLayer,
-                                     self.elevationLayer,
-                                     sourceType=FeatureLayerSourceType.Detect,
-                                     layerName=fenceLayerName, gpkgFile=self.gpkgFile)
-
-        self.connectLayerDataEvents()
-
-        self.isLoaded = True
 
     def connectLayerDataEvents(self):
         """Connect to layer data changed events."""

@@ -10,3 +10,7 @@ class WaterpointType(Enum):
     WaterTank = "Water Tank"
     Waterhole = "Waterhole"
 
+
+class WaterpointBufferType(Enum):
+    Near = "Near Buffer"
+    Far = "Far Buffer"

@@ -53,6 +53,8 @@ class PaddockPower:
         connectStateListener(self.state, self.state)
         self.state.initSelections(iface.mapCanvas())
 
+        State().detectProject()
+
         QgsProject.instance().cleared.connect(self.state.clearProject)
         QgsProject.instance().readProject.connect(lambda _: self.state.detectProject())
 

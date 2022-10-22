@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 from ..features.boundary import Boundary
-from .feature_layer import FeatureLayer, FeatureLayerSourceType
+from .feature_layer import FeatureLayer
 
 
 class BoundaryLayer(FeatureLayer):
 
     STYLE = "boundary"
 
-    def __init__(self, sourceType=FeatureLayerSourceType.Memory, layerName=None, gpkgFile=None):
-        """Create or open a Boundary layer."""
+    @classmethod
+    def getFeatureType(cls):
+        return Boundary
 
-        super().__init__(featureType=Boundary,
-                         sourceType=sourceType,
-                         layerName=layerName,
-                         gpkgFile=gpkgFile,
-                         styleName=BoundaryLayer.STYLE)
-
-        self.wrapFeature = lambda feature: Boundary(self, feature)
+    def __init__(self, gpkgFile, layerName):
+        super().__init__(gpkgFile, layerName, styleName=BoundaryLayer.STYLE)

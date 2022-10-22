@@ -4,31 +4,25 @@ from qgis.core import QgsFeatureRequest
 from ...models.glitch import Glitch
 from ..features.feature_status import FeatureStatus
 from ..features.fence import Fence
-from .elevation_layer import ElevationLayer
-from .feature_layer import FeatureLayer, FeatureLayerSourceType
-from .paddock_layer import PaddockLayer
+from .feature_layer import FeatureLayer
 
 
 class FenceLayer(FeatureLayer):
 
     STYLE = "fence"
 
-    def __init__(self, paddockLayer: PaddockLayer, elevationLayer: ElevationLayer,
-                 sourceType=FeatureLayerSourceType.Memory, layerName=None, gpkgFile=None):
-        """Create or open a Fence layer."""
+    @classmethod
+    def getFeatureType(cls):
+        return Fence
 
-        super().__init__(Fence,
-                         sourceType,
-                         layerName,
-                         gpkgFile,
-                         styleName=FenceLayer.STYLE)
-
-        # assert isinstance(paddockLayer, PaddockLayer)
-        # assert isinstance(elevationLayer, ElevationLayer)
+    def __init__(self, gpkgFile, layerName, paddockLayer, elevationLayer):
+        super().__init__(gpkgFile, layerName, styleName=FenceLayer.STYLE)
 
         self.paddockLayer = paddockLayer
+        self.elevationLayer = elevationLayer
 
-        self.wrapFeature = lambda feature: Fence(featureLayer=self, paddockLayer=self.paddockLayer, elevationLayer=elevationLayer, existingFeature=feature)
+    def wrapFeature(self, feature):
+        return self.getFeatureType()(self, self.paddockLayer, self.elevationLayer, feature)
 
     def getBuildOrder(self):
         """The lowest Build Order of any Fence in Draft status."""

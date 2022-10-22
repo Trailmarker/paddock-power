@@ -4,7 +4,6 @@ import inspect
 from qgis.core import QgsProject
 
 from .utils import qgsDebug
-from .spatial.layers.feature_layer_source_type import FeatureLayerSourceType
 from .spatial.layers.paddock_layer import PaddockLayer
 
 # def makePaddockLayer():

@@ -1,43 +1,41 @@
 # -*- coding: utf-8 -*-
 from ...models.glitch import Glitch
-from .point_feature import PointFeature
-from .schemas import WaterpointSchema
-
-from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint
-
-from ...models.glitch import Glitch
-from ...utils import qgsDebug
+from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from .edits import Edits
 from .feature import FeatureAction
-from .feature_status import FeatureStatus
-from .line_feature import LineFeature
-from .schemas import FenceSchema, BUILD_FENCE
+from .point_feature import PointFeature
+from .schemas import WaterpointSchema
+from .waterpoint_type import WaterpointBufferType
 
 
 @WaterpointSchema.addSchema()
 class Waterpoint(PointFeature):
 
-    def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):
+    def __init__(self, featureLayer, waterpointBufferLayer: WaterpointBufferLayer,
+                 elevationLayer=None, existingFeature=None):
         """Create a new LineFeature."""
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
+        self.waterpointBufferLayer = waterpointBufferLayer
 
     @Glitch.glitchy()
-    def getBuffers(self):
+    def getBuffer(self, distance):
         """Get the waterpoint buffer geometries for this Waterpoint."""
 
         bufferPoint = self.geometry
 
-        if not bufferPoint:
-            return None, None
+        # Sensible limits
+        if not bufferPoint or not distance or distance <= 0.0 or distance > 20000.0:
+            return None
 
         # Get 3 km and 5 km buffers
-        return bufferPoint.buffer(3000), bufferPoint.buffer(5000)
+        return bufferPoint.buffer(distance)
 
     @Edits.persistEdits
     @FeatureAction.draft.handler()
-    def draftWaterpoint(self):
+    def draftWaterpoint(self, point):
         """Draft a Waterpoint."""
-        
+        self.geometry = point
+
         return Edits.upsert(self)
 
     @Edits.persistEdits
@@ -45,8 +43,21 @@ class Waterpoint(PointFeature):
     def planWaterpoint(self):
         """Plan a Waterpoint."""
 
-        edits = Edits()
+        nearBuffer = self.getBuffer(self.nearBuffer)
 
-        # Derive waterpoint buffers
+        nearWaterpointBuffer = self.waterpointBufferLayer.makeFeature()
+        nearWaterpointBuffer.geometry = nearBuffer
+        nearWaterpointBuffer.waterpoint = self.id
+        nearWaterpointBuffer.waterpointBufferType = WaterpointBufferType.Inner
+        nearWaterpointBuffer.bufferDistance = self.nearBuffer
+        nearWaterpointBuffer.planFeature()
 
-        return Edits.upsert(self)
+        farBuffer = self.getBuffer(self.farBuffer)
+        farWaterpointBuffer = self.waterpointBufferLayer.makeFeature()
+        farWaterpointBuffer.geometry = farBuffer
+        farWaterpointBuffer.waterpoint = self.id
+        farWaterpointBuffer.waterpointBufferType = WaterpointBufferType.Outer
+        farWaterpointBuffer.bufferDistance = self.farBuffer
+        farWaterpointBuffer.planFeature()
+
+        return Edits.upsert(self, nearWaterpointBuffer, farWaterpointBuffer)

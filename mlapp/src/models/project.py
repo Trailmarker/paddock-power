@@ -13,7 +13,6 @@ from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
 from ..spatial.features.land_system import LandSystem
 from ..spatial.layers.elevation_layer import ElevationLayer
-from ..spatial.layers.feature_layer_source_type import FeatureLayerSourceType
 from ..utils import resolveGeoPackageFile
 from .milestone import Milestone
 from .glitch import Glitch
@@ -79,7 +78,7 @@ class Project(QObject):
     def addMilestone(self, milestoneName):
         """Add a new milestone to the project."""
         milestone = Milestone(milestoneName, self.gpkgFile, self.elevationLayer)
-        milestone.create()
+        # milestone.create()
 
         self.milestones[milestoneName] = milestone
         milestone.addToMap()
@@ -127,8 +126,7 @@ class Project(QObject):
                 self.elevationLayer = ElevationLayer(elevationLayerName, self.gpkgFile)
                 self.elevationLayer.addToMap(None)
 
-            milestoneNames = Project.findMilestones(self.gpkgFile)
-            milestoneNames.sort()
+            milestoneNames = sorted(Project.findMilestones(self.gpkgFile))
 
             self.milestones = {}
             self.milestone = None
@@ -136,7 +134,7 @@ class Project(QObject):
             for milestoneName in milestoneNames:
                 milestone = Milestone(milestoneName, self.gpkgFile, self.elevationLayer)
                 self.milestones[milestoneName] = milestone
-                milestone.load()
+                # milestone.load()
 
             self.isLoaded = True
             self.milestonesUpdated.emit(self.milestones)
