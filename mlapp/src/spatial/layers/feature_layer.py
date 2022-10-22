@@ -24,8 +24,6 @@ PADDOCK_POWER_EPSG = 7845
 
 class FeatureLayer(QgsVectorLayer):
 
-    _IS_FEATURE_LAYER = "__isPaddockPowerFeatureLayer"
-
     displayFilterChanged = pyqtSignal(list)
 
     @classmethod
@@ -33,21 +31,15 @@ class FeatureLayer(QgsVectorLayer):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Feature
 
-    # @classmethod
-    # def detectinMapLayers(cls, gpkgFile, layerName):
-    #     """Detect if a layer is already in the map, and if so, return it."""
-    #     gpkgUrl = f"{gpkgFile}|layername={layerName}"
+    @classmethod
+    def detectAndRemove(cls, gpkgFile, layerName):
+        """Detect if a layer is already in the map, and if so, return it."""
+        gpkgUrl = f"{gpkgFile}|layername={layerName}"
 
-    #     featureLayers = [l for l in QgsProject.instance().mapLayers().values() if hasattr(l, cls._IS_FEATURE_LAYER)]
-    #     for layer in featureLayers:
-    #         if layer.source() == gpkgUrl:
-    #             qgsDebug(f"{cls.__name__}.detectinMapLayers: detected existing QgsVectorLayer {layer.name()}")
-    #             QgsProject.instance().removeMapLayer(layer.id())
-    #             layer.setName(layerName)
-    #             layer.__class__ = cls
-    #             return layer
-
-    #     return None
+        layers = [l for l in QgsProject.instance().mapLayers().values()]
+        for layer in layers:
+            if layer.source() == gpkgUrl:
+                QgsProject.instance().removeMapLayer(layer.id())
 
     @classmethod
     def detectInGeoPackage(cls, gpkgFile, layerName):
@@ -100,6 +92,16 @@ class FeatureLayer(QgsVectorLayer):
         processing.run(
             'native:package', params)
 
+    def deleteFromGeoPackage(cls, gpkgFile, layerName):
+        """Delete this FeatureLayer from the GeoPackage file."""
+
+        #gpkgUrl = f"{gpkgFile}|layername={layerName}"
+
+        processing.run("native:spatialiteexecutesql", {
+            'DATABASE': gpkgFile,
+            'SQL': 'drop table {0}'.format(layerName)
+        })
+
     # def __new__(cls, *args, **kwargs):
     #     """Create a new FeatureLayer, or return an existing one if it already exists."""
     #     gpkgFile, layerName, *args = args
@@ -131,11 +133,9 @@ class FeatureLayer(QgsVectorLayer):
             self.setEditorWidgetSetup(fieldIndex, field.editorWidgetSetup())
             self.setDefaultValueDefinition(fieldIndex, field.defaultValueDefinition())
 
-        qgsDebug(f"hasattr(self, '{self._IS_FEATURE_LAYER}') = {hasattr(self, self._IS_FEATURE_LAYER)}")
-        qgsDebug(f"hasattr(self, 'displayFilter') = {hasattr(self, 'displayFilter')}")
+        self.detectAndRemove(gpkgFile, layerName)
 
-        # Do magic for __new__
-        setattr(self, self._IS_FEATURE_LAYER, True)
+        QgsProject.instance().addMapLayer(self, False)
 
         self._displayFilter = [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
         self._applyDisplayFilter(self.displayFilter)
@@ -170,7 +170,7 @@ class FeatureLayer(QgsVectorLayer):
 
     def _refreshDisplayFilterFromRenderer(self):
         """Refresh the display filter from the renderer."""
-        qgsDebug("FeatureLayer._refreshDisplayFilterFromRenderer")
+        # qgsDebug("FeatureLayer._refreshDisplayFilterFromRenderer")
         renderer = self.renderer()
         if isinstance(renderer, QgsCategorizedSymbolRenderer) and renderer.classAttribute() == 'Status':
             values = [category.value() for category in renderer.categories() if category.renderState()]
@@ -197,10 +197,12 @@ class FeatureLayer(QgsVectorLayer):
             raise Glitch(
                 "FeatureLayer.addToMap: the layer group is not present")
 
+        group.addLayer(self)
+
+    def removeFromMap(self, group):
         node = group.findLayer(self.id())
-        if node is None:
-            group.addLayer(self)
-            QgsProject.instance().addMapLayer(self, False)
+        if node:
+            group.removeChildNode(node)
 
     def _unwrapQgsFeature(self, feature):
         """Unwrap a Feature into a QgsFeature."""

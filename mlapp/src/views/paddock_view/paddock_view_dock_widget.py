@@ -20,7 +20,6 @@ class PaddockViewDockWidget(QDockWidget, FORM_CLASS):
         super().__init__(parent)
 
         self.state = State()
-        self.state.detectProject()
 
         self.setupUi(self)
 

@@ -44,7 +44,7 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
         self.refreshUi()
 
     @pyqtSlot()
-    def onMilestoneChanged(self, milestone):
+    def onProjectChanged(self, milestone):
         """Handle a change in the current Paddock Power milestone."""
         self.refreshUi()
 

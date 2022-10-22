@@ -18,13 +18,10 @@
         <property name="sizeConstraint">
           <enum>QLayout::SetMaximumSize</enum>
         </property>
-        <item row="0" column="0">
-          <widget class="MilestoneToolBar" name="milestoneToolBar" native="true"/>
-        </item>
-        <item row="2" column="0">
+        <item row="1" column="0">
           <widget class="PaddockLayerList" name="paddockList"/>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
               <widget class="QLabel" name="paddockFilterLabel">
@@ -66,12 +63,6 @@
       <class>PaddockLayerList</class>
       <extends>QListView</extends>
       <header>mlapp/src/widgets/paddock_list/paddock_layer_list</header>
-    </customwidget>
-    <customwidget>
-      <class>MilestoneToolBar</class>
-      <extends>QWidget</extends>
-      <header>mlapp/src/widgets/milestone_tool_bar/milestone_tool_bar</header>
-      <container>1</container>
     </customwidget>
   </customwidgets>
   <resources/>

@@ -12,43 +12,36 @@ from ..models.project import Project
 from ..utils import resolveGeoPackageFile
 
 
-class AddMilestoneFromExisting(QgsProcessingAlgorithm):
-    NAME = 'AddMilestoneFromExisting'
+class AddEmptyProject(QgsProcessingAlgorithm):
+    NAME = 'AddProject'
     PROJECT_FILE_PARAM = 'ProjectFile'
-    EXISTING_MILESTONE_NAME_PARAM = 'ExistingMilestoneName'
-    MILESTONE_NAME_PARAM = 'MilestoneName'
-    NEW_MILESTONE_OUTPUT = 'NewMilestone'
+    PROJECT_NAME_PARAM = 'ProjectName'
+    NEW_PROJECT_OUTPUT = 'NewProject'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFile(
             self.PROJECT_FILE_PARAM, 'Paddock Power Project File', fileFilter="QGS Project Files (*.qgz *.qgs)", optional=True))
         self.addParameter(QgsProcessingParameterString(
-            self.EXISTING_MILESTONE_NAME_PARAM, 'Existing Milestone Name', multiLine=False, defaultValue=None))
-        self.addParameter(QgsProcessingParameterString(
-            self.MILESTONE_NAME_PARAM, 'Milestone Name', multiLine=False, defaultValue='New Milestone'))
+            self.PROJECT_NAME_PARAM, 'Project Name', multiLine=False, defaultValue='New Project'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         results = {}
         outputs = {}
 
-        existingMilestoneName = parameters[self.EXISTING_MILESTONE_NAME_PARAM]
-        milestoneName = parameters[self.MILESTONE_NAME_PARAM]
+        projectName = parameters[self.PROJECT_NAME_PARAM]
         projectFilePath = parameters[self.PROJECT_FILE_PARAM]
 
         try:
             gpkgFile = resolveGeoPackageFile(projectFilePath)
 
-            milestone = None
+            project = None
             if gpkgFile is not None:
                 project = Project(gpkgFile)
                 project.load()
+                project = project.addProject(projectName)
 
-                existingMilestone = project.getMilestone(existingMilestoneName)
-                milestone = project.addMilestone(milestoneName)
-                existingMilestone.copyTo(milestone)
-
-            outputs[self.NEW_MILESTONE_OUTPUT] = milestone
-            results[self.NEW_MILESTONE_OUTPUT] = milestone
+            outputs[self.NEW_PROJECT_OUTPUT] = project
+            results[self.NEW_PROJECT_OUTPUT] = project
 
         except Glitch as ppe:
             model_feedback.reportError(str(ppe))
@@ -59,10 +52,10 @@ class AddMilestoneFromExisting(QgsProcessingAlgorithm):
         return self.NAME
 
     def displayName(self):
-        return 'Add Milestone From Existing Milestone'
+        return 'Add Empty Project'
 
     def icon(self):
-        return QIcon(":/plugins/mlapp/images/new-milestone.png")
+        return QIcon(":/plugins/mlapp/images/new-project.png")
 
     def createInstance(self):
-        return AddMilestoneFromExisting()
+        return AddEmptyProject()

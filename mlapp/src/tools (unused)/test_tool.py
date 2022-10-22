@@ -4,21 +4,21 @@ from qgis.gui import QgsIdentifyMenu, QgsMapTool, QgsMapToolIdentifyFeature
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 
-from ..models.milestone import Milestone, Glitch
+from ..models.project import Project, Glitch
 from ..utils import qgsDebug
 
 
 class TestTool(QgsMapToolIdentifyFeature):
-    def __init__(self, canvas, milestone):
+    def __init__(self, canvas, project):
         super().__init__(canvas)
 
-        if not isinstance(milestone, Milestone):
+        if not isinstance(project, Project):
             raise Glitch(
-                "TestTool.__init__: milestone is not a Milestone.")
+                "TestTool.__init__: project is not a Project.")
 
-        self.milestone = milestone
+        self.project = project
 
-        self.setLayer(milestone.paddockLayer)
+        self.setLayer(project.paddockLayer)
 
         self.setCursor(QgsApplication.getThemeCursor(
             QgsApplication.Cursor.CrossHair))

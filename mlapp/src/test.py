@@ -71,7 +71,7 @@ from .spatial.layers.paddock_layer import PaddockLayer
 from mlapp.src.models.state import State
 
 State().detectProject()
-fenceLayer = State().getMilestone().fenceLayer
-paddockLayer = State().getMilestone().paddockLayer
+fenceLayer = State().getProject().fenceLayer
+paddockLayer = State().getProject().paddockLayer
 # testFence = [f for f in fenceLayer.getFeatures() if f.name == "Test"][0]
 # anotherFence = [f for f in fenceLayer.getFeatures() if f.name == "Another"][0]

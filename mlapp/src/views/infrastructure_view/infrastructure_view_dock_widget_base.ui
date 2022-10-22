@@ -110,22 +110,6 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="MilestoneToolBar" name="milestoneToolBar" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item>
@@ -229,12 +213,6 @@
   </widget>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>MilestoneToolBar</class>
-   <extends>QWidget</extends>
-   <header>mlapp/src/widgets/milestone_tool_bar/milestone_tool_bar</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>ProfileDetails</class>
    <extends>QWidget</extends>

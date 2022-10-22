@@ -11,7 +11,7 @@ class PaddockLayerList(FeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        featureLayer = State().getMilestone().paddockLayer
+        featureLayer = State().getProject().paddockLayer
 
         def listItemFactory(paddock): return FeatureCollapsibleListItem(
             paddock, PaddockDetails, PaddockDetailsEdit, parent)

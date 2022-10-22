@@ -86,9 +86,9 @@ class FenceListItem(QWidget):
 
     def selectFence(self):
         """Select this Fence."""
-        milestone = self.state.getMilestone()
-        if milestone is not None:
-            milestone.setSelectedFence(self.fence)
+        project = self.state.getProject()
+        if project is not None:
+            project.setSelectedFence(self.fence)
 
     def zoomToFence(self, title):
         """Select this Fence and zoom to it."""

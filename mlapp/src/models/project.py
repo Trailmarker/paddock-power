@@ -1,20 +1,27 @@
 # -*- coding: utf-8 -*-
-from os import path
 import sqlite3
+from mlapp.src.widgets.paddock_power_map_tool import PaddockPowerMapTool
 
-from qgis.PyQt.QtCore import pyqtSignal, QObject
-from qgis.core import QgsVectorLayer
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QObject
+from qgis.core import QgsProject
+from qgis.utils import iface
 
 # -*- coding: utf-8 -*-
 from ..spatial.features.boundary import Boundary
 from ..spatial.features.waterpoint import Waterpoint
 from ..spatial.features.pipeline import Pipeline
+from ..spatial.features.feature import Feature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
 from ..spatial.features.land_system import LandSystem
 from ..spatial.layers.elevation_layer import ElevationLayer
-from ..utils import resolveGeoPackageFile
-from .milestone import Milestone
+from ..spatial.layers.boundary_layer import BoundaryLayer
+from ..spatial.layers.fence_layer import FenceLayer
+from ..spatial.layers.paddock_layer import PaddockLayer
+from ..spatial.layers.pipeline_layer import PipelineLayer
+from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from ..spatial.layers.waterpoint_layer import WaterpointLayer
+from ..utils import qgsDebug, resolveGeoPackageFile
 from .glitch import Glitch
 
 
@@ -24,174 +31,135 @@ class Project(QObject):
     PADDOCK_POWER_FEATURE_TYPES = (
         Boundary, Waterpoint, Pipeline, Fence, Paddock, LandSystem)
 
-    # emit this signal when paddocks are updated
-    milestonesUpdated = pyqtSignal(dict)
-    milestoneChanged = pyqtSignal(Milestone)
+    # emit this signal when a selected Feature is updated
+    selectedFeatureChanged = pyqtSignal(Feature)
+    projectDataChanged = pyqtSignal()
 
-    def __init__(self, gpkgFile=None):
+    def __init__(self, gpkgFile=None, projectName=None):
         super().__init__()
-        self.milestones = {}
-        self.milestone = None
+        
+        gpkgFile = gpkgFile or resolveGeoPackageFile()
+        self.gpkgFile = gpkgFile
+        self.projectName = projectName or "Paddock Power"
 
         self.elevationLayer = None
+        elevationLayerName = self.findElevationLayer(self.gpkgFile)
+        if elevationLayerName is not None:
+            self.elevationLayer = ElevationLayer(self.gpkgFile, elevationLayerName)
 
-        if gpkgFile is None:
-            self.gpkgFile = resolveGeoPackageFile()
+        boundaryLayerName = f"Current Boundary"
+        self.boundaryLayer = BoundaryLayer(self.gpkgFile, boundaryLayerName)
+        waterpointBufferLayerName = f"Current Waterpoint Buffers"
+        self.waterpointBufferLayer = WaterpointBufferLayer(self.gpkgFile, waterpointBufferLayerName)
+        waterpointLayerName = f"Current Waterpoints"
+        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName,
+                                               self.waterpointBufferLayer,
+                                               self.elevationLayer)
+        pipelineLayerName = f"Current Pipeline"
+        self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
+                                           self.elevationLayer)
+        paddockLayerName = f"Current Paddocks"
+        self.paddockLayer = PaddockLayer(self.gpkgFile, paddockLayerName)
+        fenceLayerName = f"Current Fence"
+        self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
+                                     self.paddockLayer,
+                                     self.elevationLayer)
 
-        if gpkgFile is not None:
-            self.gpkgFile = gpkgFile
+        self.currentTool = None
 
-        self.isLoaded = False
+        self.selectedFeatures = {
+            Fence: None,
+            Paddock: None,
+            Pipeline: None
+        }
 
-    def validateMilestoneName(self, milestoneName):
-        """Validate a Milestone name."""
-        if not milestoneName:
-            raise Glitch(
-                "Project.getMilestone: Milestone name is empty.")
+        self.connectLayerDataEvents()
 
-        if milestoneName not in self.milestones:
-            raise Glitch(
-                f"Project.getMilestone: Milestone '{milestoneName}' does not exist.")
+    @property
+    def selectedFence(self):
+        """Get the currently selected fence."""
+        return self.selectedFeatures[Fence]
 
-    def getMilestone(self, milestoneName):
-        """Get a milestone by name."""
-        self.validateMilestoneName(milestoneName)
+    @property
+    def selectedPaddock(self):
+        """Get the currently selected paddock."""
+        return self.selectedFeatures[Paddock]
 
-        return self.milestones[milestoneName]
+    @property
+    def selectedPipeline(self):
+        """Get the currently selected pipeline."""
+        return self.selectedFeatures[Pipeline]
 
-    def setMilestone(self, milestoneName):
-        """Set the current milestone."""
-        self.validateMilestoneName(milestoneName)
+    def connectLayerDataEvents(self):
+        """Connect to layer data changed events."""
+        # TODO self.boundaryLayer, self.waterpointLayer,
+        for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer]:
+            layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
+            layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
 
-        if self.milestone is not None:
-            self.milestone.disconnectAll()
+    def findGroup(self):
+        """Find this Project's group in the Layers panel."""
+        group = QgsProject.instance().layerTreeRoot().findGroup(self.projectName)
+        if group is None:
+            group = QgsProject.instance().layerTreeRoot().insertGroup(0, self.projectName)
+        return group
 
-        self.milestone = self.milestones[milestoneName]
-
-        # Set the current milestone's layer group visible, and hide others
-        for milestone in self.milestones.values():
-            milestone.setVisible(milestone.milestoneName == milestoneName)
-
-        self.milestoneChanged.emit(self.milestone)
-        return self.milestone
-
-    def addMilestone(self, milestoneName):
-        """Add a new milestone to the project."""
-        milestone = Milestone(milestoneName, self.gpkgFile, self.elevationLayer)
-        # milestone.create()
-
-        self.milestones[milestoneName] = milestone
-        milestone.addToMap()
-        self.milestonesUpdated.emit(self.milestones)
-        return milestone
-
-    def addMilestoneFromExisting(self, milestoneName, existingMilestoneName):
-        """Add a milestone copied from an existing milestone."""
-        existingMilestone = self.getMilestone(existingMilestoneName)
-
-        addedMilestone = self.addMilestone(milestoneName)
-        existingMilestone.copyTo(addedMilestone)
-
-    def deleteMilestone(self, milestoneName):
-        """Delete a milestone from the project."""
-        self.validateMilestoneName(milestoneName)
-
-        if not self.gpkgFile:
-            raise Glitch(
-                "Project.deleteMilestone: Project has no GeoPackage file yet.")
-
-        milestone = self.milestones.pop(milestoneName, None)
-        milestone.removeFromMap()
-        milestone.deleteFromGeoPackage()
-
-        # Deleting the current Milestone
-        if self.milestone is not None and self.milestone.milestoneName == milestoneName:
-            self.milestone = None
-            self.milestoneChanged.emit(self.milestone)
-
-        self.milestonesUpdated.emit(self.milestones)
-
-    def load(self, forceLoad=False):
-        """Load this project from its GeoPackage."""
-        assert(self.gpkgFile is not None)
-
-        if not self.isLoaded or forceLoad:
-            # We go to a loaded state if the GeoPackage file does not exist
-            if not path.exists(self.gpkgFile):
-                self.isLoaded = True
-                return
-
-            elevationLayerName = Project.findElevationLayer(self.gpkgFile)
-            if elevationLayerName is not None:
-                self.elevationLayer = ElevationLayer(elevationLayerName, self.gpkgFile)
-                self.elevationLayer.addToMap(None)
-
-            milestoneNames = sorted(Project.findMilestones(self.gpkgFile))
-
-            self.milestones = {}
-            self.milestone = None
-
-            for milestoneName in milestoneNames:
-                milestone = Milestone(milestoneName, self.gpkgFile, self.elevationLayer)
-                self.milestones[milestoneName] = milestone
-                # milestone.load()
-
-            self.isLoaded = True
-            self.milestonesUpdated.emit(self.milestones)
-
-        if self.milestone is None:
-            self.setMilestone(list(self.milestones.keys())[0])
-
-    def addToMap(self):
-        """Add the project to the map."""
-        # Remove first to keep order sane
-        self.removeFromMap()
-
-        milestoneNames = sorted(self.milestones.keys())
-
-        for milestoneName in milestoneNames:
-            self.milestones[milestoneName].addToMap()
-
-        # baseDataGroup = QgsProject.instance().layerTreeRoot().findGroup(Project.PROJECT_BASE_DATA_GROUP)
-        # self.elevationLayer.addToMap(baseDataGroup)
+    def addToMap(self, group=None):
+        """Add this Project to the map."""
+        group = group or self.findGroup()
+        self.waterpointLayer.addToMap(group)
+        self.boundaryLayer.addToMap(group)
+        self.pipelineLayer.addToMap(group)
+        self.fenceLayer.addToMap(group)
+        self.waterpointBufferLayer.addToMap(group)
+        self.paddockLayer.addToMap(group)
+        #self.landSystemLayer.addToMap(group)
+        self.elevationLayer.addToMap(group)
 
     def removeFromMap(self):
-        """Remove the project from the map."""
-        milestoneNames = sorted(self.milestones.keys())
+        """Remove this Project from the current map view."""
+        group = self.findGroup()
+        self.waterpointLayer.removeFromMap(group)
+        self.boundaryLayer.removeFromMap(group)
+        self.pipelineLayer.removeFromMap(group)
+        self.fenceLayer.removeFromMap(group)
+        self.waterpointBufferLayer.removeFromMap(group)
+        self.paddockLayer.removeFromMap(group)
+        #self.landSystemLayer.removeFromMap(group)
+        self.elevationLayer.removeFromMap(group)
+        QgsProject.instance().layerTreeRoot().removeChildNode(group)
 
-        for milestoneName in milestoneNames:
-            self.milestones[milestoneName].removeFromMap()
-
-    @classmethod
-    def findMilestones(cls, gpkgFile):
-        """Find the milestones in a project GeoPackage."""
-        def rchop(s, suffix):
-            if suffix and s.endswith(suffix):
-                return s[:-len(suffix)]
-            return s
-
-        layers = QgsVectorLayer(path=gpkgFile, providerLib="ogr")
-        if not layers.isValid():
+    def setTool(self, tool):
+        """Set the current tool for this Project."""
+        if not isinstance(tool, PaddockPowerMapTool):
             raise Glitch(
-                f"Project.findMilestones: error loading Paddock Power GeoPackage at {gpkgFile}")
+                "Project.setTool: tool must be a PaddockPowerMapTool")
 
-        layerNames = [l.split('!!::!!')[1]
-                      for l in layers.dataProvider().subLayers()]
-        featureTypeNames = [
-            ft.__name__ for ft in Project.PADDOCK_POWER_FEATURE_TYPES]
+        self.unsetTool()
+        self.currentTool = tool
+        iface.mapCanvas().setMapTool(self.currentTool)
 
-        milestones = set()
-        for layerName in layerNames:
-            match = next(
-                (t for t in featureTypeNames if layerName.endswith(t + 's')), None)
-            if match is not None:
-                milestones.add(rchop(layerName, match + 's').strip())
-            match = next(
-                (t for t in featureTypeNames if layerName.endswith(t)), None)
-            if match is not None:
-                milestones.add(rchop(layerName, match).strip())
+    def unsetTool(self):
+        if self.currentTool is not None:
+            self.currentTool.clear()
+            self.currentTool.dispose()
+            iface.mapCanvas().unsetMapTool(self.currentTool)
+            self.currentTool = None
 
-        return list(milestones)
+    def setSelectedFeature(self, feature):
+        if feature is not None and not isinstance(feature, Feature):
+            raise Glitch(
+                "You can't select an object that is not a Feature")
+        self.selectedFeatures[type(feature)] = feature
+        self.selectedFeatureChanged.emit(feature)
+
+    @pyqtSlot()
+    def onLayerSelectionChanged(self, layer, selection):
+        if len(selection) == 1:
+            feature = layer.getFeatureById(selection[0])
+            qgsDebug(f"onLayerSelectionChanged: {feature or 'None'}")
+            if feature is not None:
+                self.setSelectedFeature(feature)
 
     @classmethod
     def findElevationLayer(cls, gpkgFile):

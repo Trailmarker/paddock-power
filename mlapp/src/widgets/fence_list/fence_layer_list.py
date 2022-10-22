@@ -10,7 +10,7 @@ class FenceLayerList(FeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        featureLayer = State().getMilestone().fenceLayer
+        featureLayer = State().getProject().fenceLayer
         def listItemFactory(fence): return FeatureListItem(fence)
 
         super().__init__(listItemFactory, featureLayer, parent)

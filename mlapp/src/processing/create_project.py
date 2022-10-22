@@ -14,33 +14,33 @@ class CreateProject(QgsProcessingAlgorithm):
 
     NAME = 'CreateProject'
     PROJECT_FILE_PARAM = 'QgisProjectFile'
-    MILESTONE_NAME_PARAM = 'MilestoneName'
-    NEW_MILESTONE_OUTPUT = 'NewMilestone'
+    PROJECT_NAME_PARAM = 'ProjectName'
+    NEW_PROJECT_OUTPUT = 'NewProject'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFile(
             self.PROJECT_FILE_PARAM, 'QGIS Project File', fileFilter="QGS Project Files (*.qgz *.qgs)", optional=True))
         self.addParameter(QgsProcessingParameterString(
-            self.MILESTONE_NAME_PARAM, 'Milestone Name', multiLine=False, defaultValue='New Milestone'))
+            self.PROJECT_NAME_PARAM, 'Project Name', multiLine=False, defaultValue='New Project'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         results = {}
         outputs = {}
 
-        milestoneName = parameters[self.MILESTONE_NAME_PARAM]
+        projectName = parameters[self.PROJECT_NAME_PARAM]
         projectFilePath = parameters[self.PROJECT_FILE_PARAM]
 
         try:
             gpkgFile = resolveGeoPackageFile(projectFilePath)
 
-            milestone = None
+            project = None
 
             project = Project(gpkgFile)
             project.load()
-            milestone = project.addMilestone(milestoneName)
+            project = project.addProject(projectName)
 
-            outputs[self.NEW_MILESTONE_OUTPUT] = milestone
-            results[self.NEW_MILESTONE_OUTPUT] = milestone
+            outputs[self.NEW_PROJECT_OUTPUT] = project
+            results[self.NEW_PROJECT_OUTPUT] = project
 
         except Glitch as ppe:
             model_feedback.reportError(str(ppe))

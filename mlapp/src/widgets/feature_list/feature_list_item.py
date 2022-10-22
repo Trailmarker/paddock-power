@@ -39,7 +39,7 @@ class FeatureListItem(QWidget):
             lambda _: self.feature.planFence())
         self.toolBar.addFeatureAction(
             FeatureAction.plan,
-            ':/plugins/mlapp/images/delete-milestone.png',
+            ':/plugins/mlapp/images/delete-project.png',
             lambda _: self.feature.trashFeature())
         self.toolBar.addZoomAction()
 

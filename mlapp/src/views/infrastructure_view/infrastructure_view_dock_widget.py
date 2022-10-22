@@ -21,8 +21,7 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         """Constructor."""
         super().__init__(parent)
 
-        self.state = State(detectProject=True)
-        self.state.detectProject()
+        self.state = State()
 
         self.setupUi(self)
 
@@ -50,65 +49,60 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
         self.refreshUi()
 
     @pyqtSlot()
-    def onMilestoneChanged(self, milestone):
-        """Handle a change in the current Paddock Power milestone."""
-        self.refreshUi()
-
-    @pyqtSlot()
     def onSelectedFeatureChanged(self, _):
         self.refreshUi()
 
     def sketchFence(self):
         """Sketch and analyse a new Fence."""
-        milestone = self.state.getMilestone()
+        project = self.state.getProject()
 
-        if milestone is None:
-            raise Glitch("Please set the current Milestone before using the Sketch Line tool.")
+        if project is None:
+            raise Glitch("Please set the current Project before using the Sketch Line tool.")
         else:
-            tool = SketchLineTool(milestone)
+            tool = SketchLineTool(project)
             tool.sketchFinished.connect(
                 lambda sketchLine: self.onSketchFenceFinished(sketchLine))
-            milestone.setTool(tool)
+            project.setTool(tool)
 
     @pyqtSlot()
     def onSketchFenceFinished(self, sketchLine):
-        milestone = self.state.getMilestone()
+        project = self.state.getProject()
 
-        fence = milestone.fenceLayer.makeFeature()    
+        fence = project.fenceLayer.makeFeature()    
         fence.draftFence(sketchLine)
         
-        # milestone.setSelectedFeature(fence)
+        # project.setSelectedFeature(fence)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
-        milestone = self.state.getMilestone()
+        project = self.state.getProject()
 
-        if milestone is None:
-            raise Glitch("Please set the current Milestone before using the Sketch Line tool.")
+        if project is None:
+            raise Glitch("Please set the current Project before using the Sketch Line tool.")
         else:
-            tool = SketchLineTool(milestone)
+            tool = SketchLineTool(project)
             tool.sketchFinished.connect(self.onSketchPipelineFinished)
-            milestone.setTool(tool)
+            project.setTool(tool)
 
     @pyqtSlot()
     def onSketchPipelineFinished(self, sketchLine):
-        milestone = self.state.getMilestone()
+        project = self.state.getProject()
 
-        pipeline = milestone.pipelineLayer.makeFeature()
+        pipeline = project.pipelineLayer.makeFeature()
         pipeline.draftPipeline(sketchLine)
         pipeline.planPipeline()
-        milestone.setSelectedFeature(pipeline)
+        project.setSelectedFeature(pipeline)
 
     def refreshUi(self):
         """Show the Infrastructure Profile."""
         # If we have no current infrastructure profile data, clean up the canvas object
-        milestone = self.state.getMilestone()
+        project = self.state.getProject()
 
         for button in [self.sketchFenceButton,
                        self.sketchPipelineButton,
                        self.selectFenceButton,
                        self.selectPipelineButton]:
-            button.setEnabled(milestone is not None)
+            button.setEnabled(project is not None)
 
     def closeEvent(self, event):
         self.closingDockWidget.emit()

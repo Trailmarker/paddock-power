@@ -42,9 +42,9 @@ class ProfileDetails(QWidget, FORM_CLASS):
             return
 
         if self.selectedInfrastructure is not None:
-            milestone = self.state.getMilestone()
+            project = self.state.getProject()
 
-            if milestone is None:
+            if project is None:
                 self.selectedInfrastructure = None
                 self.refreshUi()
                 return
@@ -88,11 +88,6 @@ class ProfileDetails(QWidget, FORM_CLASS):
     @pyqtSlot()
     def onProjectChanged(self, project):
         """Handle a change in the current Paddock Power project."""
-        self.refreshUi()
-
-    @pyqtSlot()
-    def onMilestoneChanged(self, milestone):
-        """Handle a change in the current Paddock Power milestone."""
         self.refreshUi()
 
     @pyqtSlot()

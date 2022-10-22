@@ -32,20 +32,14 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     def onProjectChanged(self, project):
         """Handle a change in the current Paddock Power project."""
         self.clearFence()
-        self.refreshUi()
 
-    @pyqtSlot()
-    def onMilestoneChanged(self, milestone):
-        """Handle a change in the current Paddock Power milestone."""
-        self.clearFence()
-
-        if milestone is not None:
-            self.onSelectedFeatureChanged(milestone.selectedFence)
+        if project is not None:
+            self.onSelectedFeatureChanged(project.selectedFence)
 
     @pyqtSlot()
     def onMilestoneDataChanged(self):
         """Handle a change to the underlying Milestone data."""
-        fence = self.state.getMilestone().selectedFence
+        fence = self.state.getProject().selectedFence
         self.onSelectedFeatureChanged(fence)        
 
     @pyqtSlot()

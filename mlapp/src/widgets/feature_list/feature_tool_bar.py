@@ -70,9 +70,9 @@ class FeatureToolBar(QToolBar):
 
     def selectFeature(self):
         """Select this Feature."""
-        milestone = self.state.getMilestone()
-        if milestone is not None:
-            milestone.setSelectedFeature(self.feature)
+        project = self.state.getProject()
+        if project is not None:
+            project.setSelectedFeature(self.feature)
 
     def zoomToFeature(self, title):
         """Select this Fence and zoom to it."""

@@ -105,9 +105,9 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
     def selectFeature(self):
         """Select this paddock."""
         # self.collapse.setExpanded(True)
-        milestone = self.state.getMilestone()
-        if milestone is not None:
-            milestone.setSelectedFeature(self.feature)
+        project = self.state.getProject()
+        if project is not None:
+            project.setSelectedFeature(self.feature)
 
     def sizeHint(self):
         """Return the size of the widget."""
