@@ -72,4 +72,3 @@ class FeatureListItem(QWidget):
         hint = QSize(self.layout.sizeHint().width(),
                      self.layout.sizeHint().height())
         return hint
-

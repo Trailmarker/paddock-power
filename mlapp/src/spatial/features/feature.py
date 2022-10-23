@@ -91,7 +91,7 @@ class Feature(QObject, FeatureStateMachine):
         """Add or update the Feature in the FeatureLayer."""
         # TODO inefficient
         self.recalculate()
-        
+
         if (self.id >= 0):
             self.featureLayer.updateFeature(self)
         else:
@@ -147,10 +147,8 @@ class Feature(QObject, FeatureStateMachine):
         """Return the Feature's title."""
         f"{self.name}"
 
-
     @Edits.persistEdits
     @FeatureAction.trash.handler()
     def trashFeature(self):
         """Trash a Draft Feature."""
         return Edits.delete(self)
-

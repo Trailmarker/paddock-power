@@ -46,7 +46,7 @@ class FeatureToolBar(QToolBar):
 
     def addZoomAction(self):
         self.zoomAction = True
-   
+
     def refreshUi(self):
         """Refresh the UI based on the current state of the fence."""
 

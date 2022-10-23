@@ -40,7 +40,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     def onMilestoneDataChanged(self):
         """Handle a change to the underlying Milestone data."""
         fence = self.state.getProject().selectedFence
-        self.onSelectedFeatureChanged(fence)        
+        self.onSelectedFeatureChanged(fence)
 
     @pyqtSlot()
     def onSelectedFeatureChanged(self, fence):

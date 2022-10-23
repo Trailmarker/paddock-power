@@ -189,7 +189,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
         outputs['ExplodeLines'] = processing.run(
-            'native:explodelines', alg_params, context=context,  is_child_algorithm=True)
+            'native:explodelines', alg_params, context=context, is_child_algorithm=True)
 
         feedback.setCurrentStep(7)
         if feedback.isCanceled():
@@ -222,8 +222,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'FORMULA': 'if (minimum(z(start_point($geometry)), "ID") < minimum(z(end_point($geometry)), "ID"), minimum(z(start_point($geometry))), minimum(z(end_point($geometry))))',
             'INPUT': outputs['Calculate3dLines']['OUTPUT'],
             'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['MinElev'] = processing.run(
             'qgis:fieldcalculator', alg_params, context=context, is_child_algorithm=True)
 
@@ -240,8 +239,7 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             'FORMULA': 'if (maximum(z(start_point($geometry)), "ID") < maximum(z(end_point($geometry)), "ID"), maximum(z(start_point($geometry))), maximum(z(end_point($geometry))))',
             'INPUT': outputs['MinElev']['OUTPUT'],
             'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['MaxElev'] = processing.run(
             'qgis:fieldcalculator', alg_params, context=context, is_child_algorithm=True)
 
@@ -415,18 +413,33 @@ class FencelineAnalysis(QgsProcessingAlgorithm):
             return {}
 
         # Refactor fields
-        alg_params = {
-            'FIELDS_MAPPING': [{'expression': 'ID', 'length': 0, 'name': 'Line ID', 'precision': 0, 'type': 2},
-                               {'expression':  'round(x( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)',
-                                'length': 0, 'name': 'Longitude', 'precision': 0, 'type': 6},
-                               {'expression':  'round(y( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)',
-                                'length': 0, 'name': 'Latitude', 'precision': 0, 'type': 6},
-                               {'expression':  'round(zcoord,2)', 'length': 0,
-                                'name': 'Elevation (m)', 'precision': 0, 'type': 6},
-                               {'expression':  'if (z($geometry) = minimum( "zcoord" , "ID" ), \'Minimum Elevation\', \'Maximum Elevation\')', 'length': 0, 'name': 'Minimum or Maximum', 'precision': 0, 'type': 10}],
-            'INPUT': outputs['MergeMinMax']['OUTPUT'],
-            'OUTPUT': minMaxFile
-        }
+        alg_params = {'FIELDS_MAPPING': [{'expression': 'ID',
+                                          'length': 0,
+                                          'name': 'Line ID',
+                                          'precision': 0,
+                                          'type': 2},
+                                         {'expression': 'round(x( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)',
+                                          'length': 0,
+                                          'name': 'Longitude',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': 'round(y( transform($geometry, \'EPSG:7845\', \'EPSG:4326\') ),6)',
+                                          'length': 0,
+                                          'name': 'Latitude',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': 'round(zcoord,2)',
+                                          'length': 0,
+                                          'name': 'Elevation (m)',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': 'if (z($geometry) = minimum( "zcoord" , "ID" ), \'Minimum Elevation\', \'Maximum Elevation\')',
+                                          'length': 0,
+                                          'name': 'Minimum or Maximum',
+                                          'precision': 0,
+                                          'type': 10}],
+                      'INPUT': outputs['MergeMinMax']['OUTPUT'],
+                      'OUTPUT': minMaxFile}
 
         MinMaxMerge = processing.run('qgis:refactorfields', alg_params,
                                      context=context, feedback=feedback, is_child_algorithm=True)

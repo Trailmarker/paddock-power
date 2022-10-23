@@ -37,7 +37,7 @@ class Project(QObject):
 
     def __init__(self, gpkgFile=None, projectName=None):
         super().__init__()
-        
+
         gpkgFile = gpkgFile or resolveGeoPackageFile()
         self.gpkgFile = gpkgFile
         self.projectName = projectName or "Paddock Power"
@@ -113,7 +113,7 @@ class Project(QObject):
         self.fenceLayer.addToMap(group)
         self.waterpointBufferLayer.addToMap(group)
         self.paddockLayer.addToMap(group)
-        #self.landSystemLayer.addToMap(group)
+        # self.landSystemLayer.addToMap(group)
         self.elevationLayer.addToMap(group)
 
     def removeFromMap(self):
@@ -125,7 +125,7 @@ class Project(QObject):
         self.fenceLayer.removeFromMap(group)
         self.waterpointBufferLayer.removeFromMap(group)
         self.paddockLayer.removeFromMap(group)
-        #self.landSystemLayer.removeFromMap(group)
+        # self.landSystemLayer.removeFromMap(group)
         self.elevationLayer.removeFromMap(group)
         QgsProject.instance().layerTreeRoot().removeChildNode(group)
 

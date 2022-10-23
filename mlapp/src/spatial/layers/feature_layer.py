@@ -102,13 +102,6 @@ class FeatureLayer(QgsVectorLayer):
             'SQL': 'drop table {0}'.format(layerName)
         })
 
-    # def __new__(cls, *args, **kwargs):
-    #     """Create a new FeatureLayer, or return an existing one if it already exists."""
-    #     gpkgFile, layerName, *args = args
-
-    #     layer = cls.detectinMapLayers(gpkgFile, layerName)
-    #     return layer if layer else super().__new__(cls, gpkgFile, layerName, *args, **kwargs)
-
     def __init__(self, gpkgFile, layerName, styleName=None):
         """Create a new Paddock Power vector layer."""
 

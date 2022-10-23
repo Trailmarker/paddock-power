@@ -14,5 +14,3 @@ class WaterpointBufferLayer(FeatureLayer):
         """Create or open a Waterpoint layer."""
 
         super().__init__(gpkgFile, layerName, styleName=None)
-
-

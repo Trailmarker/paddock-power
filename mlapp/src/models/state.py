@@ -68,7 +68,6 @@ class State(GlitchHook, metaclass=Singleton):
         if self.project is not None:
             self.project.removeFromMap()
 
-   
     def initSelections(self, canvas):
         """Initialize the selections."""
         self.selectionsInitialised = True

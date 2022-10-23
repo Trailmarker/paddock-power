@@ -6,6 +6,7 @@ from ..models.colors import toCssColour
 from ..models.glitch import Glitch
 from ..spatial.features.feature_status import FeatureStatus
 
+
 class FeatureStatusLabel(QLabel):
 
     def __init__(self, status, parent=None):

@@ -68,9 +68,9 @@ class InfrastructureViewDockWidget(QDockWidget, FORM_CLASS):
     def onSketchFenceFinished(self, sketchLine):
         project = self.state.getProject()
 
-        fence = project.fenceLayer.makeFeature()    
+        fence = project.fenceLayer.makeFeature()
         fence.draftFence(sketchLine)
-        
+
         # project.setSelectedFeature(fence)
 
     def sketchPipeline(self):

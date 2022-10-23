@@ -7,6 +7,7 @@ from qgis.gui import QgsRubberBand
 from ..models.glitch import Glitch
 from .features.feature import Feature
 
+
 class Selection(QgsRubberBand):
 
     def __init__(self, canvas, wkbType, parent=None):
@@ -62,4 +63,4 @@ class Selection(QgsRubberBand):
     def refreshUi(self):
         """Refresh the Fence rubber band."""
         self.updateGeometry(self.selectedFeature.geometry
-                           if self.selectedFeature is not None else None)
+                            if self.selectedFeature is not None else None)

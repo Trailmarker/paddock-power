@@ -20,8 +20,12 @@ class AddProjectFromExisting(QgsProcessingAlgorithm):
     NEW_PROJECT_OUTPUT = 'NewProject'
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFile(
-            self.PROJECT_FILE_PARAM, 'Paddock Power Project File', fileFilter="QGS Project Files (*.qgz *.qgs)", optional=True))
+        self.addParameter(
+            QgsProcessingParameterFile(
+                self.PROJECT_FILE_PARAM,
+                'Paddock Power Project File',
+                fileFilter="QGS Project Files (*.qgz *.qgs)",
+                optional=True))
         self.addParameter(QgsProcessingParameterString(
             self.EXISTING_PROJECT_NAME_PARAM, 'Existing Project Name', multiLine=False, defaultValue=None))
         self.addParameter(QgsProcessingParameterString(

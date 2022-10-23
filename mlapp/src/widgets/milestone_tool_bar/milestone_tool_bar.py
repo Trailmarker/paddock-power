@@ -68,9 +68,8 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
             return
 
         self.milestoneComboBox.clear()
-        milestoneNames = [
-            milestoneName for milestoneName in project.milestones.keys()]
-        milestoneNames.sort()
+        milestoneNames = sorted([
+            milestoneName for milestoneName in project.milestones.keys()])
         milestoneNames.insert(0, '')
         self.milestoneComboBox.addItems(milestoneNames)
 
@@ -119,6 +118,7 @@ class MilestoneToolBar(QWidget, FORM_CLASS):
 
         if project.milestone is not None:
             confirmed = guiConfirm(
-                f"Are you sure you want to delete the Milestone '{project.milestone.milestoneName}'?", "Delete current Milestone")
+                f"Are you sure you want to delete the Milestone '{project.milestone.milestoneName}'?",
+                "Delete current Milestone")
             if confirmed:
                 project.deleteMilestone(project.milestone.milestoneName)

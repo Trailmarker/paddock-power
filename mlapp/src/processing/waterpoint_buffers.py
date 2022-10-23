@@ -199,8 +199,7 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         alg_params = {
             'EXPRESSION': ' \"Waterpoint Type\"  =  \'Trough\' OR  \"Waterpoint Type\" = \'Waterhole\' OR  \"Waterpoint Type\" = \'Turkey Nest\'',
             'INPUT': outputs['DeletedCurrentWaters']['OUTPUT'],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['ExtractByExpressionCurrentWaters'] = processing.run(
             'native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -312,9 +311,14 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         # Delete unneeded fields
         alg_params = {
             'INPUT': outputs['CalcPercentageCurrent']['OUTPUT'],
-            'COLUMN': ['Waterpoint Type', 'Paddock Date Commisioned', 'Paddock Date Decommisioned', 'Paddock Status', 'Date Edited', 'Paddock Perimeter (km)'],
-            'OUTPUT': current_buffer
-        }
+            'COLUMN': [
+                'Waterpoint Type',
+                'Paddock Date Commisioned',
+                'Paddock Date Decommisioned',
+                'Paddock Status',
+                'Date Edited',
+                'Paddock Perimeter (km)'],
+            'OUTPUT': current_buffer}
         current_buffers = processing.run(
             "qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -368,8 +372,7 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         alg_params = {
             'EXPRESSION': ' \"Waterpoint Type\"  =  \'Trough\' OR  \"Waterpoint Type\" = \'Waterhole\' OR  \"Waterpoint Type\" = \'Turkey Nest\'',
             'INPUT': outputs['DeletedNewWaters']['OUTPUT'],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['ExtractByExpressionNewWaters'] = processing.run(
             'native:extractbyexpression', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -394,9 +397,10 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         # Merge Current Watered Areas
         alg_params = {
             'CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
-            'LAYERS': [outputs['ExtractByLocationNewWaters']['OUTPUT'], outputs['ExtractByLocationCurrentWaters']['OUTPUT']],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'LAYERS': [
+                outputs['ExtractByLocationNewWaters']['OUTPUT'],
+                outputs['ExtractByLocationCurrentWaters']['OUTPUT']],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['MergeWaters'] = processing.run(
             'native:mergevectorlayers', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -494,9 +498,16 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         # Delete unneeded fields
         alg_params = {
             'INPUT': outputs['CalcPercentageProposed']['OUTPUT'],
-            'COLUMN': ['Waterpoint Type', 'Paddock Date Commisioned', 'Paddock Date Decommisioned', 'Paddock Status', 'Date Edited', 'Paddock Perimeter (km)', 'layer', 'path'],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'COLUMN': [
+                'Waterpoint Type',
+                'Paddock Date Commisioned',
+                'Paddock Date Decommisioned',
+                'Paddock Status',
+                'Date Edited',
+                'Paddock Perimeter (km)',
+                'layer',
+                'path'],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['DeletedWatersNew'] = processing.run(
             "qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -524,25 +535,48 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        alg_params = {
-
-            'FIELDS_MAPPING': [{'expression': '"Paddock Name"', 'length': 0, 'name': 'Paddock Name', 'precision': 0, 'type': 10},
-                               {'expression': '"Paddock Area (km²)"', 'length': 0,
-                                'name': 'Paddock Area (km²)', 'precision': 0, 'type': 6},
-                               {'expression': '"Buffer Distance (km)"', 'length': 0,
-                                'name': 'Buffer Distance (km)', 'precision': 0, 'type': 2},
-                               {'expression': '"Current Watered Area (km²)"', 'length': 0,
-                                'name': 'Current Watered Area (km²)', 'precision': 0, 'type': 6},
-                               {'expression': '"Current Watered Area (%)"', 'length': 0,
-                                'name': 'Current Watered Area (%)', 'precision': 0, 'type': 6},
-                               {'expression': '"Proposed Watered Area (km²)"', 'length': 0,
-                                'name': 'Proposed Watered Area (km²)', 'precision': 0, 'type': 6},
-                               {'expression': '"Proposed Watered Area (%)"', 'length': 0,
-                                'name': 'Proposed Watered Area (%)', 'precision': 0, 'type': 6},
-                               {'expression': ' round("Proposed Watered Area (km²)" / "Current Watered Area (km²)" ,2 )', 'length': 0, 'name': 'Proposed Watered Area Difference (km²)', 'precision': 0, 'type': 6}],
-            'INPUT': outputs['JoinedWaters']['OUTPUT'],
-            'OUTPUT': new_buffer
-        }
+        alg_params = {'FIELDS_MAPPING': [{'expression': '"Paddock Name"',
+                                          'length': 0,
+                                          'name': 'Paddock Name',
+                                          'precision': 0,
+                                          'type': 10},
+                                         {'expression': '"Paddock Area (km²)"',
+                                          'length': 0,
+                                          'name': 'Paddock Area (km²)',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': '"Buffer Distance (km)"',
+                                          'length': 0,
+                                          'name': 'Buffer Distance (km)',
+                                          'precision': 0,
+                                          'type': 2},
+                                         {'expression': '"Current Watered Area (km²)"',
+                                          'length': 0,
+                                          'name': 'Current Watered Area (km²)',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': '"Current Watered Area (%)"',
+                                          'length': 0,
+                                          'name': 'Current Watered Area (%)',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': '"Proposed Watered Area (km²)"',
+                                          'length': 0,
+                                          'name': 'Proposed Watered Area (km²)',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': '"Proposed Watered Area (%)"',
+                                          'length': 0,
+                                          'name': 'Proposed Watered Area (%)',
+                                          'precision': 0,
+                                          'type': 6},
+                                         {'expression': ' round("Proposed Watered Area (km²)" / "Current Watered Area (km²)" ,2 )',
+                                          'length': 0,
+                                          'name': 'Proposed Watered Area Difference (km²)',
+                                          'precision': 0,
+                                          'type': 6}],
+                      'INPUT': outputs['JoinedWaters']['OUTPUT'],
+                      'OUTPUT': new_buffer}
 
         new_buffers = processing.run('qgis:refactorfields', alg_params,
                                      context=context, feedback=feedback, is_child_algorithm=True)
@@ -554,7 +588,8 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
 
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        # Reproject Land Units / Systems. Shouldn't be needed if already in correct projection, maybe check projection first?
+        # Reproject Land Units / Systems. Shouldn't be needed if already in
+        # correct projection, maybe check projection first?
         alg_params = {
             'INPUT': parameters['LANDUNIT'],
             'TARGET_CRS': QgsCoordinateReferenceSystem('EPSG:7845'),
@@ -586,9 +621,15 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         # Delete unneeded fields
         alg_params = {
             'INPUT': outputs['CurrentLandInt']['OUTPUT'],
-            'COLUMN': ['Paddock Name', 'Paddock Area (km²)', 'Paddock Perimeter (km)', 'Date Edited', 'Paddock Status', 'Paddock Date Commisioned', 'Paddock Date Decommisioned'],
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'COLUMN': [
+                'Paddock Name',
+                'Paddock Area (km²)',
+                'Paddock Perimeter (km)',
+                'Date Edited',
+                'Paddock Status',
+                'Paddock Date Commisioned',
+                'Paddock Date Decommisioned'],
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['CurrentLandIntDel'] = processing.run(
             "qgis:deletecolumn", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -752,12 +793,16 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
             'FIELD': 'Paddock Land Unit/Land System Area (km²)',
             'INPUT_2': current_land_buffer,
             'FIELD_2': 'Paddock Land Unit/Land System Area (km²)',
-            'FIELDS_TO_COPY': ['Current Land Unit/Land System Area (km²)', 'Current AE in A Condition', 'Current AE in B Condition', 'Current AE in C Condition', 'Current AE in D Condition'],
+            'FIELDS_TO_COPY': [
+                'Current Land Unit/Land System Area (km²)',
+                'Current AE in A Condition',
+                'Current AE in B Condition',
+                'Current AE in C Condition',
+                'Current AE in D Condition'],
             'METHOD': 1,
             'DISCARD_NONMATCHING': False,
             'PREFIX': '',
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['JoinedLandUnits'] = processing.run(
             "native:joinattributestable", alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -774,8 +819,7 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
             'FORMULA': 'if( \"Current Land Unit/Land System Area (km²)\" IS NULL, 0,\"Current Land Unit/Land System Area (km²)\" )',
             'INPUT': outputs['JoinedLandUnits']['OUTPUT'],
             'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['FieldCalculatorCurrentLU'] = processing.run(
             'qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -792,8 +836,7 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
             'FORMULA': 'round( \"Proposed Land Unit/Land System Area (km²)\" - \"Current Land Unit/Land System Area (km²)\" ,1)',
             'INPUT': outputs['FieldCalculatorCurrentLU']['OUTPUT'],
             'NEW_FIELD': True,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-        }
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
         outputs['FieldCalculatorCurrentLUDiff'] = processing.run(
             'qgis:fieldcalculator', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -866,4 +909,5 @@ class WaterpointBuffers(QgsProcessingAlgorithm):
         new_land_buffers = processing.run(
             'qgis:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        return {self.NWAREA: new_buffers, self.CWAREA: current_buffers, self.CWLAREA: current_land_buffers, self.NWLAREA: new_land_buffers}
+        return {self.NWAREA: new_buffers, self.CWAREA: current_buffers,
+                self.CWLAREA: current_land_buffers, self.NWLAREA: new_land_buffers}

@@ -140,7 +140,7 @@ WaterpointBufferSchema = Schema(AreaFeatureSchema + [
     Field(propertyName="waterpoint", name=WATERPOINT, type=QVariant.LongLong,
           typeName="Integer64", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="waterpointBufferType", name=WATERPOINT_BUFFER_TYPE, type=QVariant.String, typeName="String",
-          len=0, prec=0, comment="", subType=QVariant.Invalid, domainType=WaterpointBufferType),  
+          len=0, prec=0, comment="", subType=QVariant.Invalid, domainType=WaterpointBufferType),
     Field(propertyName="bufferDistance", name=BUFFER_DISTANCE, type=QVariant.Double, typeName="Real",
           len=0, prec=0, comment="", subType=QVariant.Invalid),
 ])

@@ -19,8 +19,12 @@ class AddEmptyProject(QgsProcessingAlgorithm):
     NEW_PROJECT_OUTPUT = 'NewProject'
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFile(
-            self.PROJECT_FILE_PARAM, 'Paddock Power Project File', fileFilter="QGS Project Files (*.qgz *.qgs)", optional=True))
+        self.addParameter(
+            QgsProcessingParameterFile(
+                self.PROJECT_FILE_PARAM,
+                'Paddock Power Project File',
+                fileFilter="QGS Project Files (*.qgz *.qgs)",
+                optional=True))
         self.addParameter(QgsProcessingParameterString(
             self.PROJECT_NAME_PARAM, 'Project Name', multiLine=False, defaultValue='New Project'))
 

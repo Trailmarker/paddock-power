@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 
+
 class WaterpointType(Enum):
     Bore = "Bore"
     Dam = "Dam"
