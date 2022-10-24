@@ -12,7 +12,6 @@ from .resources_rc import *
 
 from .src.models.glitch import Glitch
 from .src.models.project import Project
-from .src.models.singleton import Singleton
 from .src.provider import Provider
 from .src.utils import qgsDebug, resolveGeoPackageFile, PLUGIN_NAME
 
