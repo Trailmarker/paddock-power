@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject
+
 from ..calculator import Calculator
 from ..layers.elevation_layer import ElevationLayer
 from .feature import Feature
@@ -12,9 +14,13 @@ class LineFeature(Feature):
         """Create a new LineFeature."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-        self.elevationLayer = elevationLayer
+        self._elevationLayerId = elevationLayer.id()
         self._profile = None
         # self.recalculate()
+
+    @property
+    def elevationLayer(self):
+        return QgsProject.instance().mapLayer(self._elevationLayerId)
 
     def profile(self):
         return self._profile

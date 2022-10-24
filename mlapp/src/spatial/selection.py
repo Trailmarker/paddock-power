@@ -7,14 +7,16 @@ from qgis.gui import QgsRubberBand
 from ..models.glitch import Glitch
 from .features.feature import Feature
 
+
 class Selection(QgsRubberBand):
 
-    def __init__(self, canvas, wkbType, parent=None):
+    def __init__(self, project, canvas, wkbType):
         """Constructor."""
         super().__init__(canvas, wkbType)
 
-        self.wkbType = wkbType
+        project.selectedFeatureChanged.connect(self.setSelectedFeature)
         self.canvas = canvas
+        self.wkbType = wkbType
 
         self.selectedFeature = None
 
@@ -37,12 +39,13 @@ class Selection(QgsRubberBand):
         self.selectedFeature = None
         self.refreshUi()
 
+    @pyqtSlot(Feature)
     def setSelectedFeature(self, feature):
         """Set the selection."""
 
         if not isinstance(feature, Feature):
             raise Glitch(
-                "Selection.setSelection: feature must be a QgsFeature object")
+                "Your selected feature must be a Paddock Power Feature.")
 
         self.selectedFeature = feature
         self.refreshUi()
@@ -62,4 +65,4 @@ class Selection(QgsRubberBand):
     def refreshUi(self):
         """Refresh the Fence rubber band."""
         self.updateGeometry(self.selectedFeature.geometry
-                           if self.selectedFeature is not None else None)
+                            if self.selectedFeature is not None else None)

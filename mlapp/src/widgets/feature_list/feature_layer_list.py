@@ -1,27 +1,33 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.utils import qgsDebug
+from qgis.core import QgsProject
+
 from .feature_list_base import FeatureListBase
 
 
 class FeatureLayerList(FeatureListBase):
-    def __init__(self, listItemFactory, featureLayer, parent=None):
+    def __init__(self, listItemFactory, parent=None):
         """Constructor."""
 
         super().__init__(listItemFactory, parent)
 
-        self.featureLayer = featureLayer
-
-        # TODO disable the list while the featureLayer is being edited?
-        # self.featureLayer.beforeEditingStarted.connect(self.refreshUi)
-        self.featureLayer.afterCommitChanges.connect(self.refreshUi)
-        self.featureLayer.displayFilterChanged.connect(self.onDisplayFilterChanged)
-
+        self._featureLayerId = None
         self.refreshUi()
 
-    def onDisplayFilterChanged(self, filter):
-        qgsDebug(f"FeatureLayerList.onDisplayFilterChanged: {str(filter)}")
+    @property
+    def featureLayer(self):
+        """Get the FeatureLayer."""
+        return QgsProject.instance().mapLayer(self._featureLayerId) if self._featureLayerId else None
+
+    @featureLayer.setter
+    def featureLayer(self, featureLayer):
+        """Set the Project."""
+        self._featureLayerId = featureLayer.id() if featureLayer else None
+        self.featureLayer.editsPersisted.connect(self.refreshUi)
         self.refreshUi()
 
     def getFeatures(self):
         """Get the Features."""
-        return [feature for feature in self.featureLayer.getFeaturesByStatus(*self.featureLayer.displayFilter)]
+        if self.featureLayer:
+            return [feature for feature in self.featureLayer.getFeaturesByStatus(*self.featureLayer.displayFilter)]
+        else:
+            return []

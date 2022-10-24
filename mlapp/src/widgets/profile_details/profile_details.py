@@ -3,12 +3,9 @@ import os
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
-from qgis.PyQt.QtWidgets import QWidget, QLabel
+from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.features.fence import Fence
-from ...spatial.features.pipeline import Pipeline
-from ...models.glitch import Glitch
-from ...models.state import State, connectStateListener
+from ...spatial.features.feature import Feature
 from .profile_canvas import ProfileCanvas
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -21,30 +18,33 @@ class ProfileDetails(QWidget, FORM_CLASS):
         """Constructor."""
         super().__init__(parent)
 
-        self.setupUi(self)
-
+        self.project = None
         self.selectedInfrastructure = None
         self.profileCanvas = None
 
-        self.state = State()
-        connectStateListener(self.state, self)
+        self.setupUi(self)
 
+        self.refreshUi()
+
+    def setProject(self, project):
+        """Set the Project."""
+        self.project = project
+        self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self.refreshUi()
 
     def refreshUi(self):
         """Refresh the UI."""
         # If we have no current selected infrastructure, hide stuff
-        for label in [self.elevationRangeLabel, self.elevationRangeText, self.infrastructureLengthLabel, self.infrastructureLengthText]:
+        for label in [self.elevationRangeLabel, self.elevationRangeText,
+                      self.infrastructureLengthLabel, self.infrastructureLengthText]:
             label.setVisible(self.selectedInfrastructure is not None)
-        
-        if self.selectedInfrastructure is None:
+
+        if self.project is None or self.selectedInfrastructure is None:
             self.cleanupProfileCanvas()
             return
 
         if self.selectedInfrastructure is not None:
-            milestone = self.state.getMilestone()
-
-            if milestone is None:
+            if self.project is None:
                 self.selectedInfrastructure = None
                 self.refreshUi()
                 return
@@ -85,27 +85,9 @@ class ProfileDetails(QWidget, FORM_CLASS):
         self.profileCanvas = ProfileCanvas(profile)
         self.canvasLayout.addWidget(self.profileCanvas)
 
-    @pyqtSlot()
-    def onProjectChanged(self, project):
-        """Handle a change in the current Paddock Power project."""
-        self.refreshUi()
-
-    @pyqtSlot()
-    def onMilestoneChanged(self, milestone):
-        """Handle a change in the current Paddock Power milestone."""
-        self.refreshUi()
-
-    @pyqtSlot()
+    @pyqtSlot(Feature)
     def onSelectedFeatureChanged(self, feature):
         """Handle a change to the selected Fence."""
         if feature.isInfrastructure:
-            self.setSelectedInfrastructure(feature)
-
-    def setSelectedInfrastructure(self, infrastructure):
-        """Set the selected Infrastructure."""
-        if not isinstance(infrastructure, Fence) and not isinstance(infrastructure, Pipeline):
-            raise Glitch(
-                "InfrastructureViewDockWidget.setSelectedInfrastructure: infrastructure is not a Fence or Pipeline")
-        self.selectedInfrastructure = infrastructure
-
-        self.refreshUi()
+            self.selectedInfrastructure = feature
+            self.refreshUi()

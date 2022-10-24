@@ -6,6 +6,7 @@ from qgis.core import QgsWkbTypes
 from .condition import Condition
 from .feature_status import FeatureStatus
 from .field import Field
+from .waterpoint_type import WaterpointBufferType
 from .waterpoint_type import WaterpointType
 
 
@@ -131,14 +132,17 @@ PaddockSchema = Schema(CapacityFeatureSchema + [
 
 PipelineSchema = LineFeatureSchema
 
-BUFFER_DISTANCE = "Buffer Distance (km)"
-WATERED_AREA = "Watered Area (km²)"
+WATERPOINT = "Waterpoint"
+WATERPOINT_BUFFER_TYPE = "Waterpoint Buffer Type"
+BUFFER_DISTANCE = "Buffer Distance (m)"
 
 WaterpointBufferSchema = Schema(AreaFeatureSchema + [
+    Field(propertyName="waterpoint", name=WATERPOINT, type=QVariant.LongLong,
+          typeName="Integer64", len=0, prec=0, comment="", subType=QVariant.Invalid),
+    Field(propertyName="waterpointBufferType", name=WATERPOINT_BUFFER_TYPE, type=QVariant.String, typeName="String",
+          len=0, prec=0, comment="", subType=QVariant.Invalid, domainType=WaterpointBufferType),
     Field(propertyName="bufferDistance", name=BUFFER_DISTANCE, type=QVariant.Double, typeName="Real",
           len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="wateredArea", name=WATERED_AREA, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
 ])
 
 WATERPOINT_TYPE = "Waterpoint Type"
@@ -147,6 +151,8 @@ BORE_YIELD = "Bore Yield (L/s)"
 BORE_REPORT_URL = "Bore Report URL"
 WATERPOINT_START_MONTH = "Waterpoint Start Month"
 WATERPOINT_END_MONTH = "Waterpoint End Month"
+NEAR_BUFFER = "Near Buffer (m)"
+FAR_BUFFER = "Far Buffer (m)"
 
 WaterpointSchema = Schema(PointFeatureSchema + [
     Field(propertyName="waterpointType", name=WATERPOINT_TYPE, type=QVariant.String, typeName="String",
@@ -161,5 +167,9 @@ WaterpointSchema = Schema(PointFeatureSchema + [
     Field(propertyName="waterpointStartMonth", name=WATERPOINT_START_MONTH, type=QVariant.String,
           typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="waterpointEndMonth", name=WATERPOINT_END_MONTH, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid)
+          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
+    Field(propertyName="innerBuffer", name=NEAR_BUFFER, type=QVariant.Double,
+          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue='3000.0'),
+    Field(propertyName="outerBuffer", name=FAR_BUFFER, type=QVariant.Double,
+          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue='5000.0')
 ])

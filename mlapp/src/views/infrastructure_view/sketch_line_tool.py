@@ -5,8 +5,6 @@ from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 
-from ...models.milestone import Milestone
-from ...models.glitch import Glitch
 from ...widgets.paddock_power_map_tool import PaddockPowerMapTool
 
 
@@ -15,15 +13,10 @@ class SketchLineTool(PaddockPowerMapTool):
 
     sketchFinished = pyqtSignal(QgsGeometry)
 
-    def __init__(self, milestone):
+    def __init__(self, project):
 
-        super().__init__()
-
-        if not isinstance(milestone, Milestone):
-            raise Glitch(
-                "SketchLineTool.__init__: milestone is not a Milestone.")
-
-        self.milestone = milestone
+        self.project = project
+        super().__init__(self.project.iface.mapCanvas())
 
         # flag to know whether the tool is capturing a drawing
         self.capturing = False
@@ -81,7 +74,7 @@ class SketchLineTool(PaddockPowerMapTool):
 
         if e.button() == Qt.RightButton:
             self.capturing = False
-            self.milestone.unsetTool()
+            self.project.unsetTool()
             self.updateLine()
 
     def updateLine(self):

@@ -1,69 +1,55 @@
 # -*- coding: utf-8 -*-
 import os.path
+import sys
 
-from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator, Qt
+from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, QTranslator, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from qgis.core import QgsApplication, QgsProject
-from qgis.utils import iface
 
-# Initialize Qt resources from file resources.py
 from .resources_rc import *
 
-# Import the code for the dialog(s), dock widget(s) and processing provider
-from .src.models.state import State, connectStateListener
-from .src.views.infrastructure_view.infrastructure_view_dock_widget import InfrastructureViewDockWidget
-from .src.views.paddock_view.paddock_view_dock_widget import PaddockViewDockWidget
+from .src.models.glitch import Glitch
+from .src.models.project import Project
 from .src.provider import Provider
+from .src.utils import qgsDebug, resolveGeoPackageFile, PLUGIN_NAME
 
 
-class PaddockPower:
+class PaddockPower(QObject):
+
+    __GLITCH_HOOK_WRAPPER = "__glitchHookWrapper"
+
+    caughtGlitch = pyqtSignal(Glitch)
 
     def __init__(self, iface):
-        # Save reference to the QGIS interface
-        self.iface = iface
+        super().__init__()
 
-        self.pluginPath = os.path.dirname(__file__)
+        self.iface = iface
+        self.actions = []
+
+        self.setupGlitchHook()
+        self.caughtGlitch.connect(Glitch.popup)
 
         # Initialise locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value("locale/userLocale")[0:2]
         localePath = os.path.join(
-            self.pluginPath,
-            'i18n',
-            'PaddockPower_{}.qm'.format(locale))
+            os.path.dirname(__file__),
+            "i18n",
+            f"PaddockPower_{locale}.qm")
 
         if os.path.exists(localePath):
             self.translator = QTranslator()
             self.translator.load(localePath)
             QCoreApplication.installTranslator(self.translator)
 
-        # Declare instance attributes
-        self.actions = []
-        self.menu = self.tr(u'&Paddock Power')
-        # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'PaddockPower')
-        self.toolbar.setObjectName(u'PaddockPower')
+        self.provider = Provider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
 
-        # Check if plugin was started the first time in current QGIS session
-        # Must be set in initGui() to survive plugin reloads
-        self.firstStart = None
+        QgsProject.instance().cleared.connect(self.unloadProject)
+        QgsProject.instance().readProject.connect(self.detectProject)
 
-        self.state = State()
-        connectStateListener(self.state, self.state)
-        self.state.initSelections(iface.mapCanvas())
-
-        QgsProject.instance().cleared.connect(self.state.clearProject)
-        QgsProject.instance().readProject.connect(lambda _: self.state.detectProject())
-
-        self.infrastructureViewIsActive = False
-        self.infrastructureView = None
-
-        self.paddockViewIsActive = False
-        self.paddockView = None
-
-    def tr(self, message):
-        return QCoreApplication.translate('PaddockPower', message)
+        self.project = None
 
     def addAction(self,
                   icon,
@@ -83,107 +69,126 @@ class PaddockPower:
 
         if statusTip is not None:
             action.setStatusTip(statusTip)
-
         if whatsThis is not None:
             action.setWhatsThis(whatsThis)
-
         if addToToolbar:
             self.toolbar.addAction(action)
-
         if addToMenu:
-            self.iface.addPluginToMenu(
-                self.menu,
-                action)
-
+            self.iface.addPluginToMenu(self.menu, action)
         self.actions.append(action)
-
         return action
 
     def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        """The real Paddock Power GUI is initialised when a project is opened,
+           but QGIS utilities call this when the plug-in is loaded anyway."""
+        # Initialise plug-in menu and toolbar
+        self.menu = Project.MENU_NAME
+
+        self.toolbar = self.iface.addToolBar(u"PaddockPower")
+        self.toolbar.setObjectName(u"PaddockPower")
+
+        self.actions = []
 
         self.addAction(
-            QIcon(':/plugins/mlapp/images/paddock.png'),
-            text=self.tr(u'View Paddocks'),
+            QIcon(":/plugins/mlapp/images/paddock.png"),
+            text=u"View Paddocks",
             callback=self.openPaddockView,
             parent=self.iface.mainWindow())
 
         self.addAction(
-            QIcon(':/plugins/mlapp/images/split-paddock.png'),
-            text=self.tr(u'View and Plan Fences and Pipelines'),
+            QIcon(":/plugins/mlapp/images/split-paddock.png"),
+            text=u"View and Plan Fences and Pipelines",
             callback=self.openInfrastructureView,
             parent=self.iface.mainWindow())
 
-        # Will be set False in run()
-        self.firstStart = True
+        self.detectProject()
 
-        # Register processing provider
-        self.initProcessing()
+    # Override Glitch type exceptions application-wide
+    def setupGlitchHook(self):
+        if hasattr(sys.excepthook, PaddockPower.__GLITCH_HOOK_WRAPPER):
+            qgsDebug("GlitchHook: Glitch hook already set.")
+            return
 
-    def initProcessing(self):
-        """Init Processing provider for QGIS >= 3.8."""
-        self.provider = Provider()
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        exceptHook = sys.excepthook
+        qgsDebug("GlitchHook: setting up Glitch hook.")
 
-    def onClosePaddockView(self):
-        if self.paddockView is not None:
-            self.paddockView.closingDockWidget.disconnect(
-                self.onClosePaddockView)
+        def glitchHookWrapper(exceptionType, e, traceback):
+            if isinstance(e, Glitch):
+                self.caughtGlitch.emit(e)
+                return
+            else:
+                exceptHook(exceptionType, e, traceback)
 
-        self.paddockViewIsActive = False
-        # Remove this statement if dockwidget is to remain
-        # for reuse if it is reopened later
-        self.paddockView = None
+        setattr(glitchHookWrapper, PaddockPower.__GLITCH_HOOK_WRAPPER, sys.excepthook)
+        sys.excepthook = glitchHookWrapper
 
-    def onCloseInfrastructureView(self):
-        if self.infrastructureView is not None:
-            self.infrastructureView.closingDockWidget.disconnect(
-                self.onCloseInfrastructureView)
-
-        self.infrastructureViewIsActive = False
-        self.infrastructureView = None
+    @staticmethod
+    def restoreSystemExceptionHook():
+        if hasattr(sys.excepthook, PaddockPower.__GLITCH_HOOK_WRAPPER):
+            qgsDebug("GlitchHook: restoring original system exception hook.")
+            sys.excepthook = getattr(sys.excepthook, PaddockPower.__GLITCH_HOOK_WRAPPER)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
-        for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(u'&Paddock Power'),
-                action)
-            self.iface.removeToolBarIcon(action)
-        # Remove the toolbar
-        del self.toolbar
+        try:
+            QgsProject.instance().cleared.disconnect(self.unloadProject)
+            QgsProject.instance().readProject.disconnect(self.detectProject)
+        except BaseException:
+            pass
 
-        self.state.pluginUnloading.emit()
+        try:
+            self.unloadProject()
+        except BaseException:
+            pass
 
-        # Remove processing provider
-        QgsApplication.processingRegistry().removeProvider(self.provider)
+        try:
+            # Remove the plugin menu item and icon
+            for action in self.actions:
+                self.iface.removePluginMenu(Project.MENU_NAME, action)
+                self.iface.removeToolBarIcon(action)
+
+            # Remove the toolbar
+            del self.toolbar
+        except BaseException:
+            pass
+
+        try:
+            # Remove processing provider
+            QgsApplication.processingRegistry().removeProvider(self.provider)
+        except BaseException:
+            pass
+
+        PaddockPower.restoreSystemExceptionHook()
+
+    @Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
+    def detectProject(self, _=None):
+        """Detect a Paddock Power project in the current QGIS project."""
+        self.project = None
+        try:
+            gpkgFile = resolveGeoPackageFile()
+            if gpkgFile is not None:
+                qgsDebug("Paddock Power loading project …")
+                self.project = Project(self.iface, gpkgFile)
+            else:
+                qgsDebug("Paddock Power no GeoPackage file …")
+        except BaseException:
+            pass
+        if self.project is not None:
+            self.project.addToMap()
+
+    def unloadProject(self):
+        """Removes the plugin menu item and icon from QGIS interface."""
+        if self.project is not None:
+            qgsDebug("Paddock Power unloading project …")
+            self.project.unload()
+            self.project = None
 
     def openPaddockView(self):
         """Run method that loads and opens Paddock View."""
-
-        if not self.paddockViewIsActive:
-            self.paddockViewIsActive = True
-
-            if self.paddockView is None:
-                self.paddockView = PaddockViewDockWidget()
-
-            # Connect to provide cleanup on closing of self.paddockView
-            self.paddockView.closingDockWidget.connect(self.onClosePaddockView)
-            self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.paddockView)
-            self.paddockView.show()
+        if self.project is not None:
+            self.project.openPaddockView()
 
     def openInfrastructureView(self):
         """Run method that loads and opens Plan Fences and Pipelines."""
-
-        if not self.infrastructureViewIsActive:
-            self.infrastructureViewIsActive = True
-
-            if self.infrastructureView is None:
-                self.infrastructureView = InfrastructureViewDockWidget()
-
-            # Connect to provide cleanup on closing of self.infrastructureView
-            self.infrastructureView.closingDockWidget.connect(
-                self.onCloseInfrastructureView)
-            self.iface.addDockWidget(
-                Qt.BottomDockWidgetArea, self.infrastructureView)
-            self.infrastructureView.show()
+        if self.project is not None:
+            self.project.openInfrastructureView()

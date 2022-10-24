@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 
+
 class WaterpointType(Enum):
     Bore = "Bore"
     Dam = "Dam"
@@ -10,3 +11,7 @@ class WaterpointType(Enum):
     WaterTank = "Water Tank"
     Waterhole = "Waterhole"
 
+
+class WaterpointBufferType(Enum):
+    Near = "Near Buffer"
+    Far = "Far Buffer"

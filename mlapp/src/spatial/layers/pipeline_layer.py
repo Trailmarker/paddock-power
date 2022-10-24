@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
 from ..features.pipeline import Pipeline
 from .elevation_layer import ElevationLayer
-from .feature_layer import FeatureLayer, FeatureLayerSourceType
+from .feature_layer import FeatureLayer
 
 
 class PipelineLayer(FeatureLayer):
 
     STYLE = "pipeline"
 
-    def __init__(self, elevationLayer: ElevationLayer, sourceType=FeatureLayerSourceType.Memory, layerName=None, gpkgFile=None):
+    @classmethod
+    def getFeatureType(cls):
+        return Pipeline
+
+    def __init__(self, gpkgFile, layerName, elevationLayer: ElevationLayer):
         """Create or open a Pipeline layer."""
 
-        super().__init__(Pipeline,
-                         sourceType,
+        super().__init__(gpkgFile,
                          layerName,
-                         gpkgFile,
                          styleName=PipelineLayer.STYLE)
 
-        self.wrapFeature = lambda feature: Pipeline(self, elevationLayer, feature)
+        self.elevationLayer = elevationLayer
+
+    def wrapFeature(self, feature):
+        return self.getFeatureType()(self, self.elevationLayer, feature)

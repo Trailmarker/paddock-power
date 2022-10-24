@@ -4,7 +4,6 @@ import inspect
 from qgis.core import QgsProject
 
 from .utils import qgsDebug
-from .spatial.layers.feature_layer_source_type import FeatureLayerSourceType
 from .spatial.layers.paddock_layer import PaddockLayer
 
 # def makePaddockLayer():
@@ -72,7 +71,7 @@ from .spatial.layers.paddock_layer import PaddockLayer
 from mlapp.src.models.state import State
 
 State().detectProject()
-fenceLayer = State().getMilestone().fenceLayer
-paddockLayer = State().getMilestone().paddockLayer
+fenceLayer = State().getProject().fenceLayer
+paddockLayer = State().getProject().paddockLayer
 # testFence = [f for f in fenceLayer.getFeatures() if f.name == "Test"][0]
 # anotherFence = [f for f in fenceLayer.getFeatures() if f.name == "Another"][0]

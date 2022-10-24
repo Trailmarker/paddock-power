@@ -25,12 +25,12 @@ class Edits:
         return self
 
     @staticmethod
-    def upsert(feature):
-        return Edits(upserts=[feature])
+    def upsert(*features):
+        return Edits(upserts=list(features))
 
     @staticmethod
-    def delete(feature):
-        return Edits(deletes=[feature])
+    def delete(*features):
+        return Edits(deletes=list(features))
 
     @staticmethod
     @contextmanager
@@ -46,6 +46,7 @@ class Edits:
             yield
             for layer in layers:
                 layer.commitChanges()
+                layer.editsPersisted.emit()
         except Exception as e:
             for layer in layers:
                 layer.rollBack()
@@ -83,7 +84,7 @@ class Edits:
                 for feature in edits.upserts:
                     feature.upsert()
                 for feature in edits.deletes:
-                    feature.delete()                
+                    feature.delete()
 
             # Signal updates to the rest of the system - TODO?
             for feature in edits.upserts:

@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+from os import path
+
 from qgis.PyQt.QtCore import QVariant, pyqtSignal
 
-from qgis.core import QgsCategorizedSymbolRenderer, QgsFeatureRequest, QgsGeometry, QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
+import processing
 
 from ...models.glitch import Glitch
 from ...utils import resolveStylePath, qgsDebug
 from ..features.feature import Feature
 from ..features.feature_status import FeatureStatus
-from .feature_layer_source_type import FeatureLayerSourceType
 
 # Couple of lookup dictionaries (locally useful only)
 QVARIANT_TYPES = dict([(getattr(QVariant, v), v) for v, m in vars(
@@ -21,64 +23,96 @@ PADDOCK_POWER_EPSG = 7845
 
 
 class FeatureLayer(QgsVectorLayer):
+
     displayFilterChanged = pyqtSignal(list)
+    editsPersisted = pyqtSignal()
 
-    def __new__(cls, *args, **kwargs):
+    @classmethod
+    def getFeatureType(cls):
+        """Return the type of feature that this layer contains. Override in subclasses"""
+        return Feature
 
-        sourceType = kwargs.get('sourceType', None)
-        gpkgFile = kwargs.get('gpkgFile', None)
-        layerName = kwargs.get('layerName', None)
+    @classmethod
+    def detectAndRemove(cls, gpkgFile, layerName):
+        """Detect if a layer is already in the map, and if so, return it."""
+        gpkgUrl = f"{gpkgFile}|layername={layerName}"
 
-        if sourceType == FeatureLayerSourceType.Detect:
-            gpkgUrl = f"{gpkgFile}|layername={layerName}"
+        layers = [l for l in QgsProject.instance().mapLayers().values()]
+        for layer in layers:
+            if layer.source() == gpkgUrl:
+                QgsProject.instance().removeMapLayer(layer.id())
 
-            for layer in QgsProject.instance().mapLayers().values():
+    @classmethod
+    def detectInGeoPackage(cls, gpkgFile, layerName):
+        """Detect a matching QgsVectorLayer in a GeoPackage."""
+        try:
+            layers = QgsVectorLayer(path=gpkgFile, providerLib="ogr")
+            if not layers.isValid():
+                # GeoPackage file does not yet exist
+                return None
 
-                if layer.source() == gpkgUrl:
-                    qgsDebug(f"{cls.__name__}.__new__: Coercing existing QgsVectorLayer {layer.name()}")
-                    QgsProject.instance().removeMapLayer(layer.id())
-                    layer.setName(layerName)
-                    layer.__class__ = cls
-                    return layer
+            layerNames = [l.split('!!::!!')[1]
+                          for l in layers.dataProvider().subLayers()]
 
-        return super().__new__(cls)
+            if layerName in layerNames:
+                gpkgUrl = f"{gpkgFile}|layername={layerName}"
+                layer = QgsVectorLayer(path=gpkgUrl, baseName=layerName, providerLib="ogr")
+                if layer.isValid():
+                    return True
+        except BaseException:
+            pass
 
-    def __new__(cls, *args, **kwargs):
-        """Create a new FeatureLayer, or return an existing one if it already exists."""
-        return super().__new__(cls, *args, **kwargs)
+        return False
 
-    def __init__(self, featureType=Feature, sourceType=FeatureLayerSourceType.Memory, layerName=None,
-                 gpkgFile=None, styleName=None):
-        """Create a new Paddock Power vector layer."""
-
-        self._featureType = featureType
-        self.wrapFeature = lambda existingFeature: featureType(self, existingFeature)
-
+    @classmethod
+    def createInGeoPackage(cls, gpkgFile, layerName):
+        featureType = cls.getFeatureType()
         wkbType = featureType.getWkbType()
         schema = featureType.getSchema()
 
-        # If we didn't get an already initialised FeatureLayer from the custom __new__ above …
-        if sourceType == FeatureLayerSourceType.Memory:
-            assert(layerName is not None)
-            assert(wkbType is not None)
-            assert(schema is not None)
+        assert(layerName is not None)
+        assert(wkbType is not None)
+        assert(schema is not None)
 
-            layerDefinition = f"{QGSWKB_TYPES[wkbType]}?crs=epsg:{PADDOCK_POWER_EPSG}"
+        layerDefinition = f"{QGSWKB_TYPES[wkbType]}?crs=epsg:{PADDOCK_POWER_EPSG}"
 
-            super().__init__(path=layerDefinition, baseName=layerName, providerLib="memory")
+        layer = QgsVectorLayer(path=layerDefinition, baseName=layerName, providerLib="memory")
 
-            # Have to start editing to get schema updates to stick
-            self.startEditing()
-            self.dataProvider().addAttributes(schema)
-            self.commitChanges()
+        # Have to start editing to get schema updates to stick
+        layer.startEditing()
+        layer.dataProvider().addAttributes(schema)
+        layer.commitChanges()
 
-        elif sourceType in [FeatureLayerSourceType.Detect, FeatureLayerSourceType.File]:
-            assert(layerName is not None)
-            assert(gpkgFile is not None)
+        params = {
+            'LAYERS': [layer],
+            'OVERWRITE': not path.exists(gpkgFile),
+            'SAVE_STYLES': False,
+            'OUTPUT': gpkgFile
+        }
 
-            gpkgUrl = f"{gpkgFile}|layername={layerName}"
+        processing.run(
+            'native:package', params)
 
-            super().__init__(path=gpkgUrl, baseName=layerName, providerLib="ogr")
+    def deleteFromGeoPackage(cls, gpkgFile, layerName):
+        """Delete this FeatureLayer from the GeoPackage file."""
+
+        #gpkgUrl = f"{gpkgFile}|layername={layerName}"
+
+        processing.run("native:spatialiteexecutesql", {
+            'DATABASE': gpkgFile,
+            'SQL': 'drop table {0}'.format(layerName)
+        })
+
+    def __init__(self, gpkgFile, layerName, styleName=None):
+        """Create a new Paddock Power vector layer."""
+
+        # If not found, create
+        if not self.detectInGeoPackage(gpkgFile, layerName):
+            qgsDebug(f"{self.__class__.__name__} not found in Paddock Power GeoPackage. Creating new, stand by …")
+            self.createInGeoPackage(gpkgFile, layerName)
+
+        self._gpkgUrl = f"{gpkgFile}|layername={layerName}"
+        super().__init__(path=self._gpkgUrl, baseName=layerName, providerLib="ogr")
 
         # Optionally apply a style to the layer
         if styleName is not None:
@@ -86,19 +120,23 @@ class FeatureLayer(QgsVectorLayer):
             self.loadNamedStyle(stylePath)
 
         # Apply editor widgets
+        schema = self.getFeatureType().getSchema()
+
         for field in schema:
             fieldIndex = self.fields().indexFromName(field.name())
             self.setEditorWidgetSetup(fieldIndex, field.editorWidgetSetup())
             self.setDefaultValueDefinition(fieldIndex, field.defaultValueDefinition())
 
+        self.detectAndRemove(gpkgFile, layerName)
+
+        QgsProject.instance().addMapLayer(self, False)
+
         self._displayFilter = [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
-        self._applyDisplayFilter(self._displayFilter)
+        self._applyDisplayFilter(self.displayFilter)
         self.writeCustomSymbology.connect(self._refreshDisplayFilterFromRenderer)
 
-    @property
-    def featureType(self):
-        """The Paddock Power Feature type for this layer."""
-        return self._featureType
+    def wrapFeature(self, feature):
+        return self.getFeatureType()(self, feature)
 
     @property
     def displayFilter(self):
@@ -126,7 +164,7 @@ class FeatureLayer(QgsVectorLayer):
 
     def _refreshDisplayFilterFromRenderer(self):
         """Refresh the display filter from the renderer."""
-        qgsDebug("FeatureLayer._refreshDisplayFilterFromRenderer")
+        # qgsDebug("FeatureLayer._refreshDisplayFilterFromRenderer")
         renderer = self.renderer()
         if isinstance(renderer, QgsCategorizedSymbolRenderer) and renderer.classAttribute() == 'Status':
             values = [category.value() for category in renderer.categories() if category.renderState()]
@@ -137,11 +175,11 @@ class FeatureLayer(QgsVectorLayer):
         """Copy all features in this layer to another layer."""
         if otherLayer is None:
             raise Glitch(
-                "VectorLayer.copyTo: the target layer is not present")
+                "FeatureLayer.copyTo: the target layer is not present")
 
-        if self.featureType != otherLayer.featureType:
+        if self.getFeatureType() != otherLayer.getFeatureType():
             raise Glitch(
-                f"Cannot copy features from {self.featureType.displayName()} to {otherLayer.featureType.displayName()}")
+                f"Cannot copy features from {self.getFeatureType().displayName()} to {otherLayer.getFeatureType().displayName()}")
 
         otherLayer.startEditing()
         otherLayer.dataProvider().addFeatures(self.getFeatures())
@@ -151,18 +189,20 @@ class FeatureLayer(QgsVectorLayer):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
         if group is None:
             raise Glitch(
-                "VectorLayer.addToMap: the layer group is not present")
+                "FeatureLayer.addToMap: the layer group is not present")
 
+        group.addLayer(self)
+
+    def removeFromMap(self, group):
         node = group.findLayer(self.id())
-        if node is None:
-            group.addLayer(self)
-            QgsProject.instance().addMapLayer(self, False)
+        if node:
+            group.removeChildNode(node)
 
     def _unwrapQgsFeature(self, feature):
         """Unwrap a Feature into a QgsFeature."""
-        if not isinstance(feature, self.featureType):
+        if not isinstance(feature, self.getFeatureType()):
             raise Glitch(
-                f"VectorLayer.__unwrapQgsFeature: the feature is not a {self.featureType.__name__}")
+                f"FeatureLayer.__unwrapQgsFeature: the feature is not a {self.getFeatureType().__name__}")
         return feature._qgsFeature
 
     def _wrapQgsFeatures(self, qgsFeatures):
@@ -175,23 +215,11 @@ class FeatureLayer(QgsVectorLayer):
         """Make a new Feature in this layer."""
         return self.wrapFeature(existingFeature)
 
-    def makeFeatureFromGeometry(self, geometry):
-        """Make a new Feature from a geometry."""
-        if not isinstance(geometry, QgsGeometry):
-            raise Glitch(
-                "You can't use a {self.__class__.__name__} to draft a {self.featureType.__name__} from a geometry that isn't a QgsGeometry")
-        # if geometry.wkbType() != self.wkbType():
-        #     raise Glitch(
-        #         "You're using an incompatible kind of geometry with a {self.__class__.__name__}")
-        feature = self.makeFeature()
-        feature.geometry = geometry
-        return feature
-
     def copyFeature(self, feature):
         """Copy a Feature from this layer to the clipboard."""
-        if not isinstance(feature, self.featureType):
+        if not isinstance(feature, self.getFeatureType()):
             raise Glitch(
-                "You can't use a {self.__class__.__name__} to copy an object that isn't a {self.featureType.__name__}")
+                "You can't use a {self.__class__.__name__} to copy an object that isn't a {self.getFeatureType().__name__}")
 
         qgsFeature = self._unwrapQgsFeature(feature)
         copyFeature = self.makeFeature()
@@ -228,7 +256,7 @@ class FeatureLayer(QgsVectorLayer):
 
         if not isinstance(request, QgsFeatureRequest):
             raise Glitch(
-                "VectorLayer.getFeatures: the request is not a QgsRequest")
+                "FeatureLayer.getFeatures: the request is not a QgsRequest")
 
         return self._wrapQgsFeatures(super().getFeatures(request))
 

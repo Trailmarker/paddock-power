@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
+
+from ...spatial.features.feature import Feature
+from ...utils import qgsDebug
 
 
 class FeatureListBase(QListWidget):
+    featureZoomed = pyqtSignal(Feature)
 
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
@@ -27,8 +31,7 @@ class FeatureListBase(QListWidget):
 
     def getFeatures():
         """Get the Features."""
-        raise NotImplementedError(
-            "getFeatures() must be implemented in a subclass")
+        raise NotImplementedError("getFeatures() must be implemented in a subclass")
 
     def refreshUi(self):
         """Show the Feature List."""
@@ -45,7 +48,9 @@ class FeatureListBase(QListWidget):
 
         # Repopulate list since we have Features
         for feature in features:
+            qgsDebug("FeatureListBase.refreshUi() adding {}".format(feature))
             widget = self.featureListItemFactory(feature)
+            widget.featureZoomed.connect(lambda f: self.featureZoomed.emit(f))
             item = QListWidgetItem(self)
             item.setSizeHint(widget.sizeHint())
 

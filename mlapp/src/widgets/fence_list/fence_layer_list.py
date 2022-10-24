@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from ...models.state import State
-
 from ..feature_list.feature_layer_list import FeatureLayerList
 from ..feature_list.feature_list_item import FeatureListItem
 
@@ -10,7 +8,12 @@ class FenceLayerList(FeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        featureLayer = State().getMilestone().fenceLayer
         def listItemFactory(fence): return FeatureListItem(fence)
 
-        super().__init__(listItemFactory, featureLayer, parent)
+        super().__init__(listItemFactory, parent)
+
+    def setProject(self, project):
+        """Set the FeatureLayer."""
+        self.featureLayer = project.fenceLayer
+        self.featureLayer.editsPersisted.connect(self.refreshUi)
+        super().setProject(project)

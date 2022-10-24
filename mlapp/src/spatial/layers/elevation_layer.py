@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import sqlite3
 
 from qgis.core import QgsProject, QgsRasterLayer
 
-from ...utils import qgsDebug
+from ...models.glitch import Glitch
 
 
 def rasterGpkgUrl(gpkgFile, layerName):
@@ -13,39 +14,56 @@ def rasterGpkgUrl(gpkgFile, layerName):
 
 class ElevationLayer(QgsRasterLayer):
 
-    def __new__(cls, *args, **kwargs):
+    @classmethod
+    def detectInGeoPackage(cls, gpkgFile):
+        """Find an elevation layer in a project GeoPackage."""
+        db = sqlite3.connect(gpkgFile)
+        cursor = db.cursor()
+        cursor.execute(
+            "SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
+        grids = cursor.fetchall()
 
-        gpkgFile = kwargs.get('gpkgFile', None)
-        layerName = kwargs.get('layerName', None)
+        if len(grids) == 0:
+            return None
+        elif len(grids) == 1:
+            return grids[0][0]
+        else:
+            raise Glitch(
+                f"Paddock Power found multiple possible elevation layers in {gpkgFile}")
 
-        # different from QgsVectorLayer GeoPackage URL format!
+    @classmethod
+    def detectAndRemove(cls, gpkgFile, layerName):
+        """Detect if a layer is already in the map, and if so, return it."""
         rasterUrl = rasterGpkgUrl(gpkgFile, layerName)
 
-        for layer in QgsProject.instance().mapLayers().values():
+        layers = [l for l in QgsProject.instance().mapLayers().values()]
+        for layer in layers:
             if layer.source() == rasterUrl:
-                qgsDebug(f"{cls.__name__}.__new__: Coercing existing QgsRasterLayer {layer.name()}")
                 QgsProject.instance().removeMapLayer(layer.id())
-                layer.setName(layerName)
-                layer.__class__ = cls
-                return layer
 
-        return super().__new__(cls)
-
-    def __init__(self, layerName=None, gpkgFile=None):
+    def __init__(self, gpkgFile, layerName):
         """Create a new elevation layer."""
 
-        assert(layerName is not None)
         assert(gpkgFile is not None)
+        assert(layerName is not None)
 
+        # Note ths URL format is different from QgsVectorLayer!
         rasterUrl = rasterGpkgUrl(gpkgFile, layerName)
         super().__init__(rasterUrl, baseName=layerName)
 
+        self.detectAndRemove(gpkgFile, layerName)
+
+        QgsProject.instance().addMapLayer(self, False)
+
     def addToMap(self, group):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
-
         if group is None:
-            group = QgsProject.instance().layerTreeRoot()
+            raise Glitch(
+                "ElevationLayer.addToMap: the layer group is not present")
+        self.removeFromMap(group)
+        group.addLayer(self)
 
-        if self.source() not in [layer.source() for layer in QgsProject.instance().mapLayers().values()]:
-            group.addLayer(self)
-            QgsProject.instance().addMapLayer(self, False)
+    def removeFromMap(self, group):
+        node = group.findLayer(self.id())
+        if node:
+            group.removeChildNode(node)
