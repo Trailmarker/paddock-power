@@ -103,9 +103,9 @@ class Project(ProjectBase):
 
         self.unsetTool()
 
-        self.fenceSelection.cleanUp()
-        self.paddockSelection.cleanUp()
-        self.pipelineSelection.cleanUp()
+        # self.fenceSelection.cleanUp()
+        # self.paddockSelection.cleanUp()
+        # self.pipelineSelection.cleanUp()
 
         for viewType, view in self.views.values():
             self.iface.removeDockWidget(view)
