@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QAbstractAnimation, QParallelAnimationGroup, QPropertyAnimation, QSize, Qt
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QFrame, QHBoxLayout, QToolBar, QToolButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget
-
-from ...widgets.feature_status_label import FeatureStatusLabel
+from qgis.PyQt.QtWidgets import QFrame, QHBoxLayout, QToolButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget
 
 
 class Collapse(QWidget):
@@ -26,18 +23,6 @@ class Collapse(QWidget):
             QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.toggleAnimation = QParallelAnimationGroup(self)
 
-        self.statusLabel = FeatureStatusLabel(None)
-
-        self.toolBar = QToolBar()
-        self.toolBar.setStyleSheet("""QToolBar { padding: 0; }
-                                      QToolButton::indicator {
-                                        height: 20;
-                                        width: 20;
-                                      }""")
-        self.toolBar.setFixedHeight(30)
-        self.toolBar.setSizePolicy(QSizePolicy(
-            QSizePolicy.Minimum, QSizePolicy.Minimum))
-
         self.content = QScrollArea(
             maximumHeight=0, minimumHeight=0
         )
@@ -51,8 +36,6 @@ class Collapse(QWidget):
         self.headerLayout.setContentsMargins(3, 0, 3, 3)
         self.headerLayout.addWidget(self.toggleButton)
         self.headerLayout.addStretch()
-        self.headerLayout.addWidget(self.statusLabel)
-        self.headerLayout.addWidget(self.toolBar)
 
         layout = QVBoxLayout(self)
         layout.setSpacing(0)
@@ -69,6 +52,10 @@ class Collapse(QWidget):
         self.toggleAnimation.addAnimation(
             QPropertyAnimation(self.content, b"maximumHeight")
         )
+
+    def addHeaderWidget(self, widget):
+        """Add a toolbar to this Collapse."""
+        self.headerLayout.addWidget(widget)
 
     @pyqtSlot()
     def toggle(self):
@@ -95,16 +82,8 @@ class Collapse(QWidget):
         if checked != expanded:
             self.toggleButton.toggle()
 
-    def setFeatureStatus(self, status):
-        self.statusLabel.setStatus(status)
-
     def setTitle(self, title):
         self.toggleButton.setText(title)
-
-    def addToolBarAction(self, action, callback):
-        """Add an action to the toolbar."""
-        action.triggered.connect(callback)
-        self.toolBar.addAction(action)
 
     def collapsedHeight(self):
         return self.headerLayout.sizeHint().height()

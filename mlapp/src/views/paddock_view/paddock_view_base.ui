@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>PaddockViewDockWidgetBase</class>
-  <widget class="QDockWidget" name="PaddockViewDockWidgetBase">
+  <class>PaddockViewBase</class>
+  <widget class="QDockWidget" name="PaddockViewBase">
     <property name="geometry">
       <rect>
         <x>0</x>

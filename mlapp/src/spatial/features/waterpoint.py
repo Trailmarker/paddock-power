@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject
+
 from ...models.glitch import Glitch
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from .edits import Edits
@@ -15,7 +17,11 @@ class Waterpoint(PointFeature):
                  elevationLayer=None, existingFeature=None):
         """Create a new LineFeature."""
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
-        self.waterpointBufferLayer = waterpointBufferLayer
+        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+
+    @property
+    def waterpointBufferLayer(self):
+        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
 
     @Glitch.glitchy()
     def getBuffer(self, distance):

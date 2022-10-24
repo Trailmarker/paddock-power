@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from ...models.state import State
 from ..feature_list.feature_mini_list import FeatureMiniList
 from ..feature_list.feature_collapsible_list_item import FeatureCollapsibleListItem
 from ..paddock_details.paddock_details import PaddockDetails

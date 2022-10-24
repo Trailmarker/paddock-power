@@ -5,8 +5,6 @@ from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 
-from ...models.project import Project
-from ...models.glitch import Glitch
 from ...widgets.paddock_power_map_tool import PaddockPowerMapTool
 
 
@@ -17,13 +15,8 @@ class SketchLineTool(PaddockPowerMapTool):
 
     def __init__(self, project):
 
-        super().__init__()
-
-        if not isinstance(project, Project):
-            raise Glitch(
-                "SketchLineTool.__init__: project is not a Project.")
-
         self.project = project
+        super().__init__(self.project.iface.mapCanvas())
 
         # flag to know whether the tool is capturing a drawing
         self.capturing = False

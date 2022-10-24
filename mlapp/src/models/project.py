@@ -1,69 +1,39 @@
 # -*- coding: utf-8 -*-
-import sqlite3
-from mlapp.src.widgets.paddock_power_map_tool import PaddockPowerMapTool
+from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
 
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QObject
-from qgis.core import QgsProject
-from qgis.utils import iface
+from qgis.core import QgsRectangle
 
-# -*- coding: utf-8 -*-
-from ..spatial.features.boundary import Boundary
-from ..spatial.features.waterpoint import Waterpoint
 from ..spatial.features.pipeline import Pipeline
 from ..spatial.features.feature import Feature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
-from ..spatial.features.land_system import LandSystem
-from ..spatial.layers.elevation_layer import ElevationLayer
-from ..spatial.layers.boundary_layer import BoundaryLayer
-from ..spatial.layers.fence_layer import FenceLayer
-from ..spatial.layers.paddock_layer import PaddockLayer
-from ..spatial.layers.pipeline_layer import PipelineLayer
-from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import qgsDebug, resolveGeoPackageFile
+from ..spatial.layers.feature_layer import FeatureLayer
+from ..utils import qgsDebug
+from ..views.infrastructure_view.infrastructure_view import InfrastructureView
+from ..views.paddock_view.paddock_view import PaddockView
+from ..widgets.fence_details.fence_selection import FenceSelection
+from ..widgets.paddock_details.paddock_selection import PaddockSelection
+from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
+from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
 from .glitch import Glitch
+from .project_base import ProjectBase
+
+# Initialize Qt resources from file resources.py
+from ...resources_rc import *
 
 
-class Project(QObject):
-    PROJECT_BASE_DATA_GROUP = "Base Data"
-
-    PADDOCK_POWER_FEATURE_TYPES = (
-        Boundary, Waterpoint, Pipeline, Fence, Paddock, LandSystem)
+class Project(ProjectBase):
+    MENU_NAME = u"&Paddock Power"
 
     # emit this signal when a selected Feature is updated
     selectedFeatureChanged = pyqtSignal(Feature)
     projectDataChanged = pyqtSignal()
+    projectUnloading = pyqtSignal()
 
-    def __init__(self, gpkgFile=None, projectName=None):
-        super().__init__()
+    def __init__(self, iface, gpkgFile=None, projectName=None):
+        super().__init__(gpkgFile, projectName)
 
-        gpkgFile = gpkgFile or resolveGeoPackageFile()
-        self.gpkgFile = gpkgFile
-        self.projectName = projectName or "Paddock Power"
-
-        self.elevationLayer = None
-        elevationLayerName = self.findElevationLayer(self.gpkgFile)
-        if elevationLayerName is not None:
-            self.elevationLayer = ElevationLayer(self.gpkgFile, elevationLayerName)
-
-        boundaryLayerName = f"Current Boundary"
-        self.boundaryLayer = BoundaryLayer(self.gpkgFile, boundaryLayerName)
-        waterpointBufferLayerName = f"Current Waterpoint Buffers"
-        self.waterpointBufferLayer = WaterpointBufferLayer(self.gpkgFile, waterpointBufferLayerName)
-        waterpointLayerName = f"Current Waterpoints"
-        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName,
-                                               self.waterpointBufferLayer,
-                                               self.elevationLayer)
-        pipelineLayerName = f"Current Pipeline"
-        self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
-                                           self.elevationLayer)
-        paddockLayerName = f"Current Paddocks"
-        self.paddockLayer = PaddockLayer(self.gpkgFile, paddockLayerName)
-        fenceLayerName = f"Current Fence"
-        self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
-                                     self.paddockLayer,
-                                     self.elevationLayer)
+        self.iface = iface
 
         self.currentTool = None
 
@@ -73,7 +43,17 @@ class Project(QObject):
             Pipeline: None
         }
 
-        self.connectLayerDataEvents()
+        canvas = self.iface.mapCanvas()
+
+        # self.paddockSelection = PaddockSelection(self, canvas)
+        # self.pipelineSelection = PipelineSelection(self, canvas)
+        # self.fenceSelection = FenceSelection(self, canvas)
+
+        self.views = {}
+
+        for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer]:
+            layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
+            layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
 
     @property
     def selectedFence(self):
@@ -90,90 +70,84 @@ class Project(QObject):
         """Get the currently selected pipeline."""
         return self.selectedFeatures[Pipeline]
 
-    def connectLayerDataEvents(self):
-        """Connect to layer data changed events."""
-        # TODO self.boundaryLayer, self.waterpointLayer,
-        for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer]:
-            layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
-            layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
-
-    def findGroup(self):
-        """Find this Project's group in the Layers panel."""
-        group = QgsProject.instance().layerTreeRoot().findGroup(self.projectName)
-        if group is None:
-            group = QgsProject.instance().layerTreeRoot().insertGroup(0, self.projectName)
-        return group
-
-    def addToMap(self, group=None):
-        """Add this Project to the map."""
-        group = group or self.findGroup()
-        self.waterpointLayer.addToMap(group)
-        self.boundaryLayer.addToMap(group)
-        self.pipelineLayer.addToMap(group)
-        self.fenceLayer.addToMap(group)
-        self.waterpointBufferLayer.addToMap(group)
-        self.paddockLayer.addToMap(group)
-        # self.landSystemLayer.addToMap(group)
-        self.elevationLayer.addToMap(group)
-
-    def removeFromMap(self):
-        """Remove this Project from the current map view."""
-        group = self.findGroup()
-        self.waterpointLayer.removeFromMap(group)
-        self.boundaryLayer.removeFromMap(group)
-        self.pipelineLayer.removeFromMap(group)
-        self.fenceLayer.removeFromMap(group)
-        self.waterpointBufferLayer.removeFromMap(group)
-        self.paddockLayer.removeFromMap(group)
-        # self.landSystemLayer.removeFromMap(group)
-        self.elevationLayer.removeFromMap(group)
-        QgsProject.instance().layerTreeRoot().removeChildNode(group)
-
     def setTool(self, tool):
         """Set the current tool for this Project."""
         if not isinstance(tool, PaddockPowerMapTool):
             raise Glitch(
-                "Project.setTool: tool must be a PaddockPowerMapTool")
+                "The Paddock Power tool must be of a recognised type")
 
         self.unsetTool()
         self.currentTool = tool
-        iface.mapCanvas().setMapTool(self.currentTool)
+        self.iface.mapCanvas().setMapTool(self.currentTool)
 
     def unsetTool(self):
         if self.currentTool is not None:
             self.currentTool.clear()
             self.currentTool.dispose()
-            iface.mapCanvas().unsetMapTool(self.currentTool)
+            self.iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
 
-    def setSelectedFeature(self, feature):
+    def selectFeature(self, feature):
         if feature is not None and not isinstance(feature, Feature):
             raise Glitch(
                 "You can't select an object that is not a Feature")
+        qgsDebug("Selecting feature: {}".format(feature))
+
         self.selectedFeatures[type(feature)] = feature
         self.selectedFeatureChanged.emit(feature)
 
     @pyqtSlot()
+    def unload(self):
+        """Removes the plugin menu item and icon from QGIS interface."""
+        self.projectUnloading.emit()
+
+        self.unsetTool()
+
+        self.fenceSelection.cleanUp()
+        self.paddockSelection.cleanUp()
+        self.pipelineSelection.cleanUp()
+
+        for viewType, view in self.views.values():
+            self.iface.removeDockWidget(view)
+            self.onCloseView(viewType)
+
+    @pyqtSlot(Feature)
+    def zoomFeature(self, feature):
+        self.selectFeature(feature)
+
+        if feature.geometry:
+            featureExtent = QgsRectangle(feature.geometry.boundingBox())
+            featureExtent.scale(1.5)  # Expand by 50%
+            self.iface.mapCanvas().setExtent(featureExtent)
+            self.iface.mapCanvas().refresh()
+
+    @pyqtSlot(FeatureLayer, list)
     def onLayerSelectionChanged(self, layer, selection):
         if len(selection) == 1:
             feature = layer.getFeatureById(selection[0])
             qgsDebug(f"onLayerSelectionChanged: {feature or 'None'}")
             if feature is not None:
-                self.setSelectedFeature(feature)
+                self.selectFeature(feature)
 
-    @classmethod
-    def findElevationLayer(cls, gpkgFile):
-        """Find the elevation layer in a project GeoPackage."""
-        db = sqlite3.connect(gpkgFile)
-        cursor = db.cursor()
-        cursor.execute(
-            "SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
-        grids = cursor.fetchall()
+    def openView(self, viewType, dockArea):
+        if viewType not in self.views:
+            view = viewType(self)
+            view.closingView.connect(lambda: self.onCloseView(viewType))
+            self.views[viewType] = view
+            self.iface.addDockWidget(dockArea, view)
+            view.show()
 
-        if len(grids) == 0:
-            return None
-        elif len(grids) == 1:
-            return grids[0][0]
-        else:
-            raise Glitch(
-                f"Project.findElevationLayer: multiple elevation layers found in {gpkgFile}")
+    @pyqtSlot()
+    def openPaddockView(self):
+        """Run method that loads and opens Paddock View."""
+        self.openView(PaddockView, Qt.LeftDockWidgetArea)
+
+    @pyqtSlot()
+    def openInfrastructureView(self):
+        """Run method that loads and opens Plan Fences and Pipelines."""
+        self.openView(InfrastructureView, Qt.BottomDockWidgetArea)
+
+    @pyqtSlot()
+    def onCloseView(self, viewType):
+        if viewType in self.views:
+            del self.views[viewType]

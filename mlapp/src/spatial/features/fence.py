@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from inspect import ismemberdescriptor, ismodule
-from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsPointXY, QgsRectangle
+from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsProject, QgsPointXY, QgsRectangle
 
 from ...models.glitch import Glitch
 from ...utils import qgsDebug
@@ -21,10 +20,14 @@ class Fence(LineFeature):
                  elevationLayer: ElevationLayer = None, existingFeature=None):
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
 
-        self.paddockLayer = paddockLayer
+        self._paddockLayerId = paddockLayer.id()
 
         self._supersededPaddocks = []
         self._plannedPaddocks = []
+
+    @property
+    def paddockLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLayerId)
 
     @property
     def title(self):

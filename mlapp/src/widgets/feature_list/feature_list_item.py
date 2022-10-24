@@ -2,13 +2,14 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QHBoxLayout, QLabel, QSizePolicy, QWidget
 
-from ...models.state import State
+from ...spatial.features.feature import Feature
 from ...spatial.features.feature_action import FeatureAction
 from ..feature_status_label import FeatureStatusLabel
 from .feature_tool_bar import FeatureToolBar
 
 
 class FeatureListItem(QWidget):
+    featureZoomed = pyqtSignal(Feature)
     layoutRefreshNeeded = pyqtSignal()
 
     # Editing signals
@@ -17,8 +18,6 @@ class FeatureListItem(QWidget):
 
     def __init__(self, feature, parent=None):
         super().__init__(parent)
-
-        self.state = State()
 
         self.feature = feature
 
@@ -29,19 +28,21 @@ class FeatureListItem(QWidget):
 
         self.toolBar = FeatureToolBar(self.feature)
 
-        self.toolBar.addFeatureAction(
+        self.toolBar.addStateAction(
             FeatureAction.undoPlan,
             ':/plugins/mlapp/images/item-undo.png',
             lambda _: self.feature.undoPlanFence())
-        self.toolBar.addFeatureAction(
+        self.toolBar.addStateAction(
             FeatureAction.plan,
             ':/plugins/mlapp/images/item-edit.png',
             lambda _: self.feature.planFence())
-        self.toolBar.addFeatureAction(
+        self.toolBar.addStateAction(
             FeatureAction.plan,
             ':/plugins/mlapp/images/delete-project.png',
             lambda _: self.feature.trashFeature())
         self.toolBar.addZoomAction()
+
+        self.toolBar.featureZoomed.connect(lambda f: self.featureZoomed.emit(f))
 
         self.layout = QHBoxLayout()
         self.layout.setSpacing(0)

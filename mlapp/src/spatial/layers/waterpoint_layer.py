@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..features.waterpoint import Waterpoint
 from .elevation_layer import ElevationLayer
 from .feature_layer import FeatureLayer
+from .waterpoint_buffer_layer import WaterpointBufferLayer
 
 
 class WaterpointLayer(FeatureLayer):

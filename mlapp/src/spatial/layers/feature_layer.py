@@ -25,6 +25,7 @@ PADDOCK_POWER_EPSG = 7845
 class FeatureLayer(QgsVectorLayer):
 
     displayFilterChanged = pyqtSignal(list)
+    editsPersisted = pyqtSignal()
 
     @classmethod
     def getFeatureType(cls):

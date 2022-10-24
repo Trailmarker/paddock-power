@@ -2,8 +2,7 @@
 from qgis.PyQt.QtCore import QObject
 from re import finditer
 
-from qgis.core import QgsFeature, QgsFields, QgsRectangle
-from qgis.utils import iface
+from qgis.core import QgsFeature, QgsFields, QgsProject
 
 from ...models.glitch import Glitch
 from .edits import Edits
@@ -77,7 +76,7 @@ class Feature(QObject, FeatureStateMachine):
             raise Glitch(
                 f"Feature.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
 
-        self.featureLayer = featureLayer
+        self._featureLayerId = featureLayer.id()
 
     def __repr__(self):
         """Return a string representation of the Feature."""
@@ -101,12 +100,10 @@ class Feature(QObject, FeatureStateMachine):
         """Delete the Feature from the FeatureLayer."""
         self.featureLayer.deleteFeature(self)
 
-    def zoomToFeature(self):
-        """Zoom to the Feature."""
-        featureExtent = QgsRectangle(self.geometry.boundingBox())
-        featureExtent.scale(1.5)  # Expand by 50%
-        iface.mapCanvas().setExtent(featureExtent)
-        iface.mapCanvas().refresh()
+    @property
+    def featureLayer(self):
+        """Return the FeatureLayer that contains this Feature."""
+        return QgsProject.instance().mapLayer(self._featureLayerId)
 
     @property
     def id(self):

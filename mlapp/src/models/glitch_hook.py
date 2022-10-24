@@ -11,12 +11,11 @@ class GlitchHook(QObject):
     __GLITCH_HOOK_WRAPPER = "__glitchHookWrapper"
 
     caughtGlitch = pyqtSignal(Glitch)
-    pluginUnloading = pyqtSignal()
+    unloading = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
-        self.pluginUnloading.connect(GlitchHook.__restoreSystemExceptionHook)
         self.__setupGlitchHook()
         self.caughtGlitch.connect(Glitch.popup)
 

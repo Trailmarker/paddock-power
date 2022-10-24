@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject
+
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_layer import PaddockLayer
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
@@ -14,6 +16,18 @@ class ConditionRecord(CapacityFeature):
         """Create a new Paddock."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-        self.paddockLayer = paddockLayer
-        self.landSystemLayer = landSystemLayer
-        self.waterpointBufferLayer = waterpointBufferLayer
+        self._paddockLayerId = paddockLayer.id()
+        self._landSystemLayerId = landSystemLayer.id()
+        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+
+    @property
+    def paddockLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLayerId)
+
+    @property
+    def landSystemLayer(self):
+        return QgsProject.instance().mapLayer(self._landSystemLayerId)
+
+    @property
+    def waterpointBufferLayer(self):
+        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)

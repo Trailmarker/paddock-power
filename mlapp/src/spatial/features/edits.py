@@ -46,6 +46,7 @@ class Edits:
             yield
             for layer in layers:
                 layer.commitChanges()
+                layer.editsPersisted.emit()
         except Exception as e:
             for layer in layers:
                 layer.rollBack()
