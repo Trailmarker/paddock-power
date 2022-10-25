@@ -2,12 +2,11 @@
 from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsProject, QgsPointXY, QgsRectangle
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug
 from ..layers.feature_layer import QGSWKB_TYPES
 from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
 from .edits import Edits
-from .feature import FeatureAction
+from .feature_action import FeatureAction
 from .feature_status import FeatureStatus
 from .line_feature import LineFeature
 from .schemas import FenceSchema, BUILD_FENCE
@@ -293,7 +292,7 @@ class Fence(LineFeature):
         # qgsDebug(f"Fence.planFeature: getCrossedPaddocks {len(supersededPaddocks)}, {[p.name for p in supersededPaddocks]}")
 
         for paddock in supersededPaddocks:
-            edits.editBefore(paddock.supersedePaddock(self))
+            edits.editBefore(paddock.supersedeFeature(self))
 
         # self.paddockLayer now rolls back
         return Edits.upsert(self).editAfter(edits)
@@ -310,9 +309,9 @@ class Fence(LineFeature):
         # qgsDebug(f"plannedPaddocks = {str(plannedPaddocks)}")
 
         for paddock in supersededPaddocks:
-            edits = edits.editBefore(paddock.undoSupersedePaddock())
+            edits = edits.editBefore(paddock.undoSupersedeFeature())
 
         for paddock in plannedPaddocks:
-            edits = edits.editBefore(paddock.undoPlanPaddock())
+            edits = edits.editBefore(paddock.undoPlanFeature())
 
         return Edits.upsert(self).editAfter(edits)

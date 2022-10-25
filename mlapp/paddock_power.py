@@ -106,7 +106,7 @@ class PaddockPower(QObject):
             text=u"Plan Pipelines",
             callback=self.openPipelineView,
             parent=self.iface.mainWindow())
-        
+
         self.addAction(
             QIcon(":/plugins/mlapp/images/split-paddock.png"),
             text=u"Plan Waterpoints",
@@ -176,17 +176,17 @@ class PaddockPower(QObject):
     def detectProject(self, _=None):
         """Detect a Paddock Power project in the current QGIS project."""
         self.project = None
-        try:
-            gpkgFile = resolveGeoPackageFile()
-            if gpkgFile is not None:
-                qgsInfo("Paddock Power loading project …")
-                self.project = Project(self.iface, gpkgFile)
-            else:
-                qgsInfo("Paddock Power no GeoPackage file …")
-        except BaseException:
-            pass
+        gpkgFile = resolveGeoPackageFile()
+        if gpkgFile is not None:
+            qgsInfo("Paddock Power loading project …")
+            self.project = Project(self.iface, gpkgFile)
+        else:
+            qgsInfo("Paddock Power no GeoPackage file located …")
+
         if self.project is not None:
             self.project.addToMap()
+        else:
+            qgsInfo("Paddock Power no project detected …")
 
     def unloadProject(self):
         """Removes the plugin menu item and icon from QGIS interface."""
@@ -206,7 +206,7 @@ class PaddockPower(QObject):
     def openPipelineView(self):
         if self.project is not None:
             self.project.openPipelineView()
-   
+
     def openWaterpointView(self):
         if self.project is not None:
             self.project.openWaterpointView()

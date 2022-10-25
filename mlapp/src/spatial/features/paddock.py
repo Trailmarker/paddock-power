@@ -1,16 +1,38 @@
 # -*- coding: utf-8 -*-
-from .capacity_feature import CapacityFeature
+from qgis.core import QgsProject
+
+from ..layers.condition_record_layer import ConditionRecordLayer
+from ..layers.land_system_layer import LandSystemLayer
+from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from .area_feature import AreaFeature
 from .edits import Edits
-from .feature import FeatureAction
+from .feature_action import FeatureAction
 from .schemas import PaddockSchema
 
 
 @PaddockSchema.addSchema()
-class Paddock(CapacityFeature):
+class Paddock(AreaFeature):
 
-    def __init__(self, featureLayer, existingFeature=None):
+    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, waterpointBufferLayer: WaterpointBufferLayer, 
+                 conditionRecordLayer: ConditionRecordLayer,  existingFeature=None):
         """Create a new Paddock."""
-        super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
+        super().__init__(featureLayer, existingFeature=existingFeature)
+
+        self._landSystemLayerId = landSystemLayer.id()
+        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        self._conditionRecordLayerId = conditionRecordLayer.id()
+
+    @property
+    def landSystemLayer(self):
+        return QgsProject.instance().mapLayer(self._landSystemLayerId)
+
+    @property
+    def waterpointBufferLayer(self):
+        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+
+    @property
+    def conditionRecordLayer(self):
+        return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
 
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):

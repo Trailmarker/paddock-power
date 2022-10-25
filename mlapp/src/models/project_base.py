@@ -3,20 +3,24 @@ from qgis.PyQt.QtCore import QObject
 
 from qgis.core import QgsProject
 
+from ..spatial.layers.condition_record_layer import ConditionRecordLayer
 from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.fence_layer import FenceLayer
+from ..spatial.layers.land_system_layer import LandSystemLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import resolveGeoPackageFile
+from ..utils import qgsDebug, resolveGeoPackageFile
 
 
 class ProjectBase(QObject):
 
     def __init__(self, gpkgFile=None, projectName=None):
         super().__init__()
+
+        qgsDebug("ProjectBase.__init__")
 
         gpkgFile = gpkgFile or resolveGeoPackageFile()
         self.gpkgFile = gpkgFile
@@ -38,12 +42,22 @@ class ProjectBase(QObject):
         pipelineLayerName = f"Current Pipeline"
         self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
+        landSystemLayerName = "Current Land Systems"
+        self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
+        conditionRecordLayerName = f"Current Condition Records"
+        self.conditionRecordLayer = ConditionRecordLayer(self.gpkgFile, conditionRecordLayerName)
         paddockLayerName = f"Current Paddocks"
-        self.paddockLayer = PaddockLayer(self.gpkgFile, paddockLayerName)
+        self.paddockLayer = PaddockLayer(
+            self.gpkgFile,
+            paddockLayerName,
+            self.landSystemLayer,
+            self.waterpointBufferLayer,
+            self.conditionRecordLayer)
         fenceLayerName = f"Current Fence"
         self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
                                      self.elevationLayer)
+        qgsDebug("ProjectBase: Layers created")
 
     def findGroup(self):
         """Find this Project's group in the Layers panel."""
@@ -61,9 +75,10 @@ class ProjectBase(QObject):
         self.boundaryLayer.addToMap(group)
         self.pipelineLayer.addToMap(group)
         self.fenceLayer.addToMap(group)
+        self.conditionRecordLayer.addToMap(group)
         self.waterpointBufferLayer.addToMap(group)
+        self.landSystemLayer.addToMap(group)
         self.paddockLayer.addToMap(group)
-        # self.landSystemLayer.addToMap(group)
         self.elevationLayer.addToMap(group)
 
     def removeFromMap(self):

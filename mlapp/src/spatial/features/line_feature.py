@@ -2,13 +2,12 @@
 from qgis.core import QgsProject
 
 from ..calculator import Calculator
-from ..layers.elevation_layer import ElevationLayer
-from .feature import Feature
 from .schemas import LineFeatureSchema
+from .status_feature import StatusFeature
 
 
 @LineFeatureSchema.addSchema()
-class LineFeature(Feature):
+class LineFeature(StatusFeature):
 
     def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):
         """Create a new LineFeature."""

@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject
+
 from ..features.paddock import Paddock
+from .condition_record_layer import ConditionRecordLayer
+from .land_system_layer import LandSystemLayer
+from .status_feature_layer import StatusFeatureLayer
+from .waterpoint_buffer_layer import WaterpointBufferLayer
 
-from .feature_layer import FeatureLayer
-# from .renderers import fillStatusCategoryRenderer
 
-
-class PaddockLayer(FeatureLayer):
+class PaddockLayer(StatusFeatureLayer):
 
     STYLE = "paddock"
 
@@ -13,9 +16,27 @@ class PaddockLayer(FeatureLayer):
     def getFeatureType(cls):
         return Paddock
 
-    def __init__(self, gpkgFile, layerName):
+    def __init__(self, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
+                 waterpointBufferLayer: WaterpointBufferLayer, conditionRecordLayer: ConditionRecordLayer,):
         """Create or open a Paddock layer."""
 
         super().__init__(gpkgFile, layerName, styleName=PaddockLayer.STYLE)
 
-        # self.setRenderer(fillStatusCategoryRenderer())
+        self._landSystemLayerId = landSystemLayer.id()
+        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        self._conditionRecordLayerId = conditionRecordLayer.id()
+
+    @property
+    def landSystemLayer(self):
+        return QgsProject.instance().mapLayer(self._landSystemLayerId)
+
+    @property
+    def waterpointBufferLayer(self):
+        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+
+    @property
+    def conditionRecordLayer(self):
+        return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
+
+    def wrapFeature(self, feature):
+        return self.getFeatureType()(self, self.landSystemLayer, self.waterpointBufferLayer, self.conditionRecordLayer, feature)

@@ -3,15 +3,15 @@ from qgis.core import QgsProject
 
 from ..calculator import Calculator
 from ..layers.elevation_layer import ElevationLayer
-from .feature import Feature
 from .schemas import PointFeatureSchema
+from .status_feature import StatusFeature
 
 
 @PointFeatureSchema.addSchema()
-class PointFeature(Feature):
+class PointFeature(StatusFeature):
 
     def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):
-        """Create a new LineFeature."""
+        """Create a new PointFeature."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
         assert elevationLayer is None or isinstance(elevationLayer, ElevationLayer), "elevationLayer must be provided"

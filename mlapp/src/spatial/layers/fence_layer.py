@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest
+from qgis.core import QgsFeatureRequest, QgsProject
 
 from ...models.glitch import Glitch
 from ..features.feature_status import FeatureStatus
 from ..features.fence import Fence
-from .feature_layer import FeatureLayer
+from .status_feature_layer import StatusFeatureLayer
 
 
-class FenceLayer(FeatureLayer):
+class FenceLayer(StatusFeatureLayer):
 
     STYLE = "fence"
 
@@ -18,8 +18,16 @@ class FenceLayer(FeatureLayer):
     def __init__(self, gpkgFile, layerName, paddockLayer, elevationLayer):
         super().__init__(gpkgFile, layerName, styleName=FenceLayer.STYLE)
 
-        self.paddockLayer = paddockLayer
-        self.elevationLayer = elevationLayer
+        self._paddockLayerId = paddockLayer.id()
+        self._elevationLayerId = elevationLayer.id()
+
+    @property
+    def paddockLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLayerId)
+
+    @property
+    def elevationLayer(self):
+        return QgsProject.instance().mapLayer(self._elevationLayerId)
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.paddockLayer, self.elevationLayer, feature)

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from .capacity_feature import CapacityFeature
+from .feature import Feature
 from .schemas import LandSystemSchema
 
 
 @LandSystemSchema.addSchema()
-class LandSystem(CapacityFeature):
+class LandSystem(Feature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new LandSystem."""

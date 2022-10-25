@@ -5,7 +5,7 @@ from qgis.core import QgsWkbTypes
 
 from .condition import Condition
 from .feature_status import FeatureStatus
-from .field import Field
+from .field import DomainField, IdField, MeasureField, StringField
 from .waterpoint_type import WaterpointBufferType
 from .waterpoint_type import WaterpointType
 
@@ -28,122 +28,76 @@ class Schema(list):
 
 
 FID = "fid"
-STATUS = "Status"
+Fid = IdField("id", name=FID)
 NAME = "Name"
+Name = StringField(propertyName="name", name=NAME)
+FeatureSchema = Schema([Fid, Name])
 
-FeatureSchema = Schema([
-    Field(name=FID, type=QVariant.LongLong, typeName="Integer64",
-          len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="name", name=NAME, type=QVariant.String, typeName="String",
-          len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="status", name=STATUS, type=QVariant.String, typeName="String",
-          len=0, prec=0, comment="", subType=QVariant.Invalid,
-          domainType=FeatureStatus, defaultValue=FeatureStatus.Undefined)
-])
+STATUS = "Status"
+Status = DomainField(propertyName="status", name=STATUS, domainType=FeatureStatus, defaultValue=FeatureStatus.Undefined)
+StatusFeatureSchema = Schema(FeatureSchema + [Status])
 
 LONGITUDE = "Longitude"
+Longitude = MeasureField(propertyName="featureLongitude", name=LONGITUDE, defaultValue=float('NaN'))
 LATITUDE = "Latitude"
+Latitude = MeasureField(propertyName="featureLatitude", name=LATITUDE, defaultValue=float('NaN'))
 ELEVATION = "Elevation (m)"
-
-PointFeatureSchema = Schema(FeatureSchema + [
-    Field(propertyName="featureLongitude", name=LONGITUDE, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="featureLatitude", name=LATITUDE, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="featureElevation", name=ELEVATION, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid)
-], wkbType=QgsWkbTypes.Point)
+Elevation = MeasureField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'))
+PointFeatureSchema = Schema(StatusFeatureSchema + [Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)
 
 LENGTH = "Length (km)"
+Length = MeasureField(propertyName="featureLength", name=LENGTH)
+LineFeatureSchema = Schema(StatusFeatureSchema + [Length], wkbType=QgsWkbTypes.LineString)
 
-LineFeatureSchema = Schema(FeatureSchema + [
-    Field(propertyName="featureLength", name=LENGTH, type=QVariant.Double, typeName="Real",
-          len=0, prec=0, comment="", subType=QVariant.Invalid)
-], wkbType=QgsWkbTypes.LineString)
+PipelineSchema = LineFeatureSchema
 
 AREA = "Area (km²)"
+Area = MeasureField(propertyName="featureArea", name=AREA)
 PERIMETER = "Perimeter (km)"
-
-AreaFeatureSchema = Schema(FeatureSchema + [
-    Field(propertyName="featureArea", name=AREA, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="featurePerimeter", name=PERIMETER, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid)
-], wkbType=QgsWkbTypes.MultiPolygon)
+Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER)
+AreaFeatureSchema = Schema(StatusFeatureSchema + [Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
 
 BoundarySchema = AreaFeatureSchema
 
-CAPACITY = "AE/km²"
-
-CapacityFeatureSchema = Schema(AreaFeatureSchema + [
-    Field(propertyName="featureCapacity", name="AE/km²", type=QVariant.Double, typeName="Real",
-          len=0, prec=0, comment="", subType=QVariant.Invalid)
-])
-
-CONDITION = "Condition"
-PADDOCK_NAME = "Paddock Name"
-LAND_TYPE_NAME = "Land Type Name"
-WATERPOINT_BUFFER = "Waterpoint Buffer"
-WATERPOINT_BUFFER_DISTANCE = "Waterpoint Buffer Distance"
-
-ConditionRecordSchema = Schema(CapacityFeatureSchema + [
-    Field(propertyName="condition", name=CONDITION, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid,
-          domainType=Condition, defaultValue=Condition.A),
-    Field(propertyName="paddockName", name=PADDOCK_NAME, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="landTypeName", name=LAND_TYPE_NAME, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="waterpointBUffer", name=WATERPOINT_BUFFER, type=QVariant.LongLong,
-          typeName="Integer64", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="waterpointBufferDistance", name=WATERPOINT_BUFFER_DISTANCE, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid)
-])
+CAPACITY_PER_AREA = "AE/km²"
+CapacityPerArea = MeasureField(propertyName="capacityPerArea", name=CAPACITY_PER_AREA)
+CAPACITY = "AE"
+EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=CAPACITY)
+POTENTIAL_CAPACITY = "Potential AE"
+PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY)
 
 BUILD_ORDER = "Build Order"
-
 FenceSchema = Schema(LineFeatureSchema + [
-    Field(propertyName="buildOrder", name=BUILD_ORDER, type=QVariant.LongLong,
-          typeName="Integer64", len=0, prec=0, comment="", subType=QVariant.Invalid)
+    IdField(propertyName="buildOrder", name=BUILD_ORDER)
 ])
 
 MAP_UNIT = "Map Unit"
 LANDSCAPE_CLASS = "Landscape Class"
 CLASS_DESCRIPTION = "Class Description"
 EROSION_RISK = "Erosion Risk"
-
-LandSystemSchema = Schema(CapacityFeatureSchema + [
-    Field(propertyName="mapUnit", name="Map Unit", type=QVariant.String,
-          typeName="String", len=10, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="landscapeClass", name="Landscape Class", type=QVariant.String,
-          typeName="String", len=50, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="classDescription", name="Class Description", type=QVariant.String,
-          typeName="String", len=254, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="erosionRisk", name="Erosion Risk", type=QVariant.String,
-          typeName="String", len=100, prec=0, comment="", subType=QVariant.Invalid)
-])
+LandSystemSchema = Schema(FeatureSchema + [Area, Perimeter, CapacityPerArea] + [
+    StringField(propertyName="mapUnit", name=MAP_UNIT),
+    StringField(propertyName="landscapeClass", name=LANDSCAPE_CLASS),
+    StringField(propertyName="classDescription", name=CLASS_DESCRIPTION),
+    StringField(propertyName="erosionRisk", name=EROSION_RISK)
+], wkbType=QgsWkbTypes.MultiPolygon)
 
 BUILD_FENCE = "Build Fence"
-
-PaddockSchema = Schema(CapacityFeatureSchema + [
-    Field(propertyName="buildFence", name=BUILD_FENCE, type=QVariant.LongLong,
-          typeName="Integer64", len=0, prec=0, comment="", subType=QVariant.Invalid),
-])
-
-PipelineSchema = LineFeatureSchema
+BuildFence = IdField(propertyName="buildFence", name=BUILD_FENCE)
+PaddockSchema = Schema(AreaFeatureSchema + [BuildFence, CapacityPerArea, EstimatedCapacity, PotentialCapacity])
 
 WATERPOINT = "Waterpoint"
 WATERPOINT_BUFFER_TYPE = "Waterpoint Buffer Type"
+WaterpointBufferTypeField = DomainField(
+    propertyName="waterpointBufferType",
+    name=WATERPOINT_BUFFER_TYPE,
+    domainType=WaterpointBufferType)
 BUFFER_DISTANCE = "Buffer Distance (m)"
-
-WaterpointBufferSchema = Schema(AreaFeatureSchema + [
-    Field(propertyName="waterpoint", name=WATERPOINT, type=QVariant.LongLong,
-          typeName="Integer64", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="waterpointBufferType", name=WATERPOINT_BUFFER_TYPE, type=QVariant.String, typeName="String",
-          len=0, prec=0, comment="", subType=QVariant.Invalid, domainType=WaterpointBufferType),
-    Field(propertyName="bufferDistance", name=BUFFER_DISTANCE, type=QVariant.Double, typeName="Real",
-          len=0, prec=0, comment="", subType=QVariant.Invalid),
-])
+WaterpointBufferSchema = Schema(FeatureSchema + [
+    IdField(propertyName="waterpoint", name=WATERPOINT),
+    WaterpointBufferTypeField,
+    MeasureField(propertyName="bufferDistance", name=BUFFER_DISTANCE)
+], wkbType=QgsWkbTypes.MultiPolygon)
 
 WATERPOINT_TYPE = "Waterpoint Type"
 REFERENCE = "Reference"
@@ -153,23 +107,28 @@ WATERPOINT_START_MONTH = "Waterpoint Start Month"
 WATERPOINT_END_MONTH = "Waterpoint End Month"
 NEAR_BUFFER = "Near Buffer (m)"
 FAR_BUFFER = "Far Buffer (m)"
-
 WaterpointSchema = Schema(PointFeatureSchema + [
-    Field(propertyName="waterpointType", name=WATERPOINT_TYPE, type=QVariant.String, typeName="String",
-          len=0, prec=0, comment="", subType=QVariant.Invalid,
-          domainType=WaterpointType, defaultValue=WaterpointType.Bore),
-    Field(propertyName="reference", name=REFERENCE, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="boreYield", name=BORE_YIELD, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="boreReportUrl", name=BORE_REPORT_URL, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="waterpointStartMonth", name=WATERPOINT_START_MONTH, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="waterpointEndMonth", name=WATERPOINT_END_MONTH, type=QVariant.String,
-          typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="nearBuffer", name=NEAR_BUFFER, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue="3000.0"),
-    Field(propertyName="farBuffer", name=FAR_BUFFER, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue="5000.0")
+    DomainField(propertyName="waterpointType", name=WATERPOINT_TYPE, domainType=WaterpointType, defaultValue=WaterpointType.Bore),
+    StringField(propertyName="reference", name=REFERENCE),
+    MeasureField(propertyName="boreYield", name=BORE_YIELD),
+    StringField(propertyName="boreReportUrl", name=BORE_REPORT_URL),
+    StringField(propertyName="waterpointStartMonth", name=WATERPOINT_START_MONTH),
+    StringField(propertyName="waterpointEndMonth", name=WATERPOINT_END_MONTH),
+    MeasureField(propertyName="nearBuffer", name=NEAR_BUFFER, defaultValue="3000.0"),
+    MeasureField(propertyName="farBuffer", name=FAR_BUFFER, defaultValue="5000.0")
 ])
+
+CONDITION = "Condition"
+ConditionField = DomainField(propertyName="condition", name=CONDITION, domainType=Condition, defaultValue=Condition.A)
+PADDOCK = "Paddock"
+Paddock = IdField(propertyName="paddock", name=PADDOCK)
+PADDOCK_NAME = "Paddock Name"
+PaddockName = StringField(propertyName="paddockName", name=PADDOCK_NAME)
+LAND_SYSTEM = "Land System"
+LandSystem = IdField(propertyName="landSystem", name=LAND_SYSTEM)
+LAND_SYSTEM_NAME = "Land System Name"
+LandSystemName = StringField(propertyName="landSystemName", name=LAND_SYSTEM_NAME)
+ConditionRecordSchema = Schema(
+    FeatureSchema + [Area, Perimeter, CapacityPerArea, EstimatedCapacity, PotentialCapacity] +
+    [ConditionField, Paddock, PaddockName, LandSystem, LandSystemName, WaterpointBufferTypeField],
+    wkbType=QgsWkbTypes.MultiPolygon)

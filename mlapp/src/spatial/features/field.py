@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import QVariant
+
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
 
 from ...models.glitch import Glitch
+from ...utils import qgsDebug
 from .field_domain import FieldDomain
 
 
@@ -19,6 +22,9 @@ class Field(QgsField):
             self._defaultValue = kwargs.pop('defaultValue', None)
 
         super().__init__(*args, **kwargs)
+
+        if self._defaultValue is not None:
+            qgsDebug(f"Setting default value for field: {self.name()}, {self._defaultValue}")
 
         if self._domainType is not None:
             self.setEditorWidgetSetup(Field.__fieldDomainToEditorWidgetSetup(self._domainType))
@@ -79,6 +85,11 @@ class Field(QgsField):
         else:
             return lambda feature, value: feature._qgsFeature.setAttribute(self.name(), value)
 
+    def setDefaultValue(self, feature):
+        """Set the default value of a field on a feature."""
+        if self._defaultValue:
+            self.__makeSetter()(feature, self._defaultValue)
+
     def addFieldProperty(self, cls):
         """Add a Python property to a Feature class for this Field."""
         # getterName = f"_{self._propertyName}"
@@ -87,3 +98,27 @@ class Field(QgsField):
         # setattr(cls, getterName, self.__makeGetter())
         # setattr(cls, setterName, self.__makeSetter())
         setattr(cls, self._propertyName, property(self.__makeGetter(), self.__makeSetter()))
+
+
+class MeasureField(Field):
+    def __init__(self, propertyName, name, *args, **kwargs):
+        super().__init__(propertyName=propertyName, name=name, type=QVariant.Double,
+                         typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, *args, **kwargs)
+
+
+class StringField(Field):
+    def __init__(self, propertyName, name, *args, **kwargs):
+        super().__init__(propertyName=propertyName, name=name, type=QVariant.String, typeName="String",
+                         len=0, prec=0, comment="", subType=QVariant.Invalid, *args, **kwargs)
+
+
+class IdField(Field):
+    def __init__(self, propertyName, name, *args, **kwargs):
+        super().__init__(propertyName=propertyName, name=name, type=QVariant.LongLong, typeName="Integer64",
+                         len=0, prec=0, comment="", subType=QVariant.Invalid, *args, **kwargs)
+
+
+class DomainField(Field):
+    def __init__(self, propertyName, name, domainType, *args, **kwargs):
+        super().__init__(propertyName=propertyName, name=name, type=QVariant.String, typeName="String",
+                         len=0, prec=0, comment="", subType=QVariant.Invalid, domainType=domainType, *args, **kwargs)

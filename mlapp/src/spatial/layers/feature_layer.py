@@ -3,13 +3,12 @@ from os import path
 
 from qgis.PyQt.QtCore import QVariant, pyqtSignal
 
-from qgis.core import QgsCategorizedSymbolRenderer, QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
 from ...utils import qgsInfo, resolveStylePath
 from ..features.feature import Feature
-from ..features.feature_status import FeatureStatus
 
 # Couple of lookup dictionaries (locally useful only)
 QVARIANT_TYPES = dict([(getattr(QVariant, v), v) for v, m in vars(
@@ -24,7 +23,6 @@ PADDOCK_POWER_EPSG = 7845
 
 class FeatureLayer(QgsVectorLayer):
 
-    displayFilterChanged = pyqtSignal(list)
     editsPersisted = pyqtSignal()
 
     @classmethod
@@ -119,10 +117,24 @@ class FeatureLayer(QgsVectorLayer):
             stylePath = resolveStylePath(styleName)
             self.loadNamedStyle(stylePath)
 
-        # Apply editor widgets
-        schema = self.getFeatureType().getSchema()
+        missingFields, extraFields = self.getFeatureType().checkSchema(self.fields())
 
-        for field in schema:
+        if missingFields:
+            # Start editing to to expand the schema
+            qgsInfo(f"Expanding schema for {self.__class__.__name__} to include {str([f.name() for f in missingFields])} …")
+            self.startEditing()
+            self.dataProvider().addAttributes(missingFields)
+            self.commitChanges()
+
+        if extraFields:
+            # Start editing to to cut down the schema
+            qgsInfo(f"Reducing schema for {self.__class__.__name__} to remove {str([f.name() for f in extraFields])} …")
+            self.startEditing()
+            self.dataProvider().deleteAttributes([self.fields().indexFromName(f.name*()) for f in extraFields])
+            self.commitChanges()
+
+        # Apply editor widgets
+        for field in self.getFeatureType().getSchema():
             fieldIndex = self.fields().indexFromName(field.name())
             self.setEditorWidgetSetup(fieldIndex, field.editorWidgetSetup())
             self.setDefaultValueDefinition(fieldIndex, field.defaultValueDefinition())
@@ -131,45 +143,9 @@ class FeatureLayer(QgsVectorLayer):
 
         QgsProject.instance().addMapLayer(self, False)
 
-        self._displayFilter = [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
-        self._applyDisplayFilter(self.displayFilter)
-        self.writeCustomSymbology.connect(self._refreshDisplayFilterFromRenderer)
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, feature)
-
-    @property
-    def displayFilter(self):
-        """The display layer for this layer."""
-        return self._displayFilter
-
-    @displayFilter.setter
-    def displayFilter(self, filter):
-        """Set the display filter for this layer."""
-        if self._displayFilter != filter:
-            self._displayFilter = filter
-            self.displayFilterChanged.emit(self.displayFilter)
-            self._applyDisplayFilter(filter)
-
-    def _applyDisplayFilter(self, filter):
-        """Toggle the display of a renderer category."""
-        renderer = self.renderer()
-        if isinstance(renderer, QgsCategorizedSymbolRenderer) and renderer.classAttribute() == 'Status':
-            displayed = [status.name for status in filter]
-            categories = renderer.categories()
-            for category in categories:
-                category.setRenderState(category.value() in displayed)
-            self.setRenderer(QgsCategorizedSymbolRenderer('Status', categories))
-            self.triggerRepaint()
-
-    def _refreshDisplayFilterFromRenderer(self):
-        """Refresh the display filter from the renderer."""
-        # qgsDebug("FeatureLayer._refreshDisplayFilterFromRenderer")
-        renderer = self.renderer()
-        if isinstance(renderer, QgsCategorizedSymbolRenderer) and renderer.classAttribute() == 'Status':
-            values = [category.value() for category in renderer.categories() if category.renderState()]
-            statuses = [status for status in FeatureStatus if status.match(*values)]
-            self.displayFilter = statuses
 
     def copyTo(self, otherLayer):
         """Copy all features in this layer to another layer."""
@@ -211,9 +187,9 @@ class FeatureLayer(QgsVectorLayer):
             feature = self.wrapFeature(feature)
             yield feature
 
-    def makeFeature(self, existingFeature=None):
+    def makeFeature(self):
         """Make a new Feature in this layer."""
-        return self.wrapFeature(existingFeature)
+        return self.wrapFeature(None)
 
     def copyFeature(self, feature):
         """Copy a Feature from this layer to the clipboard."""
@@ -241,14 +217,6 @@ class FeatureLayer(QgsVectorLayer):
         """Delete a feature from the layer."""
         super().deleteFeature(feature.id)
 
-    def getFeatureById(self, id):
-        """Get a feature by its ID."""
-        qgsFeature = super().getFeature(id)
-
-        if qgsFeature is not None:
-            feature = self.wrapFeature(qgsFeature)
-            return feature if feature.status.match(*self.displayFilter) else None
-
     def getFeatures(self, request=None):
         """Get the features in this layer."""
         if request is None:
@@ -259,12 +227,6 @@ class FeatureLayer(QgsVectorLayer):
                 "FeatureLayer.getFeatures: the request is not a QgsRequest")
 
         return self._wrapQgsFeatures(super().getFeatures(request))
-
-    def getFeaturesByStatus(self, *statuses, request=None):
-        """Get the features in this layer filtered by one or more FeatureStatus values."""
-        if not statuses:
-            return self.getFeatures(request)
-        return [f for f in self.getFeatures(request) if f.status.match(*statuses)]
 
     def featureCount(self):
         """Get the number of Features in the layer."""

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from ..calculator import Calculator
-from .feature import Feature
 from .schemas import AreaFeatureSchema
+from .status_feature import StatusFeature
 
 
 @AreaFeatureSchema.addSchema()
-class AreaFeature(Feature):
+class AreaFeature(StatusFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new AreaFeature."""

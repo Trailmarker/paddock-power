@@ -22,16 +22,16 @@ class Pipeline(LineFeature):
         return True
 
     @Edits.persistEdits
-    @FeatureAction.draft.handler()
-    def draftFeature(self, geometry):
-        """Draft a Pipeline."""
+    @FeatureAction.plan.handler()
+    def planFeature(self, geometry):
+        """Plan a Pipeline."""
 
         self.geometry = geometry
 
         return Edits.upsert(self)
 
     @Edits.persistEdits
-    @FeatureAction.plan.handler()
-    def planFeature(self):
-        """Plan a Pipeline."""
-        return Edits.upsert(self)
+    @FeatureAction.undoPlan.handler()
+    def undoPlanFeature(self):
+        """Undo planning a Pipeline."""
+        return Edits.delete(self)

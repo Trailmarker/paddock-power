@@ -36,6 +36,5 @@ class PipelineView(ViewBase, FORM_CLASS):
     @pyqtSlot(QgsGeometry)
     def onSketchPipelineFinished(self, sketchLine):
         pipeline = self.project.pipelineLayer.makeFeature()
-        pipeline.draftFeature(sketchLine)
-        pipeline.planFeature()
+        pipeline.planFeature(sketchLine)
         self.project.selectFeature(pipeline)

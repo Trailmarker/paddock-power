@@ -5,7 +5,7 @@ from .feature_layer import FeatureLayer
 
 class LandSystemLayer(FeatureLayer):
 
-    STYLE = "land_system"
+    # STYLE = "land_system"
 
     @classmethod
     def getFeatureType(cls):
@@ -14,4 +14,4 @@ class LandSystemLayer(FeatureLayer):
     def __init__(self, gpkgFile, layerName):
         super().__init__(gpkgFile,
                          layerName,
-                         styleName=LandSystemLayer.STYLE)
+                         styleName=None)

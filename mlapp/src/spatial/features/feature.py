@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 from re import finditer
 
 from qgis.core import QgsFeature, QgsFields, QgsProject
 
 from ...models.glitch import Glitch
-from .edits import Edits
-from .feature_action import FeatureAction
-from .feature_state_machine import FeatureStateMachine
+from ...utils import qgsDebug
 from .schemas import FeatureSchema
 
 
 @FeatureSchema.addSchema()
-class Feature(QObject, FeatureStateMachine):
+class Feature(QObject):
+    featureUpdated = pyqtSignal()
+    featureDeleted = pyqtSignal()
 
     @classmethod
     def displayName(cls):
@@ -28,7 +28,9 @@ class Feature(QObject, FeatureStateMachine):
     @classmethod
     def checkSchema(cls, fieldsToCheck):
         """Check that an incoming schema contains this Feature's schema. Checks field names only."""
-        return [field for field in cls.getSchema() if field.name() not in [f.name() for f in fieldsToCheck]]
+        missing = [field for field in cls.getSchema() if field.name() not in [f.name() for f in fieldsToCheck]]
+        extra = [field for field in fieldsToCheck if field.name() not in [f.name() for f in cls.getSchema()]]
+        return missing, extra
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Feature."""
@@ -40,13 +42,15 @@ class Feature(QObject, FeatureStateMachine):
             for field in self.getSchema():
                 fields.append(field)
             self._qgsFeature = QgsFeature(fields)
+            for field in self.getSchema():
+                field.setDefaultValue(self)
             self.clearId()
 
         elif isinstance(existingFeature, Feature):
             # Copy constructor for Feature and subclasses
 
             # Incoming Feature must have compatible schema
-            missingFields = self.checkSchema(existingFeature.getSchema())
+            missingFields, _ = self.checkSchema(existingFeature.getSchema())
             if missingFields:
                 raise Glitch(f"{self.__class__.__name__}: incoming Feature has missing fields: {missingFields}")
 
@@ -63,7 +67,7 @@ class Feature(QObject, FeatureStateMachine):
 
         elif isinstance(existingFeature, QgsFeature):
             # Incoming QgsFeature must have the correct schema
-            missingFields = self.checkSchema(existingFeature.fields().toList())
+            missingFields, _ = self.checkSchema(existingFeature.fields().toList())
             if missingFields:
                 raise Glitch(f"{self.__class__.__name__} incoming QgsFeature has missing fields: {missingFields}")
 
@@ -78,7 +82,7 @@ class Feature(QObject, FeatureStateMachine):
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        return f"{self.__class__.__name__}(id={self.id}, name='{self.name}', status={self.status})"
+        return f"{self.__class__.__name__}(id={self.id}, name='{self.name}')"
 
     def __str__(self):
         """Convert the Feature to a string representation."""
@@ -93,12 +97,12 @@ class Feature(QObject, FeatureStateMachine):
             self.featureLayer.updateFeature(self)
         else:
             self.featureLayer.addFeature(self)
-
-        self.stateChanged.emit(self.status)
+        self.featureUpdated.emit()
 
     def delete(self):
         """Delete the Feature from the FeatureLayer."""
         self.featureLayer.deleteFeature(self)
+        self.featureDeleted.emit()
 
     @property
     def featureLayer(self):
@@ -143,9 +147,3 @@ class Feature(QObject, FeatureStateMachine):
     def title(self):
         """Return the Feature's title."""
         f"{self.name}"
-
-    @Edits.persistEdits
-    @FeatureAction.trash.handler()
-    def trashFeature(self):
-        """Trash a Draft Feature."""
-        return Edits.delete(self)

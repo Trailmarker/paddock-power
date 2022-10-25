@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject
+
 from ..features.pipeline import Pipeline
 from .elevation_layer import ElevationLayer
-from .feature_layer import FeatureLayer
+from .status_feature_layer import StatusFeatureLayer
 
 
-class PipelineLayer(FeatureLayer):
+class PipelineLayer(StatusFeatureLayer):
 
     STYLE = "pipeline"
 
@@ -19,7 +21,11 @@ class PipelineLayer(FeatureLayer):
                          layerName,
                          styleName=PipelineLayer.STYLE)
 
-        self.elevationLayer = elevationLayer
+        self._elevationLayerId = elevationLayer.id()
+
+    @property
+    def elevationLayer(self):
+        return QgsProject.instance().mapLayer(self._elevationLayerId)
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.elevationLayer, feature)

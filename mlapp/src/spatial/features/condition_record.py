@@ -1,33 +1,23 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject
-
-from ..layers.land_system_layer import LandSystemLayer
-from ..layers.paddock_layer import PaddockLayer
-from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from .capacity_feature import CapacityFeature
+from .edits import Edits
+from .feature import Feature
 from .schemas import ConditionRecordSchema
 
 
 @ConditionRecordSchema.addSchema()
-class ConditionRecord(CapacityFeature):
+class ConditionRecord(Feature):
 
-    def __init__(self, featureLayer, paddockLayer: PaddockLayer, landSystemLayer: LandSystemLayer,
-                 waterpointBufferLayer: WaterpointBufferLayer, existingFeature=None):
+    def __init__(self, featureLayer, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-        self._paddockLayerId = paddockLayer.id()
-        self._landSystemLayerId = landSystemLayer.id()
-        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+    def createFeature(self, waterpoint, geometry, waterpointBufferType, bufferDistance):
+        self.waterpoint = waterpoint.id
+        self.geometry = geometry
+        self.waterpointBufferType = waterpointBufferType
+        self.bufferDistance = bufferDistance
+        return Edits.upsert(self)
 
-    @property
-    def paddockLayer(self):
-        return QgsProject.instance().mapLayer(self._paddockLayerId)
-
-    @property
-    def landSystemLayer(self):
-        return QgsProject.instance().mapLayer(self._landSystemLayerId)
-
-    @property
-    def waterpointBufferLayer(self):
-        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+    def deleteFeature(self):
+        self.waterpoint = None
+        return Edits.delete(self)
