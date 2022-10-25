@@ -65,9 +65,6 @@ class Fence(LineFeature):
         notFarm = farmRegion.difference(farm)
         return notFarm.buffer(2 * glitchBuffer, 10)
 
-    def getNewPaddockByLinePart(self, fenceLinePart, notFarm):
-        """Get the new paddocks created by this Fence, by line part."""
-
     @Glitch.glitchy()
     def getNewPaddocks(self, geometry=None):
         """Get the paddocks that are newly enclosed by this Fence, and the normalised outer fence lines."""

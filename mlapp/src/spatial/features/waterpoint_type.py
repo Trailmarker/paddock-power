@@ -10,8 +10,3 @@ class WaterpointType(FieldDomain):
     TurkeyNest = "Turkey Nest"
     WaterTank = "Water Tank"
     Waterhole = "Waterhole"
-
-
-class WaterpointBufferType(FieldDomain):
-    Near = "Near Buffer"
-    Far = "Far Buffer"

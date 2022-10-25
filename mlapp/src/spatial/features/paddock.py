@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject
+from qgis.core import QgsFeatureRequest, QgsProject
 
+from ...models.glitch import Glitch
 from ..layers.condition_record_layer import ConditionRecordLayer
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from .area_feature import AreaFeature
+from .condition_record import ConditionRecord
 from .edits import Edits
 from .feature_action import FeatureAction
-from .schemas import PaddockSchema
+from .schemas import PADDOCK, PaddockSchema
 
 
 @PaddockSchema.addSchema()
@@ -33,6 +35,51 @@ class Paddock(AreaFeature):
     @property
     def conditionRecordLayer(self):
         return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
+
+    @Glitch.glitchy()
+    def getConditionRecordsForPaddock(self):
+        paddockRequest = QgsFeatureRequest().setFilterExpression(
+            f'"{PADDOCK}" = {self.id}')
+        
+        return list(self.conditionRecordLayer.getFeatures(paddockRequest))
+
+    @Glitch.glitchy()
+    def analyseConditionRecords(self):
+        """Get the land systems that intersect this paddock."""
+
+        landSystems = (self.landSystemLayer.getFeatures(self.geometry.boundingBox()))
+        near, far = self.waterpointBufferLayer.getNearAndFarBuffers()
+
+        overLandSystems = [record 
+                           for landSystem in landSystems if landSystem.geometry.intersects(self.geometry)
+                           for record in ConditionRecord.fromPaddockAndLandSystem(self.conditionRecordLayer, self, landSystem)]
+
+        overNearBuffer = [record for unwatered in overLandSystems 
+                          for record in unwatered.overWaterpointBuffer(near)]
+
+        overFarBuffer = [record for unwatered in overLandSystems 
+                         for record in unwatered.overWaterpointBuffer(far)]
+
+        return (overNearBuffer + overFarBuffer), self.getConditionRecordsForPaddock()
+   
+    def analyseFeature(self):
+        """Analyse the feature."""
+        super().recalculate() # Re-check the area and perimeter
+        
+        edits = Edits()
+
+        conditionRecords, currentConditionRecords = self.analyseConditionRecords()
+
+        for record in conditionRecords:
+            record.recalculate()
+
+        self.estimatedCapacity = sum([record.estimatedCapacity for record in conditionRecords])
+        self.potentialCapacity = sum([record.potentialCapacity for record in conditionRecords])
+        self.capacityPerArea = self.estimatedCapacity / self.featureArea
+
+        edits.editBefore(Edits.delete(*currentConditionRecords))
+        edits.editBefore(Edits.upsert(*conditionRecords))
+        return edits
 
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):

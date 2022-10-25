@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProject
 
+from ..features.edits import Edits
 from ..features.paddock import Paddock
 from .condition_record_layer import ConditionRecordLayer
 from .land_system_layer import LandSystemLayer
@@ -40,3 +41,12 @@ class PaddockLayer(StatusFeatureLayer):
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.landSystemLayer, self.waterpointBufferLayer, self.conditionRecordLayer, feature)
+
+    @Edits.persistEdits
+    def analyseFeatures(self):
+        edits = Edits()
+
+        for paddock in self.getFeatures():
+            edits.editBefore(paddock.analyseFeature())
+        
+        return edits

@@ -222,10 +222,6 @@ class FeatureLayer(QgsVectorLayer):
         if request is None:
             return self._wrapQgsFeatures(super().getFeatures())
 
-        if not isinstance(request, QgsFeatureRequest):
-            raise Glitch(
-                "FeatureLayer.getFeatures: the request is not a QgsRequest")
-
         return self._wrapQgsFeatures(super().getFeatures(request))
 
     def featureCount(self):

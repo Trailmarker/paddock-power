@@ -6,7 +6,7 @@ from qgis.core import QgsWkbTypes
 from .condition import Condition
 from .feature_status import FeatureStatus
 from .field import DomainField, IdField, MeasureField, StringField
-from .waterpoint_type import WaterpointBufferType
+from .waterpoint_buffer_type import WaterpointBufferType
 from .waterpoint_type import WaterpointType
 
 
