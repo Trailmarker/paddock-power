@@ -5,18 +5,18 @@ from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 
-from ...widgets.paddock_power_map_tool import PaddockPowerMapTool
+from .map_tool import MapTool
 
 
-class SketchLineTool(PaddockPowerMapTool):
-    points = []
-
+class SketchLineTool(MapTool):
     sketchFinished = pyqtSignal(QgsGeometry)
 
     def __init__(self, project):
 
         self.project = project
         super().__init__(self.project.iface.mapCanvas())
+
+        self.points = []
 
         # flag to know whether the tool is capturing a drawing
         self.capturing = False

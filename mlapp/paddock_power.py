@@ -13,7 +13,7 @@ from .resources_rc import *
 from .src.models.glitch import Glitch
 from .src.models.project import Project
 from .src.provider import Provider
-from .src.utils import qgsDebug, resolveGeoPackageFile, PLUGIN_NAME
+from .src.utils import qgsInfo, resolveGeoPackageFile, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
@@ -97,8 +97,20 @@ class PaddockPower(QObject):
 
         self.addAction(
             QIcon(":/plugins/mlapp/images/split-paddock.png"),
-            text=u"View and Plan Fences and Pipelines",
-            callback=self.openInfrastructureView,
+            text=u"Plan Fences",
+            callback=self.openFenceView,
+            parent=self.iface.mainWindow())
+
+        self.addAction(
+            QIcon(":/plugins/mlapp/images/split-paddock.png"),
+            text=u"Plan Pipelines",
+            callback=self.openPipelineView,
+            parent=self.iface.mainWindow())
+        
+        self.addAction(
+            QIcon(":/plugins/mlapp/images/split-paddock.png"),
+            text=u"Plan Waterpoints",
+            callback=self.openWaterpointView,
             parent=self.iface.mainWindow())
 
         self.detectProject()
@@ -106,11 +118,11 @@ class PaddockPower(QObject):
     # Override Glitch type exceptions application-wide
     def setupGlitchHook(self):
         if hasattr(sys.excepthook, PaddockPower.__GLITCH_HOOK_WRAPPER):
-            qgsDebug("GlitchHook: Glitch hook already set.")
+            qgsInfo("GlitchHook: Glitch hook already set.")
             return
 
         exceptHook = sys.excepthook
-        qgsDebug("GlitchHook: setting up Glitch hook.")
+        qgsInfo("GlitchHook: setting up Glitch hook.")
 
         def glitchHookWrapper(exceptionType, e, traceback):
             if isinstance(e, Glitch):
@@ -125,7 +137,7 @@ class PaddockPower(QObject):
     @staticmethod
     def restoreSystemExceptionHook():
         if hasattr(sys.excepthook, PaddockPower.__GLITCH_HOOK_WRAPPER):
-            qgsDebug("GlitchHook: restoring original system exception hook.")
+            qgsInfo("GlitchHook: restoring original system exception hook.")
             sys.excepthook = getattr(sys.excepthook, PaddockPower.__GLITCH_HOOK_WRAPPER)
 
     def unload(self):
@@ -167,10 +179,10 @@ class PaddockPower(QObject):
         try:
             gpkgFile = resolveGeoPackageFile()
             if gpkgFile is not None:
-                qgsDebug("Paddock Power loading project …")
+                qgsInfo("Paddock Power loading project …")
                 self.project = Project(self.iface, gpkgFile)
             else:
-                qgsDebug("Paddock Power no GeoPackage file …")
+                qgsInfo("Paddock Power no GeoPackage file …")
         except BaseException:
             pass
         if self.project is not None:
@@ -179,16 +191,22 @@ class PaddockPower(QObject):
     def unloadProject(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         if self.project is not None:
-            qgsDebug("Paddock Power unloading project …")
+            qgsInfo("Paddock Power unloading project …")
             self.project.unload()
             self.project = None
 
+    def openFenceView(self):
+        if self.project is not None:
+            self.project.openFenceView()
+
     def openPaddockView(self):
-        """Run method that loads and opens Paddock View."""
         if self.project is not None:
             self.project.openPaddockView()
 
-    def openInfrastructureView(self):
-        """Run method that loads and opens Plan Fences and Pipelines."""
+    def openPipelineView(self):
         if self.project is not None:
-            self.project.openInfrastructureView()
+            self.project.openPipelineView()
+   
+    def openWaterpointView(self):
+        if self.project is not None:
+            self.project.openWaterpointView()

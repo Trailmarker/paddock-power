@@ -8,12 +8,14 @@ from ..spatial.features.feature import Feature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
 from ..spatial.layers.feature_layer import FeatureLayer
+from ..tools.map_tool import MapTool
 from ..utils import qgsDebug
-from ..views.infrastructure_view.infrastructure_view import InfrastructureView
+from ..views.fence_view.fence_view import FenceView
 from ..views.paddock_view.paddock_view import PaddockView
+from ..views.pipeline_view.pipeline_view import PipelineView
+from ..views.waterpoint_view.waterpoint_view import WaterpointView
 from ..widgets.fence_details.fence_selection import FenceSelection
 from ..widgets.paddock_details.paddock_selection import PaddockSelection
-from ..widgets.paddock_power_map_tool import PaddockPowerMapTool
 from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
 from .glitch import Glitch
 from .project_base import ProjectBase
@@ -72,7 +74,7 @@ class Project(ProjectBase):
 
     def setTool(self, tool):
         """Set the current tool for this Project."""
-        if not isinstance(tool, PaddockPowerMapTool):
+        if not isinstance(tool, MapTool):
             raise Glitch(
                 "The Paddock Power tool must be of a recognised type")
 
@@ -91,7 +93,7 @@ class Project(ProjectBase):
         if feature is not None and not isinstance(feature, Feature):
             raise Glitch(
                 "You can't select an object that is not a Feature")
-        qgsDebug("Selecting feature: {}".format(feature))
+        # qgsDebug("Selecting feature: {}".format(feature))
 
         self.selectedFeatures[type(feature)] = feature
         self.selectedFeatureChanged.emit(feature)
@@ -138,14 +140,24 @@ class Project(ProjectBase):
             view.show()
 
     @pyqtSlot()
+    def openFenceView(self):
+        """Run method that loads and opens Plan Fences and Pipelines."""
+        self.openView(FenceView, Qt.BottomDockWidgetArea)
+
+    @pyqtSlot()
     def openPaddockView(self):
         """Run method that loads and opens Paddock View."""
         self.openView(PaddockView, Qt.LeftDockWidgetArea)
 
     @pyqtSlot()
-    def openInfrastructureView(self):
+    def openPipelineView(self):
         """Run method that loads and opens Plan Fences and Pipelines."""
-        self.openView(InfrastructureView, Qt.BottomDockWidgetArea)
+        self.openView(PipelineView, Qt.BottomDockWidgetArea)
+
+    @pyqtSlot()
+    def openWaterpointView(self):
+        """Run method that loads and opens Plan Fences and Pipelines."""
+        self.openView(WaterpointView, Qt.BottomDockWidgetArea)
 
     @pyqtSlot()
     def onCloseView(self, viewType):

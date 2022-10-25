@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
+from .field_domain import FieldDomain
 
 
-class WaterpointType(Enum):
+class WaterpointType(FieldDomain):
     Bore = "Bore"
     Dam = "Dam"
     Trough = "Trough"
@@ -12,6 +12,6 @@ class WaterpointType(Enum):
     Waterhole = "Waterhole"
 
 
-class WaterpointBufferType(Enum):
+class WaterpointBufferType(FieldDomain):
     Near = "Near Buffer"
     Far = "Far Buffer"

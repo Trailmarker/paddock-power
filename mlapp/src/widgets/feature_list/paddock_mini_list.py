@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from ..feature_list.feature_collapsible_list_item import FeatureCollapsibleListItem
-from ..feature_list.feature_layer_list import FeatureLayerList
+from .feature_mini_list import FeatureMiniList
+from .feature_collapsible_list_item import FeatureCollapsibleListItem
 from ..paddock_details.paddock_details import PaddockDetails
 from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
 
 
-class PaddockLayerList(FeatureLayerList):
-
+class PaddockMiniList(FeatureMiniList):
     def __init__(self, parent=None):
         """Constructor."""
 

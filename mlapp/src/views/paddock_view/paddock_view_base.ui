@@ -62,7 +62,7 @@
     <customwidget>
       <class>PaddockLayerList</class>
       <extends>QListView</extends>
-      <header>mlapp/src/widgets/paddock_list/paddock_layer_list</header>
+      <header>mlapp/src/widgets/feature_list/paddock_layer_list</header>
     </customwidget>
   </customwidgets>
   <resources/>

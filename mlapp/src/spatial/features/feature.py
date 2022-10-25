@@ -13,8 +13,6 @@ from .schemas import FeatureSchema
 
 @FeatureSchema.addSchema()
 class Feature(QObject, FeatureStateMachine):
-    # featurePersisted = pyqtSignal(int)
-    # featureUpdated = pyqtSignal(int)
 
     @classmethod
     def displayName(cls):
@@ -50,7 +48,7 @@ class Feature(QObject, FeatureStateMachine):
             # Incoming Feature must have compatible schema
             missingFields = self.checkSchema(existingFeature.getSchema())
             if missingFields:
-                raise Glitch(f"{self.__class__.name__}: incoming Feature has missing fields: {missingFields}")
+                raise Glitch(f"{self.__class__.__name__}: incoming Feature has missing fields: {missingFields}")
 
             # First create an empty Feature with the correct schema
             self.__init__(featureLayer)
@@ -67,7 +65,7 @@ class Feature(QObject, FeatureStateMachine):
             # Incoming QgsFeature must have the correct schema
             missingFields = self.checkSchema(existingFeature.fields().toList())
             if missingFields:
-                raise Glitch(f"{self.__class__.name__} incoming QgsFeature has missing fields: {missingFields}")
+                raise Glitch(f"{self.__class__.__name__} incoming QgsFeature has missing fields: {missingFields}")
 
             self._qgsFeature = existingFeature
 
@@ -95,6 +93,8 @@ class Feature(QObject, FeatureStateMachine):
             self.featureLayer.updateFeature(self)
         else:
             self.featureLayer.addFeature(self)
+
+        self.stateChanged.emit(self.status)
 
     def delete(self):
         """Delete the Feature from the FeatureLayer."""

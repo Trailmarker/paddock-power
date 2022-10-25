@@ -157,7 +157,7 @@ FAR_BUFFER = "Far Buffer (m)"
 WaterpointSchema = Schema(PointFeatureSchema + [
     Field(propertyName="waterpointType", name=WATERPOINT_TYPE, type=QVariant.String, typeName="String",
           len=0, prec=0, comment="", subType=QVariant.Invalid,
-          domainType=WaterpointType),
+          domainType=WaterpointType, defaultValue=WaterpointType.Bore),
     Field(propertyName="reference", name=REFERENCE, type=QVariant.String,
           typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="boreYield", name=BORE_YIELD, type=QVariant.Double,
@@ -168,8 +168,8 @@ WaterpointSchema = Schema(PointFeatureSchema + [
           typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
     Field(propertyName="waterpointEndMonth", name=WATERPOINT_END_MONTH, type=QVariant.String,
           typeName="String", len=0, prec=0, comment="", subType=QVariant.Invalid),
-    Field(propertyName="innerBuffer", name=NEAR_BUFFER, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue='3000.0'),
-    Field(propertyName="outerBuffer", name=FAR_BUFFER, type=QVariant.Double,
-          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue='5000.0')
+    Field(propertyName="nearBuffer", name=NEAR_BUFFER, type=QVariant.Double,
+          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue="3000.0"),
+    Field(propertyName="farBuffer", name=FAR_BUFFER, type=QVariant.Double,
+          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, defaultValue="5000.0")
 ])

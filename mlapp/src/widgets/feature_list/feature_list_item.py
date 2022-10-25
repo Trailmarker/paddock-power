@@ -31,11 +31,11 @@ class FeatureListItem(QWidget):
         self.toolBar.addStateAction(
             FeatureAction.undoPlan,
             ':/plugins/mlapp/images/item-undo.png',
-            lambda _: self.feature.undoPlanFence())
+            lambda _: self.feature.undoPlanFeature())
         self.toolBar.addStateAction(
             FeatureAction.plan,
             ':/plugins/mlapp/images/item-edit.png',
-            lambda _: self.feature.planFence())
+            lambda _: self.feature.planFeature())
         self.toolBar.addStateAction(
             FeatureAction.plan,
             ':/plugins/mlapp/images/delete-project.png',

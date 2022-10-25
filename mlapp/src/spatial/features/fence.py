@@ -104,14 +104,14 @@ class Fence(LineFeature):
                 polyline = fenceLine.asPolyline()
                 splitLine = [QgsPointXY(p.x(), p.y()) for p in polyline]
 
-                qgsDebug("getNewPaddocks: splitGeometry in progress …")
+                # qgsDebug("getNewPaddocks: splitGeometry in progress …")
                 _, splits, _ = notFarm.splitGeometry(splitLine, False)
 
                 # The first result is always the piece of notFarm that is carved out? TODO check this
                 if splits:
                     paddockGeometry = notFarm.difference(splits[0])
                     newPaddock = self.paddockLayer.makeFeature()
-                    newPaddock.draftPaddock(paddockGeometry, f"Fence {self.buildOrder} New")
+                    newPaddock.draftFeature(paddockGeometry, f"Fence {self.buildOrder} New")
                     newPaddocks.append(newPaddock)
 
         # notFarm = self.getNotFarm(glitchBuffer=1.0)
@@ -191,7 +191,7 @@ class Fence(LineFeature):
 
     @Edits.persistEdits
     @FeatureAction.draft.handler()
-    def draftFence(self, geometry):
+    def draftFeature(self, geometry):
         """Draft a Fence."""
 
         self.geometry = geometry
@@ -201,19 +201,21 @@ class Fence(LineFeature):
         # New Paddocks
         enclosingLines, newPaddocks = self.getNewPaddocks()
 
-        qgsDebug(
-            f"draftFence: getNewPaddocks {len(enclosingLines)}, {len(newPaddocks)}, {[p.name for p in newPaddocks]}")
+        # qgsDebug(
+        # f"Fence.draftFeature getNewPaddocks {len(enclosingLines)},
+        # {len(newPaddocks)}, {[p.name for p in newPaddocks]}")
 
         # Split Paddocks
         splitLines, supersededPaddocks = self.getCrossedPaddocks()
 
-        qgsDebug(
-            f"draftFence: getCrossedPaddocks {len(splitLines)}, {len(supersededPaddocks)}, {[p.name for p in supersededPaddocks]}")
+        # qgsDebug(
+        # f"Fence.draftFeature getCrossedPaddocks {len(splitLines)},
+        # {len(supersededPaddocks)}, {[p.name for p in supersededPaddocks]}")
 
         fenceLines = enclosingLines + splitLines
 
         if (not newPaddocks and not supersededPaddocks) or not fenceLines:
-            qgsDebug("draftFence: no new or superseded Paddocks, returning")
+            # qgsDebug("Fence.draftFeature: no new or superseded Paddocks, returning")
             return Edits.delete(self)
             # raise Glitch("The specified Fence does not cross or touch any Built or
             # Planned Paddocks, or enclose any new Paddocks.")
@@ -222,7 +224,7 @@ class Fence(LineFeature):
 
         for fenceLine in fenceLines:
             extraFence = self.featureLayer.makeFeature()
-            edits = edits.editAfter(extraFence.draftFence(fenceLine))
+            edits = edits.editAfter(extraFence.draftFeature(fenceLine))
 
         currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
         self.buildOrder = currentBuildOrder + 1
@@ -231,7 +233,7 @@ class Fence(LineFeature):
 
     @Edits.persistEdits
     @FeatureAction.plan.handler()
-    def planFence(self):
+    def planFeature(self):
         """Plan the Paddocks that would be altered after building this Fence."""
 
         edits = Edits()
@@ -277,18 +279,18 @@ class Fence(LineFeature):
                     # the Paddock is derived in a dodgy way using splitFeatures
                     splitPaddock.status = FeatureStatus.Drafted
                     splitPaddock.recalculate()
-                    edits.editBefore(splitPaddock.planPaddock(self))
+                    edits.editBefore(splitPaddock.planFeature(self))
 
         _, newPaddocks = self.getNewPaddocks()
 
-        qgsDebug(f"planFence: getNewPaddocks {len(newPaddocks)}, {[p.name for p in newPaddocks]}")
+        # qgsDebug(f"Fence.planFeature: getNewPaddocks {len(newPaddocks)}, {[p.name for p in newPaddocks]}")
 
         for paddock in newPaddocks:
-            edits.editBefore(paddock.planPaddock(self))
+            edits.editBefore(paddock.planFeature(self))
 
         _, supersededPaddocks = self.getCrossedPaddocks()
 
-        qgsDebug(f"planFence: getCrossedPaddocks {len(supersededPaddocks)}, {[p.name for p in supersededPaddocks]}")
+        # qgsDebug(f"Fence.planFeature: getCrossedPaddocks {len(supersededPaddocks)}, {[p.name for p in supersededPaddocks]}")
 
         for paddock in supersededPaddocks:
             edits.editBefore(paddock.supersedePaddock(self))
@@ -298,7 +300,7 @@ class Fence(LineFeature):
 
     @Edits.persistEdits
     @FeatureAction.undoPlan.handler()
-    def undoPlanFence(self):
+    def undoPlanFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
         edits = Edits()
 

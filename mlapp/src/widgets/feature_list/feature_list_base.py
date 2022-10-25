@@ -3,7 +3,6 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
 
 from ...spatial.features.feature import Feature
-from ...utils import qgsDebug
 
 
 class FeatureListBase(QListWidget):
@@ -48,7 +47,6 @@ class FeatureListBase(QListWidget):
 
         # Repopulate list since we have Features
         for feature in features:
-            qgsDebug("FeatureListBase.refreshUi() adding {}".format(feature))
             widget = self.featureListItemFactory(feature)
             widget.featureZoomed.connect(lambda f: self.featureZoomed.emit(f))
             item = QListWidgetItem(self)

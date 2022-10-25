@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
+from .field_domain import FieldDomain
 
 
-class Condition(Enum):
+class Condition(FieldDomain):
     """Allowed conditions for a Land Type, Paddock and Water Buffer combination."""
     A = "A"
     B = "B"

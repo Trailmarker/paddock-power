@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from .area_feature import AreaFeature
+from .edits import Edits
+from .feature_action import FeatureAction
 from .schemas import WaterpointBufferSchema
 
 
@@ -10,7 +12,15 @@ class WaterpointBuffer(AreaFeature):
         """Create a new Boundary."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-    def recalculate(self, bufferDistance, landSystemLayer=None):
-        """Recalculate stats for this Waterpoint Buffer"""
-        # TODO
-        pass
+    @FeatureAction.plan.handler()
+    def planFeature(self, waterpoint, geometry, waterpointBufferType, bufferDistance):
+        self.waterpoint = waterpoint.id
+        self.geometry = geometry
+        self.waterpointBufferType = waterpointBufferType
+        self.bufferDistance = bufferDistance
+        return Edits.upsert(self)
+
+    @FeatureAction.undoPlan.handler()
+    def undoPlanFeature(self):
+        self.waterpoint = None
+        return Edits.delete(self)

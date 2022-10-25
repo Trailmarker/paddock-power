@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
-
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
 
 from ...models.glitch import Glitch
+from .field_domain import FieldDomain
 
 
 class Field(QgsField):
@@ -22,13 +21,13 @@ class Field(QgsField):
         super().__init__(*args, **kwargs)
 
         if self._domainType is not None:
-            self.setEditorWidgetSetup(Field.enumToEditorWidgetSetup(self._domainType))
+            self.setEditorWidgetSetup(Field.__fieldDomainToEditorWidgetSetup(self._domainType))
         else:
             self.setEditorWidgetSetup(QgsEditorWidgetSetup())
         if self._defaultValue is not None:
             if self._defaultValue == "NULL":
                 self.setDefaultValueDefinition(QgsDefaultValue("NULL"))
-            elif isinstance(self._defaultValue, Enum):
+            elif isinstance(self._defaultValue, FieldDomain):
                 self.setDefaultValueDefinition(QgsDefaultValue(f"'{self._defaultValue.name}'"))
             elif self._defaultValue is str:
                 self.setDefaultValueDefinition(QgsDefaultValue(f"'{self._defaultValue}'"))
@@ -38,18 +37,17 @@ class Field(QgsField):
             self.setDefaultValueDefinition(QgsDefaultValue())
 
     @staticmethod
-    def enumToEditorWidgetSetup(enumType):
+    def __fieldDomainToEditorWidgetSetup(domainType):
         """Get the editor widget setup for an enum type."""
 
-        mappings = [{enumType.value: enumType.name} for enumType in enumType]
+        mappings = [{format(domainItem): domainItem.name} for domainItem in domainType]
         config = {
             'map': mappings,
         }
-
         return QgsEditorWidgetSetup('ValueMap', config)
 
-    def _makeDomainvValuedFieldGetter(self):
-        """Make a gette for the value of a domain-valued field. Should not be called directly."""
+    def __makeFieldDomainGetter(self):
+        """Make a getter for the value of a domain-valued field. Should not be called directly."""
         def _getter(feature: QgsFeature):
             try:
                 return self._domainType[str(feature._qgsFeature[self.name()])]
@@ -59,34 +57,33 @@ class Field(QgsField):
                 return self._defaultValue
         return _getter
 
-    def _makeDomainValuedFieldSetter(self):
-        """Set the value of a domain-valued field. Should not be called directly."""
+    def __makeFieldDomainSetter(self):
+        """Make a setter for the value of a domain-valued field. Should not be called directly."""
         def _setter(feature: QgsFeature, domainValue):
             if not isinstance(domainValue, self._domainType):
                 raise Glitch(f"{domainValue} must be a {self._domainType.__name__}")
             feature._qgsFeature.setAttribute(self.name(), domainValue.name)
         return _setter
 
-    def _makeGetter(self):
+    def __makeGetter(self):
         if self._domainType is not None:
-            return self._makeDomainvValuedFieldGetter()
+            return self.__makeFieldDomainGetter()
         elif self.typeName() == "String":
             return lambda feature: str(feature._qgsFeature[self.name()])
         else:
             return lambda feature: feature._qgsFeature[self.name()]
 
-    def _makeSetter(self):
+    def __makeSetter(self):
         if self._domainType is not None:
-            return self._makeDomainValuedFieldSetter()
+            return self.__makeFieldDomainSetter()
         else:
             return lambda feature, value: feature._qgsFeature.setAttribute(self.name(), value)
 
     def addFieldProperty(self, cls):
         """Add a Python property to a Feature class for this Field."""
-        getterName = f"_{self._propertyName}"
-        setterName = f"_set{self._propertyName.capitalize()}"
+        # getterName = f"_{self._propertyName}"
+        # setterName = f"_set{self._propertyName.capitalize()}"
 
-        setattr(cls, getterName, self._makeGetter())
-        setattr(cls, setterName, self._makeSetter())
-
-        setattr(cls, self._propertyName, property(fget=getattr(cls, getterName), fset=getattr(cls, setterName)))
+        # setattr(cls, getterName, self.__makeGetter())
+        # setattr(cls, setterName, self.__makeSetter())
+        setattr(cls, self._propertyName, property(self.__makeGetter(), self.__makeSetter()))

@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from qgis.core import QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug
+from ...utils import qgsInfo
 
 
 class Edits:
@@ -37,9 +37,10 @@ class Edits:
     def editAndCommit(*layers):
         layers = set(layers)
         if not all(isinstance(layer, QgsVectorLayer) for layer in layers):
-            raise Glitch("When editing alayers, all layers must be QgsVectorLayers")
-        if any(layer.isEditable() for layer in layers):
-            raise Glitch("When editing layers, all layers must initially be in non-editable state")
+            raise Glitch("When editing layers, all layers must be QgsVectorLayers")
+        for layer in layers:
+            if layer.isEditable():
+                raise Glitch(f"Please end your edit session on {layer.name()} before you run this operation")
         try:
             for layer in layers:
                 layer.startEditing()
@@ -58,8 +59,9 @@ class Edits:
         layers = set(layers)
         if not all(isinstance(layer, QgsVectorLayer) for layer in layers):
             raise Glitch("When editing alayers, all layers must be QgsVectorLayers")
-        if any(layer.isEditable() for layer in layers):
-            raise Glitch("When editing layers, all layers must initially be in non-editable state")
+        for layer in layers:
+            if layer.isEditable():
+                raise Glitch(f"Please end your edit session on {layer.name()} before you run this operation")
         try:
             for layer in layers:
                 layer.startEditing()
@@ -77,7 +79,7 @@ class Edits:
         and returns a method that instead persists the edits and returns None."""
         def methodWithPersistEdits(feature, *args, **kwargs):
             edits = method(feature, *args, **kwargs)
-            qgsDebug(f"Persisting edits: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
+            qgsInfo(f"Persisting edits: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
 
             layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
             with Edits.editAndCommit(*layers):
@@ -88,9 +90,9 @@ class Edits:
 
             # Signal updates to the rest of the system - TODO?
             for feature in edits.upserts:
-                feature.stateChanged.emit(feature.status)
+                feature.stateChanged.emit(feature)
             for feature in edits.deletes:
-                feature.stateChanged.emit(feature.status)
+                feature.stateChanged.emit(feature)
 
             return None
         return methodWithPersistEdits

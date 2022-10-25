@@ -34,6 +34,9 @@ def qgsDebug(message, tag=PLUGIN_NAME, level=Qgis.Info):
         for m in message:
             QgsMessageLog.logMessage(m, tag, level)
 
+def qgsInfo(message):
+    """Print a debug message."""
+    qgsDebug(message, PLUGIN_NAME, Qgis.Info)
 
 def guiInformation(message):
     """Show an info message box."""

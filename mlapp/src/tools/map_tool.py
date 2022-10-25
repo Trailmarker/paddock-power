@@ -2,7 +2,7 @@
 from qgis.gui import QgsMapTool
 
 
-class PaddockPowerMapTool(QgsMapTool):
+class MapTool(QgsMapTool):
 
     def __init__(self, canvas):
         super().__init__(canvas)

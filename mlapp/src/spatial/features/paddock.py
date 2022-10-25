@@ -13,28 +13,28 @@ class Paddock(CapacityFeature):
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
     @FeatureAction.draft.handler()
-    def draftPaddock(self, geometry, name):
+    def draftFeature(self, geometry, name):
         """Draft a Paddock."""
         self.name = name
         self.geometry = geometry
         return Edits.upsert(self)
 
     @FeatureAction.plan.handler()
-    def planPaddock(self, fence):
+    def planFeature(self, fence):
         self.buildFence = fence.buildOrder
         return Edits.upsert(self)
 
     @FeatureAction.undoPlan.handler()
-    def undoPlanPaddock(self):
+    def undoPlanFeature(self):
         self.buildFence = None
         return Edits.delete(self)
 
     @FeatureAction.supersede.handler()
-    def supersedePaddock(self, fence):
+    def supersedeFeature(self, fence):
         self.buildFence = fence.buildOrder
         return Edits.upsert(self)
 
     @FeatureAction.undoSupersede.handler()
-    def undoSupersedePaddock(self):
+    def undoSupersedeFeature(self):
         self.buildFence = None
         return Edits.upsert(self)

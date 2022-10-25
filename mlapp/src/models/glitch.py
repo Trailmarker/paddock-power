@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 from qgis.core import Qgis
 
-from ..utils import guiError, qgsDebug
+from ..utils import guiError, qgsInfo
 
 
 class Glitch(Exception):
@@ -52,8 +52,8 @@ class Glitch(Exception):
 
         guiMessages.reverse()
         guiError(guiMessages)
-        qgsDebug(glitchMessages, level=Qgis.Critical)
-        qgsDebug(self, level=Qgis.Critical)
+        qgsInfo(glitchMessages, level=Qgis.Critical)
+        qgsInfo(self, level=Qgis.Critical)
 
     @staticmethod
     def popup(glitch):
@@ -67,7 +67,7 @@ class Glitch(Exception):
         try:
             yield
         except DeprecationWarning as d:
-            qgsDebug(f"Suppressing DeprecationWarning: {d}")
+            qgsInfo(f"Suppressing DeprecationWarning: {d}")
             return
         except Glitch as g:
             if message is not None:

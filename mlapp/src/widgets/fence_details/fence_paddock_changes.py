@@ -7,7 +7,6 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from ...spatial.features.feature import Feature
 from ...spatial.features.fence import Fence
-from ...utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_paddock_changes_base.ui')))
@@ -36,10 +35,6 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     @pyqtSlot(Feature)
     def onSelectedFeatureChanged(self, feature):
         """Handle a change in the selected fence."""
-        qgsDebug("FencePaddockChanges.onSelectedFeatureChanged: {}".format(feature))
-
-        if not isinstance(feature, Fence):
-            qgsDebug("FencePaddockChanges.onSelectedFeatureChanged: feature is not a Fence")
 
         if feature is None or isinstance(feature, Fence):
             self.fence = feature
@@ -58,9 +53,6 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         else:
             # self.setVisible(True)
             supersededPaddocks, plannedPaddocks = self.fence.getSupersededAndPlannedPaddocks()
-
-            qgsDebug("FencePaddockChanges.refreshUi: supersededPaddocks: {}".format(supersededPaddocks))
-            qgsDebug("FencePaddockChanges.refreshUi: plannedPaddocks: {}".format(plannedPaddocks))
 
             self.supersededPaddockMiniList.setFeatures(supersededPaddocks)
             self.plannedPaddockMiniList.setFeatures(plannedPaddocks)

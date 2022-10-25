@@ -6,7 +6,7 @@ from functools import partial
 from qgis.PyQt.QtCore import pyqtSignal
 
 from ..models.glitch import Glitch
-from ..utils import qgsDebug
+from ..utils import qgsInfo
 from .qt_meta import QtMeta
 
 
@@ -81,11 +81,11 @@ class StateMachine(ABC, metaclass=QtMeta):
     def doAction(self, action):
         if self.isPermitted(action):
             newStatus = self.transitions[(self.status, action)]
-            qgsDebug(f"{self}: {self.status} → {action} → {newStatus}")
+            qgsInfo(f"{self}: {self.status} → {action} → {newStatus}")
             self.status = newStatus
-            self.stateChanged.emit(self.status)
+            self.stateChanged.emit(self)
         else:
-            qgsDebug(f"{self}: {self.status} → {action} → {newStatus} not permitted")
+            qgsInfo(f"{self}: {self.status} → {action} → {newStatus} not permitted")
             # raise Glitch(f"An error happened trying to {action} a {self}")
 
     def __repr__(self):

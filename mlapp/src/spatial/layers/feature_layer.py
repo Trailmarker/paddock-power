@@ -7,7 +7,7 @@ from qgis.core import QgsCategorizedSymbolRenderer, QgsFeatureRequest, QgsProjec
 import processing
 
 from ...models.glitch import Glitch
-from ...utils import resolveStylePath, qgsDebug
+from ...utils import qgsInfo, resolveStylePath
 from ..features.feature import Feature
 from ..features.feature_status import FeatureStatus
 
@@ -108,7 +108,7 @@ class FeatureLayer(QgsVectorLayer):
 
         # If not found, create
         if not self.detectInGeoPackage(gpkgFile, layerName):
-            qgsDebug(f"{self.__class__.__name__} not found in Paddock Power GeoPackage. Creating new, stand by …")
+            qgsInfo(f"{self.__class__.__name__} not found in Paddock Power GeoPackage. Creating new, stand by …")
             self.createInGeoPackage(gpkgFile, layerName)
 
         self._gpkgUrl = f"{gpkgFile}|layername={layerName}"
