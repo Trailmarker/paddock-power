@@ -23,9 +23,6 @@ class Field(QgsField):
 
         super().__init__(*args, **kwargs)
 
-        if self._defaultValue is not None:
-            qgsDebug(f"Setting default value for field: {self.name()}, {self._defaultValue}")
-
         if self._domainType is not None:
             self.setEditorWidgetSetup(Field.__fieldDomainToEditorWidgetSetup(self._domainType))
         else:
@@ -90,13 +87,12 @@ class Field(QgsField):
         if self._defaultValue:
             self.__makeSetter()(feature, self._defaultValue)
 
+    def addReadOnlyFieldProperty(self, cls):
+        """Add a read-only Python property to a Feature class for this Field."""
+        setattr(cls, self._propertyName, property(self.__makeGetter()))
+
     def addFieldProperty(self, cls):
         """Add a Python property to a Feature class for this Field."""
-        # getterName = f"_{self._propertyName}"
-        # setterName = f"_set{self._propertyName.capitalize()}"
-
-        # setattr(cls, getterName, self.__makeGetter())
-        # setattr(cls, setterName, self.__makeSetter())
         setattr(cls, self._propertyName, property(self.__makeGetter(), self.__makeSetter()))
 
 

@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import QSize, pyqtSignal, pyqtSlot
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QSizePolicy, QVBoxLayout, QWidget
 
-from ...spatial.features.feature import Feature
+from ...spatial.features.persisted_feature import PersistedFeature
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label import FeatureStatusLabel
@@ -11,7 +11,7 @@ from ..state_tool_bar import StateToolBar
 
 
 class FeatureCollapsibleListItem(QWidget, EditStateMachine):
-    featureZoomed = pyqtSignal(Feature)
+    featureZoomed = pyqtSignal(PersistedFeature)
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, DetailsWidget, EditWidget, parent=None):

@@ -3,21 +3,21 @@ from mlapp.src.spatial.layers.watered_area_layer import WateredAreaLayer
 from qgis.core import QgsFeatureRequest, QgsProject
 
 from ...models.glitch import Glitch
-from ..layers.condition_record_layer import ConditionRecordLayer
+from ..layers.old_condition_record_layer import OldConditionRecordLayer
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.watered_area_layer import WateredAreaLayer
 from .area_feature import AreaFeature
-from .condition_record import ConditionRecord
+from .old_condition_record import OldConditionRecord
 from .edits import Edits
 from .feature_action import FeatureAction
-from .schemas import PADDOCK, PaddockSchema
+from ..schemas.schemas import PADDOCK, PaddockSchema
 
 
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
 
     def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wataredAreaLayer: WateredAreaLayer, 
-                 conditionRecordLayer: ConditionRecordLayer,  existingFeature=None):
+                 conditionRecordLayer: OldConditionRecordLayer, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
@@ -53,7 +53,7 @@ class Paddock(AreaFeature):
 
         overLandSystems = [record 
                            for landSystem in landSystems if landSystem.geometry.intersects(self.geometry)
-                           for record in ConditionRecord.fromPaddockAndLandSystem(self.conditionRecordLayer, self, landSystem)]
+                           for record in OldConditionRecord.fromPaddockAndLandSystem(self.conditionRecordLayer, self, landSystem)]
 
         overNearBuffer = [record for unwatered in overLandSystems 
                           for record in unwatered.overWaterpointBuffer(near)]

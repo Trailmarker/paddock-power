@@ -2,14 +2,14 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QHBoxLayout, QLabel, QSizePolicy, QWidget
 
-from ...spatial.features.feature import Feature
+from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.feature_action import FeatureAction
 from ..feature_status_label import FeatureStatusLabel
 from .feature_tool_bar import FeatureToolBar
 
 
 class FeatureListItem(QWidget):
-    featureZoomed = pyqtSignal(Feature)
+    featureZoomed = pyqtSignal(PersistedFeature)
     layoutRefreshNeeded = pyqtSignal()
 
     # Editing signals

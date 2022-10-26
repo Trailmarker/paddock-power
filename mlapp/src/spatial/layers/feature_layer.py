@@ -8,7 +8,7 @@ import processing
 
 from ...models.glitch import Glitch
 from ...utils import qgsInfo, resolveStylePath
-from ..features.feature import Feature
+from ..features.persisted_feature import PersistedFeature
 
 # Couple of lookup dictionaries (locally useful only)
 QVARIANT_TYPES = dict([(getattr(QVariant, v), v) for v, m in vars(
@@ -28,7 +28,7 @@ class FeatureLayer(QgsVectorLayer):
     @classmethod
     def getFeatureType(cls):
         """Return the type of feature that this layer contains. Override in subclasses"""
-        return Feature
+        return PersistedFeature
 
     @classmethod
     def detectInGeoPackage(cls, gpkgFile, layerName):
@@ -115,7 +115,7 @@ class FeatureLayer(QgsVectorLayer):
             # Start editing to to cut down the schema
             qgsInfo(f"Reducing schema for {self.__class__.__name__} to remove {str([f.name() for f in extraFields])} …")
             self.startEditing()
-            self.dataProvider().deleteAttributes([self.fields().indexFromName(f.name*()) for f in extraFields])
+            self.dataProvider().deleteAttributes([self.fields().indexFromName(f.name()) for f in extraFields])
             self.commitChanges()
 
         # Apply editor widgets
@@ -174,7 +174,7 @@ class FeatureLayer(QgsVectorLayer):
         node = group.findLayer(self.id())
         if node:
             node.setItemVisibilityChecked(visible)
-            
+
     def _unwrapQgsFeature(self, feature):
         """Unwrap a Feature into a QgsFeature."""
         if not isinstance(feature, self.getFeatureType()):

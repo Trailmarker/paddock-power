@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import QLabel
 
 from ..models.colors import toCssColour
 from ..models.glitch import Glitch
-from ..spatial.features.feature_status import FeatureStatus
+from ..spatial.schemas.feature_status import FeatureStatus
 
 
 class FeatureStatusLabel(QLabel):

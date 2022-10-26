@@ -3,7 +3,7 @@ from qgis.core import QgsProject
 
 from ..features.edits import Edits
 from ..features.paddock import Paddock
-from .condition_record_layer import ConditionRecordLayer
+from .old_condition_record_layer import OldConditionRecordLayer
 from .land_system_layer import LandSystemLayer
 from .status_feature_layer import StatusFeatureLayer
 from .waterpoint_buffer_layer import WaterpointBufferLayer
@@ -18,7 +18,7 @@ class PaddockLayer(StatusFeatureLayer):
         return Paddock
 
     def __init__(self, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
-                 waterpointBufferLayer: WaterpointBufferLayer, conditionRecordLayer: ConditionRecordLayer,):
+                 waterpointBufferLayer: WaterpointBufferLayer, conditionRecordLayer: OldConditionRecordLayer):
         """Create or open a Paddock layer."""
 
         super().__init__(gpkgFile, layerName, styleName=PaddockLayer.STYLE)

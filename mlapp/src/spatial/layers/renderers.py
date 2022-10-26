@@ -2,7 +2,7 @@
 from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsLineSymbol, QgsRendererCategory
 
 from ...models.colors import toQgisRendererColour
-from ..features.feature_status import FeatureStatus
+from ..schemas.feature_status import FeatureStatus
 
 
 def fill(colour, outline):

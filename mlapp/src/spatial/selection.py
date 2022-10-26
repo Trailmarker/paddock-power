@@ -5,7 +5,7 @@ from qgis.core import QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
 from ..models.glitch import Glitch
-from .features.feature import Feature
+from .features.persisted_feature import PersistedFeature
 
 
 class Selection(QgsRubberBand):
@@ -39,11 +39,11 @@ class Selection(QgsRubberBand):
         self.selectedFeature = None
         self.refreshUi()
 
-    @pyqtSlot(Feature)
+    @pyqtSlot(PersistedFeature)
     def setSelectedFeature(self, feature):
         """Set the selection."""
 
-        if not isinstance(feature, Feature):
+        if not isinstance(feature, PersistedFeature):
             raise Glitch(
                 "Your selected feature must be a Paddock Power Feature.")
 

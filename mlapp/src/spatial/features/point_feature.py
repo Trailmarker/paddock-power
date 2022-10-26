@@ -3,7 +3,7 @@ from qgis.core import QgsProject
 
 from ..calculator import Calculator
 from ..layers.elevation_layer import ElevationLayer
-from .schemas import PointFeatureSchema
+from ..schemas.schemas import PointFeatureSchema
 from .status_feature import StatusFeature
 
 

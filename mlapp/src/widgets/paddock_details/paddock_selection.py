@@ -4,7 +4,7 @@ from qgis.PyQt.QtGui import QColor
 
 from qgis.core import QgsWkbTypes
 
-from ...spatial.features.feature import Feature
+from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.paddock import Paddock
 from ...spatial.selection import Selection
 
@@ -23,7 +23,7 @@ class PaddockSelection(Selection):
         self.setColor(paddockColour)
         self.setFillColor(paddockColour)
 
-    @pyqtSlot(Feature)
+    @pyqtSlot(PersistedFeature)
     def setSelectedFeature(self, feature):
         if isinstance(feature, Paddock):
             super().setSelectedFeature(feature)

@@ -4,7 +4,9 @@ from qgis.PyQt.QtCore import QObject
 
 from qgis.core import QgsProject
 
-from ..spatial.layers.condition_record_layer import ConditionRecordLayer
+from ..spatial.layers.condition_table import ConditionTable
+from ..spatial.layers.condition_layer import ConditionLayer
+from ..spatial.layers.old_condition_record_layer import OldConditionRecordLayer
 from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.fence_layer import FenceLayer
@@ -13,15 +15,13 @@ from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import qgsDebug, resolveGeoPackageFile
+from ..utils import resolveGeoPackageFile
 
 
 class ProjectBase(QObject):
 
     def __init__(self, gpkgFile=None, projectName=None):
         super().__init__()
-
-        qgsDebug("ProjectBase.__init__")
 
         gpkgFile = gpkgFile or resolveGeoPackageFile()
         self.gpkgFile = gpkgFile
@@ -45,15 +45,17 @@ class ProjectBase(QObject):
                                            self.elevationLayer)
         landSystemLayerName = "Land Systems"
         self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
-        conditionRecordLayerName = f"Condition Records"
-        self.conditionRecordLayer = ConditionRecordLayer(self.gpkgFile, conditionRecordLayerName)
+        conditionRecordLayerName = f"Paddock Condition"
+        self.oldConditionRecordLayer = OldConditionRecordLayer(self.gpkgFile, conditionRecordLayerName)
         paddockLayerName = f"Paddocks"
         self.paddockLayer = PaddockLayer(
             self.gpkgFile,
             paddockLayerName,
             self.landSystemLayer,
             self.waterpointBufferLayer,
-            self.conditionRecordLayer)
+            self.oldConditionRecordLayer)
+        self.conditionTable = ConditionTable(self.gpkgFile, "Condition Table")
+        self.conditionLayer = ConditionLayer(conditionRecordLayerName, self.paddockLayer, self.landSystemLayer, self.waterpointBufferLayer, self.conditionTable)
         fenceLayerName = f"Fences"
         self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
@@ -61,7 +63,7 @@ class ProjectBase(QObject):
         boundaryLayerName = f"Boundary"
         self.boundaryLayer = BoundaryLayer(boundaryLayerName, self.paddockLayer)
 
-        qgsDebug("ProjectBase: Layers created")
+        # qgsDebug("ProjectBase: Layers created")
 
     def findGroup(self):
         """Find this Project's group in the Layers panel."""
@@ -82,8 +84,9 @@ class ProjectBase(QObject):
         # self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
-        self.conditionRecordLayer.addToMap(group)
-        self.conditionRecordLayer.setVisible(group, False)
+        self.conditionLayer.addToMap(group)
+        # Hide Old Condition Records
+        # self.oldConditionRecordLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
         self.landSystemLayer.setVisible(group, False)
         self.paddockLayer.addToMap(group)

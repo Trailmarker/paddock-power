@@ -2,7 +2,7 @@
 from .edits import Edits
 from .feature_action import FeatureAction
 from .status_feature import StatusFeature
-from .schemas import WaterpointBufferSchema
+from ..schemas.schemas import WaterpointBufferSchema
 
 
 @WaterpointBufferSchema.addSchema()

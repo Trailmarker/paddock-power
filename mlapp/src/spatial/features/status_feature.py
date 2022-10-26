@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from .edits import Edits
-from .feature import Feature
+from .persisted_feature import PersistedFeature
 from .feature_action import FeatureAction
-from .schemas import StatusFeatureSchema
+from ..schemas.schemas import StatusFeatureSchema
 from .feature_state_machine import FeatureStateMachine
 
 @StatusFeatureSchema.addSchema()
-class StatusFeature(Feature, FeatureStateMachine):
+class StatusFeature(PersistedFeature, FeatureStateMachine):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new AreaFeature."""
@@ -21,6 +21,11 @@ class StatusFeature(Feature, FeatureStateMachine):
     def __str__(self):
         """Convert the Feature to a string representation."""
         return repr(self)
+
+    # @property
+    # def title(self):
+    #     """Return the Feature's title."""
+    #     f"{self.name}"
 
     @Edits.persistEdits
     @FeatureAction.trash.handler()

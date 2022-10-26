@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
 from qgis.core import QgsRectangle
 
 from ..spatial.features.pipeline import Pipeline
-from ..spatial.features.feature import Feature
+from ..spatial.features.persisted_feature import PersistedFeature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
 from ..spatial.layers.feature_layer import FeatureLayer
@@ -28,7 +28,7 @@ class Project(ProjectBase):
     MENU_NAME = u"&Paddock Power"
 
     # emit this signal when a selected Feature is updated
-    selectedFeatureChanged = pyqtSignal(Feature)
+    selectedFeatureChanged = pyqtSignal(PersistedFeature)
     projectDataChanged = pyqtSignal()
     projectUnloading = pyqtSignal()
 
@@ -90,7 +90,7 @@ class Project(ProjectBase):
             self.currentTool = None
 
     def selectFeature(self, feature):
-        if feature is not None and not isinstance(feature, Feature):
+        if feature is not None and not isinstance(feature, PersistedFeature):
             raise Glitch(
                 "You can't select an object that is not a Feature")
         # qgsDebug("Selecting feature: {}".format(feature))
@@ -113,7 +113,7 @@ class Project(ProjectBase):
             self.iface.removeDockWidget(view)
             self.onCloseView(viewType)
 
-    @pyqtSlot(Feature)
+    @pyqtSlot(PersistedFeature)
     def zoomFeature(self, feature):
         self.selectFeature(feature)
 

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from ..features.condition_record import ConditionRecord
+from ..features.old_condition_record import OldConditionRecord
 from .feature_layer import FeatureLayer
 
 
-class ConditionRecordLayer(FeatureLayer):
+class OldConditionRecordLayer(FeatureLayer):
 
     # STYLE = "condition_record"
     @classmethod
     def getFeatureType(cls):
-        return ConditionRecord
+        return OldConditionRecord
 
     def __init__(self, gpkgFile, layerName):
         """Create or open a Waterpoint layer."""

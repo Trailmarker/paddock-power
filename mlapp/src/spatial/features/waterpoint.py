@@ -6,8 +6,8 @@ from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from .edits import Edits
 from .feature_action import FeatureAction
 from .point_feature import PointFeature
-from .schemas import WaterpointSchema, WATERPOINT
-from .waterpoint_buffer_type import WaterpointBufferType
+from ..schemas.schemas import WaterpointSchema, WATERPOINT
+from ..schemas.waterpoint_buffer_type import WaterpointBufferType
 
 
 @WaterpointSchema.addSchema()

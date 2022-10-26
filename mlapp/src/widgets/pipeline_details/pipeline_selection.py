@@ -5,7 +5,7 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
-from ...spatial.features.feature import Feature
+from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.pipeline import Pipeline
 from ...spatial.selection import Selection
 
@@ -50,7 +50,7 @@ class PipelineSelection(Selection):
 
         super().cleanUp()
 
-    @pyqtSlot(Feature)
+    @pyqtSlot(PersistedFeature)
     def setSelectedFeature(self, feature):
         if isinstance(feature, Pipeline):
             super().setSelectedFeature(feature)

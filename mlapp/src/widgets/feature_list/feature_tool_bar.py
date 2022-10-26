@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from ...spatial.features.feature import Feature
+from ...spatial.features.persisted_feature import PersistedFeature
 from ..state_tool_bar import StateToolBar
 
 
 class FeatureToolBar(StateToolBar):
-    featureZoomed = pyqtSignal(Feature)
+    featureZoomed = pyqtSignal(PersistedFeature)
 
     def __init__(self, feature, parent=None):
         super().__init__(feature, parent)

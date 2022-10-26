@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from ..models.glitch import Glitch
 from ..utils import qgsInfo
-from .qt_meta import QtMeta
+from .qt_abstract_meta import QtAbstractMeta
 
 
 class StateMachineEnum(Enum):
@@ -45,7 +45,7 @@ class StateMachineAction(StateMachineEnum):
         return partial(actionHandler, self)
 
 
-class StateMachine(ABC, metaclass=QtMeta):
+class StateMachine(ABC, metaclass=QtAbstractMeta):
     stateChanged = pyqtSignal(object)
 
     @abstractproperty

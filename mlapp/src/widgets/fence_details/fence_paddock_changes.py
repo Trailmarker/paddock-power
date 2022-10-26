@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.features.feature import Feature
+from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.fence import Fence
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -32,7 +32,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         self.plannedPaddockMiniList.featureZoomed.connect(self.project.zoomFeature)
         self.refreshUi()
 
-    @pyqtSlot(Feature)
+    @pyqtSlot(PersistedFeature)
     def onSelectedFeatureChanged(self, feature):
         """Handle a change in the selected fence."""
 

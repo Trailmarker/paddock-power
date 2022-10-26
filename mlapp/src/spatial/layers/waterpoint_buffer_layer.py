@@ -5,8 +5,8 @@ from qgis.core import QgsFeatureRequest, QgsGeometry
 
 from ..features.edits import Edits
 from ..features.waterpoint_buffer import WaterpointBuffer
-from ..features.waterpoint_buffer_type import WaterpointBufferType
-from ..features.schemas import WATERPOINT, WATERPOINT_BUFFER_TYPE
+from ..schemas.waterpoint_buffer_type import WaterpointBufferType
+from ..schemas.schemas import WATERPOINT, WATERPOINT_BUFFER_TYPE
 from .feature_layer import FeatureLayer
 
 

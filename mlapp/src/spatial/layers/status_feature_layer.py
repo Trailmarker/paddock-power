@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsCategorizedSymbolRenderer
 
-from ..features.feature_status import FeatureStatus
+from ..schemas.feature_status import FeatureStatus
 from .feature_layer import FeatureLayer
 
 

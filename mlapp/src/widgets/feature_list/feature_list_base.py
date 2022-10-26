@@ -2,11 +2,11 @@
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
 
-from ...spatial.features.feature import Feature
+from ...spatial.features.persisted_feature import PersistedFeature
 
 
 class FeatureListBase(QListWidget):
-    featureZoomed = pyqtSignal(Feature)
+    featureZoomed = pyqtSignal(PersistedFeature)
 
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""

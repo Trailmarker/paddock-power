@@ -2,12 +2,12 @@
 from ...models.glitch import Glitch
 from ..calculator import Calculator
 from .edits import Edits
-from .feature import Feature
-from .schemas import ConditionRecordSchema
+from .persisted_feature import PersistedFeature
+from ..schemas.schemas import OldConditionRecordSchema
 
 
-@ConditionRecordSchema.addSchema()
-class ConditionRecord(Feature):
+@OldConditionRecordSchema.addSchema()
+class OldConditionRecord(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Paddock."""
@@ -36,7 +36,7 @@ class ConditionRecord(Feature):
             return []
         if intersection.isMultipart():
             return [record for part in intersection.asGeometryCollection()
-                    for record in ConditionRecord.fromPaddockAndLandSystem(conditionRecordLayer, paddock, landSystem, part)]
+                    for record in OldConditionRecord.fromPaddockAndLandSystem(conditionRecordLayer, paddock, landSystem, part)]
 
         record = conditionRecordLayer.makeFeature()
         record.geometry = intersection

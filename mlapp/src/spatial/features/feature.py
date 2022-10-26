@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject
 from re import finditer
 
-from qgis.core import QgsFeature, QgsFields, QgsProject
+from qgis.core import QgsFeature, QgsProject
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug
-from .schemas import FeatureSchema
+from ..schemas.schemas import FeatureSchema
 
 
 @FeatureSchema.addSchema()
 class Feature(QObject):
-    featureUpdated = pyqtSignal()
-    featureDeleted = pyqtSignal()
 
     @classmethod
     def displayName(cls):
@@ -32,77 +29,32 @@ class Feature(QObject):
         extra = [field for field in fieldsToCheck if field.name() not in [f.name() for f in cls.getSchema()]]
         return missing, extra
 
-    def __init__(self, featureLayer, existingFeature=None):
+    def __init__(self, featureLayer, existingFeature):
         """Create a new Feature."""
         super().__init__()
 
-        if not existingFeature:
-            # Build an empty QgsFeature and wrap it up
-            fields = QgsFields()
-            for field in self.getSchema():
-                fields.append(field)
-            self._qgsFeature = QgsFeature(fields)
-            for field in self.getSchema():
-                field.setDefaultValue(self)
-            self.clearId()
-
-        elif isinstance(existingFeature, Feature):
-            # Copy constructor for Feature and subclasses
-
-            # Incoming Feature must have compatible schema
-            missingFields, _ = self.checkSchema(existingFeature.getSchema())
-            if missingFields:
-                raise Glitch(f"{self.__class__.__name__}: incoming Feature has missing fields: {missingFields}")
-
-            # First create an empty Feature with the correct schema
-            self.__init__(featureLayer)
-
-            # Then set all attributes and geometry
-            self._qgsFeature.setAttributes(existingFeature._qgsFeature.attributes())
-            self._qgsFeature.setGeometry(existingFeature._qgsFeature.geometry())
-
-            # Clear FID so that it will be created on upsert
-            self.clearId()
-            return
-
-        elif isinstance(existingFeature, QgsFeature):
+        if isinstance(existingFeature, QgsFeature):
             # Incoming QgsFeature must have the correct schema
             missingFields, _ = self.checkSchema(existingFeature.fields().toList())
             if missingFields:
-                raise Glitch(f"{self.__class__.__name__} incoming QgsFeature has missing fields: {missingFields}")
+                raise Glitch(f"{self.__class__.__name__}.__init__ incoming QgsFeature has missing fields: {missingFields}")
 
             self._qgsFeature = existingFeature
 
         elif existingFeature is not None:
             # What?
             raise Glitch(
-                f"Feature.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
+                f"{self.__class__.__name__}.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
 
         self._featureLayerId = featureLayer.id()
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        return f"{self.__class__.__name__}(id={self.id}, name='{self.name}')"
+        return f"{self.__class__.__name__}(id={self.id})"
 
     def __str__(self):
         """Convert the Feature to a string representation."""
         return repr(self)
-
-    def upsert(self):
-        """Add or update the Feature in the FeatureLayer."""
-        # TODO inefficient
-        self.recalculate()
-
-        if (self.id >= 0):
-            self.featureLayer.updateFeature(self)
-        else:
-            self.featureLayer.addFeature(self)
-        self.featureUpdated.emit()
-
-    def delete(self):
-        """Delete the Feature from the FeatureLayer."""
-        self.featureLayer.deleteFeature(self)
-        self.featureDeleted.emit()
 
     @property
     def featureLayer(self):
@@ -114,36 +66,12 @@ class Feature(QObject):
         """Return the Feature's fid."""
         return self._qgsFeature.id()
 
-    @id.setter
-    def id(self, fid):
-        """Set or the Feature's id."""
-        self._qgsFeature.setId(fid)
-
-    def clearId(self):
-        """Set or the Feature's id."""
-        self.id = -1
-        self._qgsFeature.setAttribute('fid', self.id)
-
     @property
     def geometry(self):
         """Return the Feature's geometry."""
         return self._qgsFeature.geometry()
 
-    @geometry.setter
-    def geometry(self, g):
-        """Set the Feature's geometry."""
-        self._qgsFeature.setGeometry(g)
-
-    def recalculate(self):
-        """Recalculate derived data about the Feature."""
-        pass
-
     @property
     def isInfrastructure(self):
         """Return True if the Feature is infrastructure."""
         return False
-
-    @property
-    def title(self):
-        """Return the Feature's title."""
-        f"{self.name}"

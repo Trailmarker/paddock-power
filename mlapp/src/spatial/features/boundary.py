@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from .feature import Feature
-from ..schemas.schemas import ConditionSchema
+from ..schemas.schemas import BoundarySchema
 
 
-@ConditionSchema.addSchema()
-class Condition(Feature):
+@BoundarySchema.addSchema()
+class Boundary(Feature):
 
     def __init__(self, featureLayer, existingFeature):
-        """Create a new Boundary."""
+        """Create a new AreaFeature."""
         super().__init__(featureLayer, existingFeature)
-
