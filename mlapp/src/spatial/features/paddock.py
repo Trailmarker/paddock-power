@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from mlapp.src.spatial.layers.watered_area_layer import WateredAreaLayer
 from qgis.core import QgsFeatureRequest, QgsProject
 
 from ...models.glitch import Glitch
 from ..layers.condition_record_layer import ConditionRecordLayer
 from ..layers.land_system_layer import LandSystemLayer
-from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from ..layers.watered_area_layer import WateredAreaLayer
 from .area_feature import AreaFeature
 from .condition_record import ConditionRecord
 from .edits import Edits
@@ -15,13 +16,13 @@ from .schemas import PADDOCK, PaddockSchema
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
 
-    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, waterpointBufferLayer: WaterpointBufferLayer, 
+    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wataredAreaLayer: WateredAreaLayer, 
                  conditionRecordLayer: ConditionRecordLayer,  existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
         self._landSystemLayerId = landSystemLayer.id()
-        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        self._wateredAreaLayerId = wataredAreaLayer.id()
         self._conditionRecordLayerId = conditionRecordLayer.id()
 
     @property
@@ -29,8 +30,8 @@ class Paddock(AreaFeature):
         return QgsProject.instance().mapLayer(self._landSystemLayerId)
 
     @property
-    def waterpointBufferLayer(self):
-        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+    def wataredAreaLayer(self):
+        return QgsProject.instance().mapLayer(self._wateredAreaLayerId)
 
     @property
     def conditionRecordLayer(self):

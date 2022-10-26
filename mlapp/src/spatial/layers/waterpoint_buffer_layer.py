@@ -3,15 +3,16 @@
 
 from qgis.core import QgsFeatureRequest, QgsGeometry
 
+from ..features.edits import Edits
 from ..features.waterpoint_buffer import WaterpointBuffer
 from ..features.waterpoint_buffer_type import WaterpointBufferType
-from ..features.schemas import WATERPOINT_BUFFER_TYPE
+from ..features.schemas import WATERPOINT, WATERPOINT_BUFFER_TYPE
 from .feature_layer import FeatureLayer
 
 
 class WaterpointBufferLayer(FeatureLayer):
 
-    # STYLE = "waterpoint_buffer"
+    # STYLE = "waterpoint_buffer_new_2"
     @classmethod
     def getFeatureType(cls):
         return WaterpointBuffer
@@ -21,10 +22,14 @@ class WaterpointBufferLayer(FeatureLayer):
 
         super().__init__(gpkgFile, layerName, styleName=None)
 
-    def invalidateNearAndFarBuffers(self):
-        del self.getNearAndFarBuffers
+    def loadNearAndFarBuffers(self):
+        nearRequest = QgsFeatureRequest().setFilterExpression(
+            f'"{WATERPOINT_BUFFER_TYPE}" = \'{WaterpointBufferType.Near.name}\' AND "{WATERPOINT}" = NULL')
+        farRequest = QgsFeatureRequest().setFilterExpression(
+            f'"{WATERPOINT_BUFFER_TYPE}" = \'{WaterpointBufferType.Far.name}\' AND "{WATERPOINT}" = NULL')
+        return next(self.getFeatures(nearRequest), None), next(self.getFeatures(farRequest), None)
 
-    def getNearAndFarBuffers(self):
+    def analyseNearAndFarBuffers(self):
 
         nearBufferRequest = QgsFeatureRequest().setFilterExpression(
             f'"{WATERPOINT_BUFFER_TYPE}" = \'{WaterpointBufferType.Near.name}\'')
@@ -48,3 +53,15 @@ class WaterpointBufferLayer(FeatureLayer):
         farBuffer.waterpointBufferType = WaterpointBufferType.Far
 
         return nearBuffer, farBuffer
+
+    @Edits.persistEdits
+    def analyseFeatures(self):
+        edits = Edits()
+
+        oldNear, oldFar = self.loadNearAndFarBuffers()
+        near, far = self.analyseNearAndFarBuffers()
+
+        edits.editBefore(Edits.delete(oldNear, oldFar))
+        edits.editAfter(Edits.upsert(near, far))
+
+        return edits

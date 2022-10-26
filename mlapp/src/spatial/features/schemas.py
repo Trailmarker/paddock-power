@@ -57,8 +57,6 @@ PERIMETER = "Perimeter (km)"
 Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER)
 AreaFeatureSchema = Schema(StatusFeatureSchema + [Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
 
-BoundarySchema = AreaFeatureSchema
-
 CAPACITY_PER_AREA = "AE/km²"
 CapacityPerArea = MeasureField(propertyName="capacityPerArea", name=CAPACITY_PER_AREA)
 CAPACITY = "AE"
@@ -93,7 +91,7 @@ WaterpointBufferTypeField = DomainField(
     name=WATERPOINT_BUFFER_TYPE,
     domainType=WaterpointBufferType)
 BUFFER_DISTANCE = "Buffer Distance (m)"
-WaterpointBufferSchema = Schema(FeatureSchema + [
+WaterpointBufferSchema = Schema(StatusFeatureSchema + [
     IdField(propertyName="waterpoint", name=WATERPOINT),
     WaterpointBufferTypeField,
     MeasureField(propertyName="bufferDistance", name=BUFFER_DISTANCE)
@@ -129,6 +127,6 @@ LandSystem = IdField(propertyName="landSystem", name=LAND_SYSTEM)
 LAND_SYSTEM_NAME = "Land System Name"
 LandSystemName = StringField(propertyName="landSystemName", name=LAND_SYSTEM_NAME)
 ConditionRecordSchema = Schema(
-    FeatureSchema + [Area, Perimeter, CapacityPerArea, EstimatedCapacity, PotentialCapacity] +
+    StatusFeatureSchema + [Area, Perimeter, CapacityPerArea, EstimatedCapacity, PotentialCapacity] +
     [ConditionField, Paddock, PaddockName, LandSystem, LandSystemName, WaterpointBufferTypeField],
     wkbType=QgsWkbTypes.MultiPolygon)

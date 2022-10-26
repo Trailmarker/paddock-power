@@ -42,6 +42,7 @@ class ConditionRecord(Feature):
         record.geometry = intersection
         record.paddock = paddock.id
         record.paddockName = paddock.name
+        record.status = paddock.status
         record.landSystem = landSystem.id
         record.landSystemName = landSystem.name
         record.capacityPerArea = landSystem.capacityPerArea

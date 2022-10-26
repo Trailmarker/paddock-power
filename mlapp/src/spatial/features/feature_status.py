@@ -12,6 +12,25 @@ class FeatureStatus(StateMachineStatus):
     Archived = "Archived"
     Undefined = "Undefined"
 
+    @staticmethod
+    def builtStatuses():
+        return [FeatureStatus.Built, FeatureStatus.BuiltSuperseded]
+
+    @staticmethod
+    def plannedStatuses():
+        return [FeatureStatus.Planned, FeatureStatus.Built]
+
+    @staticmethod
+    def workingStatuses():
+        return [FeatureStatus.Drafted, FeatureStatus.Planned, FeatureStatus.Built]
+
+    def isBuilt(self):
+        """Check if a status is built."""
+        return self.match(FeatureStatus.Built, FeatureStatus.BuiltSuperseded)
+
+    def isPlanned(self):
+        return self.match(FeatureStatus.Planned, FeatureStatus.Built)
+
     def toColour(self):
         """Get the colour associated with this status."""
         if self in [FeatureStatus.Undefined, FeatureStatus.Drafted]:

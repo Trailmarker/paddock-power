@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from mlapp.src.spatial.layers.watered_area_layer import WateredAreaLayer
 from qgis.PyQt.QtCore import QObject
 
 from qgis.core import QgsProject
@@ -31,32 +32,35 @@ class ProjectBase(QObject):
         if elevationLayerName is not None:
             self.elevationLayer = ElevationLayer(self.gpkgFile, elevationLayerName)
 
-        boundaryLayerName = f"Current Boundary"
-        self.boundaryLayer = BoundaryLayer(self.gpkgFile, boundaryLayerName)
-        waterpointBufferLayerName = f"Current Waterpoint Buffers"
+        waterpointBufferLayerName = f"Waterpoint Buffers"
         self.waterpointBufferLayer = WaterpointBufferLayer(self.gpkgFile, waterpointBufferLayerName)
-        waterpointLayerName = f"Current Waterpoints"
+        waterpointLayerName = f"Waterpoints"
         self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName,
                                                self.waterpointBufferLayer,
                                                self.elevationLayer)
-        pipelineLayerName = f"Current Pipeline"
+        wateredAreaLayerName = f"Watered Areas"
+        self.wateredAreaLayer = WateredAreaLayer(wateredAreaLayerName, self.waterpointBufferLayer)
+        pipelineLayerName = f"Pipelines"
         self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
-        landSystemLayerName = "Current Land Systems"
+        landSystemLayerName = "Land Systems"
         self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
-        conditionRecordLayerName = f"Current Condition Records"
+        conditionRecordLayerName = f"Condition Records"
         self.conditionRecordLayer = ConditionRecordLayer(self.gpkgFile, conditionRecordLayerName)
-        paddockLayerName = f"Current Paddocks"
+        paddockLayerName = f"Paddocks"
         self.paddockLayer = PaddockLayer(
             self.gpkgFile,
             paddockLayerName,
             self.landSystemLayer,
             self.waterpointBufferLayer,
             self.conditionRecordLayer)
-        fenceLayerName = f"Current Fence"
+        fenceLayerName = f"Fences"
         self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
                                      self.elevationLayer)
+        boundaryLayerName = f"Boundary"
+        self.boundaryLayer = BoundaryLayer(boundaryLayerName, self.paddockLayer)
+
         qgsDebug("ProjectBase: Layers created")
 
     def findGroup(self):
@@ -72,12 +76,16 @@ class ProjectBase(QObject):
 
         group = group or self.findGroup()
         self.waterpointLayer.addToMap(group)
-        self.boundaryLayer.addToMap(group)
         self.pipelineLayer.addToMap(group)
         self.fenceLayer.addToMap(group)
+        # Hide Waterpoint Buffers
+        # self.waterpointBufferLayer.addToMap(group)
+        self.wateredAreaLayer.addToMap(group)
+        self.boundaryLayer.addToMap(group)
         self.conditionRecordLayer.addToMap(group)
-        self.waterpointBufferLayer.addToMap(group)
+        self.conditionRecordLayer.setVisible(group, False)
         self.landSystemLayer.addToMap(group)
+        self.landSystemLayer.setVisible(group, False)
         self.paddockLayer.addToMap(group)
         self.elevationLayer.addToMap(group)
 

@@ -43,7 +43,6 @@ class Waterpoint(PointFeature):
     @Glitch.glitchy()
     def getWaterpointBuffers(self):
         waterpointRequest = QgsFeatureRequest().setFilterExpression(f'"{WATERPOINT}" = {self.id}')
-
         return list(self.waterpointBufferLayer.getFeatures(request=waterpointRequest))
 
     @Edits.persistEdits
@@ -67,12 +66,12 @@ class Waterpoint(PointFeature):
         nearGeometry = self.getBuffer(self.nearBuffer)
         if nearGeometry:
             near = self.waterpointBufferLayer.makeFeature()
-            edits.editBefore(near.createFeature(self, nearGeometry, WaterpointBufferType.Near, self.nearBuffer))
+            edits.editBefore(near.planFeature(self, nearGeometry, WaterpointBufferType.Near, self.nearBuffer))
 
         farGeometry = self.getBuffer(self.farBuffer)
         if farGeometry:
             far = self.waterpointBufferLayer.makeFeature()
-            edits.editBefore(far.createFeature(self, farGeometry, WaterpointBufferType.Far, self.farBuffer))
+            edits.editBefore(far.planFeature(self, farGeometry, WaterpointBufferType.Far, self.farBuffer))
 
         return edits.editAfter(Edits.upsert(self))
 
@@ -85,6 +84,6 @@ class Waterpoint(PointFeature):
         waterpointBuffers = self.getWaterpointBuffers()
 
         for waterpointBuffer in waterpointBuffers:
-            edits = edits.editBefore(waterpointBuffer.deleteFeature())
+            edits = edits.editBefore(waterpointBuffer.undoPlanFeature())
 
         return Edits.upsert(self).editAfter(edits)

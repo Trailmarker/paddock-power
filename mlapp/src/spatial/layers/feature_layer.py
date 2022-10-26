@@ -3,7 +3,7 @@ from os import path
 
 from qgis.PyQt.QtCore import QVariant, pyqtSignal
 
-from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
@@ -29,16 +29,6 @@ class FeatureLayer(QgsVectorLayer):
     def getFeatureType(cls):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Feature
-
-    @classmethod
-    def detectAndRemove(cls, gpkgFile, layerName):
-        """Detect if a layer is already in the map, and if so, return it."""
-        gpkgUrl = f"{gpkgFile}|layername={layerName}"
-
-        layers = [l for l in QgsProject.instance().mapLayers().values()]
-        for layer in layers:
-            if layer.source() == gpkgUrl:
-                QgsProject.instance().removeMapLayer(layer.id())
 
     @classmethod
     def detectInGeoPackage(cls, gpkgFile, layerName):
@@ -112,11 +102,6 @@ class FeatureLayer(QgsVectorLayer):
         self._gpkgUrl = f"{gpkgFile}|layername={layerName}"
         super().__init__(path=self._gpkgUrl, baseName=layerName, providerLib="ogr")
 
-        # Optionally apply a style to the layer
-        if styleName is not None:
-            stylePath = resolveStylePath(styleName)
-            self.loadNamedStyle(stylePath)
-
         missingFields, extraFields = self.getFeatureType().checkSchema(self.fields())
 
         if missingFields:
@@ -139,10 +124,20 @@ class FeatureLayer(QgsVectorLayer):
             self.setEditorWidgetSetup(fieldIndex, field.editorWidgetSetup())
             self.setDefaultValueDefinition(fieldIndex, field.defaultValueDefinition())
 
-        self.detectAndRemove(gpkgFile, layerName)
+        # Optionally apply a style to the layer
+        if styleName is not None:
+            stylePath = resolveStylePath(styleName)
+            self.loadNamedStyle(stylePath)
 
+        self.detectAndRemove()
         QgsProject.instance().addMapLayer(self, False)
 
+    def detectAndRemove(self):
+        """Detect if a layer is already in the map, and if so, return it."""
+        layers = [l for l in QgsProject.instance().mapLayers().values()]
+        for layer in layers:
+            if layer.source() == self.source():
+                QgsProject.instance().removeMapLayer(layer.id())
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, feature)
@@ -174,6 +169,12 @@ class FeatureLayer(QgsVectorLayer):
         if node:
             group.removeChildNode(node)
 
+    def setVisible(self, group, visible):
+        """Set the layer's visibility."""
+        node = group.findLayer(self.id())
+        if node:
+            node.setItemVisibilityChecked(visible)
+            
     def _unwrapQgsFeature(self, feature):
         """Unwrap a Feature into a QgsFeature."""
         if not isinstance(feature, self.getFeatureType()):
