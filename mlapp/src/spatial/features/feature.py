@@ -60,9 +60,10 @@ class Feature(QObject):
         return repr(self)
 
     def onSelectionChanged(self, selected, deselected, clearAndSelect):
+        # qgsInfo(f"Selection changed: {selected}, {deselected}, {clearAndSelect}")
         if not self._selected and self.id in selected and len(selected) == 1:
             self.onSelectFeature()
-        elif self._selected and self.id not in selected:
+        elif self._selected and (self.id not in selected or self.id in deselected):
             self.onDeselectFeature()        
 
     def selectFeature(self):
