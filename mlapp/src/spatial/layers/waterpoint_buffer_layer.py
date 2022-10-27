@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint_buffer import WaterpointBuffer
-from ..schemas.schemas import BUFFER_DISTANCE, FAR_BUFFER, NEAR_BUFFER, STATUS, WATERPOINT, WATERPOINT_BUFFER_TYPE
+from ..schemas.feature_status import FeatureStatus
+from ..schemas.schemas import BUFFER_DISTANCE, FAR_BUFFER, NEAR_BUFFER, STATUS, WATERPOINT, WATERPOINT_BUFFER_TYPE, FeatureSchema
 from ..schemas.waterpoint_buffer_type import WaterpointBufferType
 from .derived_layer import DerivedLayer
 
@@ -18,7 +19,8 @@ with "Buffers" as
      "{STATUS}",
      "{NEAR_BUFFER}",
      "{FAR_BUFFER}"
-     from {{0}})
+     from {{0}}
+     where "{STATUS}" in ('{FeatureStatus.Planned.name}', '{FeatureStatus.Built.name}'))
 select
     "Near" as "geometry",
     "{WATERPOINT}",
