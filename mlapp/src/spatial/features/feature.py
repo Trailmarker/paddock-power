@@ -2,10 +2,9 @@
 from qgis.PyQt.QtCore import QObject
 from re import finditer
 
-from qgis.core import QgsFeature, QgsProject
+from qgis.core import QgsFeature, QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ...utils import qgsInfo
 from ..schemas.schemas import FeatureSchema
 
 
@@ -60,7 +59,7 @@ class Feature(QObject):
         return repr(self)
 
     def onSelectionChanged(self, selected, deselected, clearAndSelect):
-        # qgsInfo(f"Selection changed: {selected}, {deselected}, {clearAndSelect}")
+        # qgsDebug(f"{self}.onSelectionChanged({selected}, {deselected}, {clearAndSelect})")
         if not self._selected and self.id in selected and len(selected) == 1:
             self.onSelectFeature()
         elif self._selected and (self.id not in selected or self.id in deselected):
@@ -68,13 +67,14 @@ class Feature(QObject):
 
     def selectFeature(self):
         """Select the Feature."""
-        self.featureLayer.removeSelection()
-        self.featureLayer.select(self.id)
+        # qgsDebug(f"{self}.selectFeature()")
+        # self.featureLayer.removeSelection()
+        self.featureLayer.selectByIds([self.id], QgsVectorLayer.SetSelection)
         
     def onSelectFeature(self):
         """Called when the Feature is selected."""
         if not self._selected:
-            qgsInfo(f"Selecting {self}")
+            # qgsDebug(f"{self}.onSelectFeature()")
             self._selected = True
             return True
         return False
@@ -82,7 +82,7 @@ class Feature(QObject):
     def onDeselectFeature(self):
         """Called when the Feature is deselected."""
         if self._selected:
-            qgsInfo(f"Deselecting {self}")
+            # qgsDebug(f"{self}.onDeselectFeature()")
             self._selected = False
             return True
         return False

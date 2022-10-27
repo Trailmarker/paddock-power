@@ -3,20 +3,16 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsRectangle
 
-from ..spatial.features.pipeline import Pipeline
-from ..spatial.features.persisted_feature import PersistedFeature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
+from ..spatial.features.persisted_feature import PersistedFeature
+from ..spatial.features.pipeline import Pipeline
 from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..tools.map_tool import MapTool
-from ..utils import qgsDebug
 from ..views.fence_view.fence_view import FenceView
 from ..views.paddock_view.paddock_view import PaddockView
 from ..views.pipeline_view.pipeline_view import PipelineView
 from ..views.waterpoint_view.waterpoint_view import WaterpointView
-# from ..widgets.fence_details.fence_selection import FenceSelection
-# from ..widgets.paddock_details.paddock_selection import PaddockSelection
-# from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
 from .glitch import Glitch
 from .project_base import ProjectBase
 
@@ -97,11 +93,7 @@ class Project(ProjectBase):
             self.currentTool = None
 
     def selectFeature(self, feature):
-        # if feature is not None and not isinstance(feature, Feature):
-        #     raise Glitch(
-        #         "You can't select an object that is not a Feature")
-        # qgsDebug("Selecting feature: {}".format(feature))
-
+        # qgsDebug(f"Project.selectFeature({feature})")
         self.selectedFeatures[feature.__class__.__name__] = feature
         self.selectedFeatureChanged.emit(feature)
 
@@ -111,10 +103,6 @@ class Project(ProjectBase):
         self.projectUnloading.emit()
 
         self.unsetTool()
-
-        # self.fenceSelection.cleanUp()
-        # self.paddockSelection.cleanUp()
-        # self.pipelineSelection.cleanUp()
 
         for viewType, view in self.views.values():
             self.iface.removeDockWidget(view)
@@ -131,9 +119,10 @@ class Project(ProjectBase):
 
     @pyqtSlot(PersistedFeatureLayer, list)
     def onLayerSelectionChanged(self, layer, selection):
+        # qgsDebug(f"Project.onLayerSelectionChanged({layer.__class__.__name__}, {selection})")
+
         if len(selection) == 1:
             feature = layer.getFeature(selection[0])
-            qgsDebug(f"onLayerSelectionChanged: {layer.__class__.__name__} {feature or 'None'}")
             if feature is not None:
                 self.selectFeature(feature)
 
