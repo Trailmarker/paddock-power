@@ -87,7 +87,7 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
     def refreshUi(self):
         # Set title to paddock name with some details
         self.collapse.setTitle(
-            f"{self.feature.name} ({self.feature.featureArea} km², ?? AE)")
+            f"{self.feature.name} ({self.feature.featureArea} km², {self.feature.estimatedCapacity:g} AE)")
 
         self.statusLabel.setStatus(self.feature.status)
 

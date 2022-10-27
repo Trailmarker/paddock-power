@@ -22,8 +22,6 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
 
         if self.paddock is not None:
             self.nameLineEdit.setText(self.paddock.name)
-            self.conditionComboBox.setEnabled(False)
-            self.conditionComboBox.addItem("Not yet implemented")
 
     @pyqtSlot()
     def savePaddock(self):

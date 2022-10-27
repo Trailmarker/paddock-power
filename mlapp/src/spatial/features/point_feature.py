@@ -17,7 +17,6 @@ class PointFeature(StatusFeature):
         assert elevationLayer is None or isinstance(elevationLayer, ElevationLayer), "elevationLayer must be provided"
 
         self._elevationLayerId = elevationLayer.id()
-        # self.recalculate()
 
     @property
     def elevationLayer(self):

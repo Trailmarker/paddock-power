@@ -14,6 +14,11 @@ class PersistedFeature(Feature):
     featureDeleted = pyqtSignal()
     featureSelected = pyqtSignal()
 
+    @classmethod
+    def twoPhaseRecalculate(self):
+        """Return True if the PersistedFeature should be recalculated after data commits."""
+        return False
+
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Feature."""
 
@@ -57,10 +62,44 @@ class PersistedFeature(Feature):
             raise Glitch(
                 f"{self.__class__.__name__}.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
 
+    @property
+    def id(self):
+        """Return the PersistedFeature's fid."""
+        return self._qgsFeature.id()
+
+    @id.setter
+    def id(self, fid):
+        """Set or the PersistedFeature's id."""
+        self._qgsFeature.setId(fid)
+
+    def clearId(self):
+        """Set or the PersistedFeature's id."""
+        self.id = -1
+        self._qgsFeature.setAttribute('fid', self.id)
+
+    @property
+    def geometry(self):
+        """Return the PersistedFeature's geometry."""
+        return self._qgsFeature.geometry()
+
+    @geometry.setter
+    def geometry(self, g):
+        """Set the PersistedFeature's geometry."""
+        self._qgsFeature.setGeometry(g)
+
+    @property
+    def isInfrastructure(self):
+        """Return True if the PersistedFeature is infrastructure."""
+        return False
+
+    def recalculate(self):
+        """Recalculate derived data about the PersistedFeature."""
+        pass
+
     def upsert(self):
-        """Add or update the Feature in the FeatureLayer."""
-        # TODO inefficient
-        self.recalculate()
+        """Add or update the PersistedFeature in the PersistedFeatureLayer."""
+        # # TODO inefficient
+        # self.recalculate()
 
         if (self.id >= 0):
             self.featureLayer.updateFeature(self)
@@ -69,40 +108,8 @@ class PersistedFeature(Feature):
         self.featureUpdated.emit()
 
     def delete(self):
-        """Delete the Feature from the FeatureLayer."""
+        """Delete the PersistedFeature from the PersistedFeatureLayer."""
         self.featureLayer.deleteFeature(self)
         self.featureDeleted.emit()
 
-    @property
-    def id(self):
-        """Return the Feature's fid."""
-        return self._qgsFeature.id()
-
-    @id.setter
-    def id(self, fid):
-        """Set or the Feature's id."""
-        self._qgsFeature.setId(fid)
-
-    def clearId(self):
-        """Set or the Feature's id."""
-        self.id = -1
-        self._qgsFeature.setAttribute('fid', self.id)
-
-    @property
-    def geometry(self):
-        """Return the Feature's geometry."""
-        return self._qgsFeature.geometry()
-
-    @geometry.setter
-    def geometry(self, g):
-        """Set the Feature's geometry."""
-        self._qgsFeature.setGeometry(g)
-
-    def recalculate(self):
-        """Recalculate derived data about the Feature."""
-        pass
-
-    @property
-    def isInfrastructure(self):
-        """Return True if the Feature is infrastructure."""
-        return False
+   

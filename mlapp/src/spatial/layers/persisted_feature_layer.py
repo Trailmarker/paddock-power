@@ -7,7 +7,8 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
-from ...utils import qgsInfo, resolveStylePath
+from ...utils import qgsDebug, qgsInfo, resolveStylePath
+from ..features.edits import Edits
 from ..features.persisted_feature import PersistedFeature
 #from ..layers.feature_layer import FeatureLayer
 
@@ -30,6 +31,11 @@ class PersistedFeatureLayer(QgsVectorLayer):
     def getFeatureType(cls):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return PersistedFeature
+
+    @classmethod
+    def twoPhaseRecalculate(cls):
+        """Return True if this layer requires two-phase recalculation."""
+        return cls.getFeatureType().twoPhaseRecalculate()
 
     @classmethod
     def detectInGeoPackage(cls, gpkgFile, layerName):
@@ -162,7 +168,7 @@ class PersistedFeatureLayer(QgsVectorLayer):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
         if group is None:
             raise Glitch(
-                "FeatureLayer.addToMap: the layer group is not present")
+                "PersistedFeatureLayer.addToMap: the layer group is not present")
 
         group.addLayer(self)
 
@@ -178,24 +184,24 @@ class PersistedFeatureLayer(QgsVectorLayer):
             node.setItemVisibilityChecked(visible)
 
     def _unwrapQgsFeature(self, feature):
-        """Unwrap a Feature into a QgsFeature."""
+        """Unwrap a PersistedFeature into a QgsFeature."""
         if not isinstance(feature, self.getFeatureType()):
             raise Glitch(
-                f"FeatureLayer.__unwrapQgsFeature: the feature is not a {self.getFeatureType().__name__}")
+                f"PersistedFeatureLayer.__unwrapQgsFeature: the feature is not a {self.getFeatureType().__name__}")
         return feature._qgsFeature
 
     def _wrapQgsFeatures(self, qgsFeatures):
-        """Adapt the features in this layer."""
+        """Adapt the PersistedFeatures in this layer."""
         for feature in qgsFeatures:
             feature = self.wrapFeature(feature)
             yield feature
 
     def makeFeature(self):
-        """Make a new Feature in this layer."""
+        """Make a new PersistedFeature in this layer."""
         return self.wrapFeature(None)
 
     def copyFeature(self, feature):
-        """Copy a Feature from this layer to the clipboard."""
+        """Copy a PersistedFeatures from this layer to the clipboard."""
         if not isinstance(feature, self.getFeatureType()):
             raise Glitch(
                 "You can't use a {self.__class__.__name__} to copy an object that isn't a {self.getFeatureType().__name__}")
@@ -209,35 +215,37 @@ class PersistedFeatureLayer(QgsVectorLayer):
         return copyFeature
 
     def addFeature(self, feature):
-        """Add a feature to the layer."""
+        """Add a PersistedFeatures to the layer."""
         super().addFeature(self._unwrapQgsFeature(feature))
 
     def updateFeature(self, feature):
-        """Update a feature in the layer."""
+        """Update a PersistedFeatures in the layer."""
         super().updateFeature(self._unwrapQgsFeature(feature))
 
     def deleteFeature(self, feature):
-        """Delete a feature from the layer."""
+        """Delete a PersistedFeatures from the layer."""
         super().deleteFeature(feature.id)
 
     def getFeature(self, fid):
-        """Get a feature by its ID."""
+        """Get a PersistedFeatures by its ID."""
         feature = super().getFeature(fid)
         return self.wrapFeature(feature) if feature else None
 
     def getFeatures(self, request=None):
-        """Get the features in this layer."""
+        """Get the PersistedFeatures in this layer."""
         if request is None:
             return self._wrapQgsFeatures(super().getFeatures())
 
         return self._wrapQgsFeatures(super().getFeatures(request))
 
     def featureCount(self):
-        """Get the number of Features in the layer."""
+        """Get the number of PersistedFeatures in the layer."""
         return len([f for f in self.getFeatures()])
 
 
 # Helper functions - used to convert QgsField objects to code in the console as below
+
+
 def dumpQgsFieldConstructorStatement(field):
     """Print a QgsField constructor statement for the given QgsField object."""
     return f"Field(propertyName="", name=\"{field.name()}\", type=QVariant.{QVARIANT_TYPES[field.type()]}, typeName=\"{field.typeName()}\", len={field.length()}, prec={field.precision()}, comment=\"{field.comment()}\", subType=QVariant.{QVARIANT_TYPES[field.subType()]})"

@@ -1,179 +1,223 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>Form</class>
-    <widget class="QWidget" name="Form">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>657</width>
-                <height>115</height>
-            </rect>
-        </property>
-        <property name="windowTitle">
-            <string>Form</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-                <layout class="QGridLayout" name="gridLayout">
-                    <property name="sizeConstraint">
-                        <enum>QLayout::SetMaximumSize</enum>
-                    </property>
-                    <item row="1" column="0">
-                        <widget class="QLabel" name="perimeterLabel">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <pointsize>8</pointsize>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string notr="true">Perimeter (km)</string>
-                            </property>
-                            <property name="alignment">
-                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="0" column="1">
-                        <widget class="QLabel" name="areaText">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <pointsize>8</pointsize>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string/>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="2" column="0">
-                        <widget class="QLabel" name="conditionLabel">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <pointsize>8</pointsize>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string notr="true">Paddock condition</string>
-                            </property>
-                            <property name="alignment">
-                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="1" column="1">
-                        <widget class="QLabel" name="perimeterText">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <pointsize>8</pointsize>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string/>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="3" column="0">
-                        <widget class="QLabel" name="capacityLabel">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <pointsize>8</pointsize>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string>Capacity (AE)</string>
-                            </property>
-                            <property name="alignment">
-                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="3" column="1">
-                        <widget class="QLabel" name="capacityText">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <pointsize>8</pointsize>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string>Not yet implemented</string>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="0" column="0">
-                        <widget class="QLabel" name="areaLabel">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <pointsize>8</pointsize>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string notr="true">Area (km²)</string>
-                            </property>
-                            <property name="alignment">
-                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                            </property>
-                        </widget>
-                    </item>
-                    <item row="2" column="1">
-                        <widget class="QLabel" name="conditionText">
-                            <property name="sizePolicy">
-                                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>Not yet implemented</string>
-                            </property>
-                        </widget>
-                    </item>
-                </layout>
-            </item>
-        </layout>
-    </widget>
-    <resources/>
-    <connections/>
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>589</width>
+    <height>114</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="areaLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Area (km²)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="estimatedCapacityLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Estimated capacity (AE)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="perimeterText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="areaText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="perimeterLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Perimeter (km)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="potentialCapacityLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Potential capacity (AE)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="capacityPerAreaLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Mean capacity by area (AE/km²)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="estimatedCapacityText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="potentialCapacityText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="capacityPerAreaText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from contextlib import contextmanager
 
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
 from ...utils import qgsInfo
@@ -49,6 +50,7 @@ class Edits:
                 layer.commitChanges()
                 layer.featuresPersisted.emit()
         except Exception as e:
+            qgsInfo("Edits.editAndCommit: Exception raised, rolling back edits")
             for layer in layers:
                 layer.rollBack()
             raise e
@@ -58,7 +60,7 @@ class Edits:
     def editAndRollBack(*layers):
         layers = set(layers)
         if not all(isinstance(layer, QgsVectorLayer) for layer in layers):
-            raise Glitch("When editing alayers, all layers must be QgsVectorLayers")
+            raise Glitch("When editing layers, all layers must be QgsVectorLayers")
         for layer in layers:
             if layer.isEditable():
                 raise Glitch(f"Please end your edit session on {layer.name()} before you run this operation")
@@ -74,19 +76,48 @@ class Edits:
             raise e
 
     @staticmethod
-    def persistFeatures(method):
+    def persistFeatures(function):
         """Decorator that takes a method returning an Edits object of edits to persist,
         and returns a method that instead persists the edits and returns None."""
-        def methodWithPersistEdits(feature, *args, **kwargs):
-            edits = method(feature, *args, **kwargs)
-            qgsInfo(f"Persisting edits: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
+        def callableWithPersistFeatures(*args, **kwargs):
+            edits = function(*args, **kwargs)
 
-            layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
+            qgsInfo(f"Edits.persistFeatures: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
+
+            layers = set([f.featureLayer for f in edits.upserts + edits.deletes])            
+            twoPhaseLayers = set()
+
             with Edits.editAndCommit(*layers):
+                upsertsByLayer = defaultdict(list)
                 for feature in edits.upserts:
-                    feature.upsert()
+                    upsertsByLayer[feature.featureLayer].append(feature)
+
+                for layer, features in upsertsByLayer.items():
+                    for feature in features:
+                        if layer.twoPhaseRecalculate() and feature.id < 0:
+                            batch = layer.getRecalculateBatchNumber()
+                            feature.recalculateCurrent = batch
+                            twoPhaseLayers.add((layer, batch))
+                            # qgsInfo(f"Edits.persistFeatures: two-phase upsert for {feature} in batch {batch}")
+                        else:
+                            feature.recalculate()
+                        feature.upsert()
+
                 for feature in edits.deletes:
                     feature.delete()
 
+            with Edits.editAndCommit(*(layer for (layer, _) in twoPhaseLayers)):
+                twoPhaseEdits = Edits()
+                for twoPhaseLayer, batch in twoPhaseLayers:
+                    twoPhaseEdits.editBefore(twoPhaseLayer.getRecalculateBatchEdits(batch))
+                    qgsInfo(f"Edits.persistFeatures: two-phase upserts={repr(twoPhaseEdits.upserts)}, deletes={repr(twoPhaseEdits.deletes)}")
+
+                    for feature in twoPhaseEdits.upserts:
+                        feature.recalculate()
+                        feature.recalculateComplete = feature.recalculateCurrent
+                        feature.upsert()
+                    for feature in twoPhaseEdits.deletes:
+                        feature.delete()
+
             return None
-        return methodWithPersistEdits
+        return callableWithPersistFeatures

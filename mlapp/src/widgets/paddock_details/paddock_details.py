@@ -18,5 +18,8 @@ class PaddockDetails(QWidget, FORM_CLASS):
 
         self.paddock = paddock
         if self.paddock is not None:
-            self.areaText.setText(str(self.paddock.featureArea))
-            self.perimeterText.setText(str(self.paddock.featurePerimeter))
+            self.areaText.setText(f"{self.paddock.featureArea:2f}")
+            self.perimeterText.setText(f"{self.paddock.featurePerimeter:2f}")
+            self.estimatedCapacityText.setText(f"{self.paddock.estimatedCapacity:g}")
+            self.potentialCapacityText.setText(f"{self.paddock.potentialCapacity:g}")
+            self.capacityPerAreaText.setText(f"{self.paddock.capacityPerArea:1f}")

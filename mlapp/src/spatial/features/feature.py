@@ -58,6 +58,26 @@ class Feature(QObject):
         """Convert the Feature to a string representation."""
         return repr(self)
 
+    @property
+    def featureLayer(self):
+        """Return the FeatureLayer that contains this Feature."""
+        return QgsProject.instance().mapLayer(self._featureLayerId)
+
+    @property
+    def id(self):
+        """Return the Feature's fid."""
+        return self._qgsFeature.id()
+
+    @property
+    def geometry(self):
+        """Return the Feature's geometry."""
+        return self._qgsFeature.geometry()
+
+    @property
+    def isInfrastructure(self):
+        """Return True if the Feature is infrastructure."""
+        return False
+
     def onSelectionChanged(self, selected, deselected, clearAndSelect):
         # qgsDebug(f"{self}.onSelectionChanged({selected}, {deselected}, {clearAndSelect})")
         if not self._selected and self.id in selected and len(selected) == 1:
@@ -87,22 +107,4 @@ class Feature(QObject):
             return True
         return False
 
-    @property
-    def featureLayer(self):
-        """Return the FeatureLayer that contains this Feature."""
-        return QgsProject.instance().mapLayer(self._featureLayerId)
-
-    @property
-    def id(self):
-        """Return the Feature's fid."""
-        return self._qgsFeature.id()
-
-    @property
-    def geometry(self):
-        """Return the Feature's geometry."""
-        return self._qgsFeature.geometry()
-
-    @property
-    def isInfrastructure(self):
-        """Return True if the Feature is infrastructure."""
-        return False
+  

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsProject
 
+from ...utils import qgsDebug
 from ..layers.condition_table import ConditionTable
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_condition_popup_layer import PaddockConditionPopupLayer
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from ..schemas.schemas import PaddockSchema
+from ..schemas.schemas import EstimatedCapacity, PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits
 from .feature_action import FeatureAction
@@ -13,6 +14,10 @@ from .feature_action import FeatureAction
 
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
+
+    @classmethod
+    def twoPhaseRecalculate(self):
+        return True
 
     def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, waterpointBufferLayer: WaterpointBufferLayer,
                  conditionTable: ConditionTable, existingFeature=None):
@@ -47,12 +52,15 @@ class Paddock(AreaFeature):
             self.conditionTable)
 
         request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-
         conditions = [f for f in conditionLayer.getFeatures(request)]
 
-        self.estimatedCapacity = sum([c.estimatedCapacity for c in conditions])
-        self.potentialCapacity = sum([c.potentialCapacity for c in conditions])
-        self.capacityPerArea = self.estimatedCapacity / self.featureArea
+        estimatedRaw = sum([c.estimatedCapacity for c in conditions])
+        self.estimatedCapacity = round(estimatedRaw)
+        self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
+        self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
+
+        # qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
+
 
     def addPopupLayer(self):
         """Add a condition layer to the project."""
