@@ -130,7 +130,6 @@ BoundarySchema = ReadOnlySchema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
 ConditionSchema = ReadOnlySchema([Fid,
                                   Status,
                                   Area,
-                                  Perimeter,
                                   CapacityPerArea,
                                   EstimatedCapacity,
                                   PotentialCapacity,

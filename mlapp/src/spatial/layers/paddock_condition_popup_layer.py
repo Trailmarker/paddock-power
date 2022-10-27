@@ -57,21 +57,35 @@ on st_intersects("Paddock".geometry, "{{1}}".geometry)
 inner join "Watered Areas"
 on st_intersects("{{1}}".geometry, "Watered Areas".geometry))
 select
-"Paddock Condition".geometry,
+geometry,
 {paddockId} as "Paddock",
 '{paddockName}' as "Paddock Name",
 '{paddockStatus}' as "Paddock Status",
-"Paddock Condition"."Land System",
+"Land System",
 "Land System Name",
 "AE/km²",
-ifnull("{{3}}"."Condition", 'A') as "Condition",
-"Paddock Condition"."Watered",
+"Area (km²)",
+("AE/km²" * "Area (km²)") as "AE",
+("AE/km²" * "Area (km²)") as "Potential AE",
+"Condition",
+"Watered",
 "Watered Area Status"
-from
-"Paddock Condition" left outer join "{{3}}"
-on {paddockId} = "{{3}}"."Paddock"
-and "Paddock Condition"."Land System" = "{{3}}"."Land System"
-and "Paddock Condition"."Watered" = "{{3}}"."Waterpoint Buffer Type"
+from 
+	(select
+	 "Paddock Condition".geometry,
+	 "Paddock Condition"."Land System",
+	 "Land System Name",
+	 "AE/km²",
+ 	 st_area("Paddock Condition".geometry) / 1000000 as "Area (km²)",
+ 	 ifnull("{{3}}"."Condition", 'A') as "Condition",
+	 "Paddock Condition"."Watered",
+	 "Watered Area Status"
+	 from
+	 "Paddock Condition" left outer join "{{3}}"
+	 on {paddockId} = "{{3}}"."Paddock"
+	 and "Paddock Condition"."Land System" = "{{3}}"."Land System"
+	 and "Paddock Condition"."Watered" = "{{3}}"."Waterpoint Buffer Type")
+where geometry is not null
 """
 
 
