@@ -37,8 +37,8 @@ from "Far"
 inner join "Near"
 on "Far"."Status" = "Near"."Status"
 union
-select st_difference("Farm".geometry, "Far".geometry), 'Unwatered' as "Watered", "Far"."Status"
-from "Farm", "Far"
+select st_difference(st_difference("Farm".geometry, "Far".geometry), "Near".geometry), 'Unwatered' as "Watered", "Far"."Status"
+from "Farm", "Far", "Near"
 """
 
 #     QUERY = """
