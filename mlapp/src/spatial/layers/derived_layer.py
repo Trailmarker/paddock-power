@@ -20,7 +20,8 @@ class DerivedLayer(FeatureLayer):
         return queryFormatSpec.format(*(layer.name() for layer in featureLayers))
 
     def __init__(self, layerName, queryFormatSpec, styleName=None, *featureLayers):
-        layerClauses = map(DerivedLayer.formatLayerClause, featureLayers)
+        # We don't need a layer clause for any DerivedLayers
+        layerClauses = map(DerivedLayer.formatLayerClause, [f for f in featureLayers if not isinstance(f, DerivedLayer)])
         queryClause = DerivedLayer.makeQueryClause(queryFormatSpec, *featureLayers)
 
         init = f"?{'&'.join(layerClauses)}&query={quote(queryClause)}"

@@ -3,9 +3,9 @@ from qgis.core import QgsProject
 
 from ..features.paddock import Paddock
 from .condition_table import ConditionTable
+from .waterpoint_buffer_layer import WaterpointBufferLayer
 from .land_system_layer import LandSystemLayer
 from .status_feature_layer import StatusFeatureLayer
-from .waterpoint_buffer_layer import WaterpointBufferLayer
 
 
 class PaddockLayer(StatusFeatureLayer):
@@ -25,7 +25,7 @@ class PaddockLayer(StatusFeatureLayer):
         self._landSystemLayerId = landSystemLayer.id()
         self._waterpointBufferLayerId = waterpointBufferLayer.id()
         self.conditionTable = conditionTable
-        
+
     @property
     def landSystemLayer(self):
         return QgsProject.instance().mapLayer(self._landSystemLayerId)
@@ -36,12 +36,3 @@ class PaddockLayer(StatusFeatureLayer):
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.landSystemLayer, self.waterpointBufferLayer, self.conditionTable, feature)
-
-    # @Edits.persistFeatures
-    # def analyseFeatures(self):
-    #     edits = Edits()
-
-    #     for paddock in self.getFeatures():
-    #         edits.editBefore(paddock.analyseFeature())
-        
-    #     return edits

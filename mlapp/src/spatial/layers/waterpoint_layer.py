@@ -4,7 +4,6 @@ from qgis.core import QgsProject
 from ..features.waterpoint import Waterpoint
 from .elevation_layer import ElevationLayer
 from .status_feature_layer import StatusFeatureLayer
-from .waterpoint_buffer_layer import WaterpointBufferLayer
 
 
 class WaterpointLayer(StatusFeatureLayer):
@@ -16,18 +15,21 @@ class WaterpointLayer(StatusFeatureLayer):
         return Waterpoint
 
     def __init__(self, gpkgFile, layerName,
-                 waterpointBufferLayer: WaterpointBufferLayer,
                  elevationLayer: ElevationLayer):
         """Create or open a Waterpoint layer."""
 
         super().__init__(gpkgFile, layerName, styleName=WaterpointLayer.STYLE)
 
-        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        self._waterpointBufferLayerId = None
         self._elevationLayerId = elevationLayer.id()
 
     @property
     def waterpointBufferLayer(self):
-        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId) if self._waterpointBufferLayerId else None
+
+    @waterpointBufferLayer.setter
+    def waterpointBufferLayer(self, waterpointBufferLayer):
+        self._waterpointBufferLayerId = waterpointBufferLayer.id()
 
     @property
     def elevationLayer(self):

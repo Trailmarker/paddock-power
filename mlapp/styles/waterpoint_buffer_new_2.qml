@@ -8,8 +8,8 @@
   </flags>
   <renderer-v2 type="categorizedSymbol" attr="Waterpoint Buffer Type" referencescale="-1" forceraster="0" enableorderby="0" symbollevels="0">
     <categories>
-      <category type="string" value="Far" symbol="0" label="Far Buffer" render="true"/>
-      <category type="string" value="Near" symbol="1" label="Near Buffer" render="true"/>
+      <category type="string" value="Far" symbol="0" label="Far" render="true"/>
+      <category type="string" value="Near" symbol="1" label="Near" render="true"/>
     </categories>
     <symbols>
       <symbol clip_to_extent="1" type="fill" name="0" is_animated="0" force_rhr="0" alpha="0.3" frame_rate="10">
@@ -153,10 +153,10 @@
           <Option type="Map">
             <Option type="List" name="map">
               <Option type="Map">
-                <Option type="QString" value="Near" name="Near Buffer"/>
+                <Option type="QString" value="Near" name="Near"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" value="Far" name="Far Buffer"/>
+                <Option type="QString" value="Far" name="Far"/>
               </Option>
             </Option>
           </Option>

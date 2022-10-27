@@ -1,67 +1,44 @@
 # -*- coding: utf-8 -*-
-# from functools import cached_property
-
-from qgis.core import QgsFeatureRequest, QgsGeometry
-
-from ..features.edits import Edits
 from ..features.waterpoint_buffer import WaterpointBuffer
+from ..schemas.schemas import BUFFER_DISTANCE, FAR_BUFFER, NEAR_BUFFER, STATUS, WATERPOINT, WATERPOINT_BUFFER_TYPE
 from ..schemas.waterpoint_buffer_type import WaterpointBufferType
-from ..schemas.schemas import WATERPOINT, WATERPOINT_BUFFER_TYPE
-from .persisted_feature_layer import PersistedFeatureLayer
+from .derived_layer import DerivedLayer
 
 
-class WaterpointBufferLayer(PersistedFeatureLayer):
+class WaterpointBufferLayer(DerivedLayer):
 
-    # STYLE = "waterpoint_buffer_new_2"
-    @classmethod
+    STYLE = "waterpoint_buffer_new_2"
+
+    QUERY = f"""
+with "Buffers" as
+    (select
+     st_buffer(geometry, "{NEAR_BUFFER}") as "Near",
+     st_buffer(geometry, "{FAR_BUFFER}") as "Far",
+     fid as "{WATERPOINT}",
+     "{STATUS}",
+     "{NEAR_BUFFER}",
+     "{FAR_BUFFER}"
+     from {{0}})
+select
+    "Near" as "geometry",
+    "{WATERPOINT}",
+    '{WaterpointBufferType.Near.name}' as "{WATERPOINT_BUFFER_TYPE}",
+    "{STATUS}",
+    "{NEAR_BUFFER}" as "{BUFFER_DISTANCE}"
+from "Buffers"
+union
+select
+    st_difference("Far", "Near") as "geometry",
+    "{WATERPOINT}",
+    '{WaterpointBufferType.Far.name}' as "{WATERPOINT_BUFFER_TYPE}",
+    "{STATUS}",
+    "{FAR_BUFFER}" as "{BUFFER_DISTANCE}"
+from "Buffers"
+"""
+
     def getFeatureType(cls):
+        """Return the type of feature that this layer contains. Override in subclasses"""
         return WaterpointBuffer
 
-    def __init__(self, gpkgFile, layerName):
-        """Create or open a Waterpoint layer."""
-
-        super().__init__(gpkgFile, layerName, styleName=None)
-
-    def loadNearAndFarBuffers(self):
-        nearRequest = QgsFeatureRequest().setFilterExpression(
-            f'"{WATERPOINT_BUFFER_TYPE}" = \'{WaterpointBufferType.Near.name}\' AND "{WATERPOINT}" = NULL')
-        farRequest = QgsFeatureRequest().setFilterExpression(
-            f'"{WATERPOINT_BUFFER_TYPE}" = \'{WaterpointBufferType.Far.name}\' AND "{WATERPOINT}" = NULL')
-        return next(self.getFeatures(nearRequest), None), next(self.getFeatures(farRequest), None)
-
-    def analyseNearAndFarBuffers(self):
-
-        nearBufferRequest = QgsFeatureRequest().setFilterExpression(
-            f'"{WATERPOINT_BUFFER_TYPE}" = \'{WaterpointBufferType.Near.name}\'')
-        nearBuffers = self.getFeatures(nearBufferRequest)
-        nearBufferGeom = QgsGeometry.unaryUnion(b.geometry for b in nearBuffers)
-
-        farBufferRequest = QgsFeatureRequest().setFilterExpression(
-            f'"{WATERPOINT_BUFFER_TYPE}" = \'{WaterpointBufferType.Far.name}\'')
-        farBuffers = self.getFeatures(farBufferRequest)
-        farBufferGeom = QgsGeometry.unaryUnion(b.geometry for b in farBuffers)
-
-        # Subtract the near buffer from the far buffer so they do not overlap
-        farBufferGeom = farBufferGeom.difference(nearBufferGeom)
-
-        nearBuffer = self.makeFeature()
-        nearBuffer.geometry = nearBufferGeom
-        nearBuffer.waterpointBufferType = WaterpointBufferType.Near
-
-        farBuffer = self.makeFeature()
-        farBuffer.geometry = farBufferGeom
-        farBuffer.waterpointBufferType = WaterpointBufferType.Far
-
-        return nearBuffer, farBuffer
-
-    @Edits.persistFeatures
-    def analyseFeatures(self):
-        edits = Edits()
-
-        oldNear, oldFar = self.loadNearAndFarBuffers()
-        near, far = self.analyseNearAndFarBuffers()
-
-        edits.editBefore(Edits.delete(oldNear, oldFar))
-        edits.editAfter(Edits.upsert(near, far))
-
-        return edits
+    def __init__(self, layerName, waterpointLayer):
+        super().__init__(layerName, WaterpointBufferLayer.QUERY, WaterpointBufferLayer.STYLE, waterpointLayer)

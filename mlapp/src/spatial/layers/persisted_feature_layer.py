@@ -212,7 +212,7 @@ class PersistedFeatureLayer(QgsVectorLayer):
         super().addFeature(self._unwrapQgsFeature(feature))
 
     def updateFeature(self, feature):
-        """Add a feature to the layer."""
+        """Update a feature in the layer."""
         super().updateFeature(self._unwrapQgsFeature(feature))
 
     def deleteFeature(self, feature):

@@ -4,6 +4,7 @@ from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsProject
 
 from ..spatial.layers.condition_table import ConditionTable
+from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.fence_layer import FenceLayer
@@ -11,7 +12,6 @@ from ..spatial.layers.land_system_layer import LandSystemLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
-from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
 from ..utils import resolveGeoPackageFile
 
@@ -30,12 +30,14 @@ class ProjectBase(QObject):
         if elevationLayerName is not None:
             self.elevationLayer = ElevationLayer(self.gpkgFile, elevationLayerName)
 
-        waterpointBufferLayerName = f"Waterpoint Buffers"
-        self.waterpointBufferLayer = WaterpointBufferLayer(self.gpkgFile, waterpointBufferLayerName)
         waterpointLayerName = f"Waterpoints"
-        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName,
-                                               self.waterpointBufferLayer,
-                                               self.elevationLayer)
+        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
+        waterpointBufferLayerName = f"Waterpoint Buffers"
+        self.waterpointBufferLayer = WaterpointBufferLayer(waterpointBufferLayerName, self.waterpointLayer)
+
+        # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
+        self.waterpointLayer.waterpointBufferLayer = self.waterpointBufferLayer
+
         pipelineLayerName = f"Pipelines"
         self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
@@ -59,8 +61,6 @@ class ProjectBase(QObject):
                                      self.elevationLayer)
         boundaryLayerName = f"Boundary"
         self.boundaryLayer = BoundaryLayer(boundaryLayerName, self.paddockLayer)
-
-        # qgsDebug("ProjectBase: Layers created")
 
     def findGroup(self):
         """Find this Project's group in the Layers panel."""
