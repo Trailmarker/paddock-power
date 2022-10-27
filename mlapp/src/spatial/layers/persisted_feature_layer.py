@@ -7,7 +7,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug, qgsInfo, resolveStylePath
+from ...utils import PLUGIN_NAME, qgsInfo, resolveStylePath
 from ..features.edits import Edits
 from ..features.persisted_feature import PersistedFeature
 #from ..layers.feature_layer import FeatureLayer
@@ -19,7 +19,7 @@ QVARIANT_TYPES = dict([(getattr(QVariant, v), v) for v, m in vars(
 QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
     QgsWkbTypes).items() if isinstance(getattr(QgsWkbTypes, v), QgsWkbTypes.Type)])
 
-# Paddock Power data is held in the GDA2020 coordinate system
+# MLA Paddock Power data is held in the GDA2020 coordinate system
 PADDOCK_POWER_EPSG = 7845
 
 
@@ -99,11 +99,11 @@ class PersistedFeatureLayer(QgsVectorLayer):
         })
 
     def __init__(self, gpkgFile, layerName, styleName=None):
-        """Create a new Paddock Power vector layer."""
+        f"""Create a new {PLUGIN_NAME} vector layer."""
 
         # If not found, create
         if not self.detectInGeoPackage(gpkgFile, layerName):
-            qgsInfo(f"{self.__class__.__name__} not found in Paddock Power GeoPackage. Creating new, stand by …")
+            qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage. Creating new, stand by …")
             self.createInGeoPackage(gpkgFile, layerName)
 
         self._gpkgUrl = f"{gpkgFile}|layername={layerName}"

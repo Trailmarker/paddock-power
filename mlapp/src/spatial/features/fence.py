@@ -2,6 +2,7 @@
 from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsProject, QgsPointXY, QgsRectangle
 
 from ...models.glitch import Glitch
+from ...utils import PLUGIN_NAME
 from ..layers.persisted_feature_layer import QGSWKB_TYPES
 from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
@@ -77,7 +78,7 @@ class Fence(LineFeature):
         notFarm = self.getNotFarm(glitchBuffer=1.0)
 
         if notFarm.isEmpty():
-            raise Glitch("Cannot find the farm boundary")
+            raise Glitch(f"{PLUGIN_NAME} can't find the farm boundary, is there any paddock data?")
 
         if fenceLine.isEmpty():
             return [], []

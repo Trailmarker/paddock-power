@@ -43,8 +43,8 @@ class PaddockPower(QObject):
             self.translator.load(localePath)
             QCoreApplication.installTranslator(self.translator)
 
-        self.provider = Provider()
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        # self.provider = Provider()
+        # QgsApplication.processingRegistry().addProvider(self.provider)
 
         QgsProject.instance().cleared.connect(self.unloadProject)
         QgsProject.instance().readProject.connect(self.detectProject)
@@ -176,11 +176,11 @@ class PaddockPower(QObject):
         except BaseException:
             pass
 
-        try:
-            # Remove processing provider
-            QgsApplication.processingRegistry().removeProvider(self.provider)
-        except BaseException:
-            pass
+        # try:
+        #     # Remove processing provider
+        #     QgsApplication.processingRegistry().removeProvider(self.provider)
+        # except BaseException:
+        #     pass
 
         PaddockPower.restoreSystemExceptionHook()
 

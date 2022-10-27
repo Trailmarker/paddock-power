@@ -3,7 +3,7 @@ from ...models.state_machine import StateMachineAction
 
 
 class FeatureAction(StateMachineAction):
-    """Allowed transitions for a Paddock Power feature."""
+    """Allowed transitions for a StatusFeature."""
     draft = "Draft"
     trash = "Trash"
     plan = "Plan"

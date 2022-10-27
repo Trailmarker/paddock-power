@@ -1,7 +1,7 @@
 
 import sqlite3
 
-from ...utils import qgsInfo
+from ...utils import qgsInfo, PLUGIN_NAME
 from ..schemas.condition_type import ConditionType
 
 
@@ -69,7 +69,7 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
     def __init__(self, gpkgFile, tableName):
         # If not found, create
         if not self.detectInGeoPackage(gpkgFile, tableName):
-            qgsInfo(f"{self.__class__.__name__} not found in Paddock Power GeoPackage. Creating new, stand by …")
+            qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage. Creating new, stand by …")
             self.createInGeoPackage(gpkgFile, tableName)
 
         self.gpkgFile = gpkgFile

@@ -3,6 +3,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsCategorizedSymbolRenderer
 
+from ...utils import PLUGIN_NAME
 from ..schemas.feature_status import FeatureStatus
 from .persisted_feature_layer import PersistedFeatureLayer
 
@@ -12,7 +13,7 @@ class StatusFeatureLayer(PersistedFeatureLayer):
     displayFilterChanged = pyqtSignal(list)
 
     def __init__(self, gpkgFile, layerName, styleName=None):
-        """Create a new Paddock Power vector layer."""
+        f"""Create a new {PLUGIN_NAME} vector layer with status management."""
         super().__init__(gpkgFile=gpkgFile, layerName=layerName, styleName=styleName)
         self._displayFilter = [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
         self._applyDisplayFilter(self.displayFilter)

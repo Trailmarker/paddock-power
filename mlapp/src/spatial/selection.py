@@ -5,6 +5,7 @@ from qgis.core import QgsWkbTypes
 from qgis.gui import QgsRubberBand
 
 from ..models.glitch import Glitch
+from ..utils import PLUGIN_NAME
 from .features.persisted_feature import PersistedFeature
 
 
@@ -45,7 +46,7 @@ class Selection(QgsRubberBand):
 
         if not isinstance(feature, PersistedFeature):
             raise Glitch(
-                "Your selected feature must be a Paddock Power Feature.")
+                f"Your selected feature must be a {PLUGIN_NAME} Feature.")
 
         self.selectedFeature = feature
         self.refreshUi()

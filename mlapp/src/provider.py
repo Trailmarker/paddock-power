@@ -21,14 +21,15 @@ class Provider(QgsProcessingProvider):
         pass
 
     def loadAlgorithms(self):
-        self.addAlgorithm(FencelineAnalysis())
-        self.addAlgorithm(PipelineAnalysis())
-        self.addAlgorithm(SplitPaddock())
-        self.addAlgorithm(WaterpointBuffers())
-        self.addAlgorithm(CreateProject())
+        # self.addAlgorithm(FencelineAnalysis())
+        # self.addAlgorithm(PipelineAnalysis())
+        # self.addAlgorithm(SplitPaddock())
+        # self.addAlgorithm(WaterpointBuffers())
+        # self.addAlgorithm(CreateProject())
         # self.addAlgorithm(AddEmptyProject())
-        self.addAlgorithm(AddProjectFromExisting())
-        self.addAlgorithm(DeleteProject())
+        # self.addAlgorithm(AddProjectFromExisting())
+        #self.addAlgorithm(DeleteProject())
+        pass
 
     def id(self):
         return 'Paddock Power'

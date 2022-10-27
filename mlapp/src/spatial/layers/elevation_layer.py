@@ -5,6 +5,7 @@ import sqlite3
 from qgis.core import QgsProject, QgsRasterLayer
 
 from ...models.glitch import Glitch
+from ...utils import PLUGIN_NAME
 
 
 def rasterGpkgUrl(gpkgFile, layerName):
@@ -34,7 +35,7 @@ class ElevationLayer(QgsRasterLayer):
                 return grids[0][0]
             else:
                 raise Glitch(
-                    f"Paddock Power found multiple possible elevation layers in {gpkgFile}")
+                    f"{PLUGIN_NAME} found multiple possible elevation layers in {gpkgFile}")
         except BaseException:
             return None
 

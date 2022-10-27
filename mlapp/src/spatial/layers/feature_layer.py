@@ -4,8 +4,7 @@ from qgis.core import QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
 from ...models.qt_abstract_meta import QtAbstractMeta
-from ...utils import resolveStylePath
-
+from ...utils import resolveStylePath, PLUGIN_NAME
 
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
@@ -15,7 +14,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         pass
 
     def __init__(self, *args, **kwargs):
-        """Create a new Paddock Power vector layer."""
+        f"""Create a new {PLUGIN_NAME} vector layer."""
 
         styleName = kwargs.pop("styleName", None)
 

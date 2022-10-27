@@ -3,7 +3,7 @@ from ...models.state_machine import StateMachineStatus
 
 
 class FeatureStatus(StateMachineStatus):
-    """Allowed statuses for a Paddock Power feature."""
+    """Allowed statuses for a StatusFeature."""
     Drafted = "Drafted"
     Planned = "Planned"
     Built = "Built"

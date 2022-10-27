@@ -9,6 +9,7 @@ from ..spatial.features.persisted_feature import PersistedFeature
 from ..spatial.features.pipeline import Pipeline
 from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..tools.map_tool import MapTool
+from ..utils import PLUGIN_NAME
 from ..views.fence_view.fence_view import FenceView
 from ..views.paddock_view.paddock_view import PaddockView
 from ..views.pipeline_view.pipeline_view import PipelineView
@@ -21,7 +22,7 @@ from ...resources_rc import *
 
 
 class Project(ProjectBase):
-    MENU_NAME = u"&Paddock Power"
+    MENU_NAME = f"&{PLUGIN_NAME}"
 
     # emit this signal when a selected Feature is updated
     selectedFeatureChanged = pyqtSignal(PersistedFeature)
@@ -82,7 +83,7 @@ class Project(ProjectBase):
         """Set the current tool for this Project."""
         if not isinstance(tool, MapTool):
             raise Glitch(
-                "The Paddock Power tool must be of a recognised type")
+                f"The {PLUGIN_NAME} tool must be of a recognised type")
 
         self.unsetTool()
         self.currentTool = tool

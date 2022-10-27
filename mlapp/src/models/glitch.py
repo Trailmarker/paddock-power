@@ -3,11 +3,11 @@ from contextlib import contextmanager
 
 from qgis.core import Qgis
 
-from ..utils import guiError, qgsInfo
+from ..utils import PLUGIN_NAME, guiError, qgsInfo
 
 
 class Glitch(Exception):
-    """Throw a Paddock Power business logic or consistency error."""
+    f"""Throw a {PLUGIN_NAME} business logic or consistency error."""
 
     def __init__(self, *args):
         """Create a new Glitch."""

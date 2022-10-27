@@ -14,7 +14,7 @@ from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import qgsInfo, resolveGeoPackageFile
+from ..utils import PLUGIN_NAME, qgsInfo, resolveGeoPackageFile
 
 
 class ProjectBase(QObject):
@@ -24,7 +24,7 @@ class ProjectBase(QObject):
 
         gpkgFile = gpkgFile or resolveGeoPackageFile()
         self.gpkgFile = gpkgFile
-        self.projectName = projectName or "Paddock Power"
+        self.projectName = projectName or PLUGIN_NAME
 
         self.elevationLayer = None
         elevationLayerName = ElevationLayer.detectInGeoPackage(self.gpkgFile)

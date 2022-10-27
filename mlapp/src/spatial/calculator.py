@@ -46,7 +46,7 @@ class Calculator:
 
         if line.isMultipart():
             raise Glitch(
-                "Calculator.calculateArea: Paddock Power should not be used with multi-part linestrings.")
+                f"Calculator.calculateArea: {PLUGIN_NAME} should not be used with multi-part linestrings.")
 
         calculator = Calculator.QGIS_CALCULATOR
 
@@ -141,12 +141,7 @@ class Calculator:
             raise Glitch(
                 "Calculator.calculateArea: polygon is not a QgsGeometry.")
 
-        # if polygon.isMultipart():
-        #     raise PaddockPowerError(
-        #         "Calculator.calculateArea: Paddock Power should not be used with multi-part polygons.")
-
         calculator = Calculator.QGIS_CALCULATOR
-
         return calculator.measureArea(polygon)
 
     @staticmethod
@@ -156,11 +151,6 @@ class Calculator:
         if not isinstance(polygon, QgsGeometry):
             raise Glitch(
                 "Calculator.calculatePerimeter: polygon is not a QgsGeometry.")
-
-        # if polygon.isMultipart():
-        #     raise PaddockPowerError(
-        #         "Calculator.calculatePerimeter: Paddock Power should not be used with multi-part polygons.")
-
+        
         calculator = Calculator.QGIS_CALCULATOR
-
         return calculator.measurePerimeter(polygon)
