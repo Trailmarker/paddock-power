@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject
+from qgis.core import QgsFeatureRequest, QgsProject
 
 from ..layers.condition_table import ConditionTable
 from ..layers.land_system_layer import LandSystemLayer
@@ -34,6 +34,25 @@ class Paddock(AreaFeature):
     @property
     def conditionRecordLayer(self):
         return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
+
+    def recalculate(self):
+        super().recalculate()
+
+        conditionLayer = PaddockConditionPopupLayer(
+            f"Paddock {self.id} Recalculate",
+            self,
+            self.featureLayer,
+            self.landSystemLayer,
+            self.waterpointBufferLayer,
+            self.conditionTable)   
+
+        request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+
+        conditions = [f for f in conditionLayer.getFeatures(request)]
+
+        self.estimatedCapacity = sum([c.estimatedCapacity for c in conditions])
+        self.potentialCapacity = sum([c.potentialCapacity for c in conditions])
+        self.capacityPerArea = self.estimatedCapacity / self.featureArea
 
     def addPopupLayer(self):
         """Add a condition layer to the project."""

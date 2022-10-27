@@ -48,12 +48,12 @@ BORE_YIELD = "Bore Yield (L/s)"
 BUFFER_DISTANCE = "Buffer Distance (m)"
 BUILD_FENCE = "Build Fence"
 BUILD_ORDER = "Build Order"
-CAPACITY = "AE"
 CAPACITY_PER_AREA = "AE/km²"
 CLASS_DESCRIPTION = "Class Description"
 CONDITION_TYPE = "Condition"
 ELEVATION = "Elevation (m)"
 EROSION_RISK = "Erosion Risk"
+ESTIMATED_CAPACITY = "AE"
 FAR_BUFFER = "Far Buffer (m)"
 FID = "fid"
 LAND_SYSTEM = "Land System"
@@ -93,7 +93,7 @@ ConditionTypeField = DomainField(
     defaultValue=ConditionType.A)
 Elevation = MeasureField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'))
 ErosionRisk = StringField(propertyName="erosionRisk", name=EROSION_RISK)
-EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=CAPACITY)
+EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=ESTIMATED_CAPACITY)
 FarBufferDistance = MeasureField(propertyName="farBuffer", name=FAR_BUFFER, defaultValue="5000.0")
 Fid = IdField("id", name=FID)
 LandscapeClass = StringField(propertyName="landscapeClass", name=LANDSCAPE_CLASS)
