@@ -90,7 +90,7 @@ BuildOrder = IdField(propertyName="buildOrder", name=BUILD_ORDER)
 CapacityPerArea = MeasureField(propertyName="capacityPerArea", name=CAPACITY_PER_AREA)
 ClassDescription = StringField(propertyName="classDescription", name=CLASS_DESCRIPTION)
 ConditionTypeField = DomainField(
-    propertyName="condition",
+    propertyName="conditionType",
     name=CONDITION_TYPE,
     domainType=ConditionType,
     defaultValue=ConditionType.A)

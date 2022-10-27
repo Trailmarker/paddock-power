@@ -85,7 +85,7 @@ from
 	 "Paddock Condition" left outer join "{{3}}"
 	 on {paddockId} = "{{3}}"."Paddock"
 	 and "Paddock Condition"."Land System" = "{{3}}"."Land System"
-	 and "Paddock Condition"."Watered" = "{{3}}"."Waterpoint Buffer Type")
+	 and "Paddock Condition"."Watered" = "{{3}}"."Watered")
 where geometry is not null
 """
 

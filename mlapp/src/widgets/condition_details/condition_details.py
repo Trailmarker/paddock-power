@@ -19,7 +19,7 @@ class ConditionDetails(QWidget, FORM_CLASS):
         self.condition = condition
         if self.condition is not None:
             self.landSystemNameText.setText(f"{self.condition.landSystemName}")
-            self.conditionText.setText(f"{self.condition.condition.value}")
+            self.conditionTypeText.setText(f"{self.condition.conditionType.value}")
             self.areaText.setText(f"{self.condition.featureArea:2f}")
             self.estimatedCapacityText.setText(f"{self.condition.estimatedCapacity:g}")
             self.potentialCapacityText.setText(f"{self.condition.potentialCapacity:g}")

@@ -10,7 +10,7 @@ class ConditionLayerList(FeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        def listItemFactory(condition): return FeatureCollapsibleListItem(
-            condition, ConditionDetails, ConditionDetailsEdit, parent)
+        def listItemFactory(condition):
+            return FeatureCollapsibleListItem(condition, ConditionDetails, ConditionDetailsEdit, parent)
 
         super().__init__(listItemFactory, parent)
