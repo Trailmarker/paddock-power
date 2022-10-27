@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from os import path
 import sqlite3
 
 from qgis.core import QgsProject, QgsRasterLayer
@@ -17,19 +18,25 @@ class ElevationLayer(QgsRasterLayer):
     @classmethod
     def detectInGeoPackage(cls, gpkgFile):
         """Find an elevation layer in a project GeoPackage."""
-        db = sqlite3.connect(gpkgFile)
-        cursor = db.cursor()
-        cursor.execute(
-            "SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
-        grids = cursor.fetchall()
+        try:
+            if not path.exists(gpkgFile):
+                return None
+            
+            db = sqlite3.connect(gpkgFile)
+            cursor = db.cursor()
+            cursor.execute(
+                "SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
+            grids = cursor.fetchall()
 
-        if len(grids) == 0:
+            if len(grids) == 0:
+                return None
+            elif len(grids) == 1:
+                return grids[0][0]
+            else:
+                raise Glitch(
+                    f"Paddock Power found multiple possible elevation layers in {gpkgFile}")
+        except BaseException:
             return None
-        elif len(grids) == 1:
-            return grids[0][0]
-        else:
-            raise Glitch(
-                f"Paddock Power found multiple possible elevation layers in {gpkgFile}")
 
     @classmethod
     def detectAndRemove(cls, gpkgFile, layerName):

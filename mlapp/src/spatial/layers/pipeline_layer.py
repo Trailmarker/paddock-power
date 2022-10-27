@@ -21,11 +21,11 @@ class PipelineLayer(StatusFeatureLayer):
                          layerName,
                          styleName=PipelineLayer.STYLE)
 
-        self._elevationLayerId = elevationLayer.id()
+        self._elevationLayerId = elevationLayer.id() if elevationLayer else None
 
     @property
     def elevationLayer(self):
-        return QgsProject.instance().mapLayer(self._elevationLayerId)
+        return QgsProject.instance().mapLayer(self._elevationLayerId) if self._elevationLayerId else None
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.elevationLayer, feature)

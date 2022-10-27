@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os.path
 from qgis.PyQt.QtCore import QObject
 
 from qgis.core import QgsProject
@@ -13,7 +14,7 @@ from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import resolveGeoPackageFile
+from ..utils import qgsInfo, resolveGeoPackageFile
 
 
 class ProjectBase(QObject):
@@ -83,7 +84,9 @@ class ProjectBase(QObject):
         self.landSystemLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
         self.paddockLayer.addToMap(group)
-        self.elevationLayer.addToMap(group)
+        
+        if self.elevationLayer is not None:
+            self.elevationLayer.addToMap(group)
 
     def removeFromMap(self):
         """Remove this Project from the current map view."""

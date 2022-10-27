@@ -13,13 +13,13 @@ class LineFeature(StatusFeature):
         """Create a new LineFeature."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-        self._elevationLayerId = elevationLayer.id()
+        self._elevationLayerId = elevationLayer.id() if elevationLayer else None
         self._profile = None
         # self.recalculate()
 
     @property
     def elevationLayer(self):
-        return QgsProject.instance().mapLayer(self._elevationLayerId)
+        return QgsProject.instance().mapLayer(self._elevationLayerId) if self._elevationLayerId else None
 
     def profile(self):
         return self._profile

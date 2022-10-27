@@ -19,7 +19,7 @@ class FenceLayer(StatusFeatureLayer):
         super().__init__(gpkgFile, layerName, styleName=FenceLayer.STYLE)
 
         self._paddockLayerId = paddockLayer.id()
-        self._elevationLayerId = elevationLayer.id()
+        self._elevationLayerId = elevationLayer.id() if elevationLayer else None
 
     @property
     def paddockLayer(self):
@@ -27,7 +27,7 @@ class FenceLayer(StatusFeatureLayer):
 
     @property
     def elevationLayer(self):
-        return QgsProject.instance().mapLayer(self._elevationLayerId)
+        return QgsProject.instance().mapLayer(self._elevationLayerId) if self._elevationLayerId else None
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.paddockLayer, self.elevationLayer, feature)

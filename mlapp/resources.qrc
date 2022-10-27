@@ -5,7 +5,6 @@
         <file>images/fenceline.png</file>
         <file>images/icon.png</file>
         <file>images/logo.png</file>
-        <file>images/project.png</file>
         <file>images/new-project.png</file>
         <file>images/new-paddock.png</file>
         <file>images/new-split-paddock.png</file>
@@ -18,5 +17,6 @@
         <file>images/pipeline.png</file>
         <file>images/split.png</file>
         <file>images/split-paddock.png</file>
+        <file>images/sparkling-star.png</file>
     </qresource>
 </RCC>

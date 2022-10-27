@@ -16,11 +16,11 @@ class PointFeature(StatusFeature):
 
         assert elevationLayer is None or isinstance(elevationLayer, ElevationLayer), "elevationLayer must be provided"
 
-        self._elevationLayerId = elevationLayer.id()
+        self._elevationLayerId = elevationLayer.id() if elevationLayer else None
 
     @property
     def elevationLayer(self):
-        return QgsProject.instance().mapLayer(self._elevationLayerId)
+        return QgsProject.instance().mapLayer(self._elevationLayerId) if self._elevationLayerId else None
 
     def recalculate(self):
         """Recalculate the longitude, latitude and elevation of the PointFeature."""

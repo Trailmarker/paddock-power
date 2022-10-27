@@ -13,7 +13,7 @@ from .resources_rc import *
 from .src.models.glitch import Glitch
 from .src.models.project import Project
 from .src.provider import Provider
-from .src.utils import qgsInfo, resolveGeoPackageFile, PLUGIN_NAME
+from .src.utils import guiError, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
@@ -90,6 +90,18 @@ class PaddockPower(QObject):
         self.actions = []
 
         self.addAction(
+            QIcon(":/plugins/mlapp/images/sparkling-star.png"),
+            text= f"Refresh {PLUGIN_NAME} Project …",
+            callback=lambda *_: self.detectProject(),
+            parent=self.iface.mainWindow())
+
+        self.addAction(
+            QIcon(":/plugins/mlapp/images/new-project.png"),
+            text= f"Create {PLUGIN_NAME} Project …",
+            callback=lambda *_: self.createProject(),
+            parent=self.iface.mainWindow())
+
+        self.addAction(
             QIcon(":/plugins/mlapp/images/paddock.png"),
             text=u"View Paddocks",
             callback=self.openPaddockView,
@@ -143,7 +155,7 @@ class PaddockPower(QObject):
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         try:
-            QgsProject.instance().cleared.disconnect(self.unloadProject)
+            # QgsProject.instance().cleared.disconnect(self.unloadProject)
             QgsProject.instance().readProject.disconnect(self.detectProject)
         except BaseException:
             pass
@@ -172,26 +184,64 @@ class PaddockPower(QObject):
 
         PaddockPower.restoreSystemExceptionHook()
 
-    @Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
+    #@Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
     def detectProject(self, _=None):
-        """Detect a Paddock Power project in the current QGIS project."""
+        f"""Detect a {PLUGIN_NAME} Project in the current QGIS project."""
         self.project = None
-        gpkgFile = resolveGeoPackageFile()
-        if gpkgFile is not None:
-            qgsInfo("Paddock Power loading project …")
-            self.project = Project(self.iface, gpkgFile)
-        else:
-            qgsInfo("Paddock Power no GeoPackage file located …")
+        try:
+            projectFile = resolveProjectFile()
+            if projectFile is None:
+                qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
+            else:
+                gpkgFile = resolveGeoPackageFile()
+                if gpkgFile is not None and os.path.exists(gpkgFile):
+                    qgsInfo(f"{PLUGIN_NAME} loading project …")
+                    self.project = Project(self.iface, gpkgFile)
+                else:
+                    qgsInfo(f"{PLUGIN_NAME} no GeoPackage file located …")
+        except BaseException:
+            qgsInfo(f"{PLUGIN_NAME} exception occurred detecting project …")
+            pass
 
         if self.project is not None:
             self.project.addToMap()
         else:
-            qgsInfo("Paddock Power no project detected …")
+            qgsInfo(f"{PLUGIN_NAME} no project detected …")
+
+    #@Glitch.glitchy(f"An exception occurred while trying to create a {PLUGIN_NAME} project.")
+    def createProject(self):
+        f"""Create a new {PLUGIN_NAME} Project in the current QGIS project."""
+        self.unloadProject()
+        try:
+            projectFile = resolveProjectFile()
+            if projectFile is None:
+                qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
+                guiError(f"Please create and save a QGIS project before you try to create a {PLUGIN_NAME} project.")
+                return
+            else:
+                gpkgFile = resolveGeoPackageFile()
+                if gpkgFile is not None:
+                    if os.path.exists(gpkgFile):
+                        qgsInfo(f"{PLUGIN_NAME} GeoPackage file already exists, not creating project …")
+                        guiError(
+                            f"A {PLUGIN_NAME} project already exists in the filesystem adjacent to your QGIS project file.")
+                    else:
+                        qgsInfo(f"{PLUGIN_NAME} creating project …")
+                        self.project = Project(self.iface, gpkgFile)
+                else:
+                    qgsInfo(f"{PLUGIN_NAME} no GeoPackage file located …")
+        except BaseException as e:
+            qgsInfo(f"{PLUGIN_NAME} exception occurred creating project …")
+            qgsInfo(str(e))
+            pass
+
+        if self.project is not None:
+            self.project.addToMap()
 
     def unloadProject(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         if self.project is not None:
-            qgsInfo("Paddock Power unloading project …")
+            qgsInfo(f"{PLUGIN_NAME} unloading project …")
             self.project.unload()
             self.project = None
 
