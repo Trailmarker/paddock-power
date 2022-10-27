@@ -4,10 +4,11 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
+from ..feature_status_label import FeatureStatusLabel
 from ..state_tool_bar import StateToolBar
 
 
-class FeatureCollapsibleListItem(QWidget, EditStateMachine):
+class PersistedFeatureCollapsibleListItem(QWidget, EditStateMachine):
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, DetailsWidget, EditWidget, parent=None):
@@ -25,6 +26,8 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.collapseLayout.addWidget(self.featureEdit)
         self.collapseLayout.addStretch()
 
+        self.statusLabel = FeatureStatusLabel(None)
+
         self.toolBar = StateToolBar(self)
 
         self.toolBar.addStateAction(EditAction.edit, ':/plugins/mlapp/images/item-edit.png', lambda *_: self.editItem())
@@ -40,6 +43,7 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
 
         self.collapse = Collapse(self)
         self.collapse.setContentLayout(self.collapseLayout)
+        self.collapse.addHeaderWidget(self.statusLabel)
         self.collapse.addHeaderWidget(self.toolBar)
 
         layout = QVBoxLayout()
@@ -54,6 +58,7 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.collapse.collapsed.connect(self.layoutRefreshNeeded.emit)
         self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
+        self.feature.stateChanged.connect(self.refreshUi)
         self.stateChanged.connect(self.refreshUi)
 
         self.refreshUi()
@@ -78,6 +83,8 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         # Set title to paddock name with some details
         self.collapse.setTitle(
             f"{self.feature.name} ({self.feature.featureArea} km², {self.feature.estimatedCapacity:g} AE)")
+
+        self.statusLabel.setStatus(self.feature.status)
 
         # Hide or show forms
         editing = self.status == EditStatus.Editing

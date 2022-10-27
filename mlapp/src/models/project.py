@@ -146,7 +146,7 @@ class Project(ProjectBase):
     @pyqtSlot()
     def openPaddockView(self):
         """Run method that loads and opens Paddock View."""
-        self.openView(PaddockView, Qt.LeftDockWidgetArea)
+        self.openView(PaddockView, Qt.BottomDockWidgetArea)
 
     @pyqtSlot()
     def openPipelineView(self):

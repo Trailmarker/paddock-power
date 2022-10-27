@@ -136,7 +136,7 @@ WaterpointTypeField = DomainField(
 
 AreaFeatureSchema = Schema([Fid, Name, Status, Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
 BoundarySchema = ReadOnlySchema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
-ConditionSchema = ReadOnlySchema([  # Fid,
+ConditionSchema = ReadOnlySchema([Fid,
     # Status,
     Area,
     CapacityPerArea,

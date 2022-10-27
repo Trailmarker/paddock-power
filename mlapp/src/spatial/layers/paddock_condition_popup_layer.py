@@ -58,6 +58,7 @@ inner join "Watered Areas"
 on st_intersects("{{1}}".geometry, "Watered Areas".geometry))
 select
 geometry,
+row_number() over (order by '') as "fid",
 {paddockId} as "Paddock",
 '{paddockName}' as "Paddock Name",
 '{paddockStatus}' as "Paddock Status",
@@ -106,3 +107,8 @@ where geometry is not null
             landSystemLayer,
             waterpointBufferLayer,
             conditionTable)
+
+        self.conditionTable = conditionTable
+
+    def wrapFeature(self, feature):
+        return Condition(self, self.conditionTable, feature)

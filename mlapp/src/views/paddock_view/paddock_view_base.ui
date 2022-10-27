@@ -1,70 +1,167 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>PaddockViewBase</class>
-  <widget class="QDockWidget" name="PaddockViewBase">
-    <property name="geometry">
-      <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>629</width>
-        <height>444</height>
-      </rect>
-    </property>
-    <property name="windowTitle">
-      <string>MLA Paddock Power | View Paddocks</string>
-    </property>
-    <widget class="QWidget" name="dockWidgetContents">
-      <layout class="QGridLayout">
-        <property name="sizeConstraint">
-          <enum>QLayout::SetMaximumSize</enum>
+ <class>PaddockViewBase</class>
+ <widget class="QDockWidget" name="PaddockViewBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>776</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <property name="windowTitle">
+   <string>MLA Paddock Power | Plan Paddocks</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="headerLayout">
+      <item>
+       <widget class="QToolButton" name="sketchPaddockButton">
+        <property name="toolTip">
+         <string>Sketch a Paddock …</string>
         </property>
-        <item row="1" column="0">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/new-split-paddock.png</normaloff>../../../images/new-split-paddock.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="toolbarSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="contentLayout" stretch="1,1">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QGroupBox" name="paddockListGroupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Paddocks</string>
+        </property>
+        <layout class="QVBoxLayout" name="paddocksVerticalLayout">
+         <item>
           <widget class="PaddockLayerList" name="paddockList"/>
-        </item>
-        <item row="2" column="0">
+         </item>
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-              <widget class="QLabel" name="paddockFilterLabel">
-                <property name="text">
-                  <string>Filter Paddocks by name</string>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <widget class="QLineEdit" name="paddockFilterLineEdit"/>
-            </item>
-            <item>
-              <widget class="QPushButton" name="clearPaddockFilterButton">
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="toolTip">
-                  <string>Clear Paddock Filter</string>
-                </property>
-                <property name="text">
-                  <string/>
-                </property>
-                <property name="icon">
-                  <iconset>
-                    <normaloff>../../../images/item-undo.png</normaloff>../../../images/item-undo.png</iconset>
-                </property>
-              </widget>
-            </item>
+           <item>
+            <widget class="QLabel" name="paddockFilterLabel">
+             <property name="text">
+              <string>Filter Paddocks by name</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="paddockFilterLineEdit"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="clearPaddockFilterButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Clear Paddock Filter</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>../../../images/item-undo.png</normaloff>../../../images/item-undo.png</iconset>
+             </property>
+            </widget>
+           </item>
           </layout>
-        </item>
-      </layout>
-    </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="conditionListGroupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Paddock Condition Records</string>
+        </property>
+        <layout class="QVBoxLayout" name="paddocksVerticalLayout_2">
+         <item>
+          <widget class="ConditionLayerList" name="conditionList"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
-  <customwidgets>
-    <customwidget>
-      <class>PaddockLayerList</class>
-      <extends>QListView</extends>
-      <header>mlapp/src/widgets/feature_list/paddock_layer_list</header>
-    </customwidget>
-  </customwidgets>
-  <resources/>
-  <connections/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PaddockLayerList</class>
+   <extends>QListView</extends>
+   <header>mlapp/src/widgets/feature_list/paddock_layer_list</header>
+  </customwidget>
+  <customwidget>
+   <class>ConditionLayerList</class>
+   <extends>QListWidget</extends>
+   <header>mlapp/src/widgets/feature_list/condition_layer_list</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
 </ui>

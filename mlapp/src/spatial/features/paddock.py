@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import pyqtSignal
+
 from qgis.core import QgsFeatureRequest, QgsProject
 
-from ...utils import qgsDebug
 from ..layers.condition_table import ConditionTable
+from ..layers.derived_layer import DerivedLayer
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_condition_popup_layer import PaddockConditionPopupLayer
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from ..schemas.schemas import EstimatedCapacity, PaddockSchema
+from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits
 from .feature_action import FeatureAction
@@ -14,6 +16,9 @@ from .feature_action import FeatureAction
 
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
+
+    popupLayerAdded = pyqtSignal(DerivedLayer)
+    popupLayerRemoved = pyqtSignal()
 
     @classmethod
     def twoPhaseRecalculate(self):
@@ -43,7 +48,7 @@ class Paddock(AreaFeature):
     def recalculate(self):
         super().recalculate()
 
-        conditionLayer = PaddockConditionPopupLayer(
+        recalculator = PaddockConditionPopupLayer(
             f"Paddock {self.id} Recalculate",
             self,
             self.featureLayer,
@@ -52,7 +57,7 @@ class Paddock(AreaFeature):
             self.conditionTable)
 
         request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-        conditions = [f for f in conditionLayer.getFeatures(request)]
+        conditions = [f for f in recalculator.getFeatures(request)]
 
         estimatedRaw = sum([c.estimatedCapacity for c in conditions])
         self.estimatedCapacity = round(estimatedRaw)
@@ -61,14 +66,13 @@ class Paddock(AreaFeature):
 
         # qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
 
-
     def addPopupLayer(self):
         """Add a condition layer to the project."""
         item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
         if not item:
             # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
             return
-        self.conditionLayer = PaddockConditionPopupLayer(
+        self.popupLayer = PaddockConditionPopupLayer(
             f"{self.name} Paddock Condition",
             self,
             self.featureLayer,
@@ -78,15 +82,17 @@ class Paddock(AreaFeature):
         group = item.parent()
 
         # Bit of a hack but it looks nicer if it's above the derived Boundary layer …
-        group.insertLayer(max(0, group.children().index(item) - 1), self.conditionLayer)
+        group.insertLayer(max(0, group.children().index(item) - 1), self.popupLayer)
+        self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
         try:
-            if self.conditionLayer:
-                layer = QgsProject.instance().layerTreeRoot().findLayer(self.conditionLayer)
+            if self.popupLayer:
+                layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)
                 if layer:
                     layer.parent().removeChildNode(layer)
-                self.conditionLayer = None
+                self.popupLayer = None
+                self.popuplayerRemoved.emit()
         except BaseException:
             pass
 

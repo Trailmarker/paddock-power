@@ -14,9 +14,9 @@ SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'
 CREATE TABLE "{tableName}" (
     "Paddock" INTEGER NOT NULL,
     "Land System" INTEGER NOT NULL,
-    "Waterpoint Buffer Type" TEXT NOT NULL,
+    "Watered" TEXT NOT NULL,
     "Condition" TEXT NOT NULL,
-    CONSTRAINT "Unique" PRIMARY KEY ("Paddock", "Land System", "Waterpoint Buffer Type")
+    CONSTRAINT "Unique" PRIMARY KEY ("Paddock", "Land System", "Watered")
 )
 """
 
@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS "{tableName}"
 
     GET_RECORD = """
 SELECT * FROM "{tableName}"
-WHERE "Paddock" = {paddockId} AND "Land System" = {landSystemId} AND "Waterpoint Buffer Type" = '{waterpointBufferType}'
+WHERE "Paddock" = {paddockId} AND "Land System" = {landSystemId} AND "Watered" = '{wateredType}'
     """
 
     GET_BY_PADDOCK = """
@@ -35,12 +35,12 @@ WHERE "Paddock" = {paddockId}
 """
 
     UPSERT = """
-INSERT INTO "{tableName}"("Paddock", "Land System", "Waterpoint Buffer Type", "Condition") VALUES({paddockId}, {landSystemId}, '{waterpointBufferType}', '{conditionType}')
-ON CONFLICT("Paddock", "Land System", "Waterpoint Buffer Type") DO UPDATE SET "Condition"='{conditionType}';
+INSERT INTO "{tableName}"("Paddock", "Land System", "Watered", "Condition") VALUES({paddockId}, {landSystemId}, '{wateredType}', '{conditionType}')
+ON CONFLICT("Paddock", "Land System", "Watered") DO UPDATE SET "Condition"='{conditionType}';
 """
 
     DELETE = """
-DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSystemId} AND "Waterpoint Buffer Type"='{waterpointBufferType}';
+DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSystemId} AND "Watered"='{wateredType}';
 """
 
     @classmethod
@@ -79,24 +79,24 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
     def name(self):
         return self.tableName
 
-    def getRecord(self, paddockId, landSystemId, waterpointBufferType):
+    def getRecord(self, paddockId, landSystemId, wateredType):
         with sqlite3.connect(self.gpkgFile) as conn:
             cursor = conn.execute(
                 self.GET_RECORD.format(
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landSystemId=landSystemId,
-                    waterpointBufferType=waterpointBufferType.name))
+                    wateredType=wateredType.name))
             return cursor.fetchone()
 
-    def getCondition(self, paddockId, landSystemId, waterpointBufferType):
+    def getCondition(self, paddockId, landSystemId, wateredType):
         with sqlite3.connect(self.gpkgFile) as conn:
             cursor = conn.execute(
                 self.GET_RECORD.format(
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landSystemId=landSystemId,
-                    waterpointBufferType=waterpointBufferType.name))
+                    wateredType=wateredType.name))
             row = cursor.fetchone()
             if row is None:
                 return ConditionType.A
@@ -108,21 +108,21 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
             cursor = conn.execute(self.GET_BY_PADDOCK.format(tableName=self.tableName, paddockId=paddockId))
             return cursor.fetchall()
 
-    def upsert(self, paddockId, landSystemId, waterpointBufferType, conditionType):
+    def upsert(self, paddockId, landSystemId, wateredType, conditionType):
         with sqlite3.connect(self.gpkgFile) as conn:
             conn.execute(
                 self.UPSERT.format(
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landSystemId=landSystemId,
-                    waterpointBufferType=waterpointBufferType.name,
+                    wateredType=wateredType.name,
                     conditionType=conditionType.name))
 
-    def delete(self, paddockId, landSystemId, waterpointBufferType):
+    def delete(self, paddockId, landSystemId, wateredType):
         with sqlite3.connect(self.gpkgFile) as conn:
             conn.execute(
                 self.DELETE.format(
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landSystemId=landSystemId,
-                    waterpointBufferType=waterpointBufferType.name))
+                    wateredType=wateredType.name))
