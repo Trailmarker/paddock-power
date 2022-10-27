@@ -5,7 +5,7 @@ from .derived_layer import DerivedLayer
 
 class PaddockConditionPopupLayer(DerivedLayer):
 
-    STYLE = "paddock_condition"
+    STYLE = "paddock_condition_popup"
 
     QUERY = """
 with "Paddock Condition" as
