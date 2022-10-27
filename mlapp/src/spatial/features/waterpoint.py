@@ -3,6 +3,7 @@ from qgis.core import QgsFeatureRequest, QgsProject
 
 from ...models.glitch import Glitch
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from ..layers.waterpoint_popup_layer import WaterpointPopupLayer
 from .edits import Edits
 from .feature_action import FeatureAction
 from .point_feature import PointFeature
@@ -26,6 +27,46 @@ class Waterpoint(PointFeature):
     @property
     def title(self):
         return f"Waterpoint ({self.id}) ({self.waterpointType})"
+
+    def addPopupLayer(self):
+        """Add a water buffer layer to the project."""
+        item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
+        if not item:
+            # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
+            return
+        self.popupLayer = WaterpointPopupLayer(
+            f"{self.waterpointType.value} {self.id} Watered Area",
+            self,
+            self.waterpointBufferLayer)
+        group = item.parent()
+
+        # Insert the buffers layer immediately below this waterpoint, so it and any neighbouring waterpoints
+        # remain visible.
+        group.insertLayer(group.children().index(item) + 1, self.popupLayer)
+
+    def removePopupLayer(self):
+        try:
+            if self.popupLayer:
+                layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)
+                if layer:
+                    layer.parent().removeChildNode(layer)
+                self.popupLayer = None
+        except BaseException:
+            pass
+
+    def onSelectFeature(self):
+        if super().onSelectFeature():
+            # Returning True from onSelectFeature() means that the feature was newly selected.
+            self.addPopupLayer()
+            return True
+        return False
+
+    def onDeselectFeature(self):
+        if super().onDeselectFeature():
+            # Returning False from onDeselectFeature() means that the feature was newly deselected.
+            self.removePopupLayer()
+            return True
+        return False
 
     @Glitch.glitchy()
     def getBuffer(self, distance):

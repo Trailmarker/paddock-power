@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject, QgsLayerTreeLayer
+from qgis.core import QgsProject
 
 from ..layers.condition_table import ConditionTable
 from ..layers.land_system_layer import LandSystemLayer
-from ..layers.paddock_condition_layer import PaddockConditionLayer
+from ..layers.paddock_condition_popup_layer import PaddockConditionPopupLayer
 from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
@@ -35,13 +35,13 @@ class Paddock(AreaFeature):
     def conditionRecordLayer(self):
         return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
 
-    def addConditionLayer(self):
+    def addPopupLayer(self):
         """Add a condition layer to the project."""
         item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
         if not item:
             # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
             return
-        self.conditionLayer = PaddockConditionLayer(
+        self.conditionLayer = PaddockConditionPopupLayer(
             f"{self.name} Paddock Condition",
             self,
             self.featureLayer,
@@ -53,74 +53,29 @@ class Paddock(AreaFeature):
         # Bit of a hack but it looks nicer if it's above the derived Boundary layer …
         group.insertLayer(max(0, group.children().index(item) - 1), self.conditionLayer)
 
+    def removePopupLayer(self):
+        try:
+            if self.conditionLayer:
+                layer = QgsProject.instance().layerTreeRoot().findLayer(self.conditionLayer)
+                if layer:
+                    layer.parent().removeChildNode(layer)
+                self.conditionLayer = None
+        except BaseException:
+            pass
+
     def onSelectFeature(self):
         if super().onSelectFeature():
             # Returning True from onSelectFeature() means that the feature was newly selected.
-            self.addConditionLayer()
+            self.addPopupLayer()
             return True
         return False
 
     def onDeselectFeature(self):
         if super().onDeselectFeature():
             # Returning False from onDeselectFeature() means that the feature was newly deselected.
-            try:
-                if self.conditionLayer:
-                    layer = QgsProject.instance().layerTreeRoot().findLayer(self.conditionLayer)
-                    if layer:
-                        layer.parent().removeChildNode(layer)
-                    self.conditionLayer = None
-            except BaseException:
-                pass
-            finally:
-                return True
+            self.removePopupLayer()
+            return True
         return False
-
-    # @Glitch.glitchy()
-    # def getConditionRecordsForPaddock(self):
-    #     paddockRequest = QgsFeatureRequest().setFilterExpression(
-    #         f'"{PADDOCK}" = {self.id}')
-
-    #     return list(self.conditionRecordLayer.getFeatures(paddockRequest))
-
-    # @Glitch.glitchy()
-    # def analyseConditionRecords(self):
-    #     """Get the land systems that intersect this paddock."""
-
-    #     landSystems = (self.landSystemLayer.getFeatures(self.geometry.boundingBox()))
-    #     near, far = self.waterpointBufferLayer.getNearAndFarBuffers()
-
-    #     overLandSystems = [record
-    #                        for landSystem in landSystems if landSystem.geometry.intersects(self.geometry)
-    # for record in
-    # OldConditionRecord.fromPaddockAndLandSystem(self.conditionRecordLayer,
-    # self, landSystem)]
-
-    #     overNearBuffer = [record for unwatered in overLandSystems
-    #                       for record in unwatered.overWaterpointBuffer(near)]
-
-    #     overFarBuffer = [record for unwatered in overLandSystems
-    #                      for record in unwatered.overWaterpointBuffer(far)]
-
-    #     return (overNearBuffer + overFarBuffer), self.getConditionRecordsForPaddock()
-
-    # def analyseFeature(self):
-    #     """Analyse the feature."""
-    #     super().recalculate() # Re-check the area and perimeter
-
-    #     edits = Edits()
-
-    #     conditionRecords, currentConditionRecords = self.analyseConditionRecords()
-
-    #     for record in conditionRecords:
-    #         record.recalculate()
-
-    #     self.estimatedCapacity = sum([record.estimatedCapacity for record in conditionRecords])
-    #     self.potentialCapacity = sum([record.potentialCapacity for record in conditionRecords])
-    #     self.capacityPerArea = self.estimatedCapacity / self.featureArea
-
-    #     edits.editBefore(Edits.delete(*currentConditionRecords))
-    #     edits.editBefore(Edits.upsert(*conditionRecords))
-    #     return edits
 
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):

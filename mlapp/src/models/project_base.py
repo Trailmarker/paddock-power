@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.spatial.layers.watered_area_layer import WateredAreaLayer
 from qgis.PyQt.QtCore import QObject
 
 from qgis.core import QgsProject
@@ -11,6 +10,7 @@ from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.land_system_layer import LandSystemLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
+from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
 from ..utils import resolveGeoPackageFile
