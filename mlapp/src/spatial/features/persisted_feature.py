@@ -23,9 +23,12 @@ class PersistedFeature(Feature):
             for field in self.getSchema():
                 fields.append(field)
             qgsFeature = QgsFeature(fields)
+            
+            # Need to call the superclass __init__ ASAP, otherwise PyQt complains
+            super().__init__(featureLayer, qgsFeature)
+            
             for field in self.getSchema():
                 field.setDefaultValue(self)
-            super().__init__(featureLayer, qgsFeature)
             self.clearId()
 
         elif isinstance(existingFeature, Feature):

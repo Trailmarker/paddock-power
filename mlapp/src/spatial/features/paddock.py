@@ -49,7 +49,9 @@ class Paddock(AreaFeature):
             self.waterpointBufferLayer,
             self.conditionTable)
         group = item.parent()
-        group.insertLayer(group.children().index(item), self.conditionLayer)
+
+        # Bit of a hack but it looks nicer if it's above the derived Boundary layer …
+        group.insertLayer(max(0, group.children().index(item) - 1), self.conditionLayer)
 
     def onSelectFeature(self):
         if super().onSelectFeature():

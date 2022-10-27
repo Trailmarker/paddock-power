@@ -7,23 +7,86 @@ class PaddockConditionLayer(DerivedLayer):
 
     STYLE = "paddock_condition"
 
+# (with 
+#   "Watered Areas" as
+#     (with
+# 		"Near" as
+# 			(select
+# 			 st_union(geometry) as "geometry",
+# 			 "Status"
+# 			 from "Waterpoint Buffers"
+# 			 where "Waterpoint Buffer Type" = 'Near'
+# 			 group by "Status")
+# 		, "Far" as
+# 			(select
+# 			 st_union(geometry) as "geometry",
+# 			 "Status"
+# 			 from "Waterpoint Buffers"
+# 			 where "Waterpoint Buffer Type" = 'Far'
+# 			 group by "Status")
+# 		, "Farm" as
+# 			(select st_union(geometry) as "geometry"
+# 			 from
+# 			 (select geometry from "Paddocks"
+# 			  union
+# 			  select geometry from "Waterpoint Buffers"))
+# 	 select "geometry", 'Near' as "Watered", "Status" 
+# 	 from "Near"
+# 	 union
+# 	 select st_difference("Far".geometry, "Near".geometry), 'Far' as "Watered", "Far"."Status"
+# 	 from "Far"
+# 	 inner join "Near"
+# 	 on "Far"."Status" = "Near"."Status"
+# 	 union
+# 	 select st_difference("Farm".geometry, "Far".geometry), 'Unwatered' as "Watered", "Far"."Status"
+# 	 from "Farm", "Far")
+# , "Paddock" as
+# 	 (select geometry from "Paddocks" where fid = 55)
+
+
     QUERY = """
 with "Paddock Condition" as
-(with "Watered Areas" as
-    (select
-     st_union(geometry) as "geometry",
-     "Waterpoint Buffer Type",
-     "Status"
-     from "{{2}}"
-     group by "Waterpoint Buffer Type", "Status"),
- "Paddock" as
+(with 
+  "Watered Areas" as
+    (with
+		"Near" as
+			(select
+			 st_union(geometry) as "geometry",
+			 "Status"
+			 from "{{2}}"
+			 where "Waterpoint Buffer Type" = 'Near'
+			 group by "Status")
+		, "Far" as
+			(select
+			 st_union(geometry) as "geometry",
+			 "Status"
+			 from "{{2}}"
+			 where "Waterpoint Buffer Type" = 'Far'
+			 group by "Status")
+		, "Farm" as
+			(select st_union(geometry) as "geometry"
+			 from
+			 (select geometry from "{{0}}"
+			  union
+			  select geometry from "{{2}}"))
+	 select "geometry", 'Near' as "Watered", "Status" 
+	 from "Near"
+	 union
+	 select st_difference("Far".geometry, "Near".geometry), 'Far' as "Watered", "Far"."Status"
+	 from "Far"
+	 inner join "Near"
+	 on "Far"."Status" = "Near"."Status"
+	 union
+	 select st_difference("Farm".geometry, "Far".geometry), 'Unwatered' as "Watered", "Far"."Status"
+	 from "Farm", "Far"),
+  "Paddock" as
 	(select geometry from "{{0}}" where fid = {paddockId})
 select
 st_intersection(st_intersection("Paddock".geometry, "{{1}}".geometry), "Watered Areas".geometry) as "geometry",
 "{{1}}".fid as "Land System",
 "{{1}}"."Name" as "Land System Name",
 "AE/km²" as "AE/km²",
-"Waterpoint Buffer Type",
+"Watered",
 "Watered Areas"."Status" as "Watered Area Status"
 from "Paddock"
 inner join "{{1}}"
@@ -39,13 +102,13 @@ select
 "Land System Name",
 "AE/km²",
 ifnull("{{3}}"."Condition", 'A') as "Condition",
-"Paddock Condition"."Waterpoint Buffer Type",
+"Paddock Condition"."Watered",
 "Watered Area Status"
 from
 "Paddock Condition" left outer join "{{3}}"
 on {paddockId} = "{{3}}"."Paddock"
 and "Paddock Condition"."Land System" = "{{3}}"."Land System"
-and "Paddock Condition"."Waterpoint Buffer Type" = "{{3}}"."Waterpoint Buffer Type"
+and "Paddock Condition"."Watered" = "{{3}}"."Waterpoint Buffer Type"
 """
 
 

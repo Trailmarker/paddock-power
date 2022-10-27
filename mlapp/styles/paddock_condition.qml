@@ -31,9 +31,9 @@
             <Option value="0,0" name="offset" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
             <Option value="MM" name="offset_unit" type="QString"/>
-            <Option value="35,35,35,255" name="outline_color" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
             <Option value="solid" name="outline_style" type="QString"/>
-            <Option value="0.26" name="outline_width" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
             <Option value="MM" name="outline_width_unit" type="QString"/>
             <Option value="solid" name="style" type="QString"/>
           </Option>
@@ -43,9 +43,9 @@
           <prop k="offset" v="0,0"/>
           <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="35,35,35,255"/>
+          <prop k="outline_color" v="255,255,0,255"/>
           <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width" v="0.66"/>
           <prop k="outline_width_unit" v="MM"/>
           <prop k="style" v="solid"/>
           <data_defined_properties>
@@ -73,9 +73,9 @@
             <Option value="0,0" name="offset" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
             <Option value="MM" name="offset_unit" type="QString"/>
-            <Option value="35,35,35,255" name="outline_color" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
             <Option value="solid" name="outline_style" type="QString"/>
-            <Option value="0.26" name="outline_width" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
             <Option value="MM" name="outline_width_unit" type="QString"/>
             <Option value="solid" name="style" type="QString"/>
           </Option>
@@ -85,9 +85,9 @@
           <prop k="offset" v="0,0"/>
           <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="35,35,35,255"/>
+          <prop k="outline_color" v="255,255,0,255"/>
           <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width" v="0.66"/>
           <prop k="outline_width_unit" v="MM"/>
           <prop k="style" v="solid"/>
           <data_defined_properties>
@@ -115,9 +115,9 @@
             <Option value="0,0" name="offset" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
             <Option value="MM" name="offset_unit" type="QString"/>
-            <Option value="35,35,35,255" name="outline_color" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
             <Option value="solid" name="outline_style" type="QString"/>
-            <Option value="0.26" name="outline_width" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
             <Option value="MM" name="outline_width_unit" type="QString"/>
             <Option value="solid" name="style" type="QString"/>
           </Option>
@@ -127,9 +127,9 @@
           <prop k="offset" v="0,0"/>
           <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="35,35,35,255"/>
+          <prop k="outline_color" v="255,255,0,255"/>
           <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width" v="0.66"/>
           <prop k="outline_width_unit" v="MM"/>
           <prop k="style" v="solid"/>
           <data_defined_properties>
@@ -157,9 +157,9 @@
             <Option value="0,0" name="offset" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
             <Option value="MM" name="offset_unit" type="QString"/>
-            <Option value="35,35,35,255" name="outline_color" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
             <Option value="solid" name="outline_style" type="QString"/>
-            <Option value="0.26" name="outline_width" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
             <Option value="MM" name="outline_width_unit" type="QString"/>
             <Option value="solid" name="style" type="QString"/>
           </Option>
@@ -169,9 +169,9 @@
           <prop k="offset" v="0,0"/>
           <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="35,35,35,255"/>
+          <prop k="outline_color" v="255,255,0,255"/>
           <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width" v="0.66"/>
           <prop k="outline_width_unit" v="MM"/>
           <prop k="style" v="solid"/>
           <data_defined_properties>
@@ -199,9 +199,9 @@
             <Option value="0,0" name="offset" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
             <Option value="MM" name="offset_unit" type="QString"/>
-            <Option value="35,35,35,255" name="outline_color" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
             <Option value="solid" name="outline_style" type="QString"/>
-            <Option value="0.26" name="outline_width" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
             <Option value="MM" name="outline_width_unit" type="QString"/>
             <Option value="solid" name="style" type="QString"/>
           </Option>
@@ -211,9 +211,9 @@
           <prop k="offset" v="0,0"/>
           <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="35,35,35,255"/>
+          <prop k="outline_color" v="255,255,0,255"/>
           <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width" v="0.66"/>
           <prop k="outline_width_unit" v="MM"/>
           <prop k="style" v="solid"/>
           <data_defined_properties>
@@ -359,7 +359,7 @@
         </config>
       </editWidget>
     </field>
-    <field name="Waterpoint Buffer Type" configurationFlags="None">
+    <field name="Watered" configurationFlags="None">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -382,7 +382,7 @@
     <alias name="" field="Land System Name" index="4"/>
     <alias name="" field="AE/km²" index="5"/>
     <alias name="" field="Condition" index="6"/>
-    <alias name="" field="Waterpoint Buffer Type" index="7"/>
+    <alias name="" field="Watered" index="7"/>
     <alias name="" field="Watered Area Status" index="8"/>
   </aliases>
   <defaults>
@@ -393,7 +393,7 @@
     <default field="Land System Name" expression="" applyOnUpdate="0"/>
     <default field="AE/km²" expression="" applyOnUpdate="0"/>
     <default field="Condition" expression="" applyOnUpdate="0"/>
-    <default field="Waterpoint Buffer Type" expression="" applyOnUpdate="0"/>
+    <default field="Watered" expression="" applyOnUpdate="0"/>
     <default field="Watered Area Status" expression="" applyOnUpdate="0"/>
   </defaults>
   <constraints>
@@ -404,7 +404,7 @@
     <constraint field="Land System Name" notnull_strength="0" constraints="0" unique_strength="0" exp_strength="0"/>
     <constraint field="AE/km²" notnull_strength="0" constraints="0" unique_strength="0" exp_strength="0"/>
     <constraint field="Condition" notnull_strength="0" constraints="0" unique_strength="0" exp_strength="0"/>
-    <constraint field="Waterpoint Buffer Type" notnull_strength="0" constraints="0" unique_strength="0" exp_strength="0"/>
+    <constraint field="Watered" notnull_strength="0" constraints="0" unique_strength="0" exp_strength="0"/>
     <constraint field="Watered Area Status" notnull_strength="0" constraints="0" unique_strength="0" exp_strength="0"/>
   </constraints>
   <constraintExpressions>
@@ -415,7 +415,7 @@
     <constraint exp="" field="Land System Name" desc=""/>
     <constraint exp="" field="AE/km²" desc=""/>
     <constraint exp="" field="Condition" desc=""/>
-    <constraint exp="" field="Waterpoint Buffer Type" desc=""/>
+    <constraint exp="" field="Watered" desc=""/>
     <constraint exp="" field="Watered Area Status" desc=""/>
   </constraintExpressions>
   <expressionfields/>
@@ -428,8 +428,8 @@
       <column name="Land System Name" type="field" hidden="0" width="-1"/>
       <column name="AE/km²" type="field" hidden="0" width="-1"/>
       <column name="Condition" type="field" hidden="0" width="-1"/>
-      <column name="Waterpoint Buffer Type" type="field" hidden="0" width="-1"/>
       <column name="Watered Area Status" type="field" hidden="0" width="-1"/>
+      <column name="Watered" type="field" hidden="0" width="-1"/>
       <column type="actions" hidden="1" width="-1"/>
     </columns>
   </attributetableconfig>
@@ -469,6 +469,7 @@ def my_form_open(dialog, layer, feature):
     <field name="Paddock" editable="1"/>
     <field name="Paddock Name" editable="1"/>
     <field name="Paddock Status" editable="1"/>
+    <field name="Watered" editable="1"/>
     <field name="Watered Area Status" editable="1"/>
     <field name="Waterpoint Buffer Type" editable="1"/>
   </editable>
@@ -480,6 +481,7 @@ def my_form_open(dialog, layer, feature):
     <field name="Paddock" labelOnTop="0"/>
     <field name="Paddock Name" labelOnTop="0"/>
     <field name="Paddock Status" labelOnTop="0"/>
+    <field name="Watered" labelOnTop="0"/>
     <field name="Watered Area Status" labelOnTop="0"/>
     <field name="Waterpoint Buffer Type" labelOnTop="0"/>
   </labelOnTop>
@@ -491,6 +493,7 @@ def my_form_open(dialog, layer, feature):
     <field name="Paddock" reuseLastValue="0"/>
     <field name="Paddock Name" reuseLastValue="0"/>
     <field name="Paddock Status" reuseLastValue="0"/>
+    <field name="Watered" reuseLastValue="0"/>
     <field name="Watered Area Status" reuseLastValue="0"/>
     <field name="Waterpoint Buffer Type" reuseLastValue="0"/>
   </reuseLastValue>

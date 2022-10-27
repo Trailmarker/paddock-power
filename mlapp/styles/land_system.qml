@@ -22,7 +22,7 @@
             <Option value="during_render" name="clip_mode" type="QString"/>
             <Option value="55,126,184,255" name="color" type="QString"/>
             <Option value="feature" name="coordinate_reference" type="QString"/>
-            <Option value="4" name="distance" type="QString"/>
+            <Option value="3.8" name="distance" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="distance_map_unit_scale" type="QString"/>
             <Option value="MM" name="distance_unit" type="QString"/>
             <Option value="0.26" name="line_width" type="QString"/>
@@ -38,7 +38,7 @@
           <prop k="clip_mode" v="during_render"/>
           <prop k="color" v="55,126,184,255"/>
           <prop k="coordinate_reference" v="feature"/>
-          <prop k="distance" v="4"/>
+          <prop k="distance" v="3.8"/>
           <prop k="distance_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="distance_unit" v="MM"/>
           <prop k="line_width" v="0.26"/>
@@ -143,9 +143,9 @@
             <Option value="MM" name="dash_pattern_offset_unit" type="QString"/>
             <Option value="0" name="draw_inside_polygon" type="QString"/>
             <Option value="bevel" name="joinstyle" type="QString"/>
-            <Option value="85,85,85,255" name="line_color" type="QString"/>
+            <Option value="35,35,35,255" name="line_color" type="QString"/>
             <Option value="solid" name="line_style" type="QString"/>
-            <Option value="0.26" name="line_width" type="QString"/>
+            <Option value="0.06" name="line_width" type="QString"/>
             <Option value="MM" name="line_width_unit" type="QString"/>
             <Option value="0" name="offset" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
@@ -171,9 +171,9 @@
           <prop k="dash_pattern_offset_unit" v="MM"/>
           <prop k="draw_inside_polygon" v="0"/>
           <prop k="joinstyle" v="bevel"/>
-          <prop k="line_color" v="85,85,85,255"/>
+          <prop k="line_color" v="35,35,35,255"/>
           <prop k="line_style" v="solid"/>
-          <prop k="line_width" v="0.26"/>
+          <prop k="line_width" v="0.06"/>
           <prop k="line_width_unit" v="MM"/>
           <prop k="offset" v="0"/>
           <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>

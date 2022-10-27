@@ -67,6 +67,7 @@ class Feature(QObject):
 
     def selectFeature(self):
         """Select the Feature."""
+        self.featureLayer.removeSelection()
         self.featureLayer.select(self.id)
         
     def onSelectFeature(self):

@@ -4,6 +4,7 @@ from qgis.core import QgsWkbTypes
 from .condition_type import ConditionType
 from .feature_status import FeatureStatus
 from .field import DomainField, IdField, MeasureField, StringField
+from .watered_type import WateredType
 from .waterpoint_buffer_type import WaterpointBufferType
 from .waterpoint_type import WaterpointType
 
@@ -70,6 +71,7 @@ PERIMETER = "Perimeter (km)"
 POTENTIAL_CAPACITY = "Potential AE"
 REFERENCE = "Reference"
 STATUS = "Status"
+WATERED_TYPE = "Watered"
 WATERPOINT = "Waterpoint"
 WATERPOINT_BUFFER_TYPE = "Waterpoint Buffer Type"
 WATERPOINT_END_MONTH = "Waterpoint End Month"
@@ -109,6 +111,7 @@ Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER)
 PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY)
 Reference = StringField(propertyName="reference", name=REFERENCE)
 Status = DomainField(propertyName="status", name=STATUS, domainType=FeatureStatus, defaultValue=FeatureStatus.Undefined)
+WateredTypeField = DomainField(propertyName="wateredType", name=WATERED_TYPE, domainType=WateredType, defaultValue=WateredType.Unwatered)
 Waterpoint = IdField(propertyName="waterpoint", name=WATERPOINT)
 WaterpointBufferTypeField = DomainField(
     propertyName="waterpointBufferType",
@@ -166,7 +169,7 @@ StatusFeatureSchema = Schema([Fid, Name, Status])
 WaterpointBufferSchema = Schema(
     [Fid, Name, Status, Waterpoint, WaterpointBufferTypeField, BufferDistance],
     wkbType=QgsWkbTypes.MultiPolygon)
-WateredAreaSchema = ReadOnlySchema([Fid, WaterpointBufferTypeField, Status], wkbType=QgsWkbTypes.MultiPolygon)
+WateredAreaSchema = ReadOnlySchema([Fid, WateredTypeField, Status], wkbType=QgsWkbTypes.MultiPolygon)
 WaterpointSchema = Schema([Fid,
                            Name,
                            Status,

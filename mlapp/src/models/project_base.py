@@ -36,8 +36,6 @@ class ProjectBase(QObject):
         self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName,
                                                self.waterpointBufferLayer,
                                                self.elevationLayer)
-        wateredAreaLayerName = f"Watered Areas"
-        self.wateredAreaLayer = WateredAreaLayer(wateredAreaLayerName, self.waterpointBufferLayer)
         pipelineLayerName = f"Pipelines"
         self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
@@ -51,7 +49,10 @@ class ProjectBase(QObject):
             self.landSystemLayer,
             self.waterpointBufferLayer,
             self.conditionTable)
-        
+
+        wateredAreaLayerName = f"Watered Areas"
+        self.wateredAreaLayer = WateredAreaLayer(wateredAreaLayerName, self.paddockLayer, self.waterpointBufferLayer)
+
         fenceLayerName = f"Fences"
         self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
@@ -79,8 +80,8 @@ class ProjectBase(QObject):
         # Hide Waterpoint Buffers
         # self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
-        self.boundaryLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
+        self.boundaryLayer.addToMap(group)
         self.paddockLayer.addToMap(group)
         self.elevationLayer.addToMap(group)
 
