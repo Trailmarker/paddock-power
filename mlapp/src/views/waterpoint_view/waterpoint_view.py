@@ -22,7 +22,6 @@ class WaterpointView(ViewBase, FORM_CLASS):
         self.setupUi(self)
 
         self.waterpointList.featureLayer = self.project.waterpointLayer
-        self.waterpointList.featureZoomed.connect(self.project.zoomFeature)
         self.sketchWaterpointButton.clicked.connect(self.sketchWaterpoint)
 
     def sketchWaterpoint(self):

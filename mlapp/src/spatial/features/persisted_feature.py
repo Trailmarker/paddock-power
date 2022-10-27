@@ -12,6 +12,7 @@ from ..schemas.schemas import PersistedFeatureSchema
 class PersistedFeature(Feature):
     featureUpdated = pyqtSignal()
     featureDeleted = pyqtSignal()
+    featureSelected = pyqtSignal()
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Feature."""

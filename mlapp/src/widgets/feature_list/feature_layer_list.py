@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import pyqtSlot
+
 from qgis.core import QgsProject
 
 from .feature_list_base import FeatureListBase
@@ -22,7 +24,8 @@ class FeatureLayerList(FeatureListBase):
     def featureLayer(self, featureLayer):
         """Set the Project."""
         self._featureLayerId = featureLayer.id() if featureLayer else None
-        self.featureLayer.editsPersisted.connect(self.refreshUi)
+        self.featureLayer.selectionChanged.connect(self.onSelectionChanged)
+        self.featureLayer.featuresPersisted.connect(self.refreshUi)
         self.refreshUi()
 
     def getFeatures(self):
@@ -31,3 +34,10 @@ class FeatureLayerList(FeatureListBase):
             return [feature for feature in self.featureLayer.getFeaturesByStatus(*self.featureLayer.displayFilter)]
         else:
             return []
+
+    def onSelectionChanged(self, selected, deselected, clearAndSelect):
+        """Handle selection changes."""
+        if selected and len(selected) == 1:
+            self.onSelectFeature(selected[0])
+        else:
+            self.clearSelection()

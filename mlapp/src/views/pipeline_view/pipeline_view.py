@@ -22,7 +22,6 @@ class PipelineView(ViewBase, FORM_CLASS):
         self.setupUi(self)
 
         self.pipelineList.featureLayer = self.project.pipelineLayer
-        self.pipelineList.featureZoomed.connect(self.project.zoomFeature)
         self.profileDetails.setProject(self.project)
 
         self.sketchPipelineButton.clicked.connect(self.sketchPipeline)

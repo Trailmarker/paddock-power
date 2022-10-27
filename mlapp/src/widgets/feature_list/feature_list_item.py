@@ -9,12 +9,7 @@ from .feature_tool_bar import FeatureToolBar
 
 
 class FeatureListItem(QWidget):
-    featureZoomed = pyqtSignal(PersistedFeature)
     layoutRefreshNeeded = pyqtSignal()
-
-    # Editing signals
-    plan = pyqtSignal()
-    undoPlan = pyqtSignal()
 
     def __init__(self, feature, parent=None):
         super().__init__(parent)
@@ -40,9 +35,7 @@ class FeatureListItem(QWidget):
             FeatureAction.plan,
             ':/plugins/mlapp/images/delete-project.png',
             lambda _: self.feature.trashFeature())
-        self.toolBar.addZoomAction()
-
-        self.toolBar.featureZoomed.connect(lambda f: self.featureZoomed.emit(f))
+        self.toolBar.addSelectAction()
 
         self.layout = QHBoxLayout()
         self.layout.setSpacing(0)

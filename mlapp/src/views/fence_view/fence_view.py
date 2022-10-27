@@ -22,7 +22,6 @@ class FenceView(ViewBase, FORM_CLASS):
         self.setupUi(self)
 
         self.fenceList.featureLayer = self.project.fenceLayer
-        self.fenceList.featureZoomed.connect(self.project.zoomFeature)
         self.fencePaddockChanges.setProject(self.project)
         self.profileDetails.setProject(self.project)
 

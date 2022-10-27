@@ -7,10 +7,10 @@ from ..features.edits import Edits
 from ..features.waterpoint_buffer import WaterpointBuffer
 from ..schemas.waterpoint_buffer_type import WaterpointBufferType
 from ..schemas.schemas import WATERPOINT, WATERPOINT_BUFFER_TYPE
-from .feature_layer import FeatureLayer
+from .persisted_feature_layer import PersistedFeatureLayer
 
 
-class WaterpointBufferLayer(FeatureLayer):
+class WaterpointBufferLayer(PersistedFeatureLayer):
 
     # STYLE = "waterpoint_buffer_new_2"
     @classmethod
@@ -54,7 +54,7 @@ class WaterpointBufferLayer(FeatureLayer):
 
         return nearBuffer, farBuffer
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     def analyseFeatures(self):
         edits = Edits()
 

@@ -28,8 +28,6 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         """Set the Project."""
         self.project = project
         self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
-        self.supersededPaddockMiniList.featureZoomed.connect(self.project.zoomFeature)
-        self.plannedPaddockMiniList.featureZoomed.connect(self.project.zoomFeature)
         self.refreshUi()
 
     @pyqtSlot(PersistedFeature)

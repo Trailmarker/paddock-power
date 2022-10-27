@@ -5,8 +5,6 @@ from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsProject
 
 from ..spatial.layers.condition_table import ConditionTable
-from ..spatial.layers.condition_layer import ConditionLayer
-from ..spatial.layers.old_condition_record_layer import OldConditionRecordLayer
 from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.fence_layer import FenceLayer
@@ -45,17 +43,15 @@ class ProjectBase(QObject):
                                            self.elevationLayer)
         landSystemLayerName = "Land Systems"
         self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
-        conditionRecordLayerName = f"Paddock Condition"
-        self.oldConditionRecordLayer = OldConditionRecordLayer(self.gpkgFile, conditionRecordLayerName)
+        self.conditionTable = ConditionTable(self.gpkgFile, "Condition Table")
         paddockLayerName = f"Paddocks"
         self.paddockLayer = PaddockLayer(
             self.gpkgFile,
             paddockLayerName,
             self.landSystemLayer,
             self.waterpointBufferLayer,
-            self.oldConditionRecordLayer)
-        self.conditionTable = ConditionTable(self.gpkgFile, "Condition Table")
-        self.conditionLayer = ConditionLayer(conditionRecordLayerName, self.paddockLayer, self.landSystemLayer, self.waterpointBufferLayer, self.conditionTable)
+            self.conditionTable)
+        
         fenceLayerName = f"Fences"
         self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
@@ -84,11 +80,7 @@ class ProjectBase(QObject):
         # self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
-        self.conditionLayer.addToMap(group)
-        # Hide Old Condition Records
-        # self.oldConditionRecordLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
-        self.landSystemLayer.setVisible(group, False)
         self.paddockLayer.addToMap(group)
         self.elevationLayer.addToMap(group)
 

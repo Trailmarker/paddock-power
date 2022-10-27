@@ -5,6 +5,7 @@ from re import finditer
 from qgis.core import QgsFeature, QgsProject
 
 from ...models.glitch import Glitch
+from ...utils import qgsInfo
 from ..schemas.schemas import FeatureSchema
 
 
@@ -46,8 +47,10 @@ class Feature(QObject):
             raise Glitch(
                 f"{self.__class__.__name__}.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
 
+        self._selected = False
         self._featureLayerId = featureLayer.id()
-
+        self.featureLayer.selectionChanged.connect(self.onSelectionChanged)
+        
     def __repr__(self):
         """Return a string representation of the Feature."""
         return f"{self.__class__.__name__}(id={self.id})"
@@ -56,6 +59,32 @@ class Feature(QObject):
         """Convert the Feature to a string representation."""
         return repr(self)
 
+    def onSelectionChanged(self, selected, deselected, clearAndSelect):
+        if not self._selected and self.id in selected and len(selected) == 1:
+            self.onSelectFeature()
+        elif self._selected and self.id not in selected:
+            self.onDeselectFeature()        
+
+    def selectFeature(self):
+        """Select the Feature."""
+        self.featureLayer.select(self.id)
+        
+    def onSelectFeature(self):
+        """Called when the Feature is selected."""
+        if not self._selected:
+            qgsInfo(f"Selecting {self}")
+            self._selected = True
+            return True
+        return False
+
+    def onDeselectFeature(self):
+        """Called when the Feature is deselected."""
+        if self._selected:
+            qgsInfo(f"Deselecting {self}")
+            self._selected = False
+            return True
+        return False
+        
     @property
     def featureLayer(self):
         """Return the FeatureLayer that contains this Feature."""

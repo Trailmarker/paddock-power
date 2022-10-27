@@ -18,7 +18,6 @@ class PaddockView(ViewBase, FORM_CLASS):
         self.setupUi(self)
 
         self.paddockList.featureLayer = self.project.paddockLayer
-        self.paddockList.featureZoomed.connect(self.project.zoomFeature)
 
         self.paddockFilterLineEdit.textChanged.connect(
             self.onPaddockFilterChanged)

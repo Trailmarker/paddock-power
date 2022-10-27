@@ -7,16 +7,16 @@ from ..spatial.features.pipeline import Pipeline
 from ..spatial.features.persisted_feature import PersistedFeature
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
-from ..spatial.layers.feature_layer import FeatureLayer
+from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..tools.map_tool import MapTool
 from ..utils import qgsDebug
 from ..views.fence_view.fence_view import FenceView
 from ..views.paddock_view.paddock_view import PaddockView
 from ..views.pipeline_view.pipeline_view import PipelineView
 from ..views.waterpoint_view.waterpoint_view import WaterpointView
-from ..widgets.fence_details.fence_selection import FenceSelection
-from ..widgets.paddock_details.paddock_selection import PaddockSelection
-from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
+# from ..widgets.fence_details.fence_selection import FenceSelection
+# from ..widgets.paddock_details.paddock_selection import PaddockSelection
+# from ..widgets.pipeline_details.pipeline_selection import PipelineSelection
 from .glitch import Glitch
 from .project_base import ProjectBase
 
@@ -29,7 +29,6 @@ class Project(ProjectBase):
 
     # emit this signal when a selected Feature is updated
     selectedFeatureChanged = pyqtSignal(PersistedFeature)
-    projectDataChanged = pyqtSignal()
     projectUnloading = pyqtSignal()
 
     def __init__(self, iface, gpkgFile=None, projectName=None):
@@ -53,9 +52,17 @@ class Project(ProjectBase):
 
         self.views = {}
 
-        for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer]:
-            layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
-            layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
+        self.selectedFeatureChanged.connect(self.zoomFeature)
+
+        self.pipelineLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.pipelineLayer, selection))
+        self.fenceLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.fenceLayer, selection))
+        self.paddockLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.paddockLayer, selection))
+        self.waterpointLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.waterpointLayer, selection))
+
+
+        # for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer, self.waterpointLayer]:
+        #     layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
+            # layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
 
     @property
     def selectedFence(self):
@@ -90,12 +97,12 @@ class Project(ProjectBase):
             self.currentTool = None
 
     def selectFeature(self, feature):
-        if feature is not None and not isinstance(feature, PersistedFeature):
-            raise Glitch(
-                "You can't select an object that is not a Feature")
+        # if feature is not None and not isinstance(feature, Feature):
+        #     raise Glitch(
+        #         "You can't select an object that is not a Feature")
         # qgsDebug("Selecting feature: {}".format(feature))
 
-        self.selectedFeatures[type(feature)] = feature
+        self.selectedFeatures[feature.__class__.__name__] = feature
         self.selectedFeatureChanged.emit(feature)
 
     @pyqtSlot()
@@ -115,7 +122,6 @@ class Project(ProjectBase):
 
     @pyqtSlot(PersistedFeature)
     def zoomFeature(self, feature):
-        self.selectFeature(feature)
 
         if feature.geometry:
             featureExtent = QgsRectangle(feature.geometry.boundingBox())
@@ -123,11 +129,11 @@ class Project(ProjectBase):
             self.iface.mapCanvas().setExtent(featureExtent)
             self.iface.mapCanvas().refresh()
 
-    @pyqtSlot(FeatureLayer, list)
+    @pyqtSlot(PersistedFeatureLayer, list)
     def onLayerSelectionChanged(self, layer, selection):
         if len(selection) == 1:
-            feature = layer.getFeatureById(selection[0])
-            qgsDebug(f"onLayerSelectionChanged: {feature or 'None'}")
+            feature = layer.getFeature(selection[0])
+            qgsDebug(f"onLayerSelectionChanged: {layer.__class__.__name__} {feature or 'None'}")
             if feature is not None:
                 self.selectFeature(feature)
 

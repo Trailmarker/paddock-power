@@ -4,10 +4,10 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsCategorizedSymbolRenderer
 
 from ..schemas.feature_status import FeatureStatus
-from .feature_layer import FeatureLayer
+from .persisted_feature_layer import PersistedFeatureLayer
 
 
-class StatusFeatureLayer(FeatureLayer):
+class StatusFeatureLayer(PersistedFeatureLayer):
 
     displayFilterChanged = pyqtSignal(list)
 

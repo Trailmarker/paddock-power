@@ -21,7 +21,7 @@ class Pipeline(LineFeature):
         """Return True for Pipeline."""
         return True
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.plan.handler()
     def planFeature(self, geometry):
         """Plan a Pipeline."""
@@ -30,7 +30,7 @@ class Pipeline(LineFeature):
 
         return Edits.upsert(self)
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.undoPlan.handler()
     def undoPlanFeature(self):
         """Undo planning a Pipeline."""

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from urllib.parse import quote
 
-from ..layers.readonly_feature_layer import ReadOnlyFeatureLayer
+from .feature_layer import FeatureLayer
 
 
-class DerivedLayer(ReadOnlyFeatureLayer):
+class DerivedLayer(FeatureLayer):
 
     @staticmethod
     def formatLayerClause(featureLayer):

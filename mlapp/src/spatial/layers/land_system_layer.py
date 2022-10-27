@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from ..features.land_system import LandSystem
-from .feature_layer import FeatureLayer
+from .persisted_feature_layer import PersistedFeatureLayer
 
 
-class LandSystemLayer(FeatureLayer):
+class LandSystemLayer(PersistedFeatureLayer):
 
-    # STYLE = "land_system"
+    STYLE = "land_system"
 
     @classmethod
     def getFeatureType(cls):
@@ -14,4 +14,4 @@ class LandSystemLayer(FeatureLayer):
     def __init__(self, gpkgFile, layerName):
         super().__init__(gpkgFile,
                          layerName,
-                         styleName=None)
+                         styleName=LandSystemLayer.STYLE)

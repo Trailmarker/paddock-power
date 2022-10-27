@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProject
 
-from ..features.edits import Edits
 from ..features.paddock import Paddock
-from .old_condition_record_layer import OldConditionRecordLayer
+from .condition_table import ConditionTable
 from .land_system_layer import LandSystemLayer
 from .status_feature_layer import StatusFeatureLayer
 from .waterpoint_buffer_layer import WaterpointBufferLayer
@@ -18,15 +17,15 @@ class PaddockLayer(StatusFeatureLayer):
         return Paddock
 
     def __init__(self, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
-                 waterpointBufferLayer: WaterpointBufferLayer, conditionRecordLayer: OldConditionRecordLayer):
+                 waterpointBufferLayer: WaterpointBufferLayer, conditionTable: ConditionTable):
         """Create or open a Paddock layer."""
 
         super().__init__(gpkgFile, layerName, styleName=PaddockLayer.STYLE)
 
         self._landSystemLayerId = landSystemLayer.id()
         self._waterpointBufferLayerId = waterpointBufferLayer.id()
-        self._conditionRecordLayerId = conditionRecordLayer.id()
-
+        self.conditionTable = conditionTable
+        
     @property
     def landSystemLayer(self):
         return QgsProject.instance().mapLayer(self._landSystemLayerId)
@@ -35,18 +34,14 @@ class PaddockLayer(StatusFeatureLayer):
     def waterpointBufferLayer(self):
         return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
 
-    @property
-    def conditionRecordLayer(self):
-        return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
-
     def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.landSystemLayer, self.waterpointBufferLayer, self.conditionRecordLayer, feature)
+        return self.getFeatureType()(self, self.landSystemLayer, self.waterpointBufferLayer, self.conditionTable, feature)
 
-    @Edits.persistEdits
-    def analyseFeatures(self):
-        edits = Edits()
+    # @Edits.persistFeatures
+    # def analyseFeatures(self):
+    #     edits = Edits()
 
-        for paddock in self.getFeatures():
-            edits.editBefore(paddock.analyseFeature())
+    #     for paddock in self.getFeatures():
+    #         edits.editBefore(paddock.analyseFeature())
         
-        return edits
+    #     return edits

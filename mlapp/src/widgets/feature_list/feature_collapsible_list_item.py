@@ -11,7 +11,6 @@ from ..state_tool_bar import StateToolBar
 
 
 class FeatureCollapsibleListItem(QWidget, EditStateMachine):
-    featureZoomed = pyqtSignal(PersistedFeature)
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, DetailsWidget, EditWidget, parent=None):
@@ -42,7 +41,7 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.toolBar.addGenericAction(
             ':/plugins/mlapp/images/paddock-zoom.png',
             f"Zoom to {self.feature.displayName()}",
-            lambda *_: self.zoomFeature())
+            lambda *_: self.selectFeature())
 
         self.collapse = Collapse(self)
         self.collapse.setContentLayout(self.collapseLayout)
@@ -102,9 +101,9 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
 
-    def zoomFeature(self):
+    def selectFeature(self):
         """Select this Fence and zoom to it."""
-        self.featureZoomed.emit(self.feature)
+        self.feature.selectFeature()
 
     def sizeHint(self):
         """Return the size of the widget."""

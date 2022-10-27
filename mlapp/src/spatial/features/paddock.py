@@ -1,86 +1,124 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.spatial.layers.watered_area_layer import WateredAreaLayer
-from qgis.core import QgsFeatureRequest, QgsProject
+from qgis.core import QgsProject, QgsLayerTreeLayer
 
-from ...models.glitch import Glitch
-from ..layers.old_condition_record_layer import OldConditionRecordLayer
+from ..layers.condition_table import ConditionTable
 from ..layers.land_system_layer import LandSystemLayer
-from ..layers.watered_area_layer import WateredAreaLayer
+from ..layers.paddock_condition_layer import PaddockConditionLayer
+from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
-from .old_condition_record import OldConditionRecord
 from .edits import Edits
 from .feature_action import FeatureAction
-from ..schemas.schemas import PADDOCK, PaddockSchema
 
 
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
 
-    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wataredAreaLayer: WateredAreaLayer, 
-                 conditionRecordLayer: OldConditionRecordLayer, existingFeature=None):
+    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, waterpointBufferLayer: WaterpointBufferLayer,
+                 conditionTable: ConditionTable, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
         self._landSystemLayerId = landSystemLayer.id()
-        self._wateredAreaLayerId = wataredAreaLayer.id()
-        self._conditionRecordLayerId = conditionRecordLayer.id()
+        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        self.conditionTable = conditionTable
 
     @property
     def landSystemLayer(self):
         return QgsProject.instance().mapLayer(self._landSystemLayerId)
 
     @property
-    def wataredAreaLayer(self):
-        return QgsProject.instance().mapLayer(self._wateredAreaLayerId)
+    def waterpointBufferLayer(self):
+        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
 
     @property
     def conditionRecordLayer(self):
         return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
 
-    @Glitch.glitchy()
-    def getConditionRecordsForPaddock(self):
-        paddockRequest = QgsFeatureRequest().setFilterExpression(
-            f'"{PADDOCK}" = {self.id}')
-        
-        return list(self.conditionRecordLayer.getFeatures(paddockRequest))
+    def addConditionLayer(self):
+        """Add a condition layer to the project."""
+        item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
+        if not item:
+            # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
+            return
+        self.conditionLayer = PaddockConditionLayer(
+            f"{self.name} Paddock Condition",
+            self,
+            self.featureLayer,
+            self.landSystemLayer,
+            self.waterpointBufferLayer,
+            self.conditionTable)
+        group = item.parent()
+        group.insertLayer(group.children().index(item), self.conditionLayer)
 
-    @Glitch.glitchy()
-    def analyseConditionRecords(self):
-        """Get the land systems that intersect this paddock."""
+    def onSelectFeature(self):
+        if super().onSelectFeature():
+            # Returning True from onSelectFeature() means that the feature was newly selected.
+            self.addConditionLayer()
+            return True
+        return False
 
-        landSystems = (self.landSystemLayer.getFeatures(self.geometry.boundingBox()))
-        near, far = self.waterpointBufferLayer.getNearAndFarBuffers()
+    def onDeselectFeature(self):
+        if super().onDeselectFeature():
+            # Returning False from onDeselectFeature() means that the feature was newly deselected.
+            try:
+                if self.conditionLayer:
+                    layer = QgsProject.instance().layerTreeRoot().findLayer(self.conditionLayer)
+                    if layer:
+                        layer.parent().removeChildNode(layer)
+                    self.conditionLayer = None
+            except BaseException:
+                pass
+            finally:
+                return True
+        return False
 
-        overLandSystems = [record 
-                           for landSystem in landSystems if landSystem.geometry.intersects(self.geometry)
-                           for record in OldConditionRecord.fromPaddockAndLandSystem(self.conditionRecordLayer, self, landSystem)]
+    # @Glitch.glitchy()
+    # def getConditionRecordsForPaddock(self):
+    #     paddockRequest = QgsFeatureRequest().setFilterExpression(
+    #         f'"{PADDOCK}" = {self.id}')
 
-        overNearBuffer = [record for unwatered in overLandSystems 
-                          for record in unwatered.overWaterpointBuffer(near)]
+    #     return list(self.conditionRecordLayer.getFeatures(paddockRequest))
 
-        overFarBuffer = [record for unwatered in overLandSystems 
-                         for record in unwatered.overWaterpointBuffer(far)]
+    # @Glitch.glitchy()
+    # def analyseConditionRecords(self):
+    #     """Get the land systems that intersect this paddock."""
 
-        return (overNearBuffer + overFarBuffer), self.getConditionRecordsForPaddock()
-   
-    def analyseFeature(self):
-        """Analyse the feature."""
-        super().recalculate() # Re-check the area and perimeter
-        
-        edits = Edits()
+    #     landSystems = (self.landSystemLayer.getFeatures(self.geometry.boundingBox()))
+    #     near, far = self.waterpointBufferLayer.getNearAndFarBuffers()
 
-        conditionRecords, currentConditionRecords = self.analyseConditionRecords()
+    #     overLandSystems = [record
+    #                        for landSystem in landSystems if landSystem.geometry.intersects(self.geometry)
+    # for record in
+    # OldConditionRecord.fromPaddockAndLandSystem(self.conditionRecordLayer,
+    # self, landSystem)]
 
-        for record in conditionRecords:
-            record.recalculate()
+    #     overNearBuffer = [record for unwatered in overLandSystems
+    #                       for record in unwatered.overWaterpointBuffer(near)]
 
-        self.estimatedCapacity = sum([record.estimatedCapacity for record in conditionRecords])
-        self.potentialCapacity = sum([record.potentialCapacity for record in conditionRecords])
-        self.capacityPerArea = self.estimatedCapacity / self.featureArea
+    #     overFarBuffer = [record for unwatered in overLandSystems
+    #                      for record in unwatered.overWaterpointBuffer(far)]
 
-        edits.editBefore(Edits.delete(*currentConditionRecords))
-        edits.editBefore(Edits.upsert(*conditionRecords))
-        return edits
+    #     return (overNearBuffer + overFarBuffer), self.getConditionRecordsForPaddock()
+
+    # def analyseFeature(self):
+    #     """Analyse the feature."""
+    #     super().recalculate() # Re-check the area and perimeter
+
+    #     edits = Edits()
+
+    #     conditionRecords, currentConditionRecords = self.analyseConditionRecords()
+
+    #     for record in conditionRecords:
+    #         record.recalculate()
+
+    #     self.estimatedCapacity = sum([record.estimatedCapacity for record in conditionRecords])
+    #     self.potentialCapacity = sum([record.potentialCapacity for record in conditionRecords])
+    #     self.capacityPerArea = self.estimatedCapacity / self.featureArea
+
+    #     edits.editBefore(Edits.delete(*currentConditionRecords))
+    #     edits.editBefore(Edits.upsert(*conditionRecords))
+    #     return edits
 
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):

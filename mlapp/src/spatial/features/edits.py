@@ -47,7 +47,7 @@ class Edits:
             yield
             for layer in layers:
                 layer.commitChanges()
-                layer.editsPersisted.emit()
+                layer.featuresPersisted.emit()
         except Exception as e:
             for layer in layers:
                 layer.rollBack()
@@ -74,7 +74,7 @@ class Edits:
             raise e
 
     @staticmethod
-    def persistEdits(method):
+    def persistFeatures(method):
         """Decorator that takes a method returning an Edits object of edits to persist,
         and returns a method that instead persists the edits and returns None."""
         def methodWithPersistEdits(feature, *args, **kwargs):

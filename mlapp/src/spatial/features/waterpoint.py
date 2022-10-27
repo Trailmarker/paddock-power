@@ -45,7 +45,7 @@ class Waterpoint(PointFeature):
         waterpointRequest = QgsFeatureRequest().setFilterExpression(f'"{WATERPOINT}" = {self.id}')
         return list(self.waterpointBufferLayer.getFeatures(request=waterpointRequest))
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.draft.handler()
     def draftFeature(self, point):
         """Draft a Waterpoint."""
@@ -57,7 +57,7 @@ class Waterpoint(PointFeature):
 
         return Edits.upsert(self)
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.plan.handler()
     def planFeature(self):
         """Plan a Waterpoint."""
@@ -75,7 +75,7 @@ class Waterpoint(PointFeature):
 
         return edits.editAfter(Edits.upsert(self))
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.undoPlan.handler()
     def undoPlanFeature(self):
         """Undo the plan of Waterpoint Buffers implied by a Waterpoint."""

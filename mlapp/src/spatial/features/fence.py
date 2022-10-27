@@ -2,7 +2,7 @@
 from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsProject, QgsPointXY, QgsRectangle
 
 from ...models.glitch import Glitch
-from ..layers.feature_layer import QGSWKB_TYPES
+from ..layers.persisted_feature_layer import QGSWKB_TYPES
 from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
 from .edits import Edits
@@ -185,7 +185,7 @@ class Fence(LineFeature):
         return ([f for f in paddocks if f.status.match(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded)],
                 [f for f in paddocks if f.status == FeatureStatus.Planned])
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry):
         """Draft a Fence."""
@@ -227,7 +227,7 @@ class Fence(LineFeature):
 
         return Edits.upsert(self).editBefore(edits)
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.plan.handler()
     def planFeature(self):
         """Plan the Paddocks that would be altered after building this Fence."""
@@ -294,7 +294,7 @@ class Fence(LineFeature):
         # self.paddockLayer now rolls back
         return Edits.upsert(self).editAfter(edits)
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.undoPlan.handler()
     def undoPlanFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""

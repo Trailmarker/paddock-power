@@ -27,7 +27,7 @@ class StatusFeature(PersistedFeature, FeatureStateMachine):
     #     """Return the Feature's title."""
     #     f"{self.name}"
 
-    @Edits.persistEdits
+    @Edits.persistFeatures
     @FeatureAction.trash.handler()
     def trashFeature(self):
         """Trash a Draft Feature."""
