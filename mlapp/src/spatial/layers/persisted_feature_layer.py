@@ -107,7 +107,8 @@ class PersistedFeatureLayer(QgsVectorLayer):
 
         if missingFields:
             # Start editing to to expand the schema
-            qgsInfo(f"Expanding schema for {self.__class__.__name__} to include {str([f.name() for f in missingFields])} …")
+            qgsInfo(
+                f"Expanding schema for {self.__class__.__name__} to include {str([f.name() for f in missingFields])} …")
             self.startEditing()
             self.dataProvider().addAttributes(missingFields)
             self.commitChanges()

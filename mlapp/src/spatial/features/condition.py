@@ -9,4 +9,3 @@ class Condition(Feature):
     def __init__(self, featureLayer, existingFeature):
         """Create a new Boundary."""
         super().__init__(featureLayer, existingFeature)
-

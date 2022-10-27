@@ -44,7 +44,7 @@ class Paddock(AreaFeature):
             self.featureLayer,
             self.landSystemLayer,
             self.waterpointBufferLayer,
-            self.conditionTable)   
+            self.conditionTable)
 
         request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
 

@@ -5,6 +5,7 @@ from .feature_action import FeatureAction
 from ..schemas.schemas import StatusFeatureSchema
 from .feature_state_machine import FeatureStateMachine
 
+
 @StatusFeatureSchema.addSchema()
 class StatusFeature(PersistedFeature, FeatureStateMachine):
 

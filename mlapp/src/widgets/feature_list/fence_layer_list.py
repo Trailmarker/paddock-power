@@ -11,5 +11,3 @@ class FenceLayerList(FeatureLayerList):
         def listItemFactory(fence): return FeatureListItem(fence)
 
         super().__init__(listItemFactory, parent)
-
-    

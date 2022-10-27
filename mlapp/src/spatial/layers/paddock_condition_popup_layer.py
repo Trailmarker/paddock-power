@@ -9,7 +9,7 @@ class PaddockConditionPopupLayer(DerivedLayer):
 
     QUERY = """
 with "Paddock Condition" as
-(with 
+(with
   "Watered Areas" as
     (with
 		"Near" as
@@ -32,7 +32,7 @@ with "Paddock Condition" as
 			 (select geometry from "{{0}}"
 			  union
 			  select geometry from "{{2}}"))
-	 select "geometry", 'Near' as "Watered", "Status" 
+	 select "geometry", 'Near' as "Watered", "Status"
 	 from "Near"
 	 union
 	 select st_difference("Far".geometry, "Near".geometry), 'Far' as "Watered", "Far"."Status"
@@ -70,7 +70,7 @@ geometry,
 "Condition",
 "Watered",
 "Watered Area Status"
-from 
+from
 	(select
 	 "Paddock Condition".geometry,
 	 "Paddock Condition"."Land System",
@@ -88,18 +88,21 @@ from
 where geometry is not null
 """
 
-
-
-
     def getFeatureType(cls):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Condition
 
     def __init__(self, layerName, paddock, paddockLayer, landSystemLayer, waterpointBufferLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
-        query = PaddockConditionPopupLayer.QUERY.format(paddockId = paddock.id,
-                                                               paddockName = paddock.name,
-                                                               paddockStatus = paddock.status)
+        query = PaddockConditionPopupLayer.QUERY.format(paddockId=paddock.id,
+                                                        paddockName=paddock.name,
+                                                        paddockStatus=paddock.status)
 
-        super().__init__(layerName, query, PaddockConditionPopupLayer.STYLE, paddockLayer, landSystemLayer, waterpointBufferLayer, conditionTable)
-
+        super().__init__(
+            layerName,
+            query,
+            PaddockConditionPopupLayer.STYLE,
+            paddockLayer,
+            landSystemLayer,
+            waterpointBufferLayer,
+            conditionTable)

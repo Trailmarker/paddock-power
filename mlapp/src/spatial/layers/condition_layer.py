@@ -61,12 +61,6 @@ and "Paddock Condition"."Waterpoint Buffer Type" = "{3}"."Waterpoint Buffer Type
 
 """
 
-
-
-
-
-
-
     QUERY = """
 with
 "Paddock Land Systems" as
@@ -111,8 +105,11 @@ on st_intersects("Watered Areas".geometry, "Paddock Land Systems".geometry)
         return Condition
 
     def __init__(self, layerName, paddockLayer, landSystemLayer, waterpointBufferLayer, conditionTable):
-        super().__init__(layerName, ConditionLayer.ALTERNATIVE_QUERY, None, paddockLayer, landSystemLayer, waterpointBufferLayer, conditionTable)
-
-
-
-        
+        super().__init__(
+            layerName,
+            ConditionLayer.ALTERNATIVE_QUERY,
+            None,
+            paddockLayer,
+            landSystemLayer,
+            waterpointBufferLayer,
+            conditionTable)

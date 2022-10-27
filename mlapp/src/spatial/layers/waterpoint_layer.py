@@ -35,6 +35,5 @@ class WaterpointLayer(StatusFeatureLayer):
     def elevationLayer(self):
         return QgsProject.instance().mapLayer(self._elevationLayerId)
 
-
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.waterpointBufferLayer, self.elevationLayer, feature)

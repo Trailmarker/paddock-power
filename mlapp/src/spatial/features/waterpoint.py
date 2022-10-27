@@ -75,7 +75,7 @@ class Waterpoint(PointFeature):
     @FeatureAction.plan.handler()
     def planFeature(self):
         """Plan a Waterpoint."""
-   
+
         return Edits.upsert(self)
 
     @Edits.persistFeatures

@@ -7,7 +7,6 @@ class WateredAreaLayer(DerivedLayer):
 
     STYLE = "watered_area"
 
-
     QUERY = """
 with
   "Near" as
@@ -30,7 +29,7 @@ with
 	 (select geometry from "{0}"
 	  union
 	  select geometry from "{1}"))
-select "geometry", 'Near' as "Watered", "Status" 
+select "geometry", 'Near' as "Watered", "Status"
 from "Near"
 union
 select st_difference("Far".geometry, "Near".geometry), 'Far' as "Watered", "Far"."Status"

@@ -50,15 +50,18 @@ class Project(ProjectBase):
 
         self.selectedFeatureChanged.connect(self.zoomFeature)
 
-        self.pipelineLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.pipelineLayer, selection))
-        self.fenceLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.fenceLayer, selection))
-        self.paddockLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.paddockLayer, selection))
-        self.waterpointLayer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(self.waterpointLayer, selection))
-
+        self.pipelineLayer.selectionChanged.connect(lambda selection, *
+                                                    _: self.onLayerSelectionChanged(self.pipelineLayer, selection))
+        self.fenceLayer.selectionChanged.connect(lambda selection, *
+                                                 _: self.onLayerSelectionChanged(self.fenceLayer, selection))
+        self.paddockLayer.selectionChanged.connect(lambda selection, *
+                                                   _: self.onLayerSelectionChanged(self.paddockLayer, selection))
+        self.waterpointLayer.selectionChanged.connect(lambda selection, *
+                                                      _: self.onLayerSelectionChanged(self.waterpointLayer, selection))
 
         # for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer, self.waterpointLayer]:
         #     layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
-            # layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
+        # layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
 
     @property
     def selectedFence(self):

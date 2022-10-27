@@ -9,7 +9,7 @@ class ConditionTable:
     EXISTS = """
 SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'
 """
-   
+
     CREATE = """
 CREATE TABLE "{tableName}" (
     "Paddock" INTEGER NOT NULL,
@@ -65,7 +65,6 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
         """Delete a ConditionTable from the GeoPackage file."""
         with sqlite3.connect(gpkgFile) as conn:
             conn.execute(cls.DROP.format(tableName=layerName))
-
 
     def __init__(self, gpkgFile, tableName):
         # If not found, create

@@ -11,4 +11,3 @@ class PipelineLayerList(FeatureLayerList):
         def listItemFactory(pipeline): return FeatureListItem(pipeline)
 
         super().__init__(listItemFactory, parent)
-

@@ -49,7 +49,7 @@ class Feature(QObject):
         self._selected = False
         self._featureLayerId = featureLayer.id()
         self.featureLayer.selectionChanged.connect(self.onSelectionChanged)
-        
+
     def __repr__(self):
         """Return a string representation of the Feature."""
         return f"{self.__class__.__name__}(id={self.id})"
@@ -63,14 +63,14 @@ class Feature(QObject):
         if not self._selected and self.id in selected and len(selected) == 1:
             self.onSelectFeature()
         elif self._selected and (self.id not in selected or self.id in deselected):
-            self.onDeselectFeature()        
+            self.onDeselectFeature()
 
     def selectFeature(self):
         """Select the Feature."""
         # qgsDebug(f"{self}.selectFeature()")
         # self.featureLayer.removeSelection()
         self.featureLayer.selectByIds([self.id], QgsVectorLayer.SetSelection)
-        
+
     def onSelectFeature(self):
         """Called when the Feature is selected."""
         if not self._selected:
@@ -86,7 +86,7 @@ class Feature(QObject):
             self._selected = False
             return True
         return False
-        
+
     @property
     def featureLayer(self):
         """Return the FeatureLayer that contains this Feature."""
