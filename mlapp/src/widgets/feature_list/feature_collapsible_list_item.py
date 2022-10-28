@@ -81,7 +81,7 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
     def refreshUi(self):
         # Set title to paddock name with some details
         self.collapse.setTitle(
-            f"{self.feature.name} ({self.feature.featureArea} km², {self.feature.estimatedCapacity:g} AE)")
+            f"{self.feature.name} ({self.feature.featureArea:.2f} km², ~{self.feature.estimatedCapacity:.0f} AE)")
 
         self.conditionTypeLabel.setConditionType(self.feature.conditionType)
 

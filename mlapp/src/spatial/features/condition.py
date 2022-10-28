@@ -17,7 +17,7 @@ class Condition(Feature):
 
     @property
     def name(self):
-        return f"{'Unknown Land System'} ({self.wateredType.value})"
+        return f"{self.landSystemName} (Watered: {self.wateredType.value})"
 
     def upsertCondition(self, conditionType):
         """Update the Condition table."""
