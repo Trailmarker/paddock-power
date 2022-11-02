@@ -10,6 +10,7 @@ from ..spatial.features.pipeline import Pipeline
 from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME
+from ..views.feature_view.feature_view import FeatureView
 from ..views.fence_view.fence_view import FenceView
 from ..views.paddock_view.paddock_view import PaddockView
 from ..views.pipeline_view.pipeline_view import PipelineView
@@ -137,6 +138,11 @@ class Project(ProjectBase):
             self.views[viewType] = view
             self.iface.addDockWidget(dockArea, view)
             view.show()
+
+    @pyqtSlot()
+    def openFeatureView(self):
+        """Run method that loads and opens the Feature View."""
+        self.openView(FeatureView, Qt.BottomDockWidgetArea)
 
     @pyqtSlot()
     def openFenceView(self):

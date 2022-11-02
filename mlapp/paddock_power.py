@@ -101,29 +101,36 @@ class PaddockPower(QObject):
             callback=lambda *_: self.createProject(),
             parent=self.iface.mainWindow())
 
-        self.addAction(
-            QIcon(":/plugins/mlapp/images/paddock.png"),
-            text=u"View Paddocks",
-            callback=self.openPaddockView,
-            parent=self.iface.mainWindow())
+        # self.addAction(
+        #     QIcon(":/plugins/mlapp/images/paddock.png"),
+        #     text=u"View Paddocks",
+        #     callback=self.openPaddockView,
+        #     parent=self.iface.mainWindow())
 
+        # self.addAction(
+        #     QIcon(":/plugins/mlapp/images/split-paddock.png"),
+        #     text=u"Plan Fences",
+        #     callback=self.openFenceView,
+        #     parent=self.iface.mainWindow())
+
+        # self.addAction(
+        #     QIcon(":/plugins/mlapp/images/split-paddock.png"),
+        #     text=u"Plan Pipelines",
+        #     callback=self.openPipelineView,
+        #     parent=self.iface.mainWindow())
+
+        # self.addAction(
+        #     QIcon(":/plugins/mlapp/images/split-paddock.png"),
+        #     text=u"Plan Waterpoints",
+        #     callback=self.openWaterpointView,
+        #     parent=self.iface.mainWindow())
+        
         self.addAction(
             QIcon(":/plugins/mlapp/images/split-paddock.png"),
-            text=u"Plan Fences",
-            callback=self.openFenceView,
+            text=u"Open MLA Paddock Power",
+            callback=self.openFeatureView,
             parent=self.iface.mainWindow())
 
-        self.addAction(
-            QIcon(":/plugins/mlapp/images/split-paddock.png"),
-            text=u"Plan Pipelines",
-            callback=self.openPipelineView,
-            parent=self.iface.mainWindow())
-
-        self.addAction(
-            QIcon(":/plugins/mlapp/images/split-paddock.png"),
-            text=u"Plan Waterpoints",
-            callback=self.openWaterpointView,
-            parent=self.iface.mainWindow())
 
         self.detectProject()
 
@@ -199,8 +206,9 @@ class PaddockPower(QObject):
                     self.project = Project(self.iface, gpkgFile)
                 else:
                     qgsInfo(f"{PLUGIN_NAME} no GeoPackage file located …")
-        except BaseException:
-            qgsInfo(f"{PLUGIN_NAME} exception occurred detecting project …")
+        except BaseException as e:
+            qgsInfo(f"{PLUGIN_NAME} exception occurred detecting project:")
+            qgsInfo(f"{e}")
             pass
 
         if self.project is not None:
@@ -244,6 +252,10 @@ class PaddockPower(QObject):
             qgsInfo(f"{PLUGIN_NAME} unloading project …")
             self.project.unload()
             self.project = None
+
+    def openFeatureView(self):
+        if self.project is not None:
+            self.project.openFeatureView()
 
     def openFenceView(self):
         if self.project is not None:

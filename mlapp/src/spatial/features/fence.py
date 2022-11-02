@@ -3,7 +3,6 @@ from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, Q
 
 from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME
-from ..layers.persisted_feature_layer import QGSWKB_TYPES
 from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
 from .edits import Edits
