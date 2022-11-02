@@ -19,13 +19,13 @@ class PaddockLayer(StatusFeatureLayer):
         return Paddock
 
     def __init__(self, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
-                 waterpointBufferLayer: WaterpointBufferLayer, conditionTable: ConditionTable):
+                 conditionTable: ConditionTable):
         """Create or open a Paddock layer."""
 
         super().__init__(gpkgFile, layerName, styleName=PaddockLayer.STYLE)
 
         self._landSystemLayerId = landSystemLayer.id()
-        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        self._waterpointBufferLayerId = None
         self.conditionTable = conditionTable
 
     @property
@@ -34,7 +34,11 @@ class PaddockLayer(StatusFeatureLayer):
 
     @property
     def waterpointBufferLayer(self):
-        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId) if self._waterpointBufferLayerId else None
+
+    @waterpointBufferLayer.setter
+    def waterpointBufferLayer(self, waterpointBufferLayer):
+        self._waterpointBufferLayerId = waterpointBufferLayer.id()
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.landSystemLayer, self.waterpointBufferLayer, self.conditionTable, feature)

@@ -31,27 +31,31 @@ class ProjectBase(QObject):
         if elevationLayerName is not None:
             self.elevationLayer = ElevationLayer(self.gpkgFile, elevationLayerName)
 
-        waterpointLayerName = f"Waterpoints"
-        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
-        waterpointBufferLayerName = f"Waterpoint Buffers"
-        self.waterpointBufferLayer = WaterpointBufferLayer(waterpointBufferLayerName, self.waterpointLayer)
-
-        # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
-        self.waterpointLayer.waterpointBufferLayer = self.waterpointBufferLayer
-
         pipelineLayerName = f"Pipelines"
         self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
+        
         landSystemLayerName = "Land Systems"
         self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
+
+        waterpointLayerName = f"Waterpoints"
+        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
+
         self.conditionTable = ConditionTable(self.gpkgFile, "Condition Table")
         paddockLayerName = f"Paddocks"
         self.paddockLayer = PaddockLayer(
             self.gpkgFile,
             paddockLayerName,
             self.landSystemLayer,
-            self.waterpointBufferLayer,
             self.conditionTable)
+
+        waterpointBufferLayerName = f"Waterpoint Buffers"
+        self.waterpointBufferLayer = WaterpointBufferLayer(waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
+
+        # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
+        # Same goes for Paddocks and Waterpoint Buffers
+        self.waterpointLayer.waterpointBufferLayer = self.waterpointBufferLayer
+        self.paddockLayer.waterpointBufferLayer = self.waterpointBufferLayer
 
         wateredAreaLayerName = f"Watered Areas"
         self.wateredAreaLayer = WateredAreaLayer(wateredAreaLayerName, self.paddockLayer, self.waterpointBufferLayer)
