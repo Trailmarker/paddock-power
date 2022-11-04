@@ -60,8 +60,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../../../images/new-fence.png</normaloff>../../../images/new-fence.png</iconset>
+         <iconset resource="../../../resources.qrc">
+          <normaloff>:/plugins/mlapp/images/new-fence.png</normaloff>:/plugins/mlapp/images/new-fence.png</iconset>
         </property>
        </widget>
       </item>
@@ -74,8 +74,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../../../images/new-pipeline.png</normaloff>../../../images/new-pipeline.png</iconset>
+         <iconset resource="../../../resources.qrc">
+          <normaloff>:/plugins/mlapp/images/new-pipeline.png</normaloff>:/plugins/mlapp/images/new-pipeline.png</iconset>
         </property>
        </widget>
       </item>
@@ -88,8 +88,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../../../images/new-waterpoint.png</normaloff>../../../images/new-waterpoint.png</iconset>
+         <iconset resource="../../../resources.qrc">
+          <normaloff>:/plugins/mlapp/images/new-waterpoint.png</normaloff>:/plugins/mlapp/images/new-waterpoint.png</iconset>
         </property>
        </widget>
       </item>

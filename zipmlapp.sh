@@ -8,7 +8,9 @@ cd deployment
 
 # remove bare image files—these are encoded in resources.py anyway
 cp mlapp/images/icon.png mlapp/icon.png
-# rm -rf mlapp/images
+rm -rf mlapp/images
+
+find . -name "*.qss" | xargs rm -f
 
 # zip up the MLA Paddock Power plug-in directory only into a datestamped archive
 7z a -r "../mlapp-$(date +'%Y%m%d').zip" mlapp
