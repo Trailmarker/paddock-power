@@ -7,6 +7,8 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from qgis.core import QgsGeometry
 
+from ...spatial.features.persisted_feature import PersistedFeature
+from ...spatial.features.pipeline import Pipeline
 from ...tools.sketch_line_tool import SketchLineTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -26,14 +28,33 @@ class PipelineWidget(QWidget, FORM_CLASS):
         self.pipelineList.featureLayer = self.project.pipelineLayer
         self.profileDetails.setProject(self.project)
 
+        self.profileGroupBox.hide()
+
+        # self.splitter.setSizes([self.pipelineListGroupBox.sizeHint().width(), 0])
+        self.splitter.setCollapsible(0, False)
+        self.splitter.setCollapsible(1, False)
+        self.splitter.setCollapsible(2, True)
+
+        self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
         tool = SketchLineTool(self.project)
         tool.sketchFinished.connect(self.onSketchPipelineFinished)
         self.project.setTool(tool)
 
+    @pyqtSlot(PersistedFeature)
+    def onSelectedFeatureChanged(self, feature):
+        """Handle a change to the selected Fence."""
+        if isinstance(feature, Pipeline):
+            self.profileGroupBox.show()
+            self.splitter.setSizes([self.fenceList.sizeHint().width(), self.profileGroupBox.sizeHint().width(), self.fencePaddockChanges.sizeHint().width()])
+        else:
+            self.profileGroupBox.hide()
+
     @pyqtSlot(QgsGeometry)
     def onSketchPipelineFinished(self, sketchLine):
         pipeline = self.project.pipelineLayer.makeFeature()
         pipeline.planFeature(sketchLine)
         self.project.selectFeature(pipeline)
+

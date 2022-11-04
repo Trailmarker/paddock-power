@@ -25,6 +25,11 @@ class PaddockWidget(QWidget, FORM_CLASS):
 
         self.paddockList.featureLayer = self.project.paddockLayer
 
+        # self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(), self.conditionListGroupBox.sizeHint().width()])
+        self.splitter.setCollapsible(0, False)
+        self.splitter.setCollapsible(1, False)
+        self.splitter.setCollapsible(2, True)
+
         self.paddockList.popupLayerAdded.connect(self.setConditionLayer)
         self.paddockList.popupLayerRemoved.connect(self.clearConditionLayer)
 

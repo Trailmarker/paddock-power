@@ -31,13 +31,14 @@ class FenceWidget(QWidget, FORM_CLASS):
 
         self.profileGroupBox.hide()
 
-        self.splitter.setSizes([self.fenceList.sizeHint().width(), 0, self.fencePaddockChanges.sizeHint().width()])
+        # self.splitter.setSizes([self.fenceListGroupBox.sizeHint().width(), 0, self.fencePaddockChanges.sizeHint().width()])
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)
         self.splitter.setCollapsible(2, False)
         self.splitter.setCollapsible(3, True)
 
         self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+    
 
     def sketchFence(self):
         """Sketch and analyse a new Fence."""

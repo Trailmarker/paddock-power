@@ -25,6 +25,10 @@ class WaterpointWidget(QWidget, FORM_CLASS):
 
         self.waterpointList.featureLayer = self.project.waterpointLayer
 
+        # self.splitter.setSizes([self.waterpointListGroupBox.sizeHint().width()])
+        self.splitter.setCollapsible(0, False)
+        self.splitter.setCollapsible(1, True)
+
     def sketchWaterpoint(self):
         """Sketch and analyse a new Fence."""
         tool = SketchPointTool(self.project)

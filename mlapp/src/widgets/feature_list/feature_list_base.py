@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem
+from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem, QSizePolicy
 
 
 class FeatureListBase(QListWidget):
@@ -15,6 +15,8 @@ class FeatureListBase(QListWidget):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setSizeAdjustPolicy(QListWidget.AdjustToContents)
+
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
 
     def filterByName(self, filter):
         """Filter the Feature list by name."""
