@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import QHBoxLayout, QLabel, QSizePolicy, QWidget
 
 from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.feature_action import FeatureAction
-from ..feature_status_label import FeatureStatusLabel
+from ..feature_status_label.feature_status_label import FeatureStatusLabel
 from .feature_tool_bar import FeatureToolBar
 
 
@@ -25,15 +25,15 @@ class FeatureListItem(QWidget):
 
         self.toolBar.addStateAction(
             FeatureAction.undoPlan,
-            ':/plugins/mlapp/images/item-undo.png',
+            ':/plugins/mlapp/images/undo-plan-feature.png',
             lambda _: self.feature.undoPlanFeature())
         self.toolBar.addStateAction(
             FeatureAction.plan,
-            ':/plugins/mlapp/images/item-edit.png',
+            ':/plugins/mlapp/images/plan-feature.png',
             lambda _: self.feature.planFeature())
         self.toolBar.addStateAction(
-            FeatureAction.plan,
-            ':/plugins/mlapp/images/delete-project.png',
+            FeatureAction.trash,
+            ':/plugins/mlapp/images/trash-feature.png',
             lambda _: self.feature.trashFeature())
         self.toolBar.addSelectAction()
 
@@ -52,7 +52,7 @@ class FeatureListItem(QWidget):
 
     def refreshUi(self):
         """Refresh the UI based on the current state of the fence."""
-        self.statusLabel.setStatus(self.feature.status)
+        self.statusLabel.status = self.feature.status
         self.titleLabel.setText(self.feature.title)
         self.toolBar.refreshUi()
 

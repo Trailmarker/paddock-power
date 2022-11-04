@@ -13,7 +13,7 @@ class Collapse(QWidget):
         self.toggleButton = QToolButton(
             text="", checkable=True, checked=False
         )
-        self.toggleButton.setStyleSheet("QToolButton { border: none; }")
+        self.toggleButton.setProperty("class", "no-border")
         self.toggleButton.setToolButtonStyle(
             Qt.ToolButtonTextBesideIcon
         )

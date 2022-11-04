@@ -9,12 +9,8 @@ from ..spatial.features.persisted_feature import PersistedFeature
 from ..spatial.features.pipeline import Pipeline
 from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..tools.map_tool import MapTool
-from ..utils import PLUGIN_NAME
+from ..utils import PLUGIN_NAME, qgsDebug
 from ..views.feature_view.feature_view import FeatureView
-from ..views.fence_view.fence_view import FenceView
-from ..views.paddock_view.paddock_view import PaddockView
-from ..views.pipeline_view.pipeline_view import PipelineView
-from ..views.waterpoint_view.waterpoint_view import WaterpointView
 from .glitch import Glitch
 from .project_base import ProjectBase
 
@@ -41,12 +37,6 @@ class Project(ProjectBase):
             Paddock: None,
             Pipeline: None
         }
-
-        canvas = self.iface.mapCanvas()
-
-        # self.paddockSelection = PaddockSelection(self, canvas)
-        # self.pipelineSelection = PipelineSelection(self, canvas)
-        # self.fenceSelection = FenceSelection(self, canvas)
 
         self.views = {}
 
@@ -143,26 +133,6 @@ class Project(ProjectBase):
     def openFeatureView(self):
         """Run method that loads and opens the Feature View."""
         self.openView(FeatureView, Qt.BottomDockWidgetArea)
-
-    @pyqtSlot()
-    def openFenceView(self):
-        """Run method that loads and opens Plan Fences and Pipelines."""
-        self.openView(FenceView, Qt.BottomDockWidgetArea)
-
-    @pyqtSlot()
-    def openPaddockView(self):
-        """Run method that loads and opens Paddock View."""
-        self.openView(PaddockView, Qt.BottomDockWidgetArea)
-
-    @pyqtSlot()
-    def openPipelineView(self):
-        """Run method that loads and opens Plan Fences and Pipelines."""
-        self.openView(PipelineView, Qt.BottomDockWidgetArea)
-
-    @pyqtSlot()
-    def openWaterpointView(self):
-        """Run method that loads and opens Plan Fences and Pipelines."""
-        self.openView(WaterpointView, Qt.BottomDockWidgetArea)
 
     @pyqtSlot()
     def onCloseView(self, viewType):

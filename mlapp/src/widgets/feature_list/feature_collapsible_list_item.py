@@ -3,9 +3,9 @@ from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ..collapse.collapse import Collapse
-from ..condition_type_label import ConditionTypeLabel
+from ..condition_type_label.condition_type_label import ConditionTypeLabel
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
-from ..state_tool_bar import StateToolBar
+from ..state_tool_bar.state_tool_bar import StateToolBar
 
 
 class FeatureCollapsibleListItem(QWidget, EditStateMachine):
@@ -30,14 +30,14 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
 
         self.toolBar = StateToolBar(self)
 
-        self.toolBar.addStateAction(EditAction.edit, ':/plugins/mlapp/images/item-edit.png', lambda *_: self.editItem())
+        self.toolBar.addStateAction(EditAction.edit, ':/plugins/mlapp/images/edit-item.png', lambda *_: self.editItem())
         self.toolBar.addStateAction(
             EditAction.cancelEdit,
-            ':/plugins/mlapp/images/item-undo.png',
+            ':/plugins/mlapp/images/cancel-edit-item.png',
             lambda *_: self.cancelEditItem())
-        self.toolBar.addStateAction(EditAction.save, ':/plugins/mlapp/images/item-save.png', lambda *_: self.saveItem())
+        self.toolBar.addStateAction(EditAction.save, ':/plugins/mlapp/images/save-item.png', lambda *_: self.saveItem())
         self.toolBar.addGenericAction(
-            ':/plugins/mlapp/images/paddock-zoom.png',
+            ':/plugins/mlapp/images/zoom-item.png',
             f"Zoom to {self.feature.displayName()}",
             lambda *_: self.selectFeature())
 

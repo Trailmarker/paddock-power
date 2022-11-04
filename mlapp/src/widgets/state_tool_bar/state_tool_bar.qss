@@ -1,0 +1,8 @@
+StateToolBar { 
+    padding: 3; 
+}
+
+StateToolBar QToolButton::indicator {
+    height: 20;
+    width: 20;
+}

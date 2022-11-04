@@ -13,7 +13,7 @@ from .resources_rc import *
 from .src.models.glitch import Glitch
 from .src.models.project import Project
 from .src.provider import Provider
-from .src.utils import guiError, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_NAME
+from .src.utils import guiError, qgsDebug, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
@@ -90,48 +90,23 @@ class PaddockPower(QObject):
         self.actions = []
 
         self.addAction(
-            QIcon(":/plugins/mlapp/images/sparkling-star.png"),
+            QIcon(":/plugins/mlapp/images/paddock-power.png"),
+            text=f"Open {PLUGIN_NAME} …",
+            callback=self.openFeatureView,
+            parent=self.iface.mainWindow())
+
+        self.addAction(
+            QIcon(":/plugins/mlapp/images/refresh-paddock-power.png"),
             text= f"Refresh {PLUGIN_NAME} Project …",
             callback=lambda *_: self.detectProject(),
             parent=self.iface.mainWindow())
 
         self.addAction(
-            QIcon(":/plugins/mlapp/images/new-project.png"),
+            QIcon(":/plugins/mlapp/images/new-paddock-power.png"),
             text= f"Create {PLUGIN_NAME} Project …",
             callback=lambda *_: self.createProject(),
             parent=self.iface.mainWindow())
-
-        # self.addAction(
-        #     QIcon(":/plugins/mlapp/images/paddock.png"),
-        #     text=u"View Paddocks",
-        #     callback=self.openPaddockView,
-        #     parent=self.iface.mainWindow())
-
-        # self.addAction(
-        #     QIcon(":/plugins/mlapp/images/split-paddock.png"),
-        #     text=u"Plan Fences",
-        #     callback=self.openFenceView,
-        #     parent=self.iface.mainWindow())
-
-        # self.addAction(
-        #     QIcon(":/plugins/mlapp/images/split-paddock.png"),
-        #     text=u"Plan Pipelines",
-        #     callback=self.openPipelineView,
-        #     parent=self.iface.mainWindow())
-
-        # self.addAction(
-        #     QIcon(":/plugins/mlapp/images/split-paddock.png"),
-        #     text=u"Plan Waterpoints",
-        #     callback=self.openWaterpointView,
-        #     parent=self.iface.mainWindow())
-        
-        self.addAction(
-            QIcon(":/plugins/mlapp/images/split-paddock.png"),
-            text=u"Open MLA Paddock Power",
-            callback=self.openFeatureView,
-            parent=self.iface.mainWindow())
-
-
+    
         self.detectProject()
 
     # Override Glitch type exceptions application-wide
@@ -194,6 +169,7 @@ class PaddockPower(QObject):
     #@Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
     def detectProject(self, _=None):
         f"""Detect a {PLUGIN_NAME} Project in the current QGIS project."""
+
         self.project = None
         try:
             projectFile = resolveProjectFile()
@@ -209,7 +185,6 @@ class PaddockPower(QObject):
         except BaseException as e:
             qgsInfo(f"{PLUGIN_NAME} exception occurred detecting project:")
             qgsInfo(f"{e}")
-            pass
 
         if self.project is not None:
             self.project.addToMap()
@@ -256,19 +231,3 @@ class PaddockPower(QObject):
     def openFeatureView(self):
         if self.project is not None:
             self.project.openFeatureView()
-
-    def openFenceView(self):
-        if self.project is not None:
-            self.project.openFenceView()
-
-    def openPaddockView(self):
-        if self.project is not None:
-            self.project.openPaddockView()
-
-    def openPipelineView(self):
-        if self.project is not None:
-            self.project.openPipelineView()
-
-    def openWaterpointView(self):
-        if self.project is not None:
-            self.project.openWaterpointView()

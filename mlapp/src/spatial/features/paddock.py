@@ -7,7 +7,7 @@ from ..layers.condition_table import ConditionTable
 from ..layers.derived_layer import DerivedLayer
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_condition_popup_layer import PaddockConditionPopupLayer
-from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from ..layers.watered_area_layer import WateredAreaLayer
 from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits
@@ -24,13 +24,13 @@ class Paddock(AreaFeature):
     def twoPhaseRecalculate(self):
         return True
 
-    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, waterpointBufferLayer: WaterpointBufferLayer,
+    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wateredAreaLayer: WateredAreaLayer,
                  conditionTable: ConditionTable, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
         self._landSystemLayerId = landSystemLayer.id()
-        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        self._wateredAreaLayerId = wateredAreaLayer.id()
         self.conditionTable = conditionTable
 
     @property
@@ -38,8 +38,8 @@ class Paddock(AreaFeature):
         return QgsProject.instance().mapLayer(self._landSystemLayerId)
 
     @property
-    def waterpointBufferLayer(self):
-        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+    def wateredAreaLayer(self):
+        return QgsProject.instance().mapLayer(self._wateredAreaLayerId)
 
     @property
     def conditionRecordLayer(self):
@@ -53,7 +53,7 @@ class Paddock(AreaFeature):
             self,
             self.featureLayer,
             self.landSystemLayer,
-            self.waterpointBufferLayer,
+            self.wateredAreaLayer,
             self.conditionTable)
 
         request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
@@ -77,7 +77,7 @@ class Paddock(AreaFeature):
             self,
             self.featureLayer,
             self.landSystemLayer,
-            self.waterpointBufferLayer,
+            self.wateredAreaLayer,
             self.conditionTable)
         group = item.parent()
 

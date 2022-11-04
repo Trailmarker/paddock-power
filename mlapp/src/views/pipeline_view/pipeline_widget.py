@@ -26,8 +26,6 @@ class PipelineWidget(QWidget, FORM_CLASS):
         self.pipelineList.featureLayer = self.project.pipelineLayer
         self.profileDetails.setProject(self.project)
 
-        self.sketchPipelineButton.clicked.connect(self.sketchPipeline)
-
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
         tool = SketchLineTool(self.project)

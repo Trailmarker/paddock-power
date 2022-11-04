@@ -20,7 +20,7 @@ class PaddockLayerList(PersistedFeatureLayerList):
         def listItemFactory(paddock):
             paddock.popupLayerAdded.connect(self.onPopupLayerAdded)
             paddock.popupLayerRemoved.connect(self.onPopupLayerRemoved)
-            return PersistedFeatureCollapsibleListItem(paddock, PaddockDetails, PaddockDetailsEdit, parent)
+            return PersistedFeatureCollapsibleListItem(paddock, PaddockDetails, PaddockDetailsEdit, self)
 
         super().__init__(listItemFactory, parent)
 

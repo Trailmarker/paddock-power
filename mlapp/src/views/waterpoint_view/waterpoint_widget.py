@@ -24,7 +24,6 @@ class WaterpointWidget(QWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.waterpointList.featureLayer = self.project.waterpointLayer
-        self.sketchWaterpointButton.clicked.connect(self.sketchWaterpoint)
 
     def sketchWaterpoint(self):
         """Sketch and analyse a new Fence."""

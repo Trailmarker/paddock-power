@@ -18,11 +18,16 @@ class ProfileDetails(QWidget, FORM_CLASS):
         """Constructor."""
         super().__init__(parent)
 
+        self.setupUi(self)
+
+        self.elevationRangeLabel.setProperty("class", "form-left")
+        self.elevationRangeText.setProperty("class", "form-right")
+        self.infrastructureLengthLabel.setProperty("class", "form-left")
+        self.infrastructureLengthText.setProperty("class", "form-right")
+
         self.project = None
         self.selectedInfrastructure = None
         self.profileCanvas = None
-
-        self.setupUi(self)
 
         self.refreshUi()
 
@@ -72,7 +77,6 @@ class ProfileDetails(QWidget, FORM_CLASS):
                     f"{maximumDistance:,.2f}")
 
             self.refreshProfileCanvas(profile)
-            self.setVisible(True)
 
     def cleanupProfileCanvas(self):
         if self.profileCanvas is not None:

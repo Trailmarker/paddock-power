@@ -1,0 +1,25 @@
+ConditionTypeLabel {
+    border-radius: 2px;
+    margin: 2px;
+    padding: 2px;
+}
+
+ConditionTypeLabel.A {
+    background-color: rgb(35, 139, 69);
+    color: #ffffff;
+}
+
+ConditionTypeLabel.B {
+    background-color: rgb(65, 171, 93);
+    color: #ffffff;
+}
+
+ConditionTypeLabel.C {
+    background-color: rgb(116, 196, 118);
+    color: #000000;
+}
+
+ConditionTypeLabel.D {
+    background-color: rgb(161, 217, 155);
+    color: #000000;
+}

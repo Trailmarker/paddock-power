@@ -10,6 +10,6 @@ class PaddockMiniList(FeatureMiniList):
         """Constructor."""
 
         def listItemFactory(paddock): return PersistedFeatureCollapsibleListItem(
-            paddock, PaddockDetails, PaddockDetailsEdit, parent)
+            paddock, PaddockDetails, PaddockDetailsEdit, self)
 
         super().__init__(listItemFactory, parent)

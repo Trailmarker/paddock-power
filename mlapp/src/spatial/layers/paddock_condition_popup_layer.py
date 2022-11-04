@@ -9,53 +9,20 @@ class PaddockConditionPopupLayer(DerivedLayer):
 
     QUERY = """
 with "Paddock Condition" as
-(with
-  "Watered Areas" as
-    (with
-		"Near" as
-			(select
-			 st_union(geometry) as "geometry",
-			 "Status"
-			 from "{{2}}"
-			 where "Waterpoint Buffer Type" = 'Near'
-			 group by "Status")
-		, "Far" as
-			(select
-			 st_union(geometry) as "geometry",
-			 "Status"
-			 from "{{2}}"
-			 where "Waterpoint Buffer Type" = 'Far'
-			 group by "Status")
-		, "Farm" as
-			(select st_union(geometry) as "geometry"
-			 from
-			 (select geometry from "{{0}}"
-			  union
-			  select geometry from "{{2}}"))
-	 select "geometry", 'Near' as "Watered", "Status"
-	 from "Near"
-	 union
-	 select st_difference("Far".geometry, "Near".geometry), 'Far' as "Watered", "Far"."Status"
-	 from "Far"
-	 inner join "Near"
-	 on "Far"."Status" = "Near"."Status"
-	 union
-	 select st_difference("Farm".geometry, "Far".geometry), 'Unwatered' as "Watered", "Far"."Status"
-	 from "Farm", "Far"),
-  "Paddock" as
-	(select geometry from "{{0}}" where fid = {paddockId})
-select
-st_intersection(st_intersection("Paddock".geometry, "{{1}}".geometry), "Watered Areas".geometry) as "geometry",
-"{{1}}".fid as "Land System",
-"{{1}}"."Name" as "Land System Name",
-"AE/km²" as "AE/km²",
-"Watered",
-"Watered Areas"."Status" as "Watered Area Status"
-from "Paddock"
-inner join "{{1}}"
-on st_intersects("Paddock".geometry, "{{1}}".geometry)
-inner join "Watered Areas"
-on st_intersects("{{1}}".geometry, "Watered Areas".geometry))
+	(with "Paddock" as
+		(select geometry from "{{0}}" where fid = {paddockId})
+	select
+	st_intersection(st_intersection("Paddock".geometry, "{{1}}".geometry), "{{2}}".geometry) as "geometry",
+	"{{1}}".fid as "Land System",
+	"{{1}}"."Name" as "Land System Name",
+	"AE/km²" as "AE/km²",
+	"Watered",
+	"{{2}}"."Status" as "Watered Area Status"
+	from "Paddock"
+	inner join "{{1}}"
+	on st_intersects("Paddock".geometry, "{{1}}".geometry)
+	inner join "{{2}}"
+	on st_intersects("{{1}}".geometry, "{{2}}".geometry))
 select
 geometry,
 row_number() over (order by '') as "fid",
@@ -93,7 +60,7 @@ where geometry is not null
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Condition
 
-    def __init__(self, layerName, paddock, paddockLayer, landSystemLayer, waterpointBufferLayer, conditionTable):
+    def __init__(self, layerName, paddock, paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
         query = PaddockConditionPopupLayer.QUERY.format(paddockId=paddock.id,
                                                         paddockName=paddock.name,
@@ -105,7 +72,7 @@ where geometry is not null
             PaddockConditionPopupLayer.STYLE,
             paddockLayer,
             landSystemLayer,
-            waterpointBufferLayer,
+            wateredAreaLayer,
             conditionTable)
 
         self.conditionTable = conditionTable

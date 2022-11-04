@@ -1,0 +1,31 @@
+QListWidget::item { 
+    selection-background-color: red;
+}
+
+QGroupBox {
+    background-color: white;
+}
+
+ProfileDetails {
+    background-color: white;
+}
+
+ProfileDetails QLabel.form-left {
+    background-color: white;
+    padding: 3px;
+    padding-right: 6px;
+}
+
+ProfileDetails QLabel.form-right {
+    background-color: white;
+    padding: 3px;
+    padding-left: 6px;
+}
+
+FencePaddockChanges {
+    background-color: white;
+}
+
+QToolButton.no-border { 
+    border: none; 
+}

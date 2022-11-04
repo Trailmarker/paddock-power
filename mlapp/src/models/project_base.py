@@ -14,7 +14,7 @@ from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import PLUGIN_NAME, qgsInfo, resolveGeoPackageFile
+from ..utils import PLUGIN_NAME, qgsDebug, resolveGeoPackageFile
 
 
 class ProjectBase(QObject):
@@ -37,11 +37,9 @@ class ProjectBase(QObject):
         
         landSystemLayerName = "Land Systems"
         self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
-
-        waterpointLayerName = f"Waterpoints"
-        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
-
+        
         self.conditionTable = ConditionTable(self.gpkgFile, "Condition Table")
+
         paddockLayerName = f"Paddocks"
         self.paddockLayer = PaddockLayer(
             self.gpkgFile,
@@ -49,21 +47,26 @@ class ProjectBase(QObject):
             self.landSystemLayer,
             self.conditionTable)
 
+        waterpointLayerName = f"Waterpoints"
+        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
+
         waterpointBufferLayerName = f"Waterpoint Buffers"
         self.waterpointBufferLayer = WaterpointBufferLayer(waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
 
         # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
-        # Same goes for Paddocks and Waterpoint Buffers
+        # Same goes for Paddocks and Watered Areas
         self.waterpointLayer.waterpointBufferLayer = self.waterpointBufferLayer
-        self.paddockLayer.waterpointBufferLayer = self.waterpointBufferLayer
 
         wateredAreaLayerName = f"Watered Areas"
         self.wateredAreaLayer = WateredAreaLayer(wateredAreaLayerName, self.paddockLayer, self.waterpointBufferLayer)
+
+        self.paddockLayer.wateredAreaLayer = self.wateredAreaLayer
 
         fenceLayerName = f"Fences"
         self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
                                      self.elevationLayer)
+
         boundaryLayerName = f"Boundary"
         self.boundaryLayer = BoundaryLayer(boundaryLayerName, self.paddockLayer)
 
@@ -88,7 +91,7 @@ class ProjectBase(QObject):
         self.landSystemLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
         self.paddockLayer.addToMap(group)
-        
+
         if self.elevationLayer is not None:
             self.elevationLayer.addToMap(group)
 

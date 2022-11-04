@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from ..state_tool_bar import StateToolBar
+from ..state_tool_bar.state_tool_bar import StateToolBar
 
 
 class FeatureToolBar(StateToolBar):
@@ -12,7 +12,7 @@ class FeatureToolBar(StateToolBar):
 
     def addSelectAction(self):
         self.addGenericAction(
-            ':/plugins/mlapp/images/paddock-zoom.png',
+            ':/plugins/mlapp/images/zoom-item.png',
             f"Zoom to {self.machine.displayName()}",
             self.selectFeature)
 

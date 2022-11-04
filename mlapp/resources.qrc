@@ -1,22 +1,36 @@
 <RCC>
     <qresource prefix="/plugins/mlapp" >
-        <file>images/buffer.png</file>
-        <file>images/delete-project.png</file>
-        <file>images/fenceline.png</file>
+        <file>images/build-feature.png</file>
+        <file>images/cancel-edit-item.png</file>
+        <file>images/clear-text.png</file>
+        <file>images/edit-item.png</file>
+        <file>images/fence.png</file>
         <file>images/icon.png</file>
-        <file>images/logo.png</file>
-        <file>images/new-project.png</file>
-        <file>images/new-paddock.png</file>
-        <file>images/new-split-paddock.png</file>
+        <file>images/new-fence.png</file>
+        <file>images/new-paddock-power.png</file>
+        <file>images/new-pipeline.png</file>
+        <file>images/new-waterpoint.png</file>
+        <file>images/new.png</file>
         <file>images/ntg-primary-cmyk.png</file>
+        <file>images/paddock-power.png</file>
         <file>images/paddock.png</file>
-        <file>images/paddock-zoom.png</file>
-        <file>images/item-edit.png</file>
-        <file>images/item-undo.png</file>
-        <file>images/item-save.png</file>
+        <file>images/pipeline-dashed.png</file>
         <file>images/pipeline.png</file>
-        <file>images/split.png</file>
-        <file>images/split-paddock.png</file>
-        <file>images/sparkling-star.png</file>
+        <file>images/plan-feature.png</file>
+        <file>images/plus.png</file>
+        <file>images/refresh-paddock-power.png</file>
+        <file>images/reload.png</file>
+        <file>images/save-item.png</file>
+        <file>images/trash-feature.png</file>
+        <file>images/undo-build-feature.png</file>
+        <file>images/undo-plan-feature.png</file>
+        <file>images/waterpoint.png</file>
+        <file>images/zoom-item.png</file>
+
+        <file>src/views/feature_view/feature_view.qss</file>
+        <file>src/widgets/condition_type_label/condition_type_label.qss</file>
+        <file>src/widgets/feature_status_label/feature_status_label.qss</file>
+        <file>src/widgets/state_tool_bar/state_tool_bar.qss</file>
+
     </qresource>
 </RCC>

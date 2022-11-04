@@ -5,7 +5,6 @@ from ..features.edits import Edits
 from ..features.paddock import Paddock
 from ..schemas.schemas import RECALCULATE_COMPLETE, RECALCULATE_CURRENT
 from .condition_table import ConditionTable
-from .waterpoint_buffer_layer import WaterpointBufferLayer
 from .land_system_layer import LandSystemLayer
 from .status_feature_layer import StatusFeatureLayer
 
@@ -25,7 +24,7 @@ class PaddockLayer(StatusFeatureLayer):
         super().__init__(gpkgFile, layerName, styleName=PaddockLayer.STYLE)
 
         self._landSystemLayerId = landSystemLayer.id()
-        self._waterpointBufferLayerId = None
+        self._wateredAreaLayerId = None
         self.conditionTable = conditionTable
 
     @property
@@ -33,15 +32,15 @@ class PaddockLayer(StatusFeatureLayer):
         return QgsProject.instance().mapLayer(self._landSystemLayerId)
 
     @property
-    def waterpointBufferLayer(self):
-        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId) if self._waterpointBufferLayerId else None
+    def wateredAreaLayer(self):
+        return QgsProject.instance().mapLayer(self._wateredAreaLayerId) if self._wateredAreaLayerId else None
 
-    @waterpointBufferLayer.setter
-    def waterpointBufferLayer(self, waterpointBufferLayer):
-        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+    @wateredAreaLayer.setter
+    def wateredAreaLayer(self, wateredAreaLayer):
+        self._wateredAreaLayerId = wateredAreaLayer.id()
 
     def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.landSystemLayer, self.waterpointBufferLayer, self.conditionTable, feature)
+        return self.getFeatureType()(self, self.landSystemLayer, self.wateredAreaLayer, self.conditionTable, feature)
 
     def getRecalculateBatchNumber(self):
         """The lowest Build Order of any Fence in Draft status."""

@@ -1,0 +1,26 @@
+FeatureStatusLabel {
+    border-radius: 2px;
+    margin: 2px;
+    padding: 2px;
+}
+
+FeatureStatusLabel.Drafted, FeatureStatusLabel.Undefined {
+    background-color: rgb(250, 218, 221);
+    color: #000000;
+}
+
+FeatureStatusLabel.Planned {
+    background-color: rgb(163, 195, 215);
+    color: #ffffff;
+}
+
+FeatureStatusLabel.Built {
+    background-color: rgb(215, 195, 163);
+    color: #000000;
+}
+
+FeatureStatusLabel.PlannedSuperseded, FeatureStatusLabel.BuiltSuperseded {
+    background-color: rgb(147, 151, 153);
+    color: #000000;
+}
+

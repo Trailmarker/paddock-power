@@ -3,12 +3,16 @@ import inspect
 import os
 from os import path
 
+from qgis.PyQt.QtCore import QFile, pyqtSignal, pyqtBoundSignal
 from qgis.PyQt.QtWidgets import QMessageBox
+
 from qgis.core import Qgis, QgsMessageLog, QgsProject
-from qgis.PyQt.QtCore import pyqtSignal, pyqtBoundSignal
 
 
 PLUGIN_NAME = "MLA Paddock Power"
+
+# 16777215
+MAX_QT_DIMENSION = (2 * 24 - 1)
 
 
 def formatMessage(message):
@@ -66,13 +70,13 @@ def guiConfirm(question="Are you sure?", title=None):
                                 QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
 
 
-def resolvePluginPath(relative, base=None):
+def resolvePluginPath(relative=None, base=None):
     """Resolve a relative path in the plug-in deployment directory."""
     if not base:
         base = path.dirname(os.path.realpath(__file__))
         # note this function will break if this code in src/utils.py is moved to a different directory
         base = path.normpath(path.join(base, os.pardir))
-    return path.normpath(path.join(base, relative))
+    return path.normpath(path.join(base, relative if relative else ""))
 
 
 def resolveProjectFile():
@@ -98,13 +102,21 @@ def resolveStylePath(styleName):
     return resolvePluginPath(relative)
 
 
-def resolveComponentStylesheet(componentType):
+def getComponentStyleSheet(componentFile):
     """Resolve the path of the component stylesheet file packaged with the plugin."""
-    relative = "stylesheets\\{componentType.__name__}.qss"
-    return resolvePluginPath(relative)
-
+    dir = path.dirname(componentFile)
+    styleSheetFilename = path.join(dir, f"{path.splitext(path.basename(componentFile))[0]}.qss")
+    styleSheetPath = path.relpath(styleSheetFilename, resolvePluginPath()).replace("\\", "/")
+    resource = f":/plugins/mlapp/{styleSheetPath}"
+    resourceFile = QFile(resource)
+    if not resourceFile.exists():
+        raise Exception(f"Stylesheet file {resource} not found.")
+    resourceFile.open(QFile.ReadOnly | QFile.Text)
+    return resourceFile.readAll().data().decode("utf-8")
 
 # See https://stackoverflow.com/questions/28258875/how-to-obtain-the-set-of-all-signals-for-a-given-widget
+
+
 def getSignals(source):
     """Get the signals of an object."""
     cls = source if isinstance(source, type) else type(source)
