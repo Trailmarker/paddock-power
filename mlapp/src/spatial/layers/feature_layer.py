@@ -29,7 +29,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         QgsProject.instance().addMapLayer(self, False)
 
     def detectAndRemove(self):
-        """Detect if a layer is already in the map, and if so, return it."""
+        """Detect if a layer is already in the map, and if so, remove it."""
         layers = [l for l in QgsProject.instance().mapLayers().values()]
         for layer in layers:
             if layer.source() == self.source():

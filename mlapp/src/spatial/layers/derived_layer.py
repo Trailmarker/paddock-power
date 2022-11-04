@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from urllib.parse import quote
 
+from qgis.core import QgsProject
+
 from .feature_layer import FeatureLayer
 
 
@@ -30,3 +32,10 @@ class DerivedLayer(FeatureLayer):
         init = f"?{'&'.join(layerClauses)}&query={quote(queryClause)}"
 
         super().__init__(init, layerName, "virtual", styleName=styleName)
+
+    def detectAndRemove(self):
+        """Detect if a DerivedLayer is already in the map, and if so, remove it."""
+        layers = [l for l in QgsProject.instance().mapLayers().values()]
+        for layer in layers:
+            if layer.name() == self.name() and layer.providerType() == "virtual":
+                QgsProject.instance().removeMapLayer(layer.id())
