@@ -1,5 +1,5 @@
 QListWidget::item { 
-    selection-background-color: red;
+    selection-background-color: green;
 }
 
 QGroupBox {
