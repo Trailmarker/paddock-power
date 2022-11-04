@@ -45,6 +45,7 @@ class Waterpoint(PointFeature):
                 layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)
                 if layer:
                     layer.parent().removeChildNode(layer)
+                    QgsProject.instance().removeMapLayer(self.popupLayer.id())
                 self.popupLayer = None
         except BaseException:
             pass

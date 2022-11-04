@@ -8,7 +8,7 @@ from .derived_layer import DerivedLayer
 
 class WaterpointBufferLayer(DerivedLayer):
 
-    STYLE = "waterpoint_buffer_new_2"
+    STYLE = "waterpoint_buffer"
 
 
     QUERY = f"""

@@ -3,6 +3,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsFeatureRequest, QgsProject
 
+from ...utils import qgsInfo
 from ..layers.condition_table import ConditionTable
 from ..layers.derived_layer import DerivedLayer
 from ..layers.land_system_layer import LandSystemLayer
@@ -48,21 +49,28 @@ class Paddock(AreaFeature):
     def recalculate(self):
         super().recalculate()
 
-        recalculator = PaddockConditionPopupLayer(
-            f"Paddock {self.id} Recalculate",
-            self,
-            self.featureLayer,
-            self.landSystemLayer,
-            self.wateredAreaLayer,
-            self.conditionTable)
+        recalculator = None
+        try:
+            recalculator = PaddockConditionPopupLayer(
+                f"Paddock {self.id} Recalculate",
+                self,
+                self.featureLayer,
+                self.landSystemLayer,
+                self.wateredAreaLayer,
+                self.conditionTable)
 
-        request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-        conditions = [f for f in recalculator.getFeatures(request)]
+            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+            conditions = [f for f in recalculator.getFeatures(request)]
 
-        estimatedRaw = sum([c.estimatedCapacity for c in conditions])
-        self.estimatedCapacity = round(estimatedRaw)
-        self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
-        self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
+            estimatedRaw = sum([c.estimatedCapacity for c in conditions])
+            self.estimatedCapacity = round(estimatedRaw)
+            self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
+            self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
+        except BaseException as e:
+            qgsInfo(f"{self}.recalculate() failed with exception {e}")
+        finally:
+            if recalculator:
+                recalculator.detectAndRemove()
 
         # qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
 
@@ -91,6 +99,7 @@ class Paddock(AreaFeature):
                 layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)
                 if layer:
                     layer.parent().removeChildNode(layer)
+                    QgsProject.instance().removeMapLayer(self.popupLayer.id())
                 self.popupLayer = None
                 self.popuplayerRemoved.emit()
         except BaseException:
