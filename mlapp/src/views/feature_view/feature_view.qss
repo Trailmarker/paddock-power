@@ -3,27 +3,36 @@ QListWidget::item {
 }
 
 QGroupBox {
-    background-color: white;
+    background-color: #fcfcfc;
 }
 
 ProfileDetails {
-    background-color: white;
+    background-color: #fcfcfc;
 }
 
 ProfileDetails QLabel.form-left {
-    background-color: white;
+    background-color: #fcfcfc;
     padding: 3px;
     padding-right: 6px;
 }
 
 ProfileDetails QLabel.form-right {
-    background-color: white;
+    background-color: #fcfcfc;
     padding: 3px;
     padding-left: 6px;
 }
 
 FencePaddockChanges {
-    background-color: white;
+    background-color: #fcfcfc;
+}
+
+/* QSplitter::handle { 
+    image: url(:/plugins/mlapp/images/splitter.png);
+} */
+
+QSplitter::handle:horizontal {
+    width: 14px;
+
 }
 
 QToolButton.no-border { 

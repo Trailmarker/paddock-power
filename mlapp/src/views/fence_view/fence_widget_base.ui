@@ -16,17 +16,8 @@
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1">
    <item>
     <widget class="QSplitter" name="splitter">
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
-     <property name="lineWidth">
-      <number>1</number>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="handleWidth">
-      <number>5</number>
      </property>
      <widget class="QGroupBox" name="fenceListGroupBox">
       <property name="sizePolicy">
