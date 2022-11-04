@@ -83,7 +83,7 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.collapse.setTitle(
             f"{self.feature.name} ({self.feature.featureArea:.2f} km², ~{self.feature.estimatedCapacity:.0f} AE)")
 
-        self.conditionTypeLabel.setConditionType(self.feature.conditionType)
+        self.conditionTypeLabel.conditionType = self.feature.conditionType
 
         # Hide or show forms
         editing = self.status == EditStatus.Editing
