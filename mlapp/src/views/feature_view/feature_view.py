@@ -29,13 +29,13 @@ class FeatureView(ViewBase, FORM_CLASS):
 
         self.setStyleSheet(STYLESHEET)
 
-        self.fenceTab = FenceWidget(project, self.tabWidget)
         self.paddockTab = PaddockWidget(project, self.tabWidget)
+        self.fenceTab = FenceWidget(project, self.tabWidget)
         self.pipelineTab = PipelineWidget(project, self.tabWidget)
         self.waterpointTab = WaterpointWidget(project, self.tabWidget)
 
-        self.tabWidget.addTab(self.fenceTab, QIcon(":/plugins/mlapp/images/fence.png"), 'Fences')
         self.tabWidget.addTab(self.paddockTab, QIcon(":/plugins/mlapp/images/paddock.png"), 'Paddocks')
+        self.tabWidget.addTab(self.fenceTab, QIcon(":/plugins/mlapp/images/fence.png"), 'Fences')
         self.tabWidget.addTab(self.pipelineTab, QIcon(":/plugins/mlapp/images/pipeline-dashed.png"), 'Pipelines')
         self.tabWidget.addTab(self.waterpointTab, QIcon(":/plugins/mlapp/images/waterpoint.png"), 'Waterpoints')
 
