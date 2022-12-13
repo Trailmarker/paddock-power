@@ -3,10 +3,10 @@ from ..features.waterpoint_buffer import WaterpointBuffer
 from ..schemas.feature_status import FeatureStatus
 from ..schemas.schemas import BUFFER_DISTANCE, FAR_BUFFER, NEAR_BUFFER, STATUS, WATERPOINT, WATERPOINT_BUFFER_TYPE, FeatureSchema
 from ..schemas.waterpoint_buffer_type import WaterpointBufferType
-from .derived_layer import DerivedLayer
+from .derived_feature_layer import DerivedFeatureLayer
 
 
-class WaterpointBufferLayer(DerivedLayer):
+class WaterpointBufferLayer(DerivedFeatureLayer):
 
     STYLE = "waterpoint_buffer"
 

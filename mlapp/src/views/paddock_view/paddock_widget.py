@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
 
-from ...spatial.layers.derived_layer import DerivedLayer
+from ...spatial.layers.derived_feature_layer import DerivedFeatureLayer
 from ...utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -38,7 +38,7 @@ class PaddockWidget(QWidget, FORM_CLASS):
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
 
-    @pyqtSlot(DerivedLayer)
+    @pyqtSlot(DerivedFeatureLayer)
     def setConditionLayer(self, layer=None):
         qgsDebug(f"PaddockWidget.setConditionLayer({layer.__class__.__name__})")
         self.conditionList.featureLayer = layer

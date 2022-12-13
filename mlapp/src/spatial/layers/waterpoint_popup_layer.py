@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint_buffer import WaterpointBuffer
-from .derived_layer import DerivedLayer
+from .derived_feature_layer import DerivedFeatureLayer
 
 
-class WaterpointPopupLayer(DerivedLayer):
+class WaterpointPopupLayer(DerivedFeatureLayer):
 
     STYLE = "waterpoint_popup"
 

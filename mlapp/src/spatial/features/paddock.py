@@ -5,7 +5,7 @@ from qgis.core import QgsFeatureRequest, QgsProject
 
 from ...utils import qgsInfo
 from ..layers.condition_table import ConditionTable
-from ..layers.derived_layer import DerivedLayer
+from ..layers.derived_feature_layer import DerivedFeatureLayer
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_condition_popup_layer import PaddockConditionPopupLayer
 from ..layers.watered_area_layer import WateredAreaLayer
@@ -18,7 +18,7 @@ from .feature_action import FeatureAction
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
 
-    popupLayerAdded = pyqtSignal(DerivedLayer)
+    popupLayerAdded = pyqtSignal(DerivedFeatureLayer)
     popupLayerRemoved = pyqtSignal()
 
     @classmethod

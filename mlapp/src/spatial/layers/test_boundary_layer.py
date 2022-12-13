@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from ..features.boundary import Boundary
-from .derived_feature_layer import DerivedFeatureLayer
+from .derived_persisted_feature_layer import DerivedPersistedFeatureLayer
 
 
-class BoundaryLayer(DerivedFeatureLayer):
+class BoundaryLayer(DerivedPersistedFeatureLayer):
 
     STYLE = "boundary"
 
@@ -16,9 +16,10 @@ from "{0}" where "Status" in ('Built', 'Planned')
 
 """
 
+    @classmethod
     def getFeatureType(cls):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Boundary
 
-    def __init__(self, layerName, paddockLayer):
-        super().__init__(layerName, BoundaryLayer.QUERY, BoundaryLayer.STYLE, paddockLayer)
+    def __init__(self, gpkgFile, layerName, paddockLayer):
+        super().__init__(gpkgFile, layerName, BoundaryLayer.QUERY, BoundaryLayer.STYLE, paddockLayer)

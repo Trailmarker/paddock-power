@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from ..features.watered_area import WateredArea
-from .derived_layer import DerivedLayer
+from .derived_feature_layer import DerivedFeatureLayer
 
 
-class WateredAreaLayer(DerivedLayer):
+class WateredAreaLayer(DerivedFeatureLayer):
 
     STYLE = "watered_area"
 

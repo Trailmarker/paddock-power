@@ -6,7 +6,7 @@ from qgis.core import QgsProject
 from .feature_layer import FeatureLayer
 
 
-class DerivedLayer(FeatureLayer):
+class DerivedFeatureLayer(FeatureLayer):
 
     @staticmethod
     def formatLayerClause(featureLayer):
@@ -22,19 +22,19 @@ class DerivedLayer(FeatureLayer):
         return queryFormatSpec.format(*(layer.name() for layer in featureLayers))
 
     def __init__(self, layerName, queryFormatSpec, styleName=None, *featureLayers):
-        # We don't need a layer clause for any DerivedLayers
+        # We don't need a layer clause for any DerivedFeatureLayers
         layerClauses = map(
-            DerivedLayer.formatLayerClause, [
+            DerivedFeatureLayer.formatLayerClause, [
                 f for f in featureLayers if not isinstance(
-                    f, DerivedLayer)])
-        queryClause = DerivedLayer.makeQueryClause(queryFormatSpec, *featureLayers)
+                    f, DerivedFeatureLayer)])
+        queryClause = DerivedFeatureLayer.makeQueryClause(queryFormatSpec, *featureLayers)
 
         init = f"?{'&'.join(layerClauses)}&query={quote(queryClause)}"
 
         super().__init__(init, layerName, "virtual", styleName=styleName)
 
     def detectAndRemove(self):
-        """Detect if a DerivedLayer is already in the map, and if so, remove it."""
+        """Detect if a DerivedFeatureLayer is already in the map, and if so, remove it."""
         layers = [l for l in QgsProject.instance().mapLayers().values()]
         for layer in layers:
             if layer.name() == self.name() and layer.providerType() == "virtual":

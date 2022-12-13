@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from ..features.condition import Condition
-from .derived_layer import DerivedLayer
+from .derived_feature_layer import DerivedFeatureLayer
 
 
-class ConditionLayer(DerivedLayer):
+class ConditionLayer(DerivedFeatureLayer):
 
     ALTERNATIVE_QUERY = """
 with "Paddock Condition" as
