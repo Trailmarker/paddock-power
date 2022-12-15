@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint_buffer import WaterpointBuffer
 from ..schemas.feature_status import FeatureStatus
-from ..schemas.schemas import BUFFER_DISTANCE, FAR_BUFFER, FID, NEAR_BUFFER, STATUS, WATERPOINT, WATERPOINT_BUFFER_TYPE
+from ..schemas.schemas import BUFFER_DISTANCE, FAR_BUFFER, FID, NEAR_BUFFER, STATUS, WATERPOINT, WATERPOINT_BUFFER_TYPE, WATERPOINT_TYPE
 from ..schemas.waterpoint_buffer_type import WaterpointBufferType
+from ..schemas.waterpoint_type import WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -18,7 +19,9 @@ with "InPaddocks" as
 	 from "{{0}}"
 	 inner join "{{1}}"
 	 on "{{0}}"."{STATUS}" in ('{FeatureStatus.Planned.name}', '{FeatureStatus.Built.name}')
-	 and st_contains("{{1}}".geometry, "{{0}}".geometry)),
+	 and st_contains("{{1}}".geometry, "{{0}}".geometry)
+     where "{{0}}"."{WATERPOINT_TYPE}" in ('{WaterpointType.Dam.name}', '{WaterpointType.Trough.name}', '{WaterpointType.Waterhole.name}')
+     ),
 "Renamed" as
      (select
 	     geometry,
