@@ -160,7 +160,7 @@ PersistedFeatureSchema = Schema([Fid], wkbType=QgsWkbTypes.MultiPolygon)
 PipelineSchema = LineFeatureSchema
 PointFeatureSchema = Schema([Fid, Name, Status, Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)
 StatusFeatureSchema = Schema([Fid, Name, Status])
-WaterpointBufferSchema = Schema([Status, Waterpoint, WaterpointBufferTypeField, BufferDistance],
+WaterpointBufferSchema = Schema([Fid, Status, Waterpoint, WaterpointBufferTypeField, BufferDistance],
                                         wkbType=QgsWkbTypes.MultiPolygon)
 WateredAreaSchema = Schema([Fid, WateredTypeField, Status], wkbType=QgsWkbTypes.MultiPolygon)
 WaterpointSchema = Schema([Fid,

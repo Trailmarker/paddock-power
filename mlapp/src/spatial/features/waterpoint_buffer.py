@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from ..schemas.schemas import WaterpointBufferSchema
 from .edits import Edits
-from .feature import Feature
+from .persisted_feature import PersistedFeature
 from .feature_action import FeatureAction
 
 
 @WaterpointBufferSchema.addSchema()
-class WaterpointBuffer(Feature):
+class WaterpointBuffer(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Boundary."""
