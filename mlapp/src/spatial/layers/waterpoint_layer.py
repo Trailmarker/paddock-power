@@ -10,8 +10,7 @@ class WaterpointLayer(StatusFeatureLayer):
 
     STYLE = "waterpoint"
 
-    @classmethod
-    def getFeatureType(cls):
+    def getFeatureType(self):
         return Waterpoint
 
     def __init__(self, gpkgFile, layerName,

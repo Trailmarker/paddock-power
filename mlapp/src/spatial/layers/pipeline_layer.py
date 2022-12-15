@@ -10,8 +10,7 @@ class PipelineLayer(StatusFeatureLayer):
 
     STYLE = "pipeline"
 
-    @classmethod
-    def getFeatureType(cls):
+    def getFeatureType(self):
         return Pipeline
 
     def __init__(self, gpkgFile, layerName, elevationLayer: ElevationLayer):

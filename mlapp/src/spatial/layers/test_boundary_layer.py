@@ -16,8 +16,7 @@ from "{0}" where "Status" in ('Built', 'Planned')
 
 """
 
-    @classmethod
-    def getFeatureType(cls):
+    def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Boundary
 

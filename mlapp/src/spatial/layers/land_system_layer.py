@@ -7,8 +7,7 @@ class LandSystemLayer(PersistedFeatureLayer):
 
     STYLE = "land_system"
 
-    @classmethod
-    def getFeatureType(cls):
+    def getFeatureType(self):
         return LandSystem
 
     def __init__(self, gpkgFile, layerName):

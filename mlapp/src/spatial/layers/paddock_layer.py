@@ -13,8 +13,7 @@ class PaddockLayer(StatusFeatureLayer):
 
     STYLE = "paddock"
 
-    @classmethod
-    def getFeatureType(cls):
+    def getFeatureType(self):
         return Paddock
 
     def __init__(self, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
@@ -54,6 +53,7 @@ class PaddockLayer(StatusFeatureLayer):
     def getRecalculateBatchEdits(self, batchNumber):
         """Get the edits for the current recalculate batch."""
 
-        recalculateBatchRequest = QgsFeatureRequest().setFilterExpression(f'("{RECALCULATE_CURRENT}"={batchNumber}) and ("{RECALCULATE_COMPLETE}" is null)')
+        recalculateBatchRequest = QgsFeatureRequest().setFilterExpression(
+            f'("{RECALCULATE_CURRENT}"={batchNumber}) and ("{RECALCULATE_COMPLETE}" is null)')
         features = list(self.getFeatures(request=recalculateBatchRequest))
         return Edits.upsert(*features)

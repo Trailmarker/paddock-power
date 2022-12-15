@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from abc import ABC, abstractclassmethod
+from abc import ABC, abstractmethod
 from qgis.core import QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
@@ -9,8 +9,8 @@ from ...utils import resolveStylePath, PLUGIN_NAME
 
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
-    @abstractclassmethod
-    def getFeatureType(cls):
+    @abstractmethod
+    def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
         pass
 

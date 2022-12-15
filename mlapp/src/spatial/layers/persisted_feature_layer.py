@@ -22,18 +22,15 @@ class PersistedFeatureLayer(FeatureLayer):
 
     featuresPersisted = pyqtSignal()
 
-    @classmethod
-    def getFeatureType(cls):
+    def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return PersistedFeature
 
-    @classmethod
-    def twoPhaseRecalculate(cls):
+    def twoPhaseRecalculate(self):
         """Return True if this layer requires two-phase recalculation."""
-        return cls.getFeatureType().twoPhaseRecalculate()
+        return self.getFeatureType().twoPhaseRecalculate()
 
-    @classmethod
-    def detectInGeoPackage(cls, gpkgFile, layerName):
+    def detectInGeoPackage(self, gpkgFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""
         try:
             layers = QgsVectorLayer(path=gpkgFile, providerLib="ogr")
@@ -54,9 +51,8 @@ class PersistedFeatureLayer(FeatureLayer):
 
         return False
 
-    @classmethod
-    def createInGeoPackage(cls, gpkgFile, layerName):
-        featureType = cls.getFeatureType()
+    def createInGeoPackage(self, gpkgFile, layerName):
+        featureType = self.getFeatureType()
         wkbType = featureType.getWkbType()
         schema = featureType.getSchema()
 
@@ -83,7 +79,7 @@ class PersistedFeatureLayer(FeatureLayer):
         processing.run(
             'native:package', params)
 
-    def deleteFromGeoPackage(cls, gpkgFile, layerName):
+    def deleteFromGeoPackage(self, gpkgFile, layerName):
         """Delete this FeatureLayer from the GeoPackage file."""
 
         #gpkgUrl = f"{gpkgFile}|layername={layerName}"

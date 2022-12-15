@@ -11,8 +11,7 @@ class FenceLayer(StatusFeatureLayer):
 
     STYLE = "fence"
 
-    @classmethod
-    def getFeatureType(cls):
+    def getFeatureType(self):
         return Fence
 
     def __init__(self, gpkgFile, layerName, paddockLayer, elevationLayer):

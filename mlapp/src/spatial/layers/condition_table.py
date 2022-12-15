@@ -43,8 +43,7 @@ ON CONFLICT("Paddock", "Land System", "Watered") DO UPDATE SET "Condition"='{con
 DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSystemId} AND "Watered"='{wateredType}';
 """
 
-    @classmethod
-    def detectInGeoPackage(cls, gpkgFile, tableName):
+    def detectInGeoPackage(self, gpkgFile, tableName):
         """Detect a matching ConditionTable in a GeoPackage."""
         try:
             with sqlite3.connect(gpkgFile) as conn:
@@ -54,17 +53,15 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
             pass
         return False
 
-    @classmethod
-    def createInGeoPackage(cls, gpkgFile, tableName):
+    def createInGeoPackage(self, gpkgFile, tableName):
         """Create a new ConditionTable in the GeoPackage file."""
         with sqlite3.connect(gpkgFile) as conn:
-            conn.execute(cls.CREATE.format(tableName=tableName))
+            conn.execute(self.CREATE.format(tableName=tableName))
 
-    @classmethod
-    def deleteFromGeoPackage(cls, gpkgFile, layerName):
+    def deleteFromGeoPackage(self, gpkgFile, layerName):
         """Delete a ConditionTable from the GeoPackage file."""
         with sqlite3.connect(gpkgFile) as conn:
-            conn.execute(cls.DROP.format(tableName=layerName))
+            conn.execute(self.DROP.format(tableName=layerName))
 
     def __init__(self, gpkgFile, tableName):
         # If not found, create

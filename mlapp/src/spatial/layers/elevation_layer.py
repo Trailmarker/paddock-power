@@ -17,7 +17,7 @@ def rasterGpkgUrl(gpkgFile, layerName):
 class ElevationLayer(QgsRasterLayer):
 
     @classmethod
-    def detectInGeoPackage(cls, gpkgFile):
+    def detectInGeoPackage(_, gpkgFile):
         """Find an elevation layer in a project GeoPackage."""
         try:
             if not path.exists(gpkgFile):
@@ -39,8 +39,7 @@ class ElevationLayer(QgsRasterLayer):
         except BaseException:
             return None
 
-    @classmethod
-    def detectAndRemove(cls, gpkgFile, layerName):
+    def detectAndRemove(self, gpkgFile, layerName):
         """Detect if a layer is already in the map, and if so, return it."""
         rasterUrl = rasterGpkgUrl(gpkgFile, layerName)
 
