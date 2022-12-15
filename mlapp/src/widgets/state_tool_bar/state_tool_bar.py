@@ -8,6 +8,7 @@ from ...utils import getComponentStyleSheet
 
 STYLESHEET = getComponentStyleSheet(__file__)
 
+
 class StateToolBarAction(QAction):
     def __init__(self, stateAction, icon, text, callback, parent=None):
         super().__init__(icon, text, parent)

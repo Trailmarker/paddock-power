@@ -84,7 +84,7 @@ class Edits:
 
             qgsInfo(f"Edits.persistFeatures: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
 
-            layers = set([f.featureLayer for f in edits.upserts + edits.deletes])            
+            layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
             twoPhaseLayers = set()
 
             with Edits.editAndCommit(*layers):
@@ -110,7 +110,8 @@ class Edits:
                 twoPhaseEdits = Edits()
                 for twoPhaseLayer, batch in twoPhaseLayers:
                     twoPhaseEdits.editBefore(twoPhaseLayer.getRecalculateBatchEdits(batch))
-                    qgsInfo(f"Edits.persistFeatures: two-phase upserts={repr(twoPhaseEdits.upserts)}, deletes={repr(twoPhaseEdits.deletes)}")
+                    qgsInfo(
+                        f"Edits.persistFeatures: two-phase upserts={repr(twoPhaseEdits.upserts)}, deletes={repr(twoPhaseEdits.deletes)}")
 
                     for feature in twoPhaseEdits.upserts:
                         feature.recalculate()

@@ -19,6 +19,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 STYLESHEET = getComponentStyleSheet(__file__)
 
+
 class FeatureView(ViewBase, FORM_CLASS):
 
     def __init__(self, project, parent=None):
@@ -58,5 +59,3 @@ class FeatureView(ViewBase, FORM_CLASS):
 
         # tabBar = self.tabWidget.findChild(QTabBar)
         # tabBar.hide()
-
-

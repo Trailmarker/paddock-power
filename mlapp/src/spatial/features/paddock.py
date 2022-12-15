@@ -33,7 +33,7 @@ class Paddock(AreaFeature):
         self._landSystemLayerId = landSystemLayer.id()
         self._wateredAreaLayerId = wateredAreaLayer.id()
         self.conditionTable = conditionTable
-        
+
         self._popupLayerId = None
         self._recalculateLayerId = None
 
@@ -60,7 +60,7 @@ class Paddock(AreaFeature):
     @property
     def recalculateLayer(self):
         return QgsProject.instance().mapLayer(self._recalculateLayerId) if self._recalculateLayerId else None
-    
+
     @recalculateLayer.setter
     def recalculateLayer(self, recalculateLayer):
         self._recalculateLayerId = recalculateLayer.id() if recalculateLayer else None

@@ -107,5 +107,3 @@ class Feature(QObject):
             self._selected = False
             return True
         return False
-
-  

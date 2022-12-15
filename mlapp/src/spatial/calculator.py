@@ -151,6 +151,6 @@ class Calculator:
         if not isinstance(polygon, QgsGeometry):
             raise Glitch(
                 "Calculator.calculatePerimeter: polygon is not a QgsGeometry.")
-        
+
         calculator = Calculator.QGIS_CALCULATOR
         return calculator.measurePerimeter(polygon)

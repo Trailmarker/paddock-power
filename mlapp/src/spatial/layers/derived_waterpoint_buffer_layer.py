@@ -10,7 +10,6 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 
     STYLE = "waterpoint_buffer"
 
-
     QUERY = f"""
 with "InPaddocks" as
     (select
@@ -29,7 +28,7 @@ with "InPaddocks" as
 		 "{FAR_BUFFER}" as FarBuffer
 	  from "{{0}}"),
 "Buffers" as
-    (select 
+    (select
 		st_buffer(geometry, NearBuffer) as geometry,
 		fid as "{WATERPOINT}",
         {STATUS},
@@ -61,4 +60,9 @@ on "Buffers"."{WATERPOINT}" = "InPaddocks"."{WATERPOINT}";
         return WaterpointBuffer
 
     def __init__(self, layerName, waterpointLayer, paddockLayer):
-        super().__init__(layerName, DerivedWaterpointBufferLayer.QUERY, DerivedWaterpointBufferLayer.STYLE, waterpointLayer, paddockLayer)
+        super().__init__(
+            layerName,
+            DerivedWaterpointBufferLayer.QUERY,
+            DerivedWaterpointBufferLayer.STYLE,
+            waterpointLayer,
+            paddockLayer)

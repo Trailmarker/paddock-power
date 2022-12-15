@@ -28,7 +28,7 @@ class Provider(QgsProcessingProvider):
         # self.addAlgorithm(CreateProject())
         # self.addAlgorithm(AddEmptyProject())
         # self.addAlgorithm(AddProjectFromExisting())
-        #self.addAlgorithm(DeleteProject())
+        # self.addAlgorithm(DeleteProject())
         pass
 
     def id(self):

@@ -57,4 +57,3 @@ class PipelineWidget(QWidget, FORM_CLASS):
         pipeline = self.project.pipelineLayer.makeFeature()
         pipeline.planFeature(sketchLine)
         self.project.selectFeature(pipeline)
-

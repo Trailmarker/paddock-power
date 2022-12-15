@@ -22,7 +22,7 @@ class ElevationLayer(QgsRasterLayer):
         try:
             if not path.exists(gpkgFile):
                 return None
-            
+
             db = sqlite3.connect(gpkgFile)
             cursor = db.cursor()
             cursor.execute(

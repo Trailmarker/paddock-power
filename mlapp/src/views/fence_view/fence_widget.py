@@ -38,7 +38,6 @@ class FenceWidget(QWidget, FORM_CLASS):
         self.splitter.setCollapsible(3, True)
 
         self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
-    
 
     def sketchFence(self):
         """Sketch and analyse a new Fence."""
@@ -51,7 +50,10 @@ class FenceWidget(QWidget, FORM_CLASS):
         """Handle a change to the selected Fence."""
         if isinstance(feature, Fence):
             self.profileGroupBox.show()
-            self.splitter.setSizes([self.fenceList.sizeHint().width(), self.profileGroupBox.sizeHint().width(), self.fencePaddockChanges.sizeHint().width()])
+            self.splitter.setSizes(
+                [self.fenceList.sizeHint().width(),
+                 self.profileGroupBox.sizeHint().width(),
+                 self.fencePaddockChanges.sizeHint().width()])
         else:
             self.profileGroupBox.hide()
 

@@ -61,4 +61,9 @@ from "Farm", "{WaterpointBufferType.Far.name}", "{WaterpointBufferType.Near.name
         return WateredArea
 
     def __init__(self, layerName, paddockLayer, waterpointBufferLayer):
-        super().__init__(layerName, DerivedWateredAreaLayer.QUERY, DerivedWateredAreaLayer.STYLE, paddockLayer, waterpointBufferLayer)
+        super().__init__(
+            layerName,
+            DerivedWateredAreaLayer.QUERY,
+            DerivedWateredAreaLayer.STYLE,
+            paddockLayer,
+            waterpointBufferLayer)

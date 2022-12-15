@@ -6,6 +6,7 @@ from qgis.PyQt.QtWidgets import QDockWidget
 from ..models.glitch import Glitch
 from ..utils import PLUGIN_NAME
 
+
 class ViewBase(QDockWidget):
 
     closingView = pyqtSignal(type)
