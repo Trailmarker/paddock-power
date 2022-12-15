@@ -33,6 +33,9 @@ class Paddock(AreaFeature):
         self._landSystemLayerId = landSystemLayer.id()
         self._wateredAreaLayerId = wateredAreaLayer.id()
         self.conditionTable = conditionTable
+        
+        self._popupLayerId = None
+        self._recalculateLayerId = None
 
     @property
     def landSystemLayer(self):
@@ -46,12 +49,27 @@ class Paddock(AreaFeature):
     def conditionRecordLayer(self):
         return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
 
+    @property
+    def popupLayer(self):
+        return QgsProject.instance().mapLayer(self._popupLayerId) if self._popupLayerId else None
+
+    @popupLayer.setter
+    def popupLayer(self, popupLayer):
+        self._popupLayerId = popupLayer.id() if popupLayer else None
+
+    @property
+    def recalculateLayer(self):
+        return QgsProject.instance().mapLayer(self._recalculateLayerId) if self._recalculateLayerId else None
+    
+    @recalculateLayer.setter
+    def recalculateLayer(self, recalculateLayer):
+        self._recalculateLayerId = recalculateLayer.id() if recalculateLayer else None
+
     def recalculate(self):
         super().recalculate()
 
-        recalculator = None
         try:
-            recalculator = PaddockConditionPopupLayer(
+            self.recalculateLayer = PaddockConditionPopupLayer(
                 f"Paddock {self.id} Recalculate",
                 self,
                 self.featureLayer,
@@ -60,7 +78,7 @@ class Paddock(AreaFeature):
                 self.conditionTable)
 
             request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-            conditions = [f for f in recalculator.getFeatures(request)]
+            conditions = [f for f in self.recalculateLayer.getFeatures(request)]
 
             estimatedRaw = sum([c.estimatedCapacity for c in conditions])
             self.estimatedCapacity = round(estimatedRaw)
@@ -69,8 +87,10 @@ class Paddock(AreaFeature):
         except BaseException as e:
             qgsInfo(f"{self}.recalculate() failed with exception {e}")
         finally:
-            if recalculator:
-                recalculator.detectAndRemove()
+            # Scoping and QGIS layer ownership design mean layer's (usually) already deleted by here
+            self.recalculateLayer = None
+            # if self.recalculateLayer:
+            #     self.recalculateLayer.detectAndRemove()
 
         # qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
 
@@ -87,6 +107,7 @@ class Paddock(AreaFeature):
             self.landSystemLayer,
             self.wateredAreaLayer,
             self.conditionTable)
+
         group = item.parent()
 
         # Bit of a hack but it looks nicer if it's above the derived Boundary layer …

@@ -126,26 +126,14 @@ class PersistedFeatureLayer(FeatureLayer):
         self.detectAndRemove()
         QgsProject.instance().addMapLayer(self, False)
 
-    def copyTo(self, otherLayer):
-        """Copy all features in this layer to another layer."""
-        if otherLayer is None:
-            raise Glitch(
-                "FeatureLayer.copyTo: the target layer is not present")
-
-        if self.getFeatureType() != otherLayer.getFeatureType():
-            raise Glitch(
-                f"Cannot copy features from {self.getFeatureType().displayName()} to {otherLayer.getFeatureType().displayName()}")
-
-        otherLayer.startEditing()
-        otherLayer.dataProvider().addFeatures(self.getFeatures())
-        otherLayer.commitChanges()
-
-    def makeFeature(self):
-        """Make a new PersistedFeature in this layer."""
-        return self.wrapFeature(None)
+    def addFeatures(self, features):
+        """Add a batch of features to this layer."""
+        for f in features:
+            f.clearId()
+            self.addFeature(f)
 
     def copyFeature(self, feature):
-        """Copy a PersistedFeatures from this layer to the clipboard."""
+        """Copy a feature using the logic (eg dependent layers) of this layer."""
         if not isinstance(feature, self.getFeatureType()):
             raise Glitch(
                 "You can't use a {self.__class__.__name__} to copy an object that isn't a {self.getFeatureType().__name__}")
@@ -158,16 +146,20 @@ class PersistedFeatureLayer(FeatureLayer):
         copyFeature.clearId()
         return copyFeature
 
+    def makeFeature(self):
+        """Make a new PersistedFeature in this layer."""
+        return self.wrapFeature(None)
+
     def addFeature(self, feature):
-        """Add a PersistedFeatures to the layer."""
+        """Add a PersistedFeature to the layer."""
         super().addFeature(self._unwrapQgsFeature(feature))
 
     def updateFeature(self, feature):
-        """Update a PersistedFeatures in the layer."""
+        """Update a PersistedFeature in the layer."""
         super().updateFeature(self._unwrapQgsFeature(feature))
 
     def deleteFeature(self, feature):
-        """Delete a PersistedFeatures from the layer."""
+        """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.id)
 
 

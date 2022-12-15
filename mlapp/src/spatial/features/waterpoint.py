@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import pyqtSignal
+
 from qgis.core import QgsProject
 
+from ..layers.derived_feature_layer import DerivedFeatureLayer
 from ..layers.waterpoint_popup_layer import WaterpointPopupLayer
 from .edits import Edits
 from .feature_action import FeatureAction
@@ -11,14 +14,27 @@ from ..schemas.schemas import WaterpointSchema
 @WaterpointSchema.addSchema()
 class Waterpoint(PointFeature):
 
+    popupLayerAdded = pyqtSignal(DerivedFeatureLayer)
+    popupLayerRemoved = pyqtSignal()
+
     def __init__(self, featureLayer, waterpointBufferLayer, elevationLayer=None, existingFeature=None):
         """Create a new LineFeature."""
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
         self._waterpointBufferLayerId = waterpointBufferLayer.id()
 
+        self._popupLayerId = None
+
     @property
     def waterpointBufferLayer(self):
         return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+
+    @property
+    def popupLayer(self):
+        return QgsProject.instance().mapLayer(self._popupLayerId) if self._popupLayerId else None
+
+    @popupLayer.setter
+    def popupLayer(self, popupLayer):
+        self._popupLayerId = popupLayer.id() if popupLayer else None
 
     @property
     def title(self):
@@ -38,6 +54,7 @@ class Waterpoint(PointFeature):
         # Insert the buffers layer immediately below this waterpoint, so it and any neighbouring waterpoints
         # remain visible.
         group.insertLayer(group.children().index(item) + 1, self.popupLayer)
+        self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
         try:
@@ -47,6 +64,7 @@ class Waterpoint(PointFeature):
                     layer.parent().removeChildNode(layer)
                     QgsProject.instance().removeMapLayer(self.popupLayer.id())
                 self.popupLayer = None
+                self.popuplayerRemoved.emit()
         except BaseException:
             pass
 

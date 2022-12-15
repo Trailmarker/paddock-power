@@ -97,16 +97,16 @@ class PaddockPower(QObject):
 
         self.addAction(
             QIcon(":/plugins/mlapp/images/refresh-paddock-power.png"),
-            text= f"Refresh {PLUGIN_NAME} Project …",
+            text=f"Refresh {PLUGIN_NAME} Project …",
             callback=lambda *_: self.detectProject(),
             parent=self.iface.mainWindow())
 
         self.addAction(
             QIcon(":/plugins/mlapp/images/new-paddock-power.png"),
-            text= f"Create {PLUGIN_NAME} Project …",
+            text=f"Create {PLUGIN_NAME} Project …",
             callback=lambda *_: self.createProject(),
             parent=self.iface.mainWindow())
-    
+
         self.detectProject()
 
     # Override Glitch type exceptions application-wide
@@ -166,7 +166,7 @@ class PaddockPower(QObject):
 
         PaddockPower.restoreSystemExceptionHook()
 
-    #@Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
+    # @Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
     def detectProject(self, _=None):
         f"""Detect a {PLUGIN_NAME} Project in the current QGIS project."""
 
@@ -191,7 +191,7 @@ class PaddockPower(QObject):
         else:
             qgsInfo(f"{PLUGIN_NAME} no project detected …")
 
-    #@Glitch.glitchy(f"An exception occurred while trying to create a {PLUGIN_NAME} project.")
+    # @Glitch.glitchy(f"An exception occurred while trying to create a {PLUGIN_NAME} project.")
     def createProject(self):
         f"""Create a new {PLUGIN_NAME} Project in the current QGIS project."""
         self.unloadProject()

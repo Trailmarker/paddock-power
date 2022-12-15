@@ -51,7 +51,7 @@ class ProjectBase(QObject):
         self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
 
         waterpointBufferLayerName = f"Waterpoint Buffers"
-        self.waterpointBufferLayer = WaterpointBufferLayer(waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
+        self.waterpointBufferLayer = WaterpointBufferLayer(self.gpkgFile, waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
 
         # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
         # Same goes for Paddocks and Watered Areas
@@ -86,7 +86,7 @@ class ProjectBase(QObject):
         self.pipelineLayer.addToMap(group)
         self.fenceLayer.addToMap(group)
         # Hide Waterpoint Buffers
-        # self.waterpointBufferLayer.addToMap(group)
+        self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
