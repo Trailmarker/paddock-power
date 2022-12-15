@@ -68,11 +68,23 @@ class Field(QgsField):
             feature._qgsFeature.setAttribute(self.name(), domainValue.name)
         return _setter
 
+    def __makeRealGetter(self):
+        """Make a getter for the value of a real-valued field. Should not be called directly."""
+        def _getter(feature: QgsFeature):
+            val = feature._qgsFeature[self.name()]
+            if isinstance(val, QVariant):
+                return val.value() if val.convert(QVariant.Double) else None
+            else:
+                return float(val)
+        return _getter
+
     def __makeGetter(self):
         if self._domainType is not None:
             return self.__makeFieldDomainGetter()
         elif self.typeName() == "String":
             return lambda feature: str(feature._qgsFeature[self.name()])
+        elif self.typeName() == "Real":
+            return self.__makeRealGetter()
         else:
             return lambda feature: feature._qgsFeature[self.name()]
 

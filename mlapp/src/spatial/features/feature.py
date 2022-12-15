@@ -5,6 +5,7 @@ from re import finditer
 from qgis.core import QgsFeature, QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
+from ...utils import qgsDebug
 from ..schemas.schemas import FeatureSchema
 
 

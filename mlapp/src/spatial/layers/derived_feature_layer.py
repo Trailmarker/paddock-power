@@ -33,6 +33,9 @@ class DerivedFeatureLayer(FeatureLayer):
 
         super().__init__(init, layerName, "virtual", styleName=styleName)
 
+        self.detectAndRemove()
+        QgsProject.instance().addMapLayer(self, False)
+
     def detectAndRemove(self):
         """Detect if a DerivedFeatureLayer is already in the map, and if so, remove it."""
         layers = [l for l in QgsProject.instance().mapLayers().values()]

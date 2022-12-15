@@ -4,6 +4,7 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QWidget
 
+
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_details_base.ui')))
 
@@ -18,8 +19,8 @@ class PaddockDetails(QWidget, FORM_CLASS):
 
         self.paddock = paddock
         if self.paddock is not None:
-            self.areaText.setText(f"{self.paddock.featureArea:2f}")
-            self.perimeterText.setText(f"{self.paddock.featurePerimeter:2f}")
-            self.estimatedCapacityText.setText(f"{self.paddock.estimatedCapacity:g}")
-            self.potentialCapacityText.setText(f"{self.paddock.potentialCapacity:g}")
-            self.capacityPerAreaText.setText(f"{self.paddock.capacityPerArea:1f}")
+            self.areaText.setValue(self.paddock.featureArea, "{0:2f}")
+            self.perimeterText.setValue(self.paddock.featurePerimeter, "{0:2f}")
+            self.estimatedCapacityText.setValue(self.paddock.estimatedCapacity, "{0:g}")
+            self.potentialCapacityText.setValue(self.paddock.potentialCapacity, "{0:g}")
+            self.capacityPerAreaText.setValue(self.paddock.capacityPerArea, "{0:1f}")

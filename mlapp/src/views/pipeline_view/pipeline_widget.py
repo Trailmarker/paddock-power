@@ -48,7 +48,7 @@ class PipelineWidget(QWidget, FORM_CLASS):
         """Handle a change to the selected Fence."""
         if isinstance(feature, Pipeline):
             self.profileGroupBox.show()
-            self.splitter.setSizes([self.fenceList.sizeHint().width(), self.profileGroupBox.sizeHint().width(), self.fencePaddockChanges.sizeHint().width()])
+            self.splitter.setSizes([self.pipelineList.sizeHint().width(), self.profileGroupBox.sizeHint().width()])
         else:
             self.profileGroupBox.hide()
 

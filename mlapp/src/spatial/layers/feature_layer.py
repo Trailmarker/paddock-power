@@ -6,6 +6,7 @@ from ...models.glitch import Glitch
 from ...models.qt_abstract_meta import QtAbstractMeta
 from ...utils import resolveStylePath, PLUGIN_NAME
 
+
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
     @abstractclassmethod
@@ -24,9 +25,6 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         if styleName is not None:
             stylePath = resolveStylePath(styleName)
             self.loadNamedStyle(stylePath)
-
-        self.detectAndRemove()
-        QgsProject.instance().addMapLayer(self, False)
 
     def detectAndRemove(self):
         """Detect if a layer is already in the map, and if so, remove it."""

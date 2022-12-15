@@ -34,20 +34,30 @@ class PersistedFeature(Feature):
 
             for field in self.getSchema():
                 field.setDefaultValue(self)
+
+            # Clear FID
             self.clearId()
 
         elif isinstance(existingFeature, Feature):
-            # Copy constructor for Feature and subclasses
+            # Repeat the constructor for an empty Feature
+            # Build an empty QgsFeature and wrap it up
+            fields = QgsFields()
+            for field in self.getSchema():
+                fields.append(field)
+            qgsFeature = QgsFeature(fields)
+
+            # Need to call the superclass __init__ ASAP, otherwise PyQt complains
+            super().__init__(featureLayer, qgsFeature)
 
             # Incoming Feature must have compatible schema
             missingFields, _ = self.checkSchema(existingFeature.getSchema())
             if missingFields:
                 raise Glitch(f"{self.__class__.__name__}.__init__: incoming Feature has missing fields: {missingFields}")
 
-            # First create an empty Feature with the correct schema
-            self.__init__(featureLayer, None)
+            for field in self.getSchema():
+                field.setDefaultValue(self)
 
-            # Then set all attributes and geometry
+            # Set all attributes and geometry from the incoming Feature
             self._qgsFeature.setAttributes(existingFeature._qgsFeature.attributes())
             self._qgsFeature.setGeometry(existingFeature._qgsFeature.geometry())
 
@@ -111,5 +121,3 @@ class PersistedFeature(Feature):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""
         self.featureLayer.deleteFeature(self)
         self.featureDeleted.emit()
-
-   

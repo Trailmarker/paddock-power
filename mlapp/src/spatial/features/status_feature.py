@@ -11,7 +11,9 @@ class StatusFeature(PersistedFeature, FeatureStateMachine):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new AreaFeature."""
-        super().__init__(featureLayer, existingFeature)
+        PersistedFeature.__init__(self, featureLayer, existingFeature)
+        FeatureStateMachine.__init__(self)
+
         self.featureUpdated.connect(lambda: self.stateChanged.emit(self))
         self.featureDeleted.connect(lambda: self.stateChanged.emit(self))
 

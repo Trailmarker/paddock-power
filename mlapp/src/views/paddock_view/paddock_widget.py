@@ -40,12 +40,12 @@ class PaddockWidget(QWidget, FORM_CLASS):
 
     @pyqtSlot(DerivedFeatureLayer)
     def setConditionLayer(self, layer=None):
-        qgsDebug(f"PaddockWidget.setConditionLayer({layer.__class__.__name__})")
+        # qgsDebug(f"PaddockWidget.setConditionLayer({layer.__class__.__name__})")
         self.conditionList.featureLayer = layer
 
     @pyqtSlot()
     def clearConditionLayer(self):
-        qgsDebug(f"PaddockWidget.unsetConditionLayer()")
+        # qgsDebug(f"PaddockWidget.unsetConditionLayer()")
         self.conditionList.featureLayer = None
 
     def onPaddockFilterChanged(self, text):

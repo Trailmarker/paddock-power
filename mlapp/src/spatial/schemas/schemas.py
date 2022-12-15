@@ -15,7 +15,7 @@ class ReadOnlySchema(list):
         self._wkbType = wkbType
 
     def addSchema(self):
-        def addSchemaToFeatureClass(cls):
+        def _addSchema(cls):
             for field in self:
                 if field._propertyName is not None:
                     field.addReadOnlyFieldProperty(cls)
@@ -23,7 +23,7 @@ class ReadOnlySchema(list):
             if self._wkbType is not None:
                 setattr(cls, "getWkbType", classmethod(lambda _: self._wkbType))
             return cls
-        return addSchemaToFeatureClass
+        return _addSchema
 
 
 class Schema(ReadOnlySchema):
@@ -31,7 +31,7 @@ class Schema(ReadOnlySchema):
         super().__init__(*args, **kwargs)
 
     def addSchema(self):
-        def addSchemaToFeatureClass(cls):
+        def _addSchema(cls):
             for field in self:
                 if field._propertyName is not None:
                     field.addFieldProperty(cls)
@@ -39,7 +39,7 @@ class Schema(ReadOnlySchema):
             if self._wkbType is not None:
                 setattr(cls, "getWkbType", classmethod(lambda _: self._wkbType))
             return cls
-        return addSchemaToFeatureClass
+        return _addSchema
 
 
 AREA = "Area (km²)"
@@ -135,8 +135,8 @@ WaterpointTypeField = DomainField(
     defaultValue=WaterpointType.Bore)
 
 AreaFeatureSchema = Schema([Fid, Name, Status, Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
-BoundarySchema = ReadOnlySchema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
-ConditionSchema = ReadOnlySchema([Fid,
+BoundarySchema = Schema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
+ConditionSchema = Schema([Fid,
     # Status,
     Area,
     CapacityPerArea,
@@ -149,7 +149,7 @@ ConditionSchema = ReadOnlySchema([Fid,
     LandSystemName,
     WateredTypeField],
     wkbType=QgsWkbTypes.MultiPolygon)
-FeatureSchema = ReadOnlySchema([Fid])
+FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)
 LandSystemSchema = Schema([Fid, Name, Area, Perimeter, CapacityPerArea, MapUnit, LandscapeClass,
                           ClassDescription, ErosionRisk], wkbType=QgsWkbTypes.MultiPolygon)
@@ -160,9 +160,9 @@ PersistedFeatureSchema = Schema([Fid], wkbType=QgsWkbTypes.MultiPolygon)
 PipelineSchema = LineFeatureSchema
 PointFeatureSchema = Schema([Fid, Name, Status, Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)
 StatusFeatureSchema = Schema([Fid, Name, Status])
-WaterpointBufferSchema = ReadOnlySchema([Status, Waterpoint, WaterpointBufferTypeField, BufferDistance],
+WaterpointBufferSchema = Schema([Status, Waterpoint, WaterpointBufferTypeField, BufferDistance],
                                         wkbType=QgsWkbTypes.MultiPolygon)
-WateredAreaSchema = ReadOnlySchema([Fid, WateredTypeField, Status], wkbType=QgsWkbTypes.MultiPolygon)
+WateredAreaSchema = Schema([Fid, WateredTypeField, Status], wkbType=QgsWkbTypes.MultiPolygon)
 WaterpointSchema = Schema([Fid,
                            Name,
                            Status,

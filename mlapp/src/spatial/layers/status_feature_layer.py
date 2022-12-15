@@ -45,7 +45,6 @@ class StatusFeatureLayer(PersistedFeatureLayer):
 
     def _refreshDisplayFilterFromRenderer(self):
         """Refresh the display filter from the renderer."""
-        # qgsDebug("FeatureLayer._refreshDisplayFilterFromRenderer")
         renderer = self.renderer()
         if isinstance(renderer, QgsCategorizedSymbolRenderer) and renderer.classAttribute() == 'Status':
             values = [category.value() for category in renderer.categories() if category.renderState()]

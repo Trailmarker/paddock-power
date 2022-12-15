@@ -62,7 +62,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="perimeterText">
+      <widget class="FormattedValue" name="perimeterText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -80,7 +80,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="areaText">
+      <widget class="FormattedValue" name="areaText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -161,7 +161,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLabel" name="estimatedCapacityText">
+      <widget class="FormattedValue" name="estimatedCapacityText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -179,7 +179,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLabel" name="potentialCapacityText">
+      <widget class="FormattedValue" name="potentialCapacityText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -197,7 +197,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLabel" name="capacityPerAreaText">
+      <widget class="FormattedValue" name="capacityPerAreaText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -218,6 +218,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FormattedValue</class>
+   <extends>QLabel</extends>
+   <header>mlapp/src/widgets/formatted_value</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
