@@ -46,7 +46,7 @@ with "InPaddocks" as
 	 from "Renamed")
 select
     0 as "{FID}",
-    st_intersection("Buffers".geometry, "InPaddocks".geometry) as geometry,
+    st_multi(st_intersection("Buffers".geometry, "InPaddocks".geometry)) as geometry,
     "Buffers"."{WATERPOINT}",
     {STATUS},
     "{WATERPOINT_BUFFER_TYPE}",

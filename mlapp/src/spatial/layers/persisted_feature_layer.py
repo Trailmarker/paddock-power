@@ -7,7 +7,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
-from ...utils import PLUGIN_NAME, qgsInfo
+from ...utils import PLUGIN_NAME, qgsInfo, qgsDebug
 from ..features.persisted_feature import PersistedFeature
 from ..layers.feature_layer import FeatureLayer
 

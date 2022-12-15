@@ -1,34 +1,11 @@
 # -*- coding: utf-8 -*-
 from ..schemas.schemas import WaterpointBufferSchema
-from .edits import Edits
 from .persisted_feature import PersistedFeature
-from .feature_action import FeatureAction
 
 
 @WaterpointBufferSchema.addSchema()
 class WaterpointBuffer(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
-        """Create a new Boundary."""
+        """Create a new Waterpoint Buffer."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
-
-    @FeatureAction.plan.handler()
-    def planFeature(self, waterpoint, geometry, waterpointBufferType, bufferDistance):
-        self.waterpoint = waterpoint.id
-        self.geometry = geometry
-        self.waterpointBufferType = waterpointBufferType
-        self.bufferDistance = bufferDistance
-        return Edits.upsert(self)
-
-    @FeatureAction.undoPlan.handler()
-    def undoPlanFeature(self):
-        self.waterpoint = None
-        return Edits.delete(self)
-
-    @FeatureAction.build.handler()
-    def buildFeature(self):
-        return Edits.upsert(self)
-
-    @FeatureAction.undoBuild.handler()
-    def undoBuildFeature(self):
-        return Edits.upsert(self)

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from .feature import Feature
+from .persisted_feature import PersistedFeature
 from ..schemas.schemas import WateredAreaSchema
 
 
 @WateredAreaSchema.addSchema()
-class WateredArea(Feature):
+class WateredArea(PersistedFeature):
 
-    def __init__(self, featureLayer, existingFeature):
-        """Create a new Boundary."""
-        super().__init__(featureLayer, existingFeature)
+    def __init__(self, featureLayer, existingFeature=None):
+        """Create a new WateredArea."""
+        super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)

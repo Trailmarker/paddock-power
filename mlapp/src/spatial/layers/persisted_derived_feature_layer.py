@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import pyqtSlot
 
 from qgis.core import QgsProject
 
-from ...utils import PLUGIN_NAME, qgsDebug
+from ...utils import PLUGIN_NAME, qgsInfo
 from .derived_feature_layer import DerivedFeatureLayer
 from .persisted_feature_layer import PersistedFeatureLayer
 from ..features.edits import Edits
@@ -47,12 +47,12 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
     @pyqtSlot()
     def repersistDerivedFeatures(self):
         """Derive all Features to be persisted from the source DerivedFeatureLayer."""
-        qgsDebug(f"Repersisting derived features for layer {self.name()} …")
+        qgsInfo(f"Repersisting derived features for layer {self.name()} …")
         self.setReadOnly(False)
         try:
             with Edits.editAndCommit(self):
                 self.dataProvider().truncate()
-                features = self.derivedLayer.getFeatures()
+                features = list(self.derivedLayer.getFeatures())
                 self.addFeatures(features)
         finally:
             self.setReadOnly(True)

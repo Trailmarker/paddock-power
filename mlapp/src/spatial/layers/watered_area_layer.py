@@ -1,56 +1,22 @@
 # -*- coding: utf-8 -*-
+from ...utils import PLUGIN_NAME
 from ..features.watered_area import WateredArea
-from .derived_feature_layer import DerivedFeatureLayer
+from .derived_watered_area_layer import DerivedWateredAreaLayer
+from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
 
-class WateredAreaLayer(DerivedFeatureLayer):
+class WateredAreaLayer(PersistedDerivedFeatureLayer):
 
     STYLE = "watered_area"
 
-    QUERY = """
-with
-  "Near" as
-	(select
-	 st_union(geometry) as "geometry",
-	 "Status"
-	 from "{1}"
-	 where "Waterpoint Buffer Type" = 'Near'
-	 group by "Status")
-, "Far" as
-	(select
-	 st_union(geometry) as "geometry",
-	 "Status"
-	 from "{1}"
-	 where "Waterpoint Buffer Type" = 'Far'
-	 group by "Status")
-, "Farm" as
-	(select st_union(geometry) as "geometry"
-     from
-	 (select geometry from "{0}"
-	  union
-	  select geometry from "{1}"))
-select "geometry", 'Near' as "Watered", "Status"
-from "Near"
-union
-select st_difference("Far".geometry, "Near".geometry), 'Far' as "Watered", "Far"."Status"
-from "Far"
-inner join "Near"
-on "Far"."Status" = "Near"."Status"
-union
-select st_difference(st_difference("Farm".geometry, "Far".geometry), "Near".geometry), 'Unwatered' as "Watered", "Far"."Status"
-from "Farm", "Far", "Near"
-"""
+    def __init__(self, gpkgFile, layerName, paddockLayer, waterpointBufferLayer):
+        f"""Create a new {PLUGIN_NAME} watered area layer."""
 
-#     QUERY = """
-# select st_union(geometry), "Waterpoint Buffer Type", "Status"
-# from "{0}"
-# group by "Waterpoint Buffer Type", "Status"
+        derivedWateredAreaLayer = DerivedWateredAreaLayer(
+            f"Derived {layerName}", paddockLayer, waterpointBufferLayer)
 
-# """
+        super().__init__(gpkgFile, layerName, derivedWateredAreaLayer, styleName=WateredAreaLayer.STYLE)
 
-    def getFeatureType(cls):
+    def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return WateredArea
-
-    def __init__(self, layerName, paddockLayer, waterpointBufferLayer):
-        super().__init__(layerName, WateredAreaLayer.QUERY, WateredAreaLayer.STYLE, paddockLayer, waterpointBufferLayer)

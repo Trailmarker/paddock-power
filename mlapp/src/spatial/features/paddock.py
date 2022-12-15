@@ -8,7 +8,7 @@ from ..layers.condition_table import ConditionTable
 from ..layers.derived_feature_layer import DerivedFeatureLayer
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_condition_popup_layer import PaddockConditionPopupLayer
-from ..layers.watered_area_layer import WateredAreaLayer
+from ..layers.derived_watered_area_layer import DerivedWateredAreaLayer
 from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits
@@ -25,7 +25,7 @@ class Paddock(AreaFeature):
     def twoPhaseRecalculate(self):
         return True
 
-    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wateredAreaLayer: WateredAreaLayer,
+    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wateredAreaLayer: DerivedWateredAreaLayer,
                  conditionTable: ConditionTable, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)

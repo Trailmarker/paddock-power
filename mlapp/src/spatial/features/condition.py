@@ -10,7 +10,7 @@ class Condition(Feature):
     featureUpdated = pyqtSignal()
 
     def __init__(self, featureLayer, conditionTable, existingFeature):
-        """Create a new Boundary."""
+        """Create a new Condition."""
         super().__init__(featureLayer, existingFeature)
 
         self.conditionTable = conditionTable

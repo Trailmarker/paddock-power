@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os.path
 from qgis.PyQt.QtCore import QObject
 
 from qgis.core import QgsProject
@@ -14,7 +13,7 @@ from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import PLUGIN_NAME, qgsDebug, resolveGeoPackageFile
+from ..utils import PLUGIN_NAME, resolveGeoPackageFile
 
 
 class ProjectBase(QObject):
@@ -34,10 +33,10 @@ class ProjectBase(QObject):
         pipelineLayerName = f"Pipelines"
         self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
-        
+
         landSystemLayerName = "Land Systems"
         self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
-        
+
         self.conditionTable = ConditionTable(self.gpkgFile, "Condition Table")
 
         paddockLayerName = f"Paddocks"
@@ -51,14 +50,19 @@ class ProjectBase(QObject):
         self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
 
         waterpointBufferLayerName = f"Waterpoint Buffers"
-        self.waterpointBufferLayer = WaterpointBufferLayer(self.gpkgFile, waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
+        self.waterpointBufferLayer = WaterpointBufferLayer(
+            self.gpkgFile, waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
 
         # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
         # Same goes for Paddocks and Watered Areas
         self.waterpointLayer.waterpointBufferLayer = self.waterpointBufferLayer
 
         wateredAreaLayerName = f"Watered Areas"
-        self.wateredAreaLayer = WateredAreaLayer(wateredAreaLayerName, self.paddockLayer, self.waterpointBufferLayer)
+        self.wateredAreaLayer = WateredAreaLayer(
+            self.gpkgFile,
+            wateredAreaLayerName,
+            self.paddockLayer,
+            self.waterpointBufferLayer)
 
         self.paddockLayer.wateredAreaLayer = self.wateredAreaLayer
 
@@ -86,7 +90,7 @@ class ProjectBase(QObject):
         self.pipelineLayer.addToMap(group)
         self.fenceLayer.addToMap(group)
         # Hide Waterpoint Buffers
-        self.waterpointBufferLayer.addToMap(group)
+        # self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
