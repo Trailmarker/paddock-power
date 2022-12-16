@@ -4,7 +4,7 @@ from qgis.core import QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
 from ...models.qt_abstract_meta import QtAbstractMeta
-from ...utils import resolveStylePath, PLUGIN_NAME
+from ...utils import qgsInfo, resolveStylePath, PLUGIN_NAME
 
 
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
@@ -32,6 +32,14 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         for layer in layers:
             if layer.source() == self.source():
                 QgsProject.instance().removeMapLayer(layer.id())
+
+    @classmethod
+    def detectAndRemoveAllOfType(cls):
+        """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
+        layers = [l for l in QgsProject.instance().mapLayers().values() if type(l).__name__ == cls.__name__]
+        for layer in layers:
+            qgsInfo(f"Removing existing layer {layer.name()} of type {type(layer).__name__}")
+            QgsProject.instance().removeMapLayer(layer.id())
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, feature)

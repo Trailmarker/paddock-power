@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import inspect
 import os
+import random
+import string
 from os import path
+
 
 from qgis.PyQt.QtCore import QFile, pyqtSignal, pyqtBoundSignal
 from qgis.PyQt.QtWidgets import QMessageBox
@@ -114,9 +117,13 @@ def getComponentStyleSheet(componentFile):
     resourceFile.open(QFile.ReadOnly | QFile.Text)
     return resourceFile.readAll().data().decode("utf-8")
 
+
+def randomString(length=8):
+    """Generate a random string of a specified length."""
+    return ''.join(random.choice(string.ascii_letters) for _ in range(length))
+
+
 # See https://stackoverflow.com/questions/28258875/how-to-obtain-the-set-of-all-signals-for-a-given-widget
-
-
 def getSignals(source):
     """Get the signals of an object."""
     cls = source if isinstance(source, type) else type(source)

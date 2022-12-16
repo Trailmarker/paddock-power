@@ -10,6 +10,7 @@ from ..schemas.schemas import PersistedFeatureSchema
 
 @PersistedFeatureSchema.addSchema()
 class PersistedFeature(Feature):
+
     featureUpdated = pyqtSignal()
     featureDeleted = pyqtSignal()
     featureSelected = pyqtSignal()

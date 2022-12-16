@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ..calculator import Calculator
 from ..features.watered_area import WateredArea
 from ..schemas.schemas import FID, PADDOCK, PADDOCK_STATUS, STATUS, GRAZING_RADIUS_TYPE, WATERED_TYPE
 from ..schemas.grazing_radius_type import GrazingRadiusType
@@ -51,9 +52,10 @@ select
 	{FAR_WATERED_AREA}."{PADDOCK_STATUS}"
 from {FAR_WATERED_AREA}
 inner join {NEAR_WATERED_AREA}
-on {FAR_WATERED_AREA}.{STATUS} = {NEAR_WATERED_AREA}.{STATUS}
-and {FAR_WATERED_AREA}.{PADDOCK} = {NEAR_WATERED_AREA}.{PADDOCK}
-and st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry) is not null
+	on {FAR_WATERED_AREA}.{STATUS} = {NEAR_WATERED_AREA}.{STATUS}
+	and {FAR_WATERED_AREA}.{PADDOCK} = {NEAR_WATERED_AREA}.{PADDOCK}
+	and st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry) is not null
+	and st_area(st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_AREA_M2}
 union
 select
 	0 as {FID},
@@ -66,6 +68,7 @@ from "{{0}}"
 inner join {FAR_WATERED_AREA}
 	on "{{0}}".{FID} = {FAR_WATERED_AREA}.{PADDOCK}
 	and st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry) is not null
+	and st_area(st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_AREA_M2}
 """
 
     def getFeatureType(cls):

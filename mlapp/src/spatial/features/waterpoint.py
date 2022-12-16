@@ -41,32 +41,40 @@ class Waterpoint(PointFeature):
         return f"Waterpoint ({self.id}) ({self.waterpointType})"
 
     def addPopupLayer(self):
-        """Add a water buffer layer to the project."""
-        item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
-        if not item:
-            # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
-            return
-        self.popupLayer = WaterpointPopupLayer(
-            f"{self.waterpointType.value} {self.id} Watered Area",
-            self,
-            self.waterpointBufferLayer)
-        group = item.parent()
-        # Insert the buffers layer immediately below this waterpoint, so it and any neighbouring waterpoints
-        # remain visible.
-        group.insertLayer(group.children().index(item) + 1, self.popupLayer)
-        self.popupLayerAdded.emit(self.popupLayer)
+        """Add a Waterpoint popup layer to the project."""
+        if not self.popupLayer:
+            item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
+            if not item:
+                # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
+                return
+
+            WaterpointPopupLayer.detectAndRemoveAllOfType()
+
+            self.popupLayer = WaterpointPopupLayer(
+                f"{self.waterpointType.value} {self.id} Watered Area",
+                self,
+                self.waterpointBufferLayer)
+            group = item.parent()
+            # Insert the buffers layer immediately below this waterpoint, so it and any neighbouring waterpoints
+            # remain visible.
+            group.insertLayer(group.children().index(item) + 1, self.popupLayer)
+            self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
+        """Remove any Waterpoint popup layer from the project."""
         try:
             if self.popupLayer:
                 layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)
                 if layer:
+                    layer.setItemVisibilityChecked(False)
+                    self.popupLayer.triggerRepaint()
                     layer.parent().removeChildNode(layer)
                     QgsProject.instance().removeMapLayer(self.popupLayer.id())
-                self.popupLayer = None
-                self.popuplayerRemoved.emit()
         except BaseException:
             pass
+        finally:
+            self.popupLayer = None
+            self.popupLayerRemoved.emit()
 
     def onSelectFeature(self):
         if super().onSelectFeature():

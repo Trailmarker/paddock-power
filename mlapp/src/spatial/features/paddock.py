@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsProject
+from qgis.core import QgsFeatureRequest, QgsProject
 
 from ...utils import qgsInfo, qgsDebug
 from ..layers.condition_table import ConditionTable
@@ -68,65 +68,73 @@ class Paddock(AreaFeature):
     def recalculate(self):
         super().recalculate()
 
-        # try:
-        #     self.recalculateLayer = PaddockConditionPopupLayer(
-        #         f"Paddock {self.id} Recalculate",
-        #         self,
-        #         self.featureLayer,
-        #         self.landSystemLayer,
-        #         self.wateredAreaLayer,
-        #         self.conditionTable)
+        try:
+            self.recalculateLayer = PaddockConditionPopupLayer(
+                f"Paddock {self.id} Recalculate",
+                self,
+                self.featureLayer,
+                self.landSystemLayer,
+                self.wateredAreaLayer,
+                self.conditionTable)
 
-        #     request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-        #     conditions = [f for f in self.recalculateLayer.getFeatures(request)]
+            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+            conditions = [f for f in self.recalculateLayer.getFeatures(request)]
 
-        #     estimatedRaw = sum([c.estimatedCapacity for c in conditions])
-        #     self.estimatedCapacity = round(estimatedRaw)
-        #     self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
-        #     self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
-        # except BaseException as e:
-        #     qgsInfo(f"{self}.recalculate() failed with exception {e}")
-        # finally:
-        #     # Scoping and QGIS layer ownership design mean layer's (usually) already deleted by here
-        #     self.recalculateLayer = None
-        #     # if self.recalculateLayer:
-        #     #     self.recalculateLayer.detectAndRemove()
+            estimatedRaw = sum([c.estimatedCapacity for c in conditions])
+            self.estimatedCapacity = round(estimatedRaw)
+            self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
+            self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
+        except BaseException as e:
+            qgsInfo(f"{self}.recalculate() failed with exception {e}")
+        finally:
+            # Scoping and QGIS layer ownership design mean layer's (usually) already deleted by here
+            self.recalculateLayer = None
+            # if self.recalculateLayer:
+            #     self.recalculateLayer.detectAndRemove()
 
-        # # qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
+        qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
 
     def addPopupLayer(self):
         """Add a condition layer to the project."""
-        item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
-        if not item:
-            # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
-            return
+        if not self.popupLayer:
+            item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
+            if not item:
+                # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
+                return
 
-        self.popupLayer = PaddockConditionPopupLayer(
-            f"{self.name} Paddock Condition",
-            self,
-            self.featureLayer,
-            self.landSystemLayer,
-            self.wateredAreaLayer,
-            self.conditionTable)
+            # Remove any existing condition popup layers - they don't play nice together
+            PaddockConditionPopupLayer.detectAndRemoveAllOfType()
 
-        group = item.parent()
+            self.popupLayer = PaddockConditionPopupLayer(
+                f"{self.name} Paddock Condition",
+                self,
+                self.featureLayer,
+                self.landSystemLayer,
+                self.wateredAreaLayer,
+                self.conditionTable)
 
-        # Bit of a hack but it looks nicer if it's above the derived Boundary layer …
-        group.insertLayer(max(0, group.children().index(item) - 1), self.popupLayer)
+            group = item.parent()
 
-        self.popupLayerAdded.emit(self.popupLayer)
+            # Bit of a hack but it looks nicer if it's above the derived Boundary layer …
+            group.insertLayer(max(0, group.children().index(item) - 1), self.popupLayer)
+
+            self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
+        """Remove any Paddock Condition popup layer from the project."""
         try:
             if self.popupLayer:
                 layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)
                 if layer:
+                    layer.setItemVisibilityChecked(False)
+                    self.popupLayer.triggerRepaint()
                     layer.parent().removeChildNode(layer)
                     QgsProject.instance().removeMapLayer(self.popupLayer.id())
-                self.popupLayer = None
-            self.popuplayerRemoved.emit()
         except BaseException:
             pass
+        finally:
+            self.popupLayerRemoved.emit()
+            self.popupLayer = None
 
     def onSelectFeature(self):
         if super().onSelectFeature():
