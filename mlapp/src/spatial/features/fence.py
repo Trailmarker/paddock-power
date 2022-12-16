@@ -37,33 +37,33 @@ class Fence(LineFeature):
         """Return True for Fence."""
         return True
 
-    def getFarm(self, glitchBuffer=1.0):
-        """Get the farm geometry for this Fence."""
-        # Get the whole area around the farm
+    def getPropertyGeometry(self, glitchBuffer=1.0):
+        """Get the property geometry for this Fence."""
+        # Get the whole area around the property
         # We are only interested in Paddocks that are current
         builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
             FeatureStatus.Built, FeatureStatus.Planned)
 
         # Get the whole current Paddock area - note the buffering here to reduce glitches
         return QgsGeometry.unaryUnion(p.geometry.buffer(glitchBuffer, 10) for p in builtAndPlannedPaddocks)
-        # return farm.buffer(-glitchBuffer, 10)
+        # return property.buffer(-glitchBuffer, 10)
 
-    def getFarmRegion(self):
-        """Get the farm geometry for this Fence."""
-        # Get the whole area around the farm
-        farmExtent = QgsRectangle(self.paddockLayer.extent())
-        farmExtent.scale(1.5)  # Expand by 50%
-        return QgsGeometry.fromRect(farmExtent)
+    def getPropertyNeighbourhood(self):
+        """Get the property neighbourhood around this Fence."""
+        # Get the whole area around the property
+        propertyExtent = QgsRectangle(self.paddockLayer.extent())
+        propertyExtent.scale(1.5)  # Expand by 50%
+        return QgsGeometry.fromRect(propertyExtent)
 
-    def getNotFarm(self, glitchBuffer=1.0):
-        """Get the not farm geometry for this Fence."""
-        # Get the whole area around the farm
-        farmRegion = self.getFarmRegion()
-        farm = self.getFarm(glitchBuffer=glitchBuffer)
+    def getNotPropertyGeometry(self, glitchBuffer=1.0):
+        """Get the not property geometry for this Fence."""
+        # Get the whole area around the property
+        propertyRegion = self.getPropertyNeighbourhood()
+        propertyGeometry = self.getPropertyGeometry(glitchBuffer=glitchBuffer)
 
-        # Get a representation of everything that's not in the farm
-        notFarm = farmRegion.difference(farm)
-        return notFarm.buffer(2 * glitchBuffer, 10)
+        # Get a representation of everything that's not in the property
+        notPropertyGeometry = propertyRegion.difference(propertyGeometry)
+        return notPropertyGeometry.buffer(2 * glitchBuffer, 10)
 
     @Glitch.glitchy()
     def getNewPaddocks(self, geometry=None):
@@ -74,16 +74,16 @@ class Fence(LineFeature):
         if not fenceLine or fenceLine.isEmpty():
             return [], []
 
-        notFarm = self.getNotFarm(glitchBuffer=1.0)
+        notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=1.0)
 
-        if notFarm.isEmpty():
-            raise Glitch(f"{PLUGIN_NAME} can't find the farm boundary, is there any paddock data?")
+        if notPropertyGeometry.isEmpty():
+            raise Glitch(f"{PLUGIN_NAME} can't find the property boundary, is there any paddock data?")
 
         if fenceLine.isEmpty():
             return [], []
 
         # QgsGeometry.fromPolygonXY([g]) to get the rings as polygons
-        _, *farmBoundaries = [QgsGeometry.fromMultiPolylineXY([g]) for g in notFarm.asPolygon()]
+        _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g]) for g in notPropertyGeometry.asPolygon()]
 
         # Straightforward case where we have a single new fence line enclosing things
         if fenceLine.isMultipart():
@@ -91,27 +91,27 @@ class Fence(LineFeature):
 
         newPaddocks = []
 
-        for farmBoundary in farmBoundaries:
+        for propertyBoundary in propertyBoundaries:
 
-            intersection = farmBoundary.intersection(fenceLine)
+            intersection = propertyBoundary.intersection(fenceLine)
 
             if (not intersection.isEmpty()) and intersection.isMultipart():
-                # We crossed the not-farm boundary more than once, so we are enclosing land
+                # We crossed the not-property boundary more than once, so we are enclosing land
                 polyline = fenceLine.asPolyline()
                 splitLine = [QgsPointXY(p.x(), p.y()) for p in polyline]
 
                 # qgsDebug("getNewPaddocks: splitGeometry in progress …")
-                _, splits, _ = notFarm.splitGeometry(splitLine, False)
+                _, splits, _ = notPropertyGeometry.splitGeometry(splitLine, False)
 
-                # The first result is always the piece of notFarm that is carved out? TODO check this
+                # The first result is always the piece of notProperty that is carved out? TODO check this
                 if splits:
-                    paddockGeometry = notFarm.difference(splits[0])
+                    paddockGeometry = notPropertyGeometry.difference(splits[0])
                     newPaddock = self.paddockLayer.makeFeature()
                     newPaddock.draftFeature(paddockGeometry, f"Fence {self.buildOrder} New")
                     newPaddocks.append(newPaddock)
 
-        # notFarm = self.getNotFarm(glitchBuffer=1.0)
-        # fenceLine = fenceLine.intersection(notFarm)
+        # notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=1.0)
+        # fenceLine = fenceLine.intersection(notPropertyGeometry)
 
         if not newPaddocks or not fenceLine:
             return [], []
@@ -134,11 +134,11 @@ class Fence(LineFeature):
 
         intersects = [p for p in builtAndPlannedPaddocks if fenceLine.intersects(p.geometry)]
 
-        # Crop the fence line to the farm
-        farm = self.getFarm(glitchBuffer=1.0)
+        # Crop the fence line to the property
+        propertyBoundary = self.getPropertyGeometry(glitchBuffer=1.0)
 
         # If this makes the fence multipart, we can ignore it
-        fenceLine = fenceLine.intersection(farm)
+        fenceLine = fenceLine.intersection(propertyBoundary)
 
         if fenceLine.isEmpty():
             return [], []
