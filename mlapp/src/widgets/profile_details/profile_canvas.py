@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...models.glitch import Glitch
-from ...spatial.profile import Profile
+from ...spatial.elevation_profile import ElevationProfile
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib
@@ -11,7 +11,7 @@ class ProfileCanvas(FigureCanvasQTAgg):
 
     def __init__(self, profile):
 
-        if not isinstance(profile, Profile):
+        if not isinstance(profile, ElevationProfile):
             raise Glitch(
                 "InfrastructureProfileCanvas.__init__: profile must be a Profile")
 

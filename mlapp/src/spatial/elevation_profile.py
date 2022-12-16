@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class Profile:
+class ElevationProfile:
     def __init__(self, *, maximumDistance, distances, elevations, minimumElevation, maximumElevation, meanElevation):
         self.maximumDistance = maximumDistance
         self.distances = distances

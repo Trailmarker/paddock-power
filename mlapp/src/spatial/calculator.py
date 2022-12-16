@@ -6,8 +6,9 @@ from shapely.wkt import dumps
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsDistanceArea, QgsGeometry, QgsPoint, QgsPointXY, QgsProject, QgsRaster
 
+from ..utils import PLUGIN_NAME
 from ..models.glitch import Glitch
-from .profile import Profile
+from .elevation_profile import ElevationProfile
 
 
 def makeDistanceAreaCalculator():
@@ -21,7 +22,7 @@ def makeDistanceAreaCalculator():
 
 
 class Calculator:
-    MINIMUM_AREA_M2 = 10.0 # 10 m² is the smallest analytic area we care about
+    MINIMUM_AREA_M2 = 10.0  # 10 m² is the smallest analytic area we care about
     QGIS_CALCULATOR = makeDistanceAreaCalculator()
 
     @staticmethod
@@ -127,12 +128,12 @@ class Calculator:
 
         maximumDistance = distances[-1]
 
-        return Profile(maximumDistance=maximumDistance,
-                       distances=distances,
-                       elevations=elevations,
-                       minimumElevation=minimumElevation,
-                       maximumElevation=maximumElevation,
-                       meanElevation=meanElevation)
+        return ElevationProfile(maximumDistance=maximumDistance,
+                                distances=distances,
+                                elevations=elevations,
+                                minimumElevation=minimumElevation,
+                                maximumElevation=maximumElevation,
+                                meanElevation=meanElevation)
 
     @staticmethod
     def calculateArea(polygon):
