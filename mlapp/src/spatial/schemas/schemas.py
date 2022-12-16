@@ -5,7 +5,7 @@ from .condition_type import ConditionType
 from .feature_status import FeatureStatus
 from .field import DomainField, IdField, MeasureField, StringField
 from .watered_type import WateredType
-from .waterpoint_buffer_type import WaterpointBufferType
+from .grazing_radius_type import GrazingRadiusType
 from .waterpoint_type import WaterpointType
 
 
@@ -45,7 +45,6 @@ class Schema(ReadOnlySchema):
 AREA = "Area (km²)"
 BORE_REPORT_URL = "Bore Report URL"
 BORE_YIELD = "Bore Yield (L/s)"
-BUFFER_DISTANCE = "Buffer Distance (m)"
 BUILD_FENCE = "Build Fence"
 BUILD_ORDER = "Build Order"
 CAPACITY_PER_AREA = "AE/km²"
@@ -54,8 +53,10 @@ CONDITION_TYPE = "Condition"
 ELEVATION = "Elevation (m)"
 EROSION_RISK = "Erosion Risk"
 ESTIMATED_CAPACITY = "AE"
-FAR_BUFFER = "Far Buffer (m)"
+FAR_GRAZING_RADIUS = "Far Grazing Radius (m)"
 FID = "fid"
+GRAZING_RADIUS = "Grazing Radius (m)"
+GRAZING_RADIUS_TYPE = "Grazing Radius Type"
 LAND_SYSTEM = "Land System"
 LAND_SYSTEM_NAME = "Land System Name"
 LANDSCAPE_CLASS = "Landscape Class"
@@ -64,18 +65,17 @@ LENGTH = "Length (km)"
 LONGITUDE = "Longitude"
 MAP_UNIT = "Map Unit"
 NAME = "Name"
-NEAR_BUFFER = "Near Buffer (m)"
+NEAR_GRAZING_RADIUS = "Near Grazing Radius (m)"
 PADDOCK = "Paddock"
 PADDOCK_NAME = "Paddock Name"
 PERIMETER = "Perimeter (km)"
 POTENTIAL_CAPACITY = "Potential AE"
-RECALCULATE_CURRENT = "Current"
 RECALCULATE_COMPLETE = "Complete"
+RECALCULATE_CURRENT = "Current"
 REFERENCE = "Reference"
 STATUS = "Status"
 WATERED_TYPE = "Watered"
 WATERPOINT = "Waterpoint"
-WATERPOINT_BUFFER_TYPE = "Waterpoint Buffer Type"
 WATERPOINT_END_MONTH = "Waterpoint End Month"
 WATERPOINT_START_MONTH = "Waterpoint Start Month"
 WATERPOINT_TYPE = "Waterpoint Type"
@@ -84,7 +84,7 @@ WATERPOINT_TYPE = "Waterpoint Type"
 Area = MeasureField(propertyName="featureArea", name=AREA)
 BoreReportUrl = StringField(propertyName="boreReportUrl", name=BORE_REPORT_URL)
 BoreYield = MeasureField(propertyName="boreYield", name=BORE_YIELD)
-BufferDistance = MeasureField(propertyName="bufferDistance", name=BUFFER_DISTANCE)
+GrazingRadius = MeasureField(propertyName="grazingRadius", name=GRAZING_RADIUS)
 BuildFence = IdField(propertyName="buildFence", name=BUILD_FENCE)
 BuildOrder = IdField(propertyName="buildOrder", name=BUILD_ORDER)
 CapacityPerArea = MeasureField(propertyName="capacityPerArea", name=CAPACITY_PER_AREA)
@@ -97,7 +97,7 @@ ConditionTypeField = DomainField(
 Elevation = MeasureField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'))
 ErosionRisk = StringField(propertyName="erosionRisk", name=EROSION_RISK)
 EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=ESTIMATED_CAPACITY)
-FarBufferDistance = MeasureField(propertyName="farBuffer", name=FAR_BUFFER, defaultValue="5000.0")
+FarGrazingRadius = MeasureField(propertyName="farGrazingRadius", name=FAR_GRAZING_RADIUS, defaultValue="5000.0")
 Fid = IdField("id", name=FID)
 LandscapeClass = StringField(propertyName="landscapeClass", name=LANDSCAPE_CLASS)
 LandSystem = IdField(propertyName="landSystem", name=LAND_SYSTEM)
@@ -107,7 +107,7 @@ Length = MeasureField(propertyName="featureLength", name=LENGTH)
 Longitude = MeasureField(propertyName="featureLongitude", name=LONGITUDE, defaultValue=float('NaN'))
 MapUnit = StringField(propertyName="mapUnit", name=MAP_UNIT)
 Name = StringField(propertyName="name", name=NAME)
-NearBufferDistance = MeasureField(propertyName="nearBuffer", name=NEAR_BUFFER, defaultValue="3000.0")
+NearGrazingRadius = MeasureField(propertyName="nearGrazingRadius", name=NEAR_GRAZING_RADIUS, defaultValue="3000.0")
 Paddock = IdField(propertyName="paddock", name=PADDOCK)
 PaddockName = StringField(propertyName="paddockName", name=PADDOCK_NAME)
 Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER)
@@ -122,10 +122,10 @@ WateredTypeField = DomainField(
     domainType=WateredType,
     defaultValue=WateredType.Unwatered)
 Waterpoint = IdField(propertyName="waterpoint", name=WATERPOINT)
-WaterpointBufferTypeField = DomainField(
-    propertyName="waterpointBufferType",
-    name=WATERPOINT_BUFFER_TYPE,
-    domainType=WaterpointBufferType)
+GrazingRadiusTypeField = DomainField(
+    propertyName="grazingRadiusType",
+    name=GRAZING_RADIUS_TYPE,
+    domainType=GrazingRadiusType)
 WaterpointEndMonth = StringField(propertyName="waterpointEndMonth", name=WATERPOINT_END_MONTH)
 WaterpointStartMonth = StringField(propertyName="waterpointStartMonth", name=WATERPOINT_START_MONTH)
 WaterpointTypeField = DomainField(
@@ -170,7 +170,7 @@ PersistedFeatureSchema = Schema([Fid], wkbType=QgsWkbTypes.MultiPolygon)
 PipelineSchema = LineFeatureSchema
 PointFeatureSchema = Schema([Fid, Name, Status, Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)
 StatusFeatureSchema = Schema([Fid, Name, Status])
-WaterpointBufferSchema = Schema([Fid, Status, Waterpoint, WaterpointBufferTypeField, BufferDistance],
+WaterpointBufferSchema = Schema([Fid, Status, Waterpoint, GrazingRadiusTypeField, GrazingRadius],
                                 wkbType=QgsWkbTypes.MultiPolygon)
 WateredAreaSchema = Schema([Fid, WateredTypeField, Status], wkbType=QgsWkbTypes.MultiPolygon)
 WaterpointSchema = Schema([Fid,
@@ -180,6 +180,6 @@ WaterpointSchema = Schema([Fid,
                            Latitude,
                            Elevation,
                            WaterpointTypeField,
-                           NearBufferDistance,
-                           FarBufferDistance],
+                           NearGrazingRadius,
+                           FarGrazingRadius],
                           wkbType=QgsWkbTypes.Point)

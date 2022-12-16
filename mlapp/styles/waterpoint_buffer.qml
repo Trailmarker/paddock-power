@@ -6,7 +6,7 @@
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <renderer-v2 type="categorizedSymbol" attr="Waterpoint Buffer Type" referencescale="-1" forceraster="0" enableorderby="0" symbollevels="0">
+  <renderer-v2 type="categorizedSymbol" attr="Grazing Radius Type" referencescale="-1" forceraster="0" enableorderby="0" symbollevels="0">
     <categories>
       <category type="string" value="Far" symbol="0" label="Far" render="true"/>
       <category type="string" value="Near" symbol="1" label="Near" render="true"/>
@@ -147,7 +147,7 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <fieldConfiguration>
-    <field configurationFlags="None" name="Waterpoint Buffer Type">
+    <field configurationFlags="None" name="Grazing Radius Type">
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
@@ -165,21 +165,21 @@
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias name="" field="Waterpoint Buffer Type" index="0"/>
+    <alias name="" field="Grazing Radius Type" index="0"/>
   </aliases>
   <defaults>
-    <default applyOnUpdate="0" field="Waterpoint Buffer Type" expression=""/>
+    <default applyOnUpdate="0" field="Grazing Radius Type" expression=""/>
   </defaults>
   <constraints>
-    <constraint unique_strength="0" constraints="0" exp_strength="0" field="Waterpoint Buffer Type" notnull_strength="0"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" field="Grazing Radius Type" notnull_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint exp="" desc="" field="Waterpoint Buffer Type"/>
+    <constraint exp="" desc="" field="Grazing Radius Type"/>
   </constraintExpressions>
   <expressionfields/>
   <attributetableconfig sortOrder="0" sortExpression="" actionWidgetStyle="dropDown">
     <columns>
-      <column type="field" hidden="0" name="Waterpoint Buffer Type" width="-1"/>
+      <column type="field" hidden="0" name="Grazing Radius Type" width="-1"/>
       <column type="actions" hidden="1" width="-1"/>
     </columns>
   </attributetableconfig>
@@ -212,24 +212,24 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
-    <field editable="1" name="Buffer Distance (m)"/>
+    <field editable="1" name="Grazing Radius (m)"/>
     <field editable="1" name="Name"/>
     <field editable="1" name="Waterpoint"/>
-    <field editable="1" name="Waterpoint Buffer Type"/>
+    <field editable="1" name="Grazing Radius Type"/>
     <field editable="1" name="fid"/>
   </editable>
   <labelOnTop>
-    <field labelOnTop="0" name="Buffer Distance (m)"/>
+    <field labelOnTop="0" name="Grazing Radius (m)"/>
     <field labelOnTop="0" name="Name"/>
     <field labelOnTop="0" name="Waterpoint"/>
-    <field labelOnTop="0" name="Waterpoint Buffer Type"/>
+    <field labelOnTop="0" name="Grazing Radius Type"/>
     <field labelOnTop="0" name="fid"/>
   </labelOnTop>
   <reuseLastValue>
-    <field name="Buffer Distance (m)" reuseLastValue="0"/>
+    <field name="Grazing Radius (m)" reuseLastValue="0"/>
     <field name="Name" reuseLastValue="0"/>
     <field name="Waterpoint" reuseLastValue="0"/>
-    <field name="Waterpoint Buffer Type" reuseLastValue="0"/>
+    <field name="Grazing Radius Type" reuseLastValue="0"/>
     <field name="fid" reuseLastValue="0"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from ..features.watered_area import WateredArea
 from ..schemas.feature_status import FeatureStatus
-from ..schemas.schemas import BUFFER_DISTANCE, FAR_BUFFER, FID, NEAR_BUFFER, STATUS, WATERPOINT, WATERPOINT_BUFFER_TYPE
-from ..schemas.waterpoint_buffer_type import WaterpointBufferType
+from ..schemas.schemas import GRAZING_RADIUS, FAR_GRAZING_RADIUS, FID, NEAR_GRAZING_RADIUS, STATUS, WATERPOINT, GRAZING_RADIUS_TYPE
+from ..schemas.grazing_radius_type import GrazingRadiusType
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -12,21 +12,21 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
 
     QUERY = f"""
 with
-  "{WaterpointBufferType.Near.name}" as
+  "{GrazingRadiusType.Near.name}" as
 	(select
 	 st_union(geometry) as "geometry",
 	 "{STATUS}"
 	 from "{{1}}"
-	 where "{WATERPOINT_BUFFER_TYPE}" = '{WaterpointBufferType.Near.name}'
+	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Near.name}'
 	 group by "{STATUS}")
-, "{WaterpointBufferType.Far.name}" as
+, "{GrazingRadiusType.Far.name}" as
 	(select
 	 st_union(geometry) as "geometry",
 	 "{STATUS}"
 	 from "{{1}}"
-	 where "{WATERPOINT_BUFFER_TYPE}" = '{WaterpointBufferType.Far.name}'
+	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Far.name}'
 	 group by "{STATUS}")
-, "Farm" as
+, "Property" as
 	(select st_union(geometry) as "geometry"
      from
 	 (select geometry from "{{0}}"
@@ -35,25 +35,25 @@ with
 select
 	0 as "{FID}",
 	st_collectionextract(geometry, 3),
-	'{WaterpointBufferType.Near.name}' as "Watered",
+	'{GrazingRadiusType.Near.name}' as "Watered",
 	"{STATUS}"
-from "{WaterpointBufferType.Near.name}"
+from "{GrazingRadiusType.Near.name}"
 union
 select
 	0 as "{FID}",
-	st_collectionextract(st_difference("{WaterpointBufferType.Far.name}".geometry, "{WaterpointBufferType.Near.name}".geometry), 3),
-	'{WaterpointBufferType.Far.name}' as "Watered",
-	"{WaterpointBufferType.Far.name}"."{STATUS}"
-from "{WaterpointBufferType.Far.name}"
-inner join "{WaterpointBufferType.Near.name}"
-on "{WaterpointBufferType.Far.name}"."{STATUS}" = "{WaterpointBufferType.Near.name}"."{STATUS}"
+	st_collectionextract(st_difference("{GrazingRadiusType.Far.name}".geometry, "{GrazingRadiusType.Near.name}".geometry), 3),
+	'{GrazingRadiusType.Far.name}' as "Watered",
+	"{GrazingRadiusType.Far.name}"."{STATUS}"
+from "{GrazingRadiusType.Far.name}"
+inner join "{GrazingRadiusType.Near.name}"
+on "{GrazingRadiusType.Far.name}"."{STATUS}" = "{GrazingRadiusType.Near.name}"."{STATUS}"
 union
 select
 	0 as "{FID}",
-	st_collectionextract(st_difference(st_difference("Farm".geometry, "{WaterpointBufferType.Far.name}".geometry), "{WaterpointBufferType.Near.name}".geometry), 3),
+	st_collectionextract(st_difference(st_difference("Property".geometry, "{GrazingRadiusType.Far.name}".geometry), "{GrazingRadiusType.Near.name}".geometry), 3),
 	'Unwatered' as "Watered",
-	"{WaterpointBufferType.Far.name}"."{STATUS}"
-from "Farm", "{WaterpointBufferType.Far.name}", "{WaterpointBufferType.Near.name}"
+	"{GrazingRadiusType.Far.name}"."{STATUS}"
+from "Property", "{GrazingRadiusType.Far.name}", "{GrazingRadiusType.Near.name}"
 """
 
     def getFeatureType(cls):

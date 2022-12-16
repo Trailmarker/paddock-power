@@ -11,7 +11,7 @@ class WaterpointPopupLayer(DerivedFeatureLayer):
 select *
 from "{{0}}"
 where "Waterpoint" = {waterpointId}
-order by "Waterpoint Buffer Type"
+order by "Grazing Radius Type"
 """
 
     def getFeatureType(cls):

@@ -258,30 +258,30 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
-    <field editable="1" name="Buffer Distance (m)"/>
+    <field editable="1" name="Grazing Radius (m)"/>
     <field editable="1" name="Name"/>
     <field editable="1" name="Status"/>
     <field editable="1" name="Watered"/>
     <field editable="1" name="Waterpoint"/>
-    <field editable="1" name="Waterpoint Buffer Type"/>
+    <field editable="1" name="Grazing Radius Type"/>
     <field editable="1" name="fid"/>
   </editable>
   <labelOnTop>
-    <field labelOnTop="0" name="Buffer Distance (m)"/>
+    <field labelOnTop="0" name="Grazing Radius (m)"/>
     <field labelOnTop="0" name="Name"/>
     <field labelOnTop="0" name="Status"/>
     <field labelOnTop="0" name="Watered"/>
     <field labelOnTop="0" name="Waterpoint"/>
-    <field labelOnTop="0" name="Waterpoint Buffer Type"/>
+    <field labelOnTop="0" name="Grazing Radius Type"/>
     <field labelOnTop="0" name="fid"/>
   </labelOnTop>
   <reuseLastValue>
-    <field name="Buffer Distance (m)" reuseLastValue="0"/>
+    <field name="Grazing Radius (m)" reuseLastValue="0"/>
     <field name="Name" reuseLastValue="0"/>
     <field name="Status" reuseLastValue="0"/>
     <field name="Watered" reuseLastValue="0"/>
     <field name="Waterpoint" reuseLastValue="0"/>
-    <field name="Waterpoint Buffer Type" reuseLastValue="0"/>
+    <field name="Grazing Radius Type" reuseLastValue="0"/>
     <field name="fid" reuseLastValue="0"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>

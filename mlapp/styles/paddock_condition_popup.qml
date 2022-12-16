@@ -471,7 +471,7 @@ def my_form_open(dialog, layer, feature):
     <field name="Paddock Status" editable="1"/>
     <field name="Watered" editable="1"/>
     <field name="Watered Area Status" editable="1"/>
-    <field name="Waterpoint Buffer Type" editable="1"/>
+    <field name="Grazing Radius Type" editable="1"/>
   </editable>
   <labelOnTop>
     <field name="AE/km²" labelOnTop="0"/>
@@ -483,7 +483,7 @@ def my_form_open(dialog, layer, feature):
     <field name="Paddock Status" labelOnTop="0"/>
     <field name="Watered" labelOnTop="0"/>
     <field name="Watered Area Status" labelOnTop="0"/>
-    <field name="Waterpoint Buffer Type" labelOnTop="0"/>
+    <field name="Grazing Radius Type" labelOnTop="0"/>
   </labelOnTop>
   <reuseLastValue>
     <field name="AE/km²" reuseLastValue="0"/>
@@ -495,7 +495,7 @@ def my_form_open(dialog, layer, feature):
     <field name="Paddock Status" reuseLastValue="0"/>
     <field name="Watered" reuseLastValue="0"/>
     <field name="Watered Area Status" reuseLastValue="0"/>
-    <field name="Waterpoint Buffer Type" reuseLastValue="0"/>
+    <field name="Grazing Radius Type" reuseLastValue="0"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>

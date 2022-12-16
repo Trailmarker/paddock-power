@@ -810,14 +810,14 @@
         </config>
       </editWidget>
     </field>
-    <field name="Far Buffer (m)" configurationFlags="None">
+    <field name="Far Grazing Radius (m)" configurationFlags="None">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Near Buffer (m)" configurationFlags="None">
+    <field name="Near Grazing Radius (m)" configurationFlags="None">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -833,8 +833,8 @@
     <alias name="" field="Longitude" index="4"/>
     <alias name="" field="Latitude" index="5"/>
     <alias name="" field="Elevation (m)" index="6"/>
-    <alias name="" field="Far Buffer (m)" index="7"/>
-    <alias name="" field="Near Buffer (m)" index="8"/>
+    <alias name="" field="Far Grazing Radius (m)" index="7"/>
+    <alias name="" field="Near Grazing Radius (m)" index="8"/>
   </aliases>
   <defaults>
     <default expression="" applyOnUpdate="0" field="fid"/>
@@ -844,8 +844,8 @@
     <default expression="" applyOnUpdate="0" field="Longitude"/>
     <default expression="" applyOnUpdate="0" field="Latitude"/>
     <default expression="" applyOnUpdate="0" field="Elevation (m)"/>
-    <default expression="" applyOnUpdate="0" field="Far Buffer (m)"/>
-    <default expression="" applyOnUpdate="0" field="Near Buffer (m)"/>
+    <default expression="" applyOnUpdate="0" field="Far Grazing Radius (m)"/>
+    <default expression="" applyOnUpdate="0" field="Near Grazing Radius (m)"/>
   </defaults>
   <constraints>
     <constraint notnull_strength="1" field="fid" exp_strength="0" unique_strength="1" constraints="3"/>
@@ -855,8 +855,8 @@
     <constraint notnull_strength="0" field="Longitude" exp_strength="0" unique_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Latitude" exp_strength="0" unique_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Elevation (m)" exp_strength="0" unique_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Far Buffer (m)" exp_strength="0" unique_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Near Buffer (m)" exp_strength="0" unique_strength="0" constraints="0"/>
+    <constraint notnull_strength="0" field="Far Grazing Radius (m)" exp_strength="0" unique_strength="0" constraints="0"/>
+    <constraint notnull_strength="0" field="Near Grazing Radius (m)" exp_strength="0" unique_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
     <constraint field="fid" exp="" desc=""/>
@@ -866,8 +866,8 @@
     <constraint field="Longitude" exp="" desc=""/>
     <constraint field="Latitude" exp="" desc=""/>
     <constraint field="Elevation (m)" exp="" desc=""/>
-    <constraint field="Far Buffer (m)" exp="" desc=""/>
-    <constraint field="Near Buffer (m)" exp="" desc=""/>
+    <constraint field="Far Grazing Radius (m)" exp="" desc=""/>
+    <constraint field="Near Grazing Radius (m)" exp="" desc=""/>
   </constraintExpressions>
   <expressionfields/>
   <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
@@ -879,8 +879,8 @@
       <column name="Longitude" type="field" width="-1" hidden="0"/>
       <column name="Latitude" type="field" width="-1" hidden="0"/>
       <column name="Elevation (m)" type="field" width="-1" hidden="0"/>
-      <column name="Far Buffer (m)" type="field" width="-1" hidden="0"/>
-      <column name="Near Buffer (m)" type="field" width="-1" hidden="0"/>
+      <column name="Far Grazing Radius (m)" type="field" width="-1" hidden="0"/>
+      <column name="Near Grazing Radius (m)" type="field" width="-1" hidden="0"/>
       <column type="actions" width="-1" hidden="1"/>
     </columns>
   </attributetableconfig>
@@ -951,12 +951,12 @@ def my_form_open(dialog, layer, feature):
         <labelFont underline="0" style="" bold="0" strikethrough="0" description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" italic="0"/>
       </labelStyle>
     </attributeEditorField>
-    <attributeEditorField name="Far Buffer (m)" showLabel="1" index="7">
+    <attributeEditorField name="Far Grazing Radius (m)" showLabel="1" index="7">
       <labelStyle overrideLabelFont="0" overrideLabelColor="0" labelColor="0,0,0,255">
         <labelFont underline="0" style="" bold="0" strikethrough="0" description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" italic="0"/>
       </labelStyle>
     </attributeEditorField>
-    <attributeEditorField name="Near Buffer (m)" showLabel="1" index="8">
+    <attributeEditorField name="Near Grazing Radius (m)" showLabel="1" index="8">
       <labelStyle overrideLabelFont="0" overrideLabelColor="0" labelColor="0,0,0,255">
         <labelFont underline="0" style="" bold="0" strikethrough="0" description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" italic="0"/>
       </labelStyle>
@@ -964,33 +964,33 @@ def my_form_open(dialog, layer, feature):
   </attributeEditorForm>
   <editable>
     <field name="Elevation (m)" editable="1"/>
-    <field name="Far Buffer (m)" editable="1"/>
+    <field name="Far Grazing Radius (m)" editable="1"/>
     <field name="Latitude" editable="1"/>
     <field name="Longitude" editable="1"/>
     <field name="Name" editable="1"/>
-    <field name="Near Buffer (m)" editable="1"/>
+    <field name="Near Grazing Radius (m)" editable="1"/>
     <field name="Status" editable="1"/>
     <field name="Waterpoint Type" editable="1"/>
     <field name="fid" editable="1"/>
   </editable>
   <labelOnTop>
     <field name="Elevation (m)" labelOnTop="0"/>
-    <field name="Far Buffer (m)" labelOnTop="0"/>
+    <field name="Far Grazing Radius (m)" labelOnTop="0"/>
     <field name="Latitude" labelOnTop="0"/>
     <field name="Longitude" labelOnTop="0"/>
     <field name="Name" labelOnTop="0"/>
-    <field name="Near Buffer (m)" labelOnTop="0"/>
+    <field name="Near Grazing Radius (m)" labelOnTop="0"/>
     <field name="Status" labelOnTop="0"/>
     <field name="Waterpoint Type" labelOnTop="0"/>
     <field name="fid" labelOnTop="0"/>
   </labelOnTop>
   <reuseLastValue>
     <field name="Elevation (m)" reuseLastValue="0"/>
-    <field name="Far Buffer (m)" reuseLastValue="0"/>
+    <field name="Far Grazing Radius (m)" reuseLastValue="0"/>
     <field name="Latitude" reuseLastValue="0"/>
     <field name="Longitude" reuseLastValue="0"/>
     <field name="Name" reuseLastValue="0"/>
-    <field name="Near Buffer (m)" reuseLastValue="0"/>
+    <field name="Near Grazing Radius (m)" reuseLastValue="0"/>
     <field name="Status" reuseLastValue="0"/>
     <field name="Waterpoint Type" reuseLastValue="0"/>
     <field name="fid" reuseLastValue="0"/>

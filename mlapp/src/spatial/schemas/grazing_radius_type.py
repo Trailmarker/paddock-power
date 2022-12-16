@@ -2,6 +2,6 @@
 from .field_domain import FieldDomain
 
 
-class WaterpointBufferType(FieldDomain):
+class GrazingRadiusType(FieldDomain):
     Near = "Near"
     Far = "Far"
