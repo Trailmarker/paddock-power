@@ -47,12 +47,13 @@ BORE_REPORT_URL = "Bore Report URL"
 BORE_YIELD = "Bore Yield (L/s)"
 BUILD_FENCE = "Build Fence"
 BUILD_ORDER = "Build Order"
-CAPACITY_PER_AREA = "AE/km²"
 CLASS_DESCRIPTION = "Class Description"
+CONDITION_DISCOUNT = "Condition Discount"
 CONDITION_TYPE = "Condition"
 ELEVATION = "Elevation (m)"
 EROSION_RISK = "Erosion Risk"
 ESTIMATED_CAPACITY = "AE"
+ESTIMATED_CAPACITY_PER_AREA = "AE/km²"
 FAR_GRAZING_RADIUS = "Far Grazing Radius (m)"
 FID = "fid"
 GRAZING_RADIUS = "Grazing Radius (m)"
@@ -71,11 +72,13 @@ PADDOCK_NAME = "Paddock Name"
 PADDOCK_STATUS = "Paddock Status"
 PERIMETER = "Perimeter (km)"
 POTENTIAL_CAPACITY = "Potential AE"
+POTENTIAL_CAPACITY_PER_AREA = "Potential AE/km²"
 RECALCULATE_COMPLETE = "Complete"
 RECALCULATE_CURRENT = "Current"
 REFERENCE = "Reference"
 STATUS = "Status"
 WATERED_AREA_STATUS = "Watered Area Status"
+WATERED_DISCOUNT = "Watered Discount"
 WATERED_TYPE = "Watered"
 WATERPOINT = "Waterpoint"
 WATERPOINT_END_MONTH = "Waterpoint End Month"
@@ -89,7 +92,6 @@ BoreYield = MeasureField(propertyName="boreYield", name=BORE_YIELD)
 GrazingRadius = MeasureField(propertyName="grazingRadius", name=GRAZING_RADIUS)
 BuildFence = IdField(propertyName="buildFence", name=BUILD_FENCE)
 BuildOrder = IdField(propertyName="buildOrder", name=BUILD_ORDER)
-CapacityPerArea = MeasureField(propertyName="capacityPerArea", name=CAPACITY_PER_AREA)
 ClassDescription = StringField(propertyName="classDescription", name=CLASS_DESCRIPTION)
 ConditionTypeField = DomainField(
     propertyName="conditionType",
@@ -99,6 +101,7 @@ ConditionTypeField = DomainField(
 Elevation = MeasureField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'))
 ErosionRisk = StringField(propertyName="erosionRisk", name=EROSION_RISK)
 EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=ESTIMATED_CAPACITY)
+EstimatedCapacityPerArea = MeasureField(propertyName="estimatedCapacityPerArea", name=ESTIMATED_CAPACITY_PER_AREA)
 FarGrazingRadius = MeasureField(propertyName="farGrazingRadius", name=FAR_GRAZING_RADIUS, defaultValue="5000.0")
 Fid = IdField("id", name=FID)
 LandscapeClass = StringField(propertyName="landscapeClass", name=LANDSCAPE_CLASS)
@@ -119,6 +122,7 @@ PaddockStatus = DomainField(
     defaultValue=FeatureStatus.Undefined)
 Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER)
 PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY)
+PotentialCapacityPerArea = MeasureField(propertyName="potentialCapacityPerArea", name=POTENTIAL_CAPACITY_PER_AREA)
 RecalculateCurrent = IdField(propertyName="recalculateCurrent", name=RECALCULATE_CURRENT)
 RecalculateComplete = IdField(propertyName="recalculateComplete", name=RECALCULATE_COMPLETE)
 Reference = StringField(propertyName="reference", name=REFERENCE)
@@ -146,7 +150,8 @@ BoundarySchema = Schema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
 ConditionSchema = Schema([Fid,
                           # Status,
                           Area,
-                          CapacityPerArea,
+                          EstimatedCapacityPerArea,
+                          PotentialCapacityPerArea,
                           EstimatedCapacity,
                           PotentialCapacity,
                           ConditionTypeField,
@@ -158,7 +163,7 @@ ConditionSchema = Schema([Fid,
                          wkbType=QgsWkbTypes.MultiPolygon)
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)
-LandSystemSchema = Schema([Fid, Name, Area, Perimeter, CapacityPerArea, MapUnit, LandscapeClass,
+LandSystemSchema = Schema([Fid, Name, Area, Perimeter, EstimatedCapacityPerArea, MapUnit, LandscapeClass,
                           ClassDescription, ErosionRisk], wkbType=QgsWkbTypes.MultiPolygon)
 LineFeatureSchema = Schema([Fid, Name, Status, Length], wkbType=QgsWkbTypes.LineString)
 PaddockSchema = Schema([Fid,
@@ -167,8 +172,9 @@ PaddockSchema = Schema([Fid,
                         Area,
                         Perimeter,
                         BuildFence,
-                        CapacityPerArea,
+                        EstimatedCapacityPerArea,
                         EstimatedCapacity,
+                        PotentialCapacityPerArea,
                         PotentialCapacity,
                         RecalculateCurrent,
                         RecalculateComplete],

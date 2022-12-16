@@ -2,7 +2,7 @@
 from ...utils import randomString
 from ..calculator import Calculator
 from ..features.condition import Condition
-from ..schemas.schemas import AREA, CAPACITY_PER_AREA, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_SYSTEM, LAND_SYSTEM_NAME, NAME, PADDOCK, PADDOCK_NAME, PADDOCK_STATUS, POTENTIAL_CAPACITY, STATUS, WATERED_TYPE, WATERED_AREA_STATUS
+from ..schemas.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_SYSTEM, LAND_SYSTEM_NAME, NAME, PADDOCK, PADDOCK_NAME, PADDOCK_STATUS, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -19,7 +19,7 @@ with {paddockConditionTempView} as
 	st_intersection("{{1}}".geometry, "{{2}}".geometry) as geometry,
 	"{{1}}".{FID} as "{LAND_SYSTEM}",
 	"{{1}}".{NAME} as "{LAND_SYSTEM_NAME}",
-	"{{1}}"."{CAPACITY_PER_AREA}" as "{CAPACITY_PER_AREA}",
+	"{{1}}"."{ESTIMATED_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}",
 	"{{2}}"."{WATERED_TYPE}",
 	"{{2}}".{STATUS} as "{WATERED_AREA_STATUS}"
 	from "{{1}}"
@@ -35,10 +35,11 @@ select
 	'{paddockStatus}' as "{PADDOCK_STATUS}",
 	"{LAND_SYSTEM}",
 	"{LAND_SYSTEM_NAME}",
-	"{CAPACITY_PER_AREA}",
+	("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}") as "{ESTIMATED_CAPACITY_PER_AREA}",
+	"{POTENTIAL_CAPACITY_PER_AREA}",
 	"{AREA}",
-	("{CAPACITY_PER_AREA}" * "{AREA}") as "{ESTIMATED_CAPACITY}",
-	("{CAPACITY_PER_AREA}" * "{AREA}") as "{POTENTIAL_CAPACITY}",
+	("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}" * "{AREA}" ) as "{ESTIMATED_CAPACITY}",
+	("{POTENTIAL_CAPACITY_PER_AREA}" * "{AREA}") as "{POTENTIAL_CAPACITY}",
 	"{CONDITION_TYPE}",
 	"{WATERED_TYPE}",
 	"{WATERED_AREA_STATUS}"
@@ -47,10 +48,23 @@ from
 		{paddockConditionTempView}.geometry,
 		{paddockConditionTempView}."{LAND_SYSTEM}",
 		"{LAND_SYSTEM_NAME}",
-		"{CAPACITY_PER_AREA}",
+		"{ESTIMATED_CAPACITY_PER_AREA}" as "{POTENTIAL_CAPACITY_PER_AREA}",
 		st_area({paddockConditionTempView}.geometry) / 1000000 as "{AREA}",
 		ifnull("{{3}}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
+		case ifnull("{{3}}"."{CONDITION_TYPE}", 'A')
+			when 'A' then 1.0
+			when 'B' then 0.75
+			when 'C' then 0.45
+			when 'D' then 0.20
+			else 0.0 
+		end as "{CONDITION_DISCOUNT}",
 		{paddockConditionTempView}."{WATERED_TYPE}",
+		case {paddockConditionTempView}."{WATERED_TYPE}"
+			when 'Near' then 1.0
+			when 'Far' then 0.5
+			when 'Unwatered' then 0.0
+			else 0.0
+		end as "{WATERED_DISCOUNT}",
 		"{WATERED_AREA_STATUS}"
 	 from
 	 {paddockConditionTempView} left outer join "{{3}}"

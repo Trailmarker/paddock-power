@@ -140,7 +140,7 @@
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="capacityPerAreaLabel">
+      <widget class="QLabel" name="estimatedCapacityPerAreaLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -197,7 +197,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="FormattedValue" name="capacityPerAreaText">
+      <widget class="FormattedValue" name="estimatedCapacityPerAreaText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>

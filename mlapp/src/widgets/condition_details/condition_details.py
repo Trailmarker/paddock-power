@@ -23,4 +23,4 @@ class ConditionDetails(QWidget, FORM_CLASS):
             self.areaText.setValue(self.condition.featureArea, "{0:2f}")
             self.estimatedCapacityText.setValue(self.condition.estimatedCapacity, "{0:g}")
             self.potentialCapacityText.setValue(self.condition.potentialCapacity, "{0:g}")
-            self.capacityPerAreaText.setValue(self.condition.capacityPerArea, "{0:1f}")
+            self.estimatedCapacityPerAreaText.setValue(self.condition.estimatedCapacityPerArea, "{0:1f}")

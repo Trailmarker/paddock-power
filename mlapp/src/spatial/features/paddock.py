@@ -81,9 +81,13 @@ class Paddock(AreaFeature):
             conditions = [f for f in self.recalculateLayer.getFeatures(request)]
 
             estimatedRaw = sum([c.estimatedCapacity for c in conditions])
-            self.estimatedCapacity = round(estimatedRaw)
-            self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
-            self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
+            self.estimatedCapacity = round(estimatedRaw, 2)
+            potentialRaw = sum([c.potentialCapacity for c in conditions])
+            self.potentialCapacity = round(potentialRaw, 2)
+
+            self.estimatedCapacityPerArea = round(estimatedRaw / self.featureArea, 2)
+            self.potentialCapacityPerArea = round(potentialRaw / self.featureArea, 2)
+
         except BaseException as e:
             qgsInfo(f"{self}.recalculate() failed with exception {e}")
         finally:
@@ -92,7 +96,7 @@ class Paddock(AreaFeature):
             # if self.recalculateLayer:
             #     self.recalculateLayer.detectAndRemove()
 
-        qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
+        qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, estimatedCapacityPerArea={self.estimatedCapacityPerArea}")
 
     def addPopupLayer(self):
         """Add a condition layer to the project."""

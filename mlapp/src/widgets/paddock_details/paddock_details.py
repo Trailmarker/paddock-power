@@ -23,4 +23,4 @@ class PaddockDetails(QWidget, FORM_CLASS):
             self.perimeterText.setValue(self.paddock.featurePerimeter, "{0:2f}")
             self.estimatedCapacityText.setValue(self.paddock.estimatedCapacity, "{0:g}")
             self.potentialCapacityText.setValue(self.paddock.potentialCapacity, "{0:g}")
-            self.capacityPerAreaText.setValue(self.paddock.capacityPerArea, "{0:1f}")
+            self.estimatedCapacityPerAreaText.setValue(self.paddock.estimatedCapacityPerArea, "{0:1f}")
