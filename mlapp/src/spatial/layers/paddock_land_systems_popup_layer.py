@@ -55,7 +55,7 @@ from
 			when 'B' then 0.75
 			when 'C' then 0.45
 			when 'D' then 0.20
-			else 0.0 
+			else 0.0
 		end as "{CONDITION_DISCOUNT}",
 		{paddockConditionTempView}."{WATERED_TYPE}",
 		case {paddockConditionTempView}."{WATERED_TYPE}"
