@@ -437,20 +437,6 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Watered">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="Watered Area Status">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
   </fieldConfiguration>
   <aliases>
     <alias index="0" field="fid" name=""/>
@@ -465,8 +451,6 @@
     <alias index="9" field="AE" name=""/>
     <alias index="10" field="Potential AE" name=""/>
     <alias index="11" field="Condition" name=""/>
-    <alias index="12" field="Watered" name=""/>
-    <alias index="13" field="Watered Area Status" name=""/>
   </aliases>
   <defaults>
     <default applyOnUpdate="0" field="fid" expression=""/>
@@ -481,8 +465,6 @@
     <default applyOnUpdate="0" field="AE" expression=""/>
     <default applyOnUpdate="0" field="Potential AE" expression=""/>
     <default applyOnUpdate="0" field="Condition" expression=""/>
-    <default applyOnUpdate="0" field="Watered" expression=""/>
-    <default applyOnUpdate="0" field="Watered Area Status" expression=""/>
   </defaults>
   <constraints>
     <constraint exp_strength="0" unique_strength="0" field="fid" constraints="0" notnull_strength="0"/>
@@ -497,8 +479,6 @@
     <constraint exp_strength="0" unique_strength="0" field="AE" constraints="0" notnull_strength="0"/>
     <constraint exp_strength="0" unique_strength="0" field="Potential AE" constraints="0" notnull_strength="0"/>
     <constraint exp_strength="0" unique_strength="0" field="Condition" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="Watered" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="Watered Area Status" constraints="0" notnull_strength="0"/>
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="fid" desc=""/>
@@ -513,8 +493,6 @@
     <constraint exp="" field="AE" desc=""/>
     <constraint exp="" field="Potential AE" desc=""/>
     <constraint exp="" field="Condition" desc=""/>
-    <constraint exp="" field="Watered" desc=""/>
-    <constraint exp="" field="Watered Area Status" desc=""/>
   </constraintExpressions>
   <expressionfields/>
   <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
@@ -531,8 +509,6 @@
       <column type="field" hidden="0" name="AE" width="-1"/>
       <column type="field" hidden="0" name="Potential AE" width="-1"/>
       <column type="field" hidden="0" name="Potential AE/km²" width="-1"/>
-      <column type="field" hidden="0" name="Watered" width="-1"/>
-      <column type="field" hidden="0" name="Watered Area Status" width="-1"/>
       <column type="actions" hidden="1" width="-1"/>
     </columns>
   </attributetableconfig>

@@ -132,6 +132,11 @@ WateredTypeField = DomainField(
     name=WATERED_TYPE,
     domainType=WateredType,
     defaultValue=WateredType.Unwatered)
+WateredAreaStatus = DomainField(
+    propertyName="wateredAreaStatus",
+    name=WATERED_AREA_STATUS,
+    domainType=FeatureStatus,
+    defaultValue=FeatureStatus.Undefined)
 Waterpoint = IdField(propertyName="waterpoint", name=WATERPOINT)
 GrazingRadiusTypeField = DomainField(
     propertyName="grazingRadiusType",
@@ -147,8 +152,7 @@ WaterpointTypeField = DomainField(
 
 AreaFeatureSchema = Schema([Fid, Name, Status, Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
 BoundarySchema = Schema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
-ConditionSchema = Schema([Fid,
-                          # Status,
+PaddockConditionSchema = Schema([Fid,
                           Area,
                           EstimatedCapacityPerArea,
                           PotentialCapacityPerArea,
@@ -159,7 +163,21 @@ ConditionSchema = Schema([Fid,
                           PaddockName,
                           LandSystem,
                           LandSystemName,
-                          WateredTypeField],
+                          WateredTypeField,
+                          WateredAreaStatus],
+                         wkbType=QgsWkbTypes.MultiPolygon)
+PaddockLandSystemSchema = Schema([Fid,
+                          Area,
+                          EstimatedCapacityPerArea,
+                          PotentialCapacityPerArea,
+                          EstimatedCapacity,
+                          PotentialCapacity,
+                          ConditionTypeField,
+                          Paddock,
+                          PaddockName,
+                          LandSystem,
+                          LandSystemName,
+                          WateredAreaStatus],
                          wkbType=QgsWkbTypes.MultiPolygon)
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)

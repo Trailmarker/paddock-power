@@ -3,11 +3,11 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsFeatureRequest, QgsProject
 
-from ...utils import qgsInfo, qgsDebug
+from ...utils import qgsInfo, qgsDebug, randomString
 from ..layers.condition_table import ConditionTable
 from ..layers.derived_feature_layer import DerivedFeatureLayer
 from ..layers.land_system_layer import LandSystemLayer
-from ..layers.paddock_condition_popup_layer import PaddockConditionPopupLayer
+from ..layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
 from ..layers.derived_watered_area_layer import DerivedWateredAreaLayer
 from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
@@ -46,10 +46,6 @@ class Paddock(AreaFeature):
         return QgsProject.instance().mapLayer(self._wateredAreaLayerId)
 
     @property
-    def conditionRecordLayer(self):
-        return QgsProject.instance().mapLayer(self._conditionRecordLayerId)
-
-    @property
     def popupLayer(self):
         return QgsProject.instance().mapLayer(self._popupLayerId) if self._popupLayerId else None
 
@@ -69,8 +65,8 @@ class Paddock(AreaFeature):
         super().recalculate()
 
         try:
-            self.recalculateLayer = PaddockConditionPopupLayer(
-                f"Paddock {self.id} Recalculate",
+            self.recalculateLayer = PaddockLandSystemsPopupLayer(
+                f"Paddock{self.id}Recalculate{randomString()}",
                 self,
                 self.featureLayer,
                 self.landSystemLayer,
@@ -78,11 +74,11 @@ class Paddock(AreaFeature):
                 self.conditionTable)
 
             request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-            conditions = [f for f in self.recalculateLayer.getFeatures(request)]
+            paddockLandSystems = [f for f in self.recalculateLayer.getFeatures(request)]
 
-            estimatedRaw = sum([c.estimatedCapacity for c in conditions])
+            estimatedRaw = sum([c.estimatedCapacity for c in paddockLandSystems])
             self.estimatedCapacity = round(estimatedRaw, 2)
-            potentialRaw = sum([c.potentialCapacity for c in conditions])
+            potentialRaw = sum([c.potentialCapacity for c in paddockLandSystems])
             self.potentialCapacity = round(potentialRaw, 2)
 
             self.estimatedCapacityPerArea = round(estimatedRaw / self.featureArea, 2)
@@ -96,21 +92,21 @@ class Paddock(AreaFeature):
             # if self.recalculateLayer:
             #     self.recalculateLayer.detectAndRemove()
 
-        qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, estimatedCapacityPerArea={self.estimatedCapacityPerArea}")
+        qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, estimatedCapacityPerArea={self.estimatedCapacityPerArea}, potentialCapacityPerArea={self.potentialCapacityPerArea}")
 
     def addPopupLayer(self):
         """Add a condition layer to the project."""
         if not self.popupLayer:
             item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
             if not item:
-                # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
+                # If the Paddocks layer isn't in the map, don't initialise or add the Paddock Land Systems layer.
                 return
 
-            # Remove any existing condition popup layers - they don't play nice together
-            PaddockConditionPopupLayer.detectAndRemoveAllOfType()
+            # Remove any existing Paddock Land Systems popup layers - they don't play nice together
+            PaddockLandSystemsPopupLayer.detectAndRemoveAllOfType()
 
-            self.popupLayer = PaddockConditionPopupLayer(
-                f"{self.name} Paddock Condition",
+            self.popupLayer = PaddockLandSystemsPopupLayer(
+                f"{self.name} Land Systems",
                 self,
                 self.featureLayer,
                 self.landSystemLayer,

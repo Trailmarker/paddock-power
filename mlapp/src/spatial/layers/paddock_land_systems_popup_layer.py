@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from ...utils import randomString
 from ..calculator import Calculator
-from ..features.paddock_condition import PaddockCondition
+from ..features.paddock_land_system import PaddockLandSystem
 from ..schemas.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_SYSTEM, LAND_SYSTEM_NAME, NAME, PADDOCK, PADDOCK_NAME, PADDOCK_STATUS, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
 from .derived_feature_layer import DerivedFeatureLayer
 
 
-class PaddockConditionPopupLayer(DerivedFeatureLayer):
+class PaddockLandSystemsPopupLayer(DerivedFeatureLayer):
 
-    STYLE = "paddock_condition_popup"
+    STYLE = "paddock_land_systems_popup"
 
     def parameteriseQuery(self, paddockId, paddockName, paddockStatus):
         paddockConditionTempView = f"PaddockCondition{randomString()}"
@@ -28,20 +28,19 @@ with {paddockConditionTempView} as
 		and st_intersects("{{1}}".geometry, "{{2}}".geometry)
 		and st_area(st_intersection("{{1}}".geometry, "{{2}}".geometry)) >= {Calculator.MINIMUM_AREA_M2})
 select
-	geometry,
+	st_multi(st_union(geometry)) as geometry,
 	row_number() over (order by '') as {FID},
 	{paddockId} as {PADDOCK},
 	'{paddockName}' as "{PADDOCK_NAME}",
 	'{paddockStatus}' as "{PADDOCK_STATUS}",
 	"{LAND_SYSTEM}",
 	"{LAND_SYSTEM_NAME}",
-	("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}") as "{ESTIMATED_CAPACITY_PER_AREA}",
-	"{POTENTIAL_CAPACITY_PER_AREA}",
-	"{AREA}",
-	("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}" * "{AREA}" ) as "{ESTIMATED_CAPACITY}",
-	("{POTENTIAL_CAPACITY_PER_AREA}" * "{AREA}") as "{POTENTIAL_CAPACITY}",
+	(sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
+	(sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
+	sum("{AREA}") as "{AREA}",
+	((sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{ESTIMATED_CAPACITY}",
+	((sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{POTENTIAL_CAPACITY}",
 	"{CONDITION_TYPE}",
-	"{WATERED_TYPE}",
 	"{WATERED_AREA_STATUS}"
 from
 	(select
@@ -66,16 +65,17 @@ from
 			else 0.0
 		end as "{WATERED_DISCOUNT}",
 		"{WATERED_AREA_STATUS}"
-	 from
-	 {paddockConditionTempView} left outer join "{{3}}"
-	 on {paddockId} = "{{3}}"."{PADDOCK}"
-	 and {paddockConditionTempView}."{LAND_SYSTEM}" = "{{3}}"."{LAND_SYSTEM}")
+	 from {paddockConditionTempView}
+	 left outer join "{{3}}"
+	 	on {paddockId} = "{{3}}"."{PADDOCK}"
+	 	and {paddockConditionTempView}."{LAND_SYSTEM}" = "{{3}}"."{LAND_SYSTEM}")
 where geometry is not null
+group by "{LAND_SYSTEM}", "{CONDITION_TYPE}", "{WATERED_AREA_STATUS}"
 """
 
     def getFeatureType(cls):
         """Return the type of feature that this layer contains. Override in subclasses"""
-        return PaddockCondition
+        return PaddockLandSystem
 
     def __init__(self, layerName, paddock, paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
@@ -86,7 +86,7 @@ where geometry is not null
         super().__init__(
             layerName,
             query,
-            PaddockConditionPopupLayer.STYLE,
+            PaddockLandSystemsPopupLayer.STYLE,
             paddockLayer,
             landSystemLayer,
             wateredAreaLayer,
@@ -95,4 +95,4 @@ where geometry is not null
         self.conditionTable = conditionTable
 
     def wrapFeature(self, feature):
-        return PaddockCondition(self, self.conditionTable, feature)
+        return PaddockLandSystem(self, self.conditionTable, feature)

@@ -2,15 +2,15 @@
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .feature import Feature
-from ..schemas.schemas import ConditionSchema
+from ..schemas.schemas import PaddockLandSystemSchema
 
 
-@ConditionSchema.addSchema()
-class Condition(Feature):
+@PaddockLandSystemSchema.addSchema()
+class PaddockLandSystem(Feature):
     featureUpdated = pyqtSignal()
 
     def __init__(self, featureLayer, conditionTable, existingFeature):
-        """Create a new Condition."""
+        """Create a new Paddock Condition."""
         super().__init__(featureLayer, existingFeature)
 
         self.conditionTable = conditionTable
@@ -21,5 +21,5 @@ class Condition(Feature):
 
     def upsertCondition(self, conditionType):
         """Update the Condition table."""
-        self.conditionTable.upsert(self.paddock, self.landSystem, self.wateredType, conditionType)
+        self.conditionTable.upsert(self.paddock, self.landSystem, conditionType)
         self.featureUpdated.emit()

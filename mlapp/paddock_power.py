@@ -6,14 +6,13 @@ from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, QTranslator, 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
-from qgis.core import QgsApplication, QgsProject
+from qgis.core import QgsProject
 
 from .resources_rc import *
 
 from .src.models.glitch import Glitch
 from .src.models.project import Project
-from .src.provider import Provider
-from .src.utils import guiError, qgsDebug, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_NAME
+from .src.utils import guiError, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
@@ -43,10 +42,7 @@ class PaddockPower(QObject):
             self.translator.load(localePath)
             QCoreApplication.installTranslator(self.translator)
 
-        # self.provider = Provider()
-        # QgsApplication.processingRegistry().addProvider(self.provider)
-
-        # QgsProject.instance().cleared.connect(self.unloadProject)
+        QgsProject.instance().cleared.connect(self.unloadProject)
         QgsProject.instance().readProject.connect(self.detectProject)
 
         self.project = None
@@ -137,15 +133,15 @@ class PaddockPower(QObject):
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         try:
-            # QgsProject.instance().cleared.disconnect(self.unloadProject)
+            QgsProject.instance().cleared.disconnect(self.unloadProject)
             QgsProject.instance().readProject.disconnect(self.detectProject)
         except BaseException:
             pass
 
-        # try:
-        #     self.unloadProject()
-        # except BaseException:
-        #     pass
+        try:
+            self.unloadProject()
+        except BaseException:
+            pass
 
         try:
             # Remove the plugin menu item and icon
@@ -171,20 +167,20 @@ class PaddockPower(QObject):
         f"""Detect a {PLUGIN_NAME} Project in the current QGIS project."""
 
         self.project = None
-        # try:
-        projectFile = resolveProjectFile()
-        if projectFile is None:
-            qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
-        else:
-            gpkgFile = resolveGeoPackageFile()
-            if gpkgFile is not None and os.path.exists(gpkgFile):
-                qgsInfo(f"{PLUGIN_NAME} loading project …")
-                self.project = Project(self.iface, gpkgFile)
+        try:
+            projectFile = resolveProjectFile()
+            if projectFile is None:
+                qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
             else:
-                qgsInfo(f"{PLUGIN_NAME} no GeoPackage file located …")
-        # except BaseException as e:
-        #     qgsInfo(f"{PLUGIN_NAME} exception occurred detecting project:")
-        #     qgsInfo(f"{e}")
+                gpkgFile = resolveGeoPackageFile()
+                if gpkgFile is not None and os.path.exists(gpkgFile):
+                    qgsInfo(f"{PLUGIN_NAME} loading project …")
+                    self.project = Project(self.iface, gpkgFile)
+                else:
+                    qgsInfo(f"{PLUGIN_NAME} no GeoPackage file located …")
+        except BaseException as e:
+            qgsInfo(f"{PLUGIN_NAME} exception occurred detecting project:")
+            qgsInfo(f"{e}")
 
         if self.project is not None:
             self.project.addToMap()
