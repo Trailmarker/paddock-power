@@ -46,7 +46,7 @@ class PaddockPower(QObject):
         # self.provider = Provider()
         # QgsApplication.processingRegistry().addProvider(self.provider)
 
-        QgsProject.instance().cleared.connect(self.unloadProject)
+        # QgsProject.instance().cleared.connect(self.unloadProject)
         QgsProject.instance().readProject.connect(self.detectProject)
 
         self.project = None
@@ -142,10 +142,10 @@ class PaddockPower(QObject):
         except BaseException:
             pass
 
-        try:
-            self.unloadProject()
-        except BaseException:
-            pass
+        # try:
+        #     self.unloadProject()
+        # except BaseException:
+        #     pass
 
         try:
             # Remove the plugin menu item and icon

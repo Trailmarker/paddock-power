@@ -26,10 +26,10 @@ class PaddockLayerList(PersistedFeatureLayerList):
 
     @pyqtSlot(DerivedFeatureLayer)
     def onPopupLayerAdded(self, layer):
-        # qgsDebug(f"PaddockLayerList.onPopupLayerAdded({layer})")
+        qgsDebug(f"PaddockLayerList.onPopupLayerAdded({layer})")
         self.popupLayerAdded.emit(layer)
 
     @pyqtSlot()
     def onPopupLayerRemoved(self):
-        # qgsDebug(f"PaddockLayerList.onPopupLayerRemoved()")
+        qgsDebug(f"PaddockLayerList.onPopupLayerRemoved()")
         self.popupLayerRemoved.emit()

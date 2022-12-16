@@ -1,141 +1,141 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable" labelsEnabled="0" readOnly="0" version="3.26.2-Buenos Aires">
+<qgis styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable" readOnly="0" version="3.26.2-Buenos Aires" labelsEnabled="0">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <renderer-v2 referencescale="-1" attr="Grazing Radius Type" enableorderby="0" forceraster="0" type="categorizedSymbol" symbollevels="0">
+  <renderer-v2 type="categorizedSymbol" enableorderby="0" symbollevels="0" referencescale="-1" forceraster="0" attr="Grazing Radius Type">
     <categories>
-      <category symbol="0" render="true" label="Far" value="Far" type="string"/>
-      <category symbol="1" render="true" label="Near" value="Near" type="string"/>
+      <category type="string" label="Far" value="Far" symbol="0" render="true"/>
+      <category type="string" label="Near" value="Near" symbol="1" render="true"/>
     </categories>
     <symbols>
-      <symbol alpha="0.7" clip_to_extent="1" name="0" is_animated="0" force_rhr="0" type="fill" frame_rate="10">
+      <symbol alpha="0.7" type="fill" clip_to_extent="1" is_animated="0" force_rhr="0" frame_rate="10" name="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" enabled="1" class="SimpleFill" pass="0">
+        <layer pass="0" locked="0" class="SimpleFill" enabled="1">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="61,164,237,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale"/>
+            <Option type="QString" value="61,164,237,255" name="color"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="255,255,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0.66" name="outline_width"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="solid" name="style"/>
           </Option>
-          <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
-          <prop v="61,164,237,255" k="color"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="0,0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="255,255,0,255" k="outline_color"/>
-          <prop v="solid" k="outline_style"/>
-          <prop v="0.66" k="outline_width"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="solid" k="style"/>
+          <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="color" v="61,164,237,255"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="offset" v="0,0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="outline_color" v="255,255,0,255"/>
+          <prop k="outline_style" v="solid"/>
+          <prop k="outline_width" v="0.66"/>
+          <prop k="outline_width_unit" v="MM"/>
+          <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="0.7" clip_to_extent="1" name="1" is_animated="0" force_rhr="0" type="fill" frame_rate="10">
+      <symbol alpha="0.7" type="fill" clip_to_extent="1" is_animated="0" force_rhr="0" frame_rate="10" name="1">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" enabled="1" class="SimpleFill" pass="0">
+        <layer pass="0" locked="0" class="SimpleFill" enabled="1">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="12,85,136,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale"/>
+            <Option type="QString" value="12,85,136,255" name="color"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="255,255,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0.66" name="outline_width"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="solid" name="style"/>
           </Option>
-          <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
-          <prop v="12,85,136,255" k="color"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="0,0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="255,255,0,255" k="outline_color"/>
-          <prop v="solid" k="outline_style"/>
-          <prop v="0.66" k="outline_width"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="solid" k="style"/>
+          <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="color" v="12,85,136,255"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="offset" v="0,0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="outline_color" v="255,255,0,255"/>
+          <prop k="outline_style" v="solid"/>
+          <prop k="outline_width" v="0.66"/>
+          <prop k="outline_width_unit" v="MM"/>
+          <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </symbols>
     <source-symbol>
-      <symbol alpha="1" clip_to_extent="1" name="0" is_animated="0" force_rhr="0" type="fill" frame_rate="10">
+      <symbol alpha="1" type="fill" clip_to_extent="1" is_animated="0" force_rhr="0" frame_rate="10" name="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" enabled="1" class="SimpleFill" pass="0">
+        <layer pass="0" locked="0" class="SimpleFill" enabled="1">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="213,180,60,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="35,35,35,0"/>
-            <Option name="outline_style" type="QString" value="no"/>
-            <Option name="outline_width" type="QString" value="0"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale"/>
+            <Option type="QString" value="213,180,60,255" name="color"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="35,35,35,0" name="outline_color"/>
+            <Option type="QString" value="no" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="solid" name="style"/>
           </Option>
-          <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
-          <prop v="213,180,60,255" k="color"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="0,0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="35,35,35,0" k="outline_color"/>
-          <prop v="no" k="outline_style"/>
-          <prop v="0" k="outline_width"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="solid" k="style"/>
+          <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="color" v="213,180,60,255"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="offset" v="0,0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="outline_color" v="35,35,35,0"/>
+          <prop k="outline_style" v="no"/>
+          <prop k="outline_width" v="0"/>
+          <prop k="outline_width_unit" v="MM"/>
+          <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -147,44 +147,58 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <fieldConfiguration>
-    <field name="Waterpoint" configurationFlags="None">
+    <field configurationFlags="None" name="fid">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Name" configurationFlags="None">
+    <field configurationFlags="None" name="Status">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Grazing Radius Type" configurationFlags="None">
+    <field configurationFlags="None" name="Waterpoint">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="Grazing Radius Type">
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
-            <Option name="map" type="List">
+            <Option type="List" name="map">
               <Option type="Map">
-                <Option name="Near" type="QString" value="Near"/>
+                <Option type="QString" value="Near" name="Near"/>
               </Option>
               <Option type="Map">
-                <Option name="Far" type="QString" value="Far"/>
+                <Option type="QString" value="Far" name="Far"/>
               </Option>
             </Option>
           </Option>
         </config>
       </editWidget>
     </field>
-    <field name="Grazing Radius (m)" configurationFlags="None">
+    <field configurationFlags="None" name="Grazing Radius (m)">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Status" configurationFlags="None">
+    <field configurationFlags="None" name="Paddock">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="Paddock Status">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -193,42 +207,52 @@
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias index="0" name="" field="Waterpoint"/>
-    <alias index="1" name="" field="Name"/>
-    <alias index="2" name="" field="Grazing Radius Type"/>
-    <alias index="3" name="" field="Grazing Radius (m)"/>
-    <alias index="4" name="" field="Status"/>
+    <alias field="fid" index="0" name=""/>
+    <alias field="Status" index="1" name=""/>
+    <alias field="Waterpoint" index="2" name=""/>
+    <alias field="Grazing Radius Type" index="3" name=""/>
+    <alias field="Grazing Radius (m)" index="4" name=""/>
+    <alias field="Paddock" index="5" name=""/>
+    <alias field="Paddock Status" index="6" name=""/>
   </aliases>
   <defaults>
-    <default applyOnUpdate="0" field="Waterpoint" expression=""/>
-    <default applyOnUpdate="0" field="Name" expression=""/>
-    <default applyOnUpdate="0" field="Grazing Radius Type" expression=""/>
-    <default applyOnUpdate="0" field="Grazing Radius (m)" expression=""/>
-    <default applyOnUpdate="0" field="Status" expression=""/>
+    <default applyOnUpdate="0" expression="" field="fid"/>
+    <default applyOnUpdate="0" expression="" field="Status"/>
+    <default applyOnUpdate="0" expression="" field="Waterpoint"/>
+    <default applyOnUpdate="0" expression="" field="Grazing Radius Type"/>
+    <default applyOnUpdate="0" expression="" field="Grazing Radius (m)"/>
+    <default applyOnUpdate="0" expression="" field="Paddock"/>
+    <default applyOnUpdate="0" expression="" field="Paddock Status"/>
   </defaults>
   <constraints>
-    <constraint exp_strength="0" constraints="0" field="Waterpoint" notnull_strength="0" unique_strength="0"/>
-    <constraint exp_strength="0" constraints="0" field="Name" notnull_strength="0" unique_strength="0"/>
-    <constraint exp_strength="0" constraints="0" field="Grazing Radius Type" notnull_strength="0" unique_strength="0"/>
-    <constraint exp_strength="0" constraints="0" field="Grazing Radius (m)" notnull_strength="0" unique_strength="0"/>
-    <constraint exp_strength="0" constraints="0" field="Status" notnull_strength="0" unique_strength="0"/>
+    <constraint exp_strength="0" notnull_strength="0" field="fid" unique_strength="0" constraints="0"/>
+    <constraint exp_strength="0" notnull_strength="0" field="Status" unique_strength="0" constraints="0"/>
+    <constraint exp_strength="0" notnull_strength="0" field="Waterpoint" unique_strength="0" constraints="0"/>
+    <constraint exp_strength="0" notnull_strength="0" field="Grazing Radius Type" unique_strength="0" constraints="0"/>
+    <constraint exp_strength="0" notnull_strength="0" field="Grazing Radius (m)" unique_strength="0" constraints="0"/>
+    <constraint exp_strength="0" notnull_strength="0" field="Paddock" unique_strength="0" constraints="0"/>
+    <constraint exp_strength="0" notnull_strength="0" field="Paddock Status" unique_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
+    <constraint desc="" field="fid" exp=""/>
+    <constraint desc="" field="Status" exp=""/>
     <constraint desc="" field="Waterpoint" exp=""/>
-    <constraint desc="" field="Name" exp=""/>
     <constraint desc="" field="Grazing Radius Type" exp=""/>
     <constraint desc="" field="Grazing Radius (m)" exp=""/>
-    <constraint desc="" field="Status" exp=""/>
+    <constraint desc="" field="Paddock" exp=""/>
+    <constraint desc="" field="Paddock Status" exp=""/>
   </constraintExpressions>
   <expressionfields/>
-  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
+  <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
     <columns>
-      <column width="-1" name="Grazing Radius Type" hidden="0" type="field"/>
-      <column width="-1" name="Name" hidden="0" type="field"/>
-      <column width="-1" name="Waterpoint" hidden="0" type="field"/>
-      <column width="-1" name="Grazing Radius (m)" hidden="0" type="field"/>
-      <column width="-1" name="Status" hidden="0" type="field"/>
-      <column width="-1" hidden="1" type="actions"/>
+      <column type="field" width="-1" hidden="0" name="Grazing Radius Type"/>
+      <column type="field" width="-1" hidden="0" name="Waterpoint"/>
+      <column type="field" width="-1" hidden="0" name="Grazing Radius (m)"/>
+      <column type="field" width="-1" hidden="0" name="Status"/>
+      <column type="field" width="-1" hidden="0" name="fid"/>
+      <column type="field" width="-1" hidden="0" name="Paddock"/>
+      <column type="field" width="-1" hidden="0" name="Paddock Status"/>
+      <column type="actions" width="-1" hidden="1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -256,31 +280,37 @@ from qgis.PyQt.QtWidgets import QWidget
 def my_form_open(dialog, layer, feature):
     geom = feature.geometry()
     control = dialog.findChild(QWidget, "MyLineEdit")
-]]>  </editforminitcode>
+]]></editforminitcode>
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
-    <field name="Grazing Radius (m)" editable="1"/>
-    <field name="Name" editable="1"/>
-    <field name="Status" editable="1"/>
-    <field name="Waterpoint" editable="1"/>
-    <field name="Grazing Radius Type" editable="1"/>
-    <field name="fid" editable="1"/>
+    <field editable="1" name="Grazing Radius (m)"/>
+    <field editable="1" name="Grazing Radius Type"/>
+    <field editable="1" name="Name"/>
+    <field editable="1" name="Paddock"/>
+    <field editable="1" name="Paddock Status"/>
+    <field editable="1" name="Status"/>
+    <field editable="1" name="Waterpoint"/>
+    <field editable="1" name="fid"/>
   </editable>
   <labelOnTop>
     <field labelOnTop="0" name="Grazing Radius (m)"/>
+    <field labelOnTop="0" name="Grazing Radius Type"/>
     <field labelOnTop="0" name="Name"/>
+    <field labelOnTop="0" name="Paddock"/>
+    <field labelOnTop="0" name="Paddock Status"/>
     <field labelOnTop="0" name="Status"/>
     <field labelOnTop="0" name="Waterpoint"/>
-    <field labelOnTop="0" name="Grazing Radius Type"/>
     <field labelOnTop="0" name="fid"/>
   </labelOnTop>
   <reuseLastValue>
     <field reuseLastValue="0" name="Grazing Radius (m)"/>
+    <field reuseLastValue="0" name="Grazing Radius Type"/>
     <field reuseLastValue="0" name="Name"/>
+    <field reuseLastValue="0" name="Paddock"/>
+    <field reuseLastValue="0" name="Paddock Status"/>
     <field reuseLastValue="0" name="Status"/>
     <field reuseLastValue="0" name="Waterpoint"/>
-    <field reuseLastValue="0" name="Grazing Radius Type"/>
     <field reuseLastValue="0" name="fid"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>

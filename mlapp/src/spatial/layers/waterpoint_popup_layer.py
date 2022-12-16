@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint_buffer import WaterpointBuffer
+from ..schemas.schemas import GRAZING_RADIUS_TYPE, WATERPOINT
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -7,11 +8,12 @@ class WaterpointPopupLayer(DerivedFeatureLayer):
 
     STYLE = "waterpoint_popup"
 
-    QUERY = """
+    def parameteriseQuery(self, waterpointId):
+        return f"""
 select *
 from "{{0}}"
-where "Waterpoint" = {waterpointId}
-order by "Grazing Radius Type"
+where "{WATERPOINT}" = {waterpointId}
+order by "{GRAZING_RADIUS_TYPE}"
 """
 
     def getFeatureType(cls):
@@ -20,6 +22,6 @@ order by "Grazing Radius Type"
 
     def __init__(self, layerName, waterpoint, waterpointBufferLayer):
         # Burn in the Waterpoint specific parameters first …
-        query = WaterpointPopupLayer.QUERY.format(waterpointId=waterpoint.id)
+        query = self.parameteriseQuery(waterpointId=waterpoint.id)
 
         super().__init__(layerName, query, WaterpointPopupLayer.STYLE, waterpointBufferLayer)

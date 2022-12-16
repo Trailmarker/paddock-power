@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..features.condition import Condition
+from ..schemas.schemas import AREA, CAPACITY_PER_AREA, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_SYSTEM, LAND_SYSTEM_NAME, NAME, PADDOCK, PADDOCK_NAME, PADDOCK_STATUS, POTENTIAL_CAPACITY, STATUS, WATERED_TYPE, WATERED_AREA_STATUS
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -7,52 +8,52 @@ class PaddockConditionPopupLayer(DerivedFeatureLayer):
 
     STYLE = "paddock_condition_popup"
 
-    QUERY = """
-with "Paddock Condition" as
-	(with "Paddock" as
-		(select geometry from "{{0}}" where fid = {paddockId})
-	select
-	st_intersection(st_intersection("Paddock".geometry, "{{1}}".geometry), "{{2}}".geometry) as "geometry",
-	"{{1}}".fid as "Land System",
-	"{{1}}"."Name" as "Land System Name",
-	"AE/km²" as "AE/km²",
-	"Watered",
-	"{{2}}"."Status" as "Watered Area Status"
-	from "Paddock"
-	inner join "{{1}}"
-	on st_intersects("Paddock".geometry, "{{1}}".geometry)
+    def parameteriseQuery(self, paddockId, paddockName, paddockStatus):
+        PADDOCK_CONDITION = "PaddockCondition"
+
+        return f"""
+with {PADDOCK_CONDITION} as
+	(select
+	st_intersection("{{1}}".geometry, "{{2}}".geometry) as geometry,
+	"{{1}}".{FID} as "{LAND_SYSTEM}",
+	"{{1}}".{NAME} as "{LAND_SYSTEM_NAME}",
+	"{{1}}"."{CAPACITY_PER_AREA}" as "{CAPACITY_PER_AREA}",
+	"{{2}}"."{WATERED_TYPE}",
+	"{{2}}".{STATUS} as "{WATERED_AREA_STATUS}"
+	from "{{1}}"
 	inner join "{{2}}"
-	on st_intersects("{{1}}".geometry, "{{2}}".geometry))
+	on "{{2}}".{PADDOCK} = {paddockId}
+	and st_intersects("{{1}}".geometry, "{{2}}".geometry))
 select
-geometry,
-row_number() over (order by '') as "fid",
-{paddockId} as "Paddock",
-'{paddockName}' as "Paddock Name",
-'{paddockStatus}' as "Paddock Status",
-"Land System",
-"Land System Name",
-"AE/km²",
-"Area (km²)",
-("AE/km²" * "Area (km²)") as "AE",
-("AE/km²" * "Area (km²)") as "Potential AE",
-"Condition",
-"Watered",
-"Watered Area Status"
+	geometry,
+	row_number() over (order by '') as {FID},
+	{paddockId} as {PADDOCK},
+	'{paddockName}' as "{PADDOCK_NAME}",
+	'{paddockStatus}' as "{PADDOCK_STATUS}",
+	"{LAND_SYSTEM}",
+	"{LAND_SYSTEM_NAME}",
+	"{CAPACITY_PER_AREA}",
+	"{AREA}",
+	("{CAPACITY_PER_AREA}" * "{AREA}") as "{ESTIMATED_CAPACITY}",
+	("{CAPACITY_PER_AREA}" * "{AREA}") as "{POTENTIAL_CAPACITY}",
+	"{CONDITION_TYPE}",
+	"{WATERED_TYPE}",
+	"{WATERED_AREA_STATUS}"
 from
 	(select
-	 "Paddock Condition".geometry,
-	 "Paddock Condition"."Land System",
-	 "Land System Name",
-	 "AE/km²",
- 	 st_area("Paddock Condition".geometry) / 1000000 as "Area (km²)",
- 	 ifnull("{{3}}"."Condition", 'A') as "Condition",
-	 "Paddock Condition"."Watered",
-	 "Watered Area Status"
+		{PADDOCK_CONDITION}.geometry,
+		{PADDOCK_CONDITION}."{LAND_SYSTEM}",
+		"{LAND_SYSTEM_NAME}",
+		"{CAPACITY_PER_AREA}",
+		st_area({PADDOCK_CONDITION}.geometry) / 1000000 as "{AREA}",
+		ifnull("{{3}}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
+		{PADDOCK_CONDITION}."{WATERED_TYPE}",
+		"{WATERED_AREA_STATUS}"
 	 from
-	 "Paddock Condition" left outer join "{{3}}"
-	 on {paddockId} = "{{3}}"."Paddock"
-	 and "Paddock Condition"."Land System" = "{{3}}"."Land System"
-	 and "Paddock Condition"."Watered" = "{{3}}"."Watered")
+	 {PADDOCK_CONDITION} left outer join "{{3}}"
+	 on {paddockId} = "{{3}}"."{PADDOCK}"
+	 and {PADDOCK_CONDITION}."{LAND_SYSTEM}" = "{{3}}"."{LAND_SYSTEM}"
+	 and {PADDOCK_CONDITION}."{WATERED_TYPE}" = "{{3}}"."{WATERED_TYPE}")
 where geometry is not null
 """
 
@@ -62,9 +63,9 @@ where geometry is not null
 
     def __init__(self, layerName, paddock, paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
-        query = PaddockConditionPopupLayer.QUERY.format(paddockId=paddock.id,
-                                                        paddockName=paddock.name,
-                                                        paddockStatus=paddock.status)
+        query = self.parameteriseQuery(paddockId=paddock.id,
+                                       paddockName=paddock.name,
+                                       paddockStatus=paddock.status)
 
         super().__init__(
             layerName,

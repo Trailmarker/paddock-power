@@ -68,12 +68,14 @@ NAME = "Name"
 NEAR_GRAZING_RADIUS = "Near Grazing Radius (m)"
 PADDOCK = "Paddock"
 PADDOCK_NAME = "Paddock Name"
+PADDOCK_STATUS = "Paddock Status"
 PERIMETER = "Perimeter (km)"
 POTENTIAL_CAPACITY = "Potential AE"
 RECALCULATE_COMPLETE = "Complete"
 RECALCULATE_CURRENT = "Current"
 REFERENCE = "Reference"
 STATUS = "Status"
+WATERED_AREA_STATUS = "Watered Area Status"
 WATERED_TYPE = "Watered"
 WATERPOINT = "Waterpoint"
 WATERPOINT_END_MONTH = "Waterpoint End Month"
@@ -110,6 +112,11 @@ Name = StringField(propertyName="name", name=NAME)
 NearGrazingRadius = MeasureField(propertyName="nearGrazingRadius", name=NEAR_GRAZING_RADIUS, defaultValue="3000.0")
 Paddock = IdField(propertyName="paddock", name=PADDOCK)
 PaddockName = StringField(propertyName="paddockName", name=PADDOCK_NAME)
+PaddockStatus = DomainField(
+    propertyName="paddockStatus",
+    name=PADDOCK_STATUS,
+    domainType=FeatureStatus,
+    defaultValue=FeatureStatus.Undefined)
 Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER)
 PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY)
 RecalculateCurrent = IdField(propertyName="recalculateCurrent", name=RECALCULATE_CURRENT)
@@ -170,9 +177,10 @@ PersistedFeatureSchema = Schema([Fid], wkbType=QgsWkbTypes.MultiPolygon)
 PipelineSchema = LineFeatureSchema
 PointFeatureSchema = Schema([Fid, Name, Status, Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)
 StatusFeatureSchema = Schema([Fid, Name, Status])
-WaterpointBufferSchema = Schema([Fid, Status, Waterpoint, GrazingRadiusTypeField, GrazingRadius],
-                                wkbType=QgsWkbTypes.MultiPolygon)
-WateredAreaSchema = Schema([Fid, WateredTypeField, Status], wkbType=QgsWkbTypes.MultiPolygon)
+WaterpointBufferSchema = Schema(
+    [Fid, Status, Paddock, Waterpoint, GrazingRadiusTypeField, GrazingRadius, PaddockStatus],
+    wkbType=QgsWkbTypes.MultiPolygon)
+WateredAreaSchema = Schema([Fid, WateredTypeField, Status, Paddock, PaddockStatus], wkbType=QgsWkbTypes.MultiPolygon)
 WaterpointSchema = Schema([Fid,
                            Name,
                            Status,

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsFeatureRequest, QgsProject
+from qgis.core import QgsProject
 
-from ...utils import qgsInfo
+from ...utils import qgsInfo, qgsDebug
 from ..layers.condition_table import ConditionTable
 from ..layers.derived_feature_layer import DerivedFeatureLayer
 from ..layers.land_system_layer import LandSystemLayer
@@ -68,31 +68,31 @@ class Paddock(AreaFeature):
     def recalculate(self):
         super().recalculate()
 
-        try:
-            self.recalculateLayer = PaddockConditionPopupLayer(
-                f"Paddock {self.id} Recalculate",
-                self,
-                self.featureLayer,
-                self.landSystemLayer,
-                self.wateredAreaLayer,
-                self.conditionTable)
+        # try:
+        #     self.recalculateLayer = PaddockConditionPopupLayer(
+        #         f"Paddock {self.id} Recalculate",
+        #         self,
+        #         self.featureLayer,
+        #         self.landSystemLayer,
+        #         self.wateredAreaLayer,
+        #         self.conditionTable)
 
-            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-            conditions = [f for f in self.recalculateLayer.getFeatures(request)]
+        #     request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+        #     conditions = [f for f in self.recalculateLayer.getFeatures(request)]
 
-            estimatedRaw = sum([c.estimatedCapacity for c in conditions])
-            self.estimatedCapacity = round(estimatedRaw)
-            self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
-            self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
-        except BaseException as e:
-            qgsInfo(f"{self}.recalculate() failed with exception {e}")
-        finally:
-            # Scoping and QGIS layer ownership design mean layer's (usually) already deleted by here
-            self.recalculateLayer = None
-            # if self.recalculateLayer:
-            #     self.recalculateLayer.detectAndRemove()
+        #     estimatedRaw = sum([c.estimatedCapacity for c in conditions])
+        #     self.estimatedCapacity = round(estimatedRaw)
+        #     self.potentialCapacity = round(sum([c.potentialCapacity for c in conditions]))
+        #     self.capacityPerArea = round(estimatedRaw / self.featureArea, 2)
+        # except BaseException as e:
+        #     qgsInfo(f"{self}.recalculate() failed with exception {e}")
+        # finally:
+        #     # Scoping and QGIS layer ownership design mean layer's (usually) already deleted by here
+        #     self.recalculateLayer = None
+        #     # if self.recalculateLayer:
+        #     #     self.recalculateLayer.detectAndRemove()
 
-        # qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
+        # # qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, capacityPerArea={self.capacityPerArea}")
 
     def addPopupLayer(self):
         """Add a condition layer to the project."""
@@ -100,6 +100,7 @@ class Paddock(AreaFeature):
         if not item:
             # If the Paddocks layer isn't in the map, don't initialise or add the condition layer.
             return
+
         self.popupLayer = PaddockConditionPopupLayer(
             f"{self.name} Paddock Condition",
             self,
@@ -112,6 +113,7 @@ class Paddock(AreaFeature):
 
         # Bit of a hack but it looks nicer if it's above the derived Boundary layer …
         group.insertLayer(max(0, group.children().index(item) - 1), self.popupLayer)
+
         self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
@@ -122,7 +124,7 @@ class Paddock(AreaFeature):
                     layer.parent().removeChildNode(layer)
                     QgsProject.instance().removeMapLayer(self.popupLayer.id())
                 self.popupLayer = None
-                self.popuplayerRemoved.emit()
+            self.popuplayerRemoved.emit()
         except BaseException:
             pass
 
