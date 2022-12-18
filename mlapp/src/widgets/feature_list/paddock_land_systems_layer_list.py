@@ -12,12 +12,8 @@ class PaddockLandSystemsLayerList(FeatureLayerList):
         """Constructor."""
 
         def listItemFactory(paddockLandSystem):
+            paddockLandSystem.featureUpdated.connect(self.refreshUi)
             return PaddockLandSystemListItem(paddockLandSystem, PaddockLandSystemDetails,
                                              PaddockLandSystemDetailsEdit, parent)
 
         super().__init__(listItemFactory, parent)
-
-    def refreshUi(self):
-        """Refresh the UI."""
-        qgsDebug(f"Refreshing PaddockLandSystemsLayerList")
-        super().refreshUi()

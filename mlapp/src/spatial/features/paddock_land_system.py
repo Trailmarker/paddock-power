@@ -22,4 +22,5 @@ class PaddockLandSystem(Feature):
     def upsertCondition(self, conditionType):
         """Update the Condition table."""
         self.conditionTable.upsert(self.paddock, self.landSystem, conditionType)
+        self.conditionType = conditionType
         self.featureUpdated.emit()

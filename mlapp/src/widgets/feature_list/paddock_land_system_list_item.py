@@ -55,6 +55,7 @@ class PaddockLandSystemListItem(QWidget, EditStateMachine):
         self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
         self.stateChanged.connect(self.refreshUi)
+        self.feature.featureUpdated.connect(self.refreshUi)
 
         self.refreshUi()
 
