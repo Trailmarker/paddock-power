@@ -20,8 +20,7 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
 
         self.paddock = paddock
 
-        if self.paddock is not None:
-            self.nameLineEdit.setText(self.paddock.name)
+        self.nameLineEdit.setText(self.paddock.name)
 
     @pyqtSlot()
     def saveFeature(self):

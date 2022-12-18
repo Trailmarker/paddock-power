@@ -28,6 +28,7 @@ with "{IN_PADDOCKS}" as
 	 from "{{0}}"
 	 inner join "{{1}}"
      on "{{0}}"."{STATUS}" in ('{FeatureStatus.Planned.name}', '{FeatureStatus.Built.name}')
+     and "{{1}}"."{STATUS}" in ('{FeatureStatus.Planned.name}', '{FeatureStatus.Built.name}')
 	 and st_contains("{{1}}".geometry, "{{0}}".geometry)
      where "{{0}}"."{WATERPOINT_TYPE}" in ('{WaterpointType.Dam.name}', '{WaterpointType.Trough.name}', '{WaterpointType.Waterhole.name}')
      ),

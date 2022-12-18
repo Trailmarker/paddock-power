@@ -13,6 +13,9 @@ from ..schemas.schemas import WaterpointSchema
 @WaterpointSchema.addSchema()
 class Waterpoint(PointFeature):
 
+    NEAREST_GRAZING_RADIUS = 0
+    FARTHEST_GRAZING_RADIUS = 20000
+
     popupLayerAdded = pyqtSignal(WaterpointPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
@@ -37,6 +40,8 @@ class Waterpoint(PointFeature):
 
     @property
     def title(self):
+        if self.name and self.name != "NULL":
+            return f"{self.name} ({self.waterpointType})"
         return f"Waterpoint ({self.id}) ({self.waterpointType})"
 
     def addPopupLayer(self):
@@ -58,7 +63,7 @@ class Waterpoint(PointFeature):
             # Insert the buffers layer immediately below this waterpoint, so it and any neighbouring waterpoints
             # remain visible.
             group.insertLayer(group.children().index(item) + 1, self.popupLayer)
-            
+
             self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
