@@ -17,7 +17,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         """Return the type of feature that this layer contains, which depnds on the underlying derived layer. Override in subclasses."""
         pass
 
-    def __init__(self, gpkgFile, layerName, derivedLayer, styleName=None):
+    def __init__(self, project, gpkgFile, layerName, derivedLayer, styleName=None):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""
 
         assert(isinstance(derivedLayer, DerivedFeatureLayer))
@@ -29,7 +29,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         # Adjusts the schema to match the feature type
         # Applies the editor widgets (TODO need to make read only for a derived layer?)
         # Optionally applies a style
-        super().__init__(gpkgFile, layerName, styleName=styleName)
+        super().__init__(project, gpkgFile, layerName, styleName=styleName)
 
         # Connect persistence on upstream PersistedFeatureLayers to the deriveFeatures slot
         for featureLayer in self.derivedLayer.persistedFeatureLayers:

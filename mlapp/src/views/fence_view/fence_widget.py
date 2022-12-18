@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsGeometry
 
 from ...spatial.features.fence import Fence
-from ...spatial.features.persisted_feature import PersistedFeature
+from ...spatial.features.persisted_feature import Feature
 from ...tools.sketch_line_tool import SketchLineTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -45,7 +45,7 @@ class FenceWidget(QWidget, FORM_CLASS):
         tool.sketchFinished.connect(self.onSketchFenceFinished)
         self.project.setTool(tool)
 
-    @pyqtSlot(PersistedFeature)
+    @pyqtSlot(Feature)
     def onSelectedFeatureChanged(self, feature):
         """Handle a change to the selected Fence."""
         if isinstance(feature, Fence):

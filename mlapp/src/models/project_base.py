@@ -28,30 +28,31 @@ class ProjectBase(QObject):
         self.elevationLayer = None
         elevationLayerName = ElevationLayer.detectInGeoPackage(self.gpkgFile)
         if elevationLayerName is not None:
-            self.elevationLayer = ElevationLayer(self.gpkgFile, elevationLayerName)
+            self.elevationLayer = ElevationLayer(self, self.gpkgFile, elevationLayerName)
 
         pipelineLayerName = f"Pipelines"
-        self.pipelineLayer = PipelineLayer(self.gpkgFile, pipelineLayerName,
+        self.pipelineLayer = PipelineLayer(self, self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
 
         landSystemLayerName = "Land Systems"
-        self.landSystemLayer = LandSystemLayer(self.gpkgFile, landSystemLayerName)
+        self.landSystemLayer = LandSystemLayer(self, self.gpkgFile, landSystemLayerName)
 
-        self.conditionTable = ConditionTable(self.gpkgFile, "Condition Table")
+        self.conditionTable = ConditionTable(self, self.gpkgFile, "Condition Table")
 
         paddockLayerName = f"Paddocks"
         self.paddockLayer = PaddockLayer(
+            self,
             self.gpkgFile,
             paddockLayerName,
             self.landSystemLayer,
             self.conditionTable)
 
         waterpointLayerName = f"Waterpoints"
-        self.waterpointLayer = WaterpointLayer(self.gpkgFile, waterpointLayerName, self.elevationLayer)
+        self.waterpointLayer = WaterpointLayer(self, self.gpkgFile, waterpointLayerName, self.elevationLayer)
 
         waterpointBufferLayerName = f"Waterpoint Buffers"
         self.waterpointBufferLayer = WaterpointBufferLayer(
-            self.gpkgFile, waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
+            self, self.gpkgFile, waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
 
         # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
         # Same goes for Paddocks and Watered Areas
@@ -59,6 +60,7 @@ class ProjectBase(QObject):
 
         wateredAreaLayerName = f"Watered Areas"
         self.wateredAreaLayer = WateredAreaLayer(
+            self,
             self.gpkgFile,
             wateredAreaLayerName,
             self.paddockLayer,
@@ -67,12 +69,12 @@ class ProjectBase(QObject):
         self.paddockLayer.wateredAreaLayer = self.wateredAreaLayer
 
         fenceLayerName = f"Fences"
-        self.fenceLayer = FenceLayer(self.gpkgFile, fenceLayerName,
+        self.fenceLayer = FenceLayer(self, self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
                                      self.elevationLayer)
 
         boundaryLayerName = f"Boundary"
-        self.boundaryLayer = BoundaryLayer(boundaryLayerName, self.paddockLayer)
+        self.boundaryLayer = BoundaryLayer(self, boundaryLayerName, self.paddockLayer)
 
     def findGroup(self):
         """Find this Project's group in the Layers panel."""

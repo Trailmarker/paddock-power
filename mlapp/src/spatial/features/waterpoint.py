@@ -3,7 +3,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsProject
 
-from ..layers.derived_feature_layer import DerivedFeatureLayer
 from ..layers.waterpoint_popup_layer import WaterpointPopupLayer
 from .edits import Edits
 from .feature_action import FeatureAction
@@ -14,7 +13,7 @@ from ..schemas.schemas import WaterpointSchema
 @WaterpointSchema.addSchema()
 class Waterpoint(PointFeature):
 
-    popupLayerAdded = pyqtSignal(DerivedFeatureLayer)
+    popupLayerAdded = pyqtSignal(WaterpointPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
     def __init__(self, featureLayer, waterpointBufferLayer, elevationLayer=None, existingFeature=None):
@@ -51,6 +50,7 @@ class Waterpoint(PointFeature):
             WaterpointPopupLayer.detectAndRemoveAllOfType()
 
             self.popupLayer = WaterpointPopupLayer(
+                self.featureLayer.getPaddockPowerProject(),
                 f"{self.waterpointType.value} {self.id} Watered Area",
                 self,
                 self.waterpointBufferLayer)

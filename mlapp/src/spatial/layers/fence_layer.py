@@ -14,8 +14,8 @@ class FenceLayer(StatusFeatureLayer):
     def getFeatureType(self):
         return Fence
 
-    def __init__(self, gpkgFile, layerName, paddockLayer, elevationLayer):
-        super().__init__(gpkgFile, layerName, styleName=FenceLayer.STYLE)
+    def __init__(self, project, gpkgFile, layerName, paddockLayer, elevationLayer):
+        super().__init__(project, gpkgFile, layerName, styleName=FenceLayer.STYLE)
 
         self._paddockLayerId = paddockLayer.id()
         self._elevationLayerId = elevationLayer.id() if elevationLayer else None

@@ -8,19 +8,19 @@ from qgis.PyQt.QtWidgets import QWidget
 from ...spatial.schemas.condition_type import ConditionType
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'condition_details_edit_base.ui')))
+    os.path.dirname(__file__), 'paddock_land_system_details_edit_base.ui')))
 
 
-class ConditionDetailsEdit(QWidget, FORM_CLASS):
+class PaddockLandSystemDetailsEdit(QWidget, FORM_CLASS):
 
-    def __init__(self, condition, parent=None):
+    def __init__(self, paddockLandSystem, parent=None):
         """Constructor."""
         super().__init__(parent)
 
         self.setupUi(self)
 
-        self.condition = condition
-        self._conditionType = condition.conditionType
+        self.paddockLandSystem = paddockLandSystem
+        self._conditionType = paddockLandSystem.conditionType
 
         for conditionType in ConditionType:
             self.conditionTypeComboBox.addItem(conditionType.value, conditionType)
@@ -36,5 +36,5 @@ class ConditionDetailsEdit(QWidget, FORM_CLASS):
 
     @pyqtSlot()
     def saveFeature(self):
-        """Save the Condition Details."""
-        self.condition.upsertCondition(self._conditionType)
+        """Save the Paddock Land System details, updating the Condition Type."""
+        self.paddockLandSystem.upsertCondition(self._conditionType)

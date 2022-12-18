@@ -9,13 +9,13 @@ class WateredAreaLayer(PersistedDerivedFeatureLayer):
 
     STYLE = "watered_area"
 
-    def __init__(self, gpkgFile, layerName, paddockLayer, waterpointBufferLayer):
+    def __init__(self, project, gpkgFile, layerName, paddockLayer, waterpointBufferLayer):
         f"""Create a new {PLUGIN_NAME} watered area layer."""
 
         derivedWateredAreaLayer = DerivedWateredAreaLayer(
-            f"Derived {layerName}", paddockLayer, waterpointBufferLayer)
+            project, f"Derived {layerName}", paddockLayer, waterpointBufferLayer)
 
-        super().__init__(gpkgFile, layerName, derivedWateredAreaLayer, styleName=WateredAreaLayer.STYLE)
+        super().__init__(project, gpkgFile, layerName, derivedWateredAreaLayer, styleName=WateredAreaLayer.STYLE)
 
     def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""

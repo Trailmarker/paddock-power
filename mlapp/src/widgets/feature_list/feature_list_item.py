@@ -2,7 +2,7 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QHBoxLayout, QLabel, QSizePolicy, QWidget
 
-from ...spatial.features.persisted_feature import PersistedFeature
+from ...spatial.features.persisted_feature import Feature
 from ...spatial.features.feature_action import FeatureAction
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
 from .feature_tool_bar import FeatureToolBar

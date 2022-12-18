@@ -10,7 +10,8 @@ class LandSystemLayer(PersistedFeatureLayer):
     def getFeatureType(self):
         return LandSystem
 
-    def __init__(self, gpkgFile, layerName):
-        super().__init__(gpkgFile,
+    def __init__(self, project, gpkgFile, layerName):
+        super().__init__(project,
+                         gpkgFile,
                          layerName,
                          styleName=LandSystemLayer.STYLE)

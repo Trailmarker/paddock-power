@@ -9,7 +9,7 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class DerivedFeatureLayer(FeatureLayer):
 
-    def __init__(self, layerName, queryFormatSpec, styleName=None, *featureLayers):
+    def __init__(self, project, layerName, queryFormatSpec, styleName=None, *featureLayers):
         # We don't need a layer clause for any DerivedFeatureLayers
 
         self._featureLayers = list(featureLayers)
@@ -17,7 +17,7 @@ class DerivedFeatureLayer(FeatureLayer):
 
         init = self._makeDerivedFeatureLayerSource()
 
-        super().__init__(init, layerName, "virtual", styleName=styleName)
+        super().__init__(project, init, layerName, "virtual", styleName=styleName)
 
         self.detectAndRemove()
         QgsProject.instance().addMapLayer(self, False)

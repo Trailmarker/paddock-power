@@ -82,7 +82,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="conditionListGroupBox">
+     <widget class="QGroupBox" name="paddockLandSystemListGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
@@ -90,9 +90,9 @@
        </sizepolicy>
       </property>
       <property name="title">
-       <string>Paddock Condition Records</string>
+       <string>Paddock Land Systems</string>
       </property>
-      <layout class="QVBoxLayout" name="conditionRecordsVerticalLayout">
+      <layout class="QVBoxLayout" name="paddockLandSystemsVerticalLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -106,7 +106,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="ConditionLayerList" name="conditionList"/>
+        <widget class="PaddockLandSystemsLayerList" name="paddockLandSystemList"/>
        </item>
       </layout>
      </widget>
@@ -129,9 +129,9 @@
    <header>mlapp/src/widgets/feature_list/paddock_layer_list</header>
   </customwidget>
   <customwidget>
-   <class>ConditionLayerList</class>
+   <class>PaddockLandSystemsLayerList</class>
    <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/condition_layer_list</header>
+   <header>mlapp/src/widgets/feature_list/paddock_land_systems_layer_list</header>
   </customwidget>
  </customwidgets>
  <resources/>

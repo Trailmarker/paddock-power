@@ -75,8 +75,9 @@ and st_area(st_intersection("{BUFFERS}".geometry, "{IN_PADDOCKS}".geometry)) >= 
         """Return the type of feature that this layer contains. Override in subclasses"""
         return WaterpointBuffer
 
-    def __init__(self, layerName, waterpointLayer, paddockLayer):
+    def __init__(self, project, layerName, waterpointLayer, paddockLayer):
         super().__init__(
+            project,
             layerName,
             DerivedWaterpointBufferLayer.QUERY,
             DerivedWaterpointBufferLayer.STYLE,

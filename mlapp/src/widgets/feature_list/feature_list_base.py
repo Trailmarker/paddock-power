@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, pyqtSlot
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem, QSizePolicy
+
+from ...spatial.features.feature import Feature
 
 
 class FeatureListBase(QListWidget):
@@ -31,14 +33,16 @@ class FeatureListBase(QListWidget):
         """Get the Features."""
         raise NotImplementedError("getFeatures() must be implemented in a subclass")
 
-    def onSelectFeature(self, id):
+    @pyqtSlot(Feature)
+    def onSelectedFeatureChanged(self, feature):
         """Select the Feature."""
         self.clearSelection()
-        for item in [self.item(i) for i in range(self.count())]:
-            widget = self.itemWidget(item)
-            if widget.feature.id == id:
-                self.setCurrentItem(item)
-                return
+        if feature:
+            for item in [self.item(i) for i in range(self.count())]:
+                widget = self.itemWidget(item)
+                if widget.feature.id == feature.id:  # TODO might this lead to "old" copies of the Feature "aliasing"?
+                    self.setCurrentItem(item)
+                    return
 
     def refreshUi(self):
         """Show the Feature List."""

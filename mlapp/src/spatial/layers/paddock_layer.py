@@ -16,11 +16,11 @@ class PaddockLayer(StatusFeatureLayer):
     def getFeatureType(self):
         return Paddock
 
-    def __init__(self, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
+    def __init__(self, project, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
                  conditionTable: ConditionTable):
         """Create or open a Paddock layer."""
 
-        super().__init__(gpkgFile, layerName, styleName=PaddockLayer.STYLE)
+        super().__init__(project, gpkgFile, layerName, styleName=PaddockLayer.STYLE)
 
         self._landSystemLayerId = landSystemLayer.id()
         self._wateredAreaLayerId = None

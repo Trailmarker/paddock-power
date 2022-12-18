@@ -8,7 +8,7 @@ import processing
 
 from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME, qgsInfo, qgsDebug
-from ..features.persisted_feature import PersistedFeature
+from ..features.persisted_feature import Feature
 from ..layers.feature_layer import FeatureLayer
 
 QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
@@ -24,7 +24,7 @@ class PersistedFeatureLayer(FeatureLayer):
 
     def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
-        return PersistedFeature
+        return Feature
 
     def twoPhaseRecalculate(self):
         """Return True if this layer requires two-phase recalculation."""
@@ -89,7 +89,7 @@ class PersistedFeatureLayer(FeatureLayer):
             'SQL': 'drop table {0}'.format(layerName)
         })
 
-    def __init__(self, gpkgFile, layerName, styleName=None):
+    def __init__(self, project, gpkgFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} vector layer."""
 
         # If not found, create
@@ -98,7 +98,7 @@ class PersistedFeatureLayer(FeatureLayer):
             self.createInGeoPackage(gpkgFile, layerName)
 
         self._gpkgUrl = f"{gpkgFile}|layername={layerName}"
-        super().__init__(path=self._gpkgUrl, baseName=layerName, providerLib="ogr", styleName=styleName)
+        super().__init__(project, path=self._gpkgUrl, baseName=layerName, providerLib="ogr", styleName=styleName)
 
         missingFields, extraFields = self.getFeatureType().checkSchema(self.fields())
 

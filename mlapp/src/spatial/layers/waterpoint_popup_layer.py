@@ -20,8 +20,8 @@ order by "{GRAZING_RADIUS_TYPE}"
         """Return the type of feature that this layer contains. Override in subclasses"""
         return WaterpointBuffer
 
-    def __init__(self, layerName, waterpoint, waterpointBufferLayer):
+    def __init__(self, project, layerName, waterpoint, waterpointBufferLayer):
         # Burn in the Waterpoint specific parameters first …
         query = self.parameteriseQuery(waterpointId=waterpoint.id)
 
-        super().__init__(layerName, query, WaterpointPopupLayer.STYLE, waterpointBufferLayer)
+        super().__init__(project, layerName, query, WaterpointPopupLayer.STYLE, waterpointBufferLayer)

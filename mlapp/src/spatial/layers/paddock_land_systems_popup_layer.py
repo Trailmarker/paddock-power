@@ -77,13 +77,14 @@ group by "{LAND_SYSTEM}", "{CONDITION_TYPE}", "{WATERED_AREA_STATUS}"
         """Return the type of feature that this layer contains. Override in subclasses"""
         return PaddockLandSystem
 
-    def __init__(self, layerName, paddock, paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable):
+    def __init__(self, project, layerName, paddock, paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
         query = self.parameteriseQuery(paddockId=paddock.id,
                                        paddockName=paddock.name,
                                        paddockStatus=paddock.status)
 
         super().__init__(
+            project,
             layerName,
             query,
             PaddockLandSystemsPopupLayer.STYLE,

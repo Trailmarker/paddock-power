@@ -75,8 +75,9 @@ inner join {FAR_WATERED_AREA}
         """Return the type of feature that this layer contains. Override in subclasses"""
         return WateredArea
 
-    def __init__(self, layerName, paddockLayer, waterpointBufferLayer):
+    def __init__(self, project, layerName, paddockLayer, waterpointBufferLayer):
         super().__init__(
+            project,
             layerName,
             DerivedWateredAreaLayer.QUERY,
             DerivedWateredAreaLayer.STYLE,

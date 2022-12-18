@@ -12,9 +12,9 @@ class StatusFeatureLayer(PersistedFeatureLayer):
 
     displayFilterChanged = pyqtSignal(list)
 
-    def __init__(self, gpkgFile, layerName, styleName=None):
+    def __init__(self, project, gpkgFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} vector layer with status management."""
-        super().__init__(gpkgFile=gpkgFile, layerName=layerName, styleName=styleName)
+        super().__init__(project, gpkgFile=gpkgFile, layerName=layerName, styleName=styleName)
         self._displayFilter = [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
         self._applyDisplayFilter(self.displayFilter)
         self.writeCustomSymbology.connect(self._refreshDisplayFilterFromRenderer)

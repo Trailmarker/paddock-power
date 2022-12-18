@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.features.persisted_feature import PersistedFeature
+from ...spatial.features.persisted_feature import Feature
 from .profile_canvas import ProfileCanvas
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -89,7 +89,7 @@ class ProfileDetails(QWidget, FORM_CLASS):
         self.profileCanvas = ProfileCanvas(profile)
         self.canvasLayout.addWidget(self.profileCanvas)
 
-    @pyqtSlot(PersistedFeature)
+    @pyqtSlot(Feature)
     def onSelectedFeatureChanged(self, feature):
         """Handle a change to the selected Fence."""
         if feature.isInfrastructure:

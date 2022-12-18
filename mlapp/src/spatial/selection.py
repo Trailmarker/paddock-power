@@ -6,7 +6,7 @@ from qgis.gui import QgsRubberBand
 
 from ..models.glitch import Glitch
 from ..utils import PLUGIN_NAME
-from .features.persisted_feature import PersistedFeature
+from .features.persisted_feature import Feature
 
 
 class Selection(QgsRubberBand):
@@ -40,11 +40,11 @@ class Selection(QgsRubberBand):
         self.selectedFeature = None
         self.refreshUi()
 
-    @pyqtSlot(PersistedFeature)
+    @pyqtSlot(Feature)
     def setSelectedFeature(self, feature):
         """Set the selection."""
 
-        if not isinstance(feature, PersistedFeature):
+        if not isinstance(feature, Feature):
             raise Glitch(
                 f"Your selected feature must be a {PLUGIN_NAME} Feature.")
 

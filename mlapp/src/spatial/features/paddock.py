@@ -3,9 +3,8 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsFeatureRequest, QgsProject
 
-from ...utils import qgsInfo, qgsDebug, randomString
+from ...utils import qgsInfo, randomString
 from ..layers.condition_table import ConditionTable
-from ..layers.derived_feature_layer import DerivedFeatureLayer
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
 from ..layers.derived_watered_area_layer import DerivedWateredAreaLayer
@@ -18,7 +17,7 @@ from .feature_action import FeatureAction
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
 
-    popupLayerAdded = pyqtSignal(DerivedFeatureLayer)
+    popupLayerAdded = pyqtSignal(PaddockLandSystemsPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
     @classmethod
@@ -66,6 +65,7 @@ class Paddock(AreaFeature):
 
         try:
             self.recalculateLayer = PaddockLandSystemsPopupLayer(
+                self.featureLayer.getPaddockPowerProject(),
                 f"Paddock{self.id}Recalculate{randomString()}",
                 self,
                 self.featureLayer,
@@ -92,7 +92,7 @@ class Paddock(AreaFeature):
             # if self.recalculateLayer:
             #     self.recalculateLayer.detectAndRemove()
 
-        qgsDebug(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, estimatedCapacityPerArea={self.estimatedCapacityPerArea}, potentialCapacityPerArea={self.potentialCapacityPerArea}")
+        qgsInfo(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, estimatedCapacityPerArea={self.estimatedCapacityPerArea}, potentialCapacityPerArea={self.potentialCapacityPerArea}")
 
     def addPopupLayer(self):
         """Add a condition layer to the project."""
@@ -106,6 +106,7 @@ class Paddock(AreaFeature):
             PaddockLandSystemsPopupLayer.detectAndRemoveAllOfType()
 
             self.popupLayer = PaddockLandSystemsPopupLayer(
+                self.featureLayer.getPaddockPowerProject(),
                 f"{self.name} Land Systems",
                 self,
                 self.featureLayer,
@@ -145,7 +146,7 @@ class Paddock(AreaFeature):
 
     def onDeselectFeature(self):
         if super().onDeselectFeature():
-            # Returning False from onDeselectFeature() means that the feature was newly deselected.
+            # Returning True from onDeselectFeature() means that the feature was newly deselected.
             self.removePopupLayer()
             return True
         return False

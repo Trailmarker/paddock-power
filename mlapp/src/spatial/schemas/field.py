@@ -4,7 +4,6 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug
 from .field_domain import FieldDomain
 
 

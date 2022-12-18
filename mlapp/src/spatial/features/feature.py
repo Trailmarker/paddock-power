@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, pyqtSlot
 from re import finditer
 
-from qgis.core import QgsFeature, QgsProject, QgsVectorLayer
+from qgis.core import QgsFeature, QgsProject, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug
 from ..schemas.schemas import FeatureSchema
 
 
@@ -49,7 +48,6 @@ class Feature(QObject):
 
         self._selected = False
         self._featureLayerId = featureLayer.id()
-        self.featureLayer.selectionChanged.connect(self.onSelectionChanged)
 
     def __repr__(self):
         """Return a string representation of the Feature."""
@@ -79,31 +77,32 @@ class Feature(QObject):
         """Return True if the Feature is infrastructure."""
         return False
 
-    def onSelectionChanged(self, selected, deselected, clearAndSelect):
-        # qgsDebug(f"{self}.onSelectionChanged({selected}, {deselected}, {clearAndSelect})")
-        if not self._selected and self.id in selected and len(selected) == 1:
-            self.onSelectFeature()
-        elif self._selected and (self.id not in selected or self.id in deselected):
-            self.onDeselectFeature()
-
+    @pyqtSlot()
     def selectFeature(self):
         """Select the Feature."""
-        # qgsDebug(f"{self}.selectFeature()")
-        # self.featureLayer.removeSelection()
+        self.featureLayer.removeSelection()
         self.featureLayer.selectByIds([self.id], QgsVectorLayer.SetSelection)
+
+    def zoomFeature(self):
+        """Zoom to the Feature."""
+        iface = self.featureLayer.getPaddockPowerProject().iface
+        if self.geometry and iface:
+            featureExtent = QgsRectangle(self.geometry.boundingBox())
+            featureExtent.scale(1.5)  # Expand by 50%
+            iface.mapCanvas().setExtent(featureExtent)
+            iface.mapCanvas().refresh()
 
     def onSelectFeature(self):
         """Called when the Feature is selected."""
         if not self._selected:
-            # qgsDebug(f"{self}.onSelectFeature()")
             self._selected = True
+            self.zoomFeature()
             return True
         return False
 
     def onDeselectFeature(self):
         """Called when the Feature is deselected."""
         if self._selected:
-            # qgsDebug(f"{self}.onDeselectFeature()")
             self._selected = False
             return True
         return False

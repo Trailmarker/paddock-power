@@ -1,21 +1,33 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
+
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+
 from qgis.core import QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
 from ...models.qt_abstract_meta import QtAbstractMeta
-from ...utils import qgsInfo, resolveStylePath, PLUGIN_NAME
+from ...utils import resolveStylePath, PLUGIN_NAME
+from ..features.feature import Feature
 
 
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
+
+    # emit this signal when a selected Feature is updated
+    selectedFeatureChanged = pyqtSignal(Feature)
 
     @abstractmethod
     def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
         pass
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, project, *args, **kwargs):
         f"""Create a new {PLUGIN_NAME} vector layer."""
+
+        # Keep a reference to the Paddock Power Project
+        assert(project is not None)
+        self._project = project
+        self._selectedFeature = None
 
         styleName = kwargs.pop("styleName", None)
 
@@ -25,6 +37,11 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         if styleName is not None:
             stylePath = resolveStylePath(styleName)
             self.loadNamedStyle(stylePath)
+
+        # Route changes to this layer's selection *through* the Paddock Power
+        # Project for *all* Paddock Power FeatureLayers
+        self._project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+        self.selectionChanged.connect(lambda selection, *_: self._project.onLayerSelectionChanged(self, selection))
 
     def detectAndRemove(self):
         """Detect if a layer is already in the map, and if so, remove it."""
@@ -38,7 +55,6 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
         layers = [l for l in QgsProject.instance().mapLayers().values() if type(l).__name__ == cls.__name__]
         for layer in layers:
-            qgsInfo(f"Removing existing layer {layer.name()} of type {type(layer).__name__}")
             QgsProject.instance().removeMapLayer(layer.id())
 
     def wrapFeature(self, feature):
@@ -76,6 +92,10 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             feature = self.wrapFeature(feature)
             yield feature
 
+    def getPaddockPowerProject(self):
+        """Get the PaddockPowerProject for this layer."""
+        return self._project
+
     def getFeature(self, fid):
         """Get a feature by its ID."""
         feature = super().getFeature(fid)
@@ -91,3 +111,22 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
     def featureCount(self):
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
+
+    @pyqtSlot(Feature)
+    def onSelectedFeatureChanged(self, selectedFeature):
+        """Handle the selected feature changing."""
+
+        if selectedFeature and selectedFeature.featureLayer and selectedFeature.featureLayer.id() == self.id():
+            if self._selectedFeature and self._selectedFeature.id == selectedFeature.id:
+                # Reselecting the same Feature, TODO?
+                return
+            self._selectedFeature = selectedFeature
+            self._selectedFeature.onSelectFeature()
+            self.selectedFeatureChanged.emit(self._selectedFeature)
+
+        elif self._selectedFeature:
+            self._selectedFeature.onDeselectFeature()
+            self._selectedFeature = None
+            self.selectedFeatureChanged.emit(self._selectedFeature)
+
+

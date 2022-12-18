@@ -62,7 +62,11 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
         with sqlite3.connect(gpkgFile) as conn:
             conn.execute(self.DROP.format(tableName=tableName))
 
-    def __init__(self, gpkgFile, tableName):
+    def __init__(self, project, gpkgFile, tableName):
+        # Stash the Paddock Power project
+        assert(project is not None)
+        self._project = project
+
         # If not found, create
         if not self.detectInGeoPackage(gpkgFile, tableName):
             qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage. Creating new, stand by …")

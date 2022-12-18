@@ -12,15 +12,18 @@ class PersistedFeatureLayerList(FeatureLayerList):
 
     @property
     def featureLayer(self):
-        """Get the PersistedFeatureLayer."""
+        """Get the FeatureLayer."""
         return QgsProject.instance().mapLayer(self._featureLayerId) if self._featureLayerId else None
 
     @featureLayer.setter
     def featureLayer(self, featureLayer):
-        """Set the Project."""
-        self._featureLayerId = featureLayer.id() if featureLayer else None
-        self.featureLayer.selectionChanged.connect(self.onSelectionChanged)
-        self.featureLayer.featuresPersisted.connect(self.refreshUi)
+        """Set the FeatureLayer."""
+        if featureLayer:
+            self._featureLayerId = featureLayer.id()
+            self.featureLayer.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+            self.featureLayer.featuresPersisted.connect(self.refreshUi)
+        else:
+            self._featureLayerId = None
         self.refreshUi()
 
     def getFeatures(self):

@@ -20,5 +20,5 @@ from "{0}" where "Status" in ('Built', 'Planned')
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Boundary
 
-    def __init__(self, layerName, paddockLayer):
-        super().__init__(layerName, BoundaryLayer.QUERY, BoundaryLayer.STYLE, paddockLayer)
+    def __init__(self, project, layerName, paddockLayer):
+        super().__init__(project, layerName, BoundaryLayer.QUERY, BoundaryLayer.STYLE, paddockLayer)

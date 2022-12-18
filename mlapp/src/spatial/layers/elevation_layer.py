@@ -48,11 +48,13 @@ class ElevationLayer(QgsRasterLayer):
             if layer.source() == rasterUrl:
                 QgsProject.instance().removeMapLayer(layer.id())
 
-    def __init__(self, gpkgFile, layerName):
+    def __init__(self, project, gpkgFile, layerName):
         """Create a new elevation layer."""
 
         assert(gpkgFile is not None)
         assert(layerName is not None)
+
+        self._project = project
 
         # Note ths URL format is different from QgsVectorLayer!
         rasterUrl = rasterGpkgUrl(gpkgFile, layerName)

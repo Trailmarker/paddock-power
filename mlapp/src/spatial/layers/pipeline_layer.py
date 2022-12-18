@@ -13,10 +13,11 @@ class PipelineLayer(StatusFeatureLayer):
     def getFeatureType(self):
         return Pipeline
 
-    def __init__(self, gpkgFile, layerName, elevationLayer: ElevationLayer):
+    def __init__(self, project, gpkgFile, layerName, elevationLayer: ElevationLayer):
         """Create or open a Pipeline layer."""
 
-        super().__init__(gpkgFile,
+        super().__init__(project,
+                         gpkgFile,
                          layerName,
                          styleName=PipelineLayer.STYLE)
 

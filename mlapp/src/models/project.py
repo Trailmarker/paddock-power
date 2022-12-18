@@ -5,7 +5,7 @@ from qgis.core import QgsRectangle
 
 from ..spatial.features.fence import Fence
 from ..spatial.features.paddock import Paddock
-from ..spatial.features.persisted_feature import PersistedFeature
+from ..spatial.features.persisted_feature import Feature
 from ..spatial.features.pipeline import Pipeline
 from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..tools.map_tool import MapTool
@@ -22,7 +22,7 @@ class Project(ProjectBase):
     MENU_NAME = f"&{PLUGIN_NAME}"
 
     # emit this signal when a selected Feature is updated
-    selectedFeatureChanged = pyqtSignal(PersistedFeature)
+    selectedFeatureChanged = pyqtSignal(Feature)
     projectUnloading = pyqtSignal()
 
     def __init__(self, iface, gpkgFile=None, projectName=None):
@@ -32,43 +32,9 @@ class Project(ProjectBase):
 
         self.currentTool = None
 
-        self.selectedFeatures = {
-            Fence: None,
-            Paddock: None,
-            Pipeline: None
-        }
-
         self.views = {}
 
-        self.selectedFeatureChanged.connect(self.zoomFeature)
-
-        self.pipelineLayer.selectionChanged.connect(lambda selection, *
-                                                    _: self.onLayerSelectionChanged(self.pipelineLayer, selection))
-        self.fenceLayer.selectionChanged.connect(lambda selection, *
-                                                 _: self.onLayerSelectionChanged(self.fenceLayer, selection))
-        self.paddockLayer.selectionChanged.connect(lambda selection, *
-                                                   _: self.onLayerSelectionChanged(self.paddockLayer, selection))
-        self.waterpointLayer.selectionChanged.connect(lambda selection, *
-                                                      _: self.onLayerSelectionChanged(self.waterpointLayer, selection))
-
-        # for layer in [self.pipelineLayer, self.fenceLayer, self.paddockLayer, self.waterpointLayer]:
-        #     layer.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(layer, selection))
-        # layer.afterCommitChanges.connect(lambda: self.projectDataChanged.emit)
-
-    @property
-    def selectedFence(self):
-        """Get the currently selected fence."""
-        return self.selectedFeatures[Fence]
-
-    @property
-    def selectedPaddock(self):
-        """Get the currently selected paddock."""
-        return self.selectedFeatures[Paddock]
-
-    @property
-    def selectedPipeline(self):
-        """Get the currently selected pipeline."""
-        return self.selectedFeatures[Pipeline]
+        # self.selectedFeatureChanged.connect(self.zoomFeature)
 
     def setTool(self, tool):
         """Set the current tool for this Project."""
@@ -88,8 +54,6 @@ class Project(ProjectBase):
             self.currentTool = None
 
     def selectFeature(self, feature):
-        # qgsDebug(f"Project.selectFeature({feature})")
-        self.selectedFeatures[feature.__class__.__name__] = feature
         self.selectedFeatureChanged.emit(feature)
 
     @pyqtSlot()
@@ -103,19 +67,8 @@ class Project(ProjectBase):
             self.iface.removeDockWidget(view)
             self.onCloseView(viewType)
 
-    @pyqtSlot(PersistedFeature)
-    def zoomFeature(self, feature):
-
-        if feature.geometry:
-            featureExtent = QgsRectangle(feature.geometry.boundingBox())
-            featureExtent.scale(1.5)  # Expand by 50%
-            self.iface.mapCanvas().setExtent(featureExtent)
-            self.iface.mapCanvas().refresh()
-
     @pyqtSlot(PersistedFeatureLayer, list)
     def onLayerSelectionChanged(self, layer, selection):
-        # qgsDebug(f"Project.onLayerSelectionChanged({layer.__class__.__name__}, {selection})")
-
         if len(selection) == 1:
             feature = layer.getFeature(selection[0])
             if feature is not None:
