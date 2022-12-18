@@ -4,6 +4,7 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ...spatial.features.edits import Edits
 from ...spatial.features.feature_action import FeatureAction
+from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.status_feature import StatusFeature
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
@@ -144,7 +145,11 @@ class FeatureListItem(QWidget, EditStateMachine):
     @EditAction.save.handler()
     def saveItem(self):
         self.featureEdit.saveFeature()
-        return Edits.upsert(self.feature)
+
+        if isinstance(self.feature, PersistedFeature):
+            return Edits.upsert(self.feature)
+        else:
+            return Edits()
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
@@ -171,8 +176,9 @@ class FeatureListItem(QWidget, EditStateMachine):
             self.featureDetails.setVisible(not editing)
             self.featureEdit.setVisible(editing)
 
-            # Hide workflow functions when in edit mode
-            self.statusToolBar.setVisible(not editing)
+            # Hide status workflow functions when in edit mode
+            if self.hasStatus:
+                self.statusToolBar.setVisible(not editing)
 
             self.editToolBar.refreshUi()
 

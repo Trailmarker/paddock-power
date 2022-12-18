@@ -2,8 +2,7 @@
 from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
 
 from ..spatial.features.feature import Feature
-from ..spatial.features.persisted_feature import PersistedFeature
-from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
+from ..spatial.layers.feature_layer import FeatureLayer
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME
 from ..views.feature_view.feature_view import FeatureView
@@ -18,7 +17,7 @@ class Project(ProjectBase):
     MENU_NAME = f"&{PLUGIN_NAME}"
 
     # emit this signal when a selected PersistedFeature is updated
-    selectedFeatureChanged = pyqtSignal(PersistedFeature)
+    selectedFeatureChanged = pyqtSignal(Feature)
     projectUnloading = pyqtSignal()
 
     def __init__(self, iface, gpkgFile=None, projectName=None):
@@ -48,10 +47,7 @@ class Project(ProjectBase):
             self.currentTool = None
 
     def selectFeature(self, feature):
-        if isinstance(feature, PersistedFeature):
-            self.selectedFeatureChanged.emit(feature)
-        elif isinstance(feature, Feature):
-            feature.zoomFeature()
+        self.selectedFeatureChanged.emit(feature)
 
     @pyqtSlot()
     def unload(self):
@@ -64,7 +60,7 @@ class Project(ProjectBase):
             self.iface.removeDockWidget(view)
             self.onCloseView(viewType)
 
-    @pyqtSlot(PersistedFeatureLayer, list)
+    @pyqtSlot(FeatureLayer, list)
     def onLayerSelectionChanged(self, layer, selection):
         if len(selection) == 1:
             feature = layer.getFeature(selection[0])

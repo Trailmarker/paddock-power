@@ -9,3 +9,8 @@ class WaterpointBuffer(PersistedFeature):
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Waterpoint Buffer."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
+
+    @property
+    def focusOnSelect(self):
+        """Return True if the app should focus on this Feature when selected."""
+        return False

@@ -58,6 +58,7 @@ class Waterpoint(PointFeature):
             # Insert the buffers layer immediately below this waterpoint, so it and any neighbouring waterpoints
             # remain visible.
             group.insertLayer(group.children().index(item) + 1, self.popupLayer)
+            
             self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
@@ -77,18 +78,14 @@ class Waterpoint(PointFeature):
             self.popupLayerRemoved.emit()
 
     def onSelectFeature(self):
-        if super().onSelectFeature():
-            # Returning True from onSelectFeature() means that the feature was newly selected.
-            self.addPopupLayer()
-            return True
-        return False
+        """Do the stuff we'd normally do, but also add the Waterpoint popup layer."""
+        super().onSelectFeature()
+        self.addPopupLayer()
 
     def onDeselectFeature(self):
-        if super().onDeselectFeature():
-            # Returning False from onDeselectFeature() means that the feature was newly deselected.
-            self.removePopupLayer()
-            return True
-        return False
+        """Do the stuff we'd normally do, but also remove the Waterpoint popup layer."""
+        super().onDeselectFeature()
+        self.removePopupLayer()
 
     @Edits.persistFeatures
     @FeatureAction.draft.handler()
@@ -97,5 +94,3 @@ class Waterpoint(PointFeature):
         self.geometry = point
 
         return Edits.upsert(self)
-
- 

@@ -2,16 +2,20 @@
 from collections import defaultdict
 from contextlib import contextmanager
 
-from qgis.core import QgsProject, QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from ...models.glitch import Glitch
+from ...spatial.features.persisted_feature import PersistedFeature
 from ...utils import qgsInfo
 
 
 class Edits:
+    
     def __init__(self, upserts=[], deletes=[]):
-        self.upserts = upserts or []
-        self.deletes = deletes or []
+        def _filter(features=[]):
+            return [f for f in (features or []) if isinstance(f, PersistedFeature)]
+        self.upserts = _filter(upserts)
+        self.deletes = _filter(deletes)
 
     def editAfter(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
@@ -80,6 +84,7 @@ class Edits:
         """Decorator that takes a method returning an Edits object of edits to persist,
         and returns a method that instead persists the edits and returns None."""
         def callableWithPersistFeatures(*args, **kwargs):
+            # Get the result of the inner function
             edits = function(*args, **kwargs)
 
             qgsInfo(f"Edits.persistFeatures: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")

@@ -15,3 +15,9 @@ class PaddockCondition(Feature):
     @property
     def name(self):
         return f"{self.landSystemName} (Watered: {self.wateredType.value})"
+
+    @property
+    def focusOnSelect(self):
+        """Return True if the app should focus on this Feature when selected."""
+        return False
+

@@ -26,10 +26,6 @@ class PersistedFeatureLayer(FeatureLayer):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return Feature
 
-    def twoPhaseRecalculate(self):
-        """Return True if this layer requires two-phase recalculation."""
-        return self.getFeatureType().twoPhaseRecalculate()
-
     def detectInGeoPackage(self, gpkgFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""
         try:

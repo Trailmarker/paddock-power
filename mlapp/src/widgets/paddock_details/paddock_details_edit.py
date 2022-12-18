@@ -27,4 +27,3 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS):
     def saveFeature(self):
         """Save the Paddock Details."""
         self.paddock.name = self.nameLineEdit.text()
-        self.paddock.upsert()

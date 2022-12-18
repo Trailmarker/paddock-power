@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSlot
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem, QSizePolicy
 
 from ...spatial.features.feature import Feature
-
+from ...utils import qgsDebug
 
 class FeatureListBase(QListWidget):
 
@@ -38,6 +38,7 @@ class FeatureListBase(QListWidget):
         """Select the Feature."""
         self.clearSelection()
         if feature:
+            # qgsDebug(f"Selecting Feature {feature.id} in {self.__class__.__name__}")
             for item in [self.item(i) for i in range(self.count())]:
                 widget = self.itemWidget(item)
                 if widget.feature.id == feature.id:  # TODO might this lead to "old" copies of the Feature "aliasing"?

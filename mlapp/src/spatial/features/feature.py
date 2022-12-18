@@ -5,7 +5,7 @@ from re import finditer
 from qgis.core import QgsFeature, QgsProject, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ..schemas.schemas import FeatureSchema
+from ..schemas.schemas import FID, FeatureSchema
 
 
 @FeatureSchema.addSchema()
@@ -46,7 +46,6 @@ class Feature(QObject):
             raise Glitch(
                 f"{self.__class__.__name__}.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
 
-        self._selected = False
         self._featureLayerId = featureLayer.id()
 
     def __repr__(self):
@@ -81,18 +80,18 @@ class Feature(QObject):
         return f"{self.displayName()} {self.id}"
 
     @property
-    def isSelected(self):
-        return self._selected
-
-    @property
     def isInfrastructure(self):
         """Return True if the Feature is infrastructure."""
         return False
 
+    @property
+    def focusOnSelect(self):
+        """Return True if the app should focus on this Feature when selected."""
+        return True
+
     @pyqtSlot()
     def selectFeature(self):
         """Select the Feature."""
-        self.featureLayer.removeSelection()
         self.featureLayer.selectByIds([self.id], QgsVectorLayer.SetSelection)
 
     def zoomFeature(self):
@@ -106,15 +105,8 @@ class Feature(QObject):
 
     def onSelectFeature(self):
         """Called when the Feature is selected."""
-        if not self.isSelected:
-            self._selected = True
-            self.zoomFeature()
-            return True
-        return False
+        self.zoomFeature()
 
     def onDeselectFeature(self):
-        """Called when the Feature is deselected."""
-        if self.isSelected:
-            self._selected = False
-            return True
-        return False
+        """Called when the Feature is selected."""
+        pass

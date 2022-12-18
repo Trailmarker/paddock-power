@@ -156,18 +156,14 @@ class Paddock(AreaFeature):
             self.popupLayer = None
 
     def onSelectFeature(self):
-        if super().onSelectFeature():
-            # Returning True from onSelectFeature() means that the feature was newly selected.
-            self.addPopupLayer()
-            return True
-        return False
+        """Do the stuff we'd normally do, but also add the Paddock Land Systems popup layer."""
+        super().onSelectFeature()
+        self.addPopupLayer()
 
     def onDeselectFeature(self):
-        if super().onDeselectFeature():
-            # Returning True from onDeselectFeature() means that the feature was newly deselected.
-            self.removePopupLayer()
-            return True
-        return False
+        """Do the stuff we'd normally do, but also remove the Paddock Land Systems popup layer."""
+        super().onDeselectFeature()
+        self.removePopupLayer()
 
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):

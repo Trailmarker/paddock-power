@@ -9,3 +9,8 @@ class WateredArea(PersistedFeature):
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new WateredArea."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
+
+    @property
+    def focusOnSelect(self):
+        """Return True if the app should focus on this Feature when selected."""
+        return False
