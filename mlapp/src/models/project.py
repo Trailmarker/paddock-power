@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
 
-from qgis.core import QgsRectangle
-
-from ..spatial.features.fence import Fence
-from ..spatial.features.paddock import Paddock
-from ..spatial.features.persisted_feature import Feature
-from ..spatial.features.pipeline import Pipeline
+from ..spatial.features.feature import Feature
+from ..spatial.features.persisted_feature import PersistedFeature
 from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..tools.map_tool import MapTool
-from ..utils import PLUGIN_NAME, qgsDebug
+from ..utils import PLUGIN_NAME
 from ..views.feature_view.feature_view import FeatureView
 from .glitch import Glitch
 from .project_base import ProjectBase
@@ -21,8 +17,8 @@ from ...resources_rc import *
 class Project(ProjectBase):
     MENU_NAME = f"&{PLUGIN_NAME}"
 
-    # emit this signal when a selected Feature is updated
-    selectedFeatureChanged = pyqtSignal(Feature)
+    # emit this signal when a selected PersistedFeature is updated
+    selectedFeatureChanged = pyqtSignal(PersistedFeature)
     projectUnloading = pyqtSignal()
 
     def __init__(self, iface, gpkgFile=None, projectName=None):
@@ -33,8 +29,6 @@ class Project(ProjectBase):
         self.currentTool = None
 
         self.views = {}
-
-        # self.selectedFeatureChanged.connect(self.zoomFeature)
 
     def setTool(self, tool):
         """Set the current tool for this Project."""
@@ -54,7 +48,10 @@ class Project(ProjectBase):
             self.currentTool = None
 
     def selectFeature(self, feature):
-        self.selectedFeatureChanged.emit(feature)
+        if isinstance(feature, PersistedFeature):
+            self.selectedFeatureChanged.emit(feature)
+        elif isinstance(feature, Feature):
+            feature.zoomFeature()
 
     @pyqtSlot()
     def unload(self):

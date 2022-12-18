@@ -97,7 +97,7 @@ class PersistedFeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.layoutRefreshNeeded.emit()
 
     def selectFeature(self):
-        """Select this Fence and zoom to it."""
+        """Select this Persisted Feature (and zoom to it)."""
         self.feature.selectFeature()
 
     def sizeHint(self):

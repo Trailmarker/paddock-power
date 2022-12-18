@@ -90,7 +90,7 @@ class PaddockLandSystemListItem(QWidget, EditStateMachine):
         self.layoutRefreshNeeded.emit()
 
     def selectFeature(self):
-        """Select this Fence and zoom to it."""
+        """Select this Paddock Land System and zoom to it."""
         self.feature.selectFeature()
 
     def sizeHint(self):
