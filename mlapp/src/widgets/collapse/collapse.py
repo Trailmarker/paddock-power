@@ -58,6 +58,10 @@ class Collapse(QWidget):
         self.headerLayout.addWidget(widget)
 
     @pyqtSlot()
+    def setCollapseEnabled(self, enabled=True):
+        self.toggleButton.setEnabled(enabled)
+
+    @pyqtSlot()
     def toggle(self):
 
         checked = self.toggleButton.isChecked()
