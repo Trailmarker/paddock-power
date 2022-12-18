@@ -10,6 +10,8 @@ class Collapse(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self._collapseEnabled = True
+        self._collapsed = False
         self.toggleButton = QToolButton(
             text="", checkable=True, checked=False
         )
@@ -59,10 +61,13 @@ class Collapse(QWidget):
 
     @pyqtSlot()
     def setCollapseEnabled(self, enabled=True):
-        self.toggleButton.setEnabled(enabled)
+        """Enable or disable the collapse functionality."""
+        self._collapseEnabled = enabled
 
     @pyqtSlot()
     def toggle(self):
+        if not self._collapseEnabled:
+            return
 
         checked = self.toggleButton.isChecked()
         self.toggleButton.setArrowType(

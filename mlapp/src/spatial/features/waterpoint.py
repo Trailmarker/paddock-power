@@ -98,16 +98,4 @@ class Waterpoint(PointFeature):
 
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.plan.handler()
-    def planFeature(self):
-        """Plan a Waterpoint."""
-
-        return Edits.upsert(self)
-
-    @Edits.persistFeatures
-    @FeatureAction.undoPlan.handler()
-    def undoPlanFeature(self):
-        """Undo the plan of Waterpoint Buffers implied by a Waterpoint."""
-
-        return Edits.upsert(self)
+ 

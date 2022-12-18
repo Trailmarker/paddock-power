@@ -25,13 +25,49 @@ class StatusFeature(PersistedFeature, FeatureStateMachine):
         """Convert the Feature to a string representation."""
         return repr(self)
 
-    # @property
-    # def title(self):
-    #     """Return the Feature's title."""
-    #     f"{self.name}"
+    @Edits.persistFeatures
+    @FeatureAction.plan.handler()
+    def planFeature(self):
+        """Plan a Feature."""
+
+        return Edits.upsert(self)
+
+    @Edits.persistFeatures
+    @FeatureAction.undoPlan.handler()
+    def undoPlanFeature(self):
+        """Undo planning a Feature."""
+        return Edits.upsert(self)
+
+    @Edits.persistFeatures
+    @FeatureAction.build.handler()
+    def buildFeature(self):
+        """Build a Feature."""
+        return Edits.upsert(self)
+
+    @Edits.persistFeatures
+    @FeatureAction.undoBuild.handler()
+    def undoBuildFeature(self):
+        """Undo Building a Feature."""
+        return Edits.upsert(self)
+
+    @FeatureAction.supersede.handler()
+    def supersedeFeature(self):
+        """Supersede a Feature."""
+        return Edits.upsert(self)
+
+    @FeatureAction.undoSupersede.handler()
+    def undoSupersedeFeature(self):
+        """Undo superseding a Feature."""
+        return Edits.upsert(self)
 
     @Edits.persistFeatures
     @FeatureAction.trash.handler()
     def trashFeature(self):
-        """Trash a Draft Feature."""
+        """Trash a Feature."""
         return Edits.delete(self)
+
+    @Edits.persistFeatures
+    @FeatureAction.archive.handler()
+    def archiveFeature(self):
+        """Archive a Feature."""
+        return Edits.upsert(self)

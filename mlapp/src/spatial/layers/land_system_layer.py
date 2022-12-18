@@ -15,3 +15,5 @@ class LandSystemLayer(PersistedFeatureLayer):
                          gpkgFile,
                          layerName,
                          styleName=LandSystemLayer.STYLE)
+
+        self.setReadOnly(True)

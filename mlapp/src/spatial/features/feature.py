@@ -73,6 +73,18 @@ class Feature(QObject):
         return self._qgsFeature.geometry()
 
     @property
+    def name(self):
+        return self.title
+
+    @property
+    def title(self):
+        return f"{self.displayName()} {self.id}"
+
+    @property
+    def isSelected(self):
+        return self._selected
+
+    @property
     def isInfrastructure(self):
         """Return True if the Feature is infrastructure."""
         return False
@@ -94,7 +106,7 @@ class Feature(QObject):
 
     def onSelectFeature(self):
         """Called when the Feature is selected."""
-        if not self._selected:
+        if not self.isSelected:
             self._selected = True
             self.zoomFeature()
             return True
@@ -102,7 +114,7 @@ class Feature(QObject):
 
     def onDeselectFeature(self):
         """Called when the Feature is deselected."""
-        if self._selected:
+        if self.isSelected:
             self._selected = False
             return True
         return False

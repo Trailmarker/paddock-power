@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
-from ..state_tool_bar.state_tool_bar import StateToolBar
+from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 
 
 class PaddockLandSystemListItem(QWidget, EditStateMachine):
@@ -25,7 +25,7 @@ class PaddockLandSystemListItem(QWidget, EditStateMachine):
         self.collapseLayout.addWidget(self.featureEdit)
         self.collapseLayout.addStretch()
 
-        self.toolBar = StateToolBar(self)
+        self.toolBar = StateMachineToolBar(self)
 
         self.toolBar.addStateAction(EditAction.edit, ':/plugins/mlapp/images/edit-item.png', lambda *_: self.editItem())
         self.toolBar.addStateAction(

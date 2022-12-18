@@ -6,7 +6,7 @@ from ...spatial.features.paddock import Paddock
 from ...spatial.layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
 from ..paddock_details.paddock_details import PaddockDetails
 from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
-from .persisted_feature_collapsible_list_item import PersistedFeatureCollapsibleListItem
+from .feature_list_item import FeatureListItem
 from .persisted_feature_layer_list import PersistedFeatureLayerList
 
 
@@ -19,7 +19,8 @@ class PaddockLayerList(PersistedFeatureLayerList):
         """Constructor."""
 
         def listItemFactory(paddock):
-            return PersistedFeatureCollapsibleListItem(paddock, PaddockDetails, PaddockDetailsEdit, self)
+            return FeatureListItem(paddock, detailsWidgetFactory=PaddockDetails,
+                                   editWidgetFactory=PaddockDetailsEdit, parent=parent)
 
         super().__init__(listItemFactory, parent)
 

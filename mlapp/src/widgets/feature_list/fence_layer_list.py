@@ -8,6 +8,6 @@ class FenceLayerList(PersistedFeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        def listItemFactory(fence): return FeatureListItem(fence)
+        def listItemFactory(fence): return FeatureListItem(fence, parent=parent)
 
         super().__init__(listItemFactory, parent)

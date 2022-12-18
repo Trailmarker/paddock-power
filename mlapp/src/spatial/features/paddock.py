@@ -3,11 +3,11 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsFeatureRequest, QgsProject
 
-from ...utils import qgsInfo, randomString
+from ...utils import qgsDebug, qgsInfo, randomString
 from ..layers.condition_table import ConditionTable
 from ..layers.land_system_layer import LandSystemLayer
 from ..layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
-from ..layers.derived_watered_area_layer import DerivedWateredAreaLayer
+from ..layers.watered_area_layer import WateredAreaLayer
 from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits
@@ -24,7 +24,7 @@ class Paddock(AreaFeature):
     def twoPhaseRecalculate(self):
         return True
 
-    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wateredAreaLayer: DerivedWateredAreaLayer,
+    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wateredAreaLayer: WateredAreaLayer,
                  conditionTable: ConditionTable, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
@@ -35,6 +35,10 @@ class Paddock(AreaFeature):
 
         self._popupLayerId = None
         self._recalculateLayerId = None
+
+    @property
+    def title(self):
+        return f"{self.name} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
 
     @property
     def landSystemLayer(self):
@@ -54,43 +58,57 @@ class Paddock(AreaFeature):
 
     @property
     def recalculateLayer(self):
-        return QgsProject.instance().mapLayer(self._recalculateLayerId) if self._recalculateLayerId else None
+        if self.popupLayer:
+            self._recalculateLayerId = None
+            qgsDebug(f"{self}.recalculateLayer() returning popupLayer")
+            return self.popupLayer
 
-    @recalculateLayer.setter
-    def recalculateLayer(self, recalculateLayer):
-        self._recalculateLayerId = recalculateLayer.id() if recalculateLayer else None
+        if self._recalculateLayerId:
+            qgsDebug(f"{self}.recalculateLayer() returning existing recalculate layer")
+            return QgsProject.instance().mapLayer(self._recalculateLayerId)
+
+        qgsDebug(f"{self}.recalculateLayer() would create new recalculate layer")
+
+        return None
+
+        # recalculateLayer = PaddockLandSystemsPopupLayer(
+        #     self.featureLayer.getPaddockPowerProject(),
+        #     f"Paddock{self.id}Recalculate{randomString()}",
+        #     self,
+        #     self.featureLayer,
+        #     self.landSystemLayer,
+        #     self.wateredAreaLayer,
+        #     self.conditionTable)
+
+        # self._recalculateLayerId = recalculateLayer.id()
+        # return recalculateLayer
+
+    def clearRecalculateLayer(self):
+        if self._recalculateLayerId:
+            QgsProject.instance().removeMapLayer(self._recalculateLayerId)
+            self._recalculateLayerId
 
     def recalculate(self):
-        super().recalculate()
-
         try:
-            self.recalculateLayer = PaddockLandSystemsPopupLayer(
-                self.featureLayer.getPaddockPowerProject(),
-                f"Paddock{self.id}Recalculate{randomString()}",
-                self,
-                self.featureLayer,
-                self.landSystemLayer,
-                self.wateredAreaLayer,
-                self.conditionTable)
+            super().recalculate()
 
-            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-            paddockLandSystems = [f for f in self.recalculateLayer.getFeatures(request)]
+            foo = self.recalculateLayer
+            # request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+            # paddockLandSystems = [f for f in self.recalculateLayer.getFeatures(request)]
 
-            estimatedRaw = sum([c.estimatedCapacity for c in paddockLandSystems])
-            self.estimatedCapacity = round(estimatedRaw, 2)
-            potentialRaw = sum([c.potentialCapacity for c in paddockLandSystems])
-            self.potentialCapacity = round(potentialRaw, 2)
+            # estimatedRaw = sum([c.estimatedCapacity for c in paddockLandSystems])
+            # self.estimatedCapacity = round(estimatedRaw, 2)
+            # potentialRaw = sum([c.potentialCapacity for c in paddockLandSystems])
+            # self.potentialCapacity = round(potentialRaw, 2)
 
-            self.estimatedCapacityPerArea = round(estimatedRaw / self.featureArea, 2)
-            self.potentialCapacityPerArea = round(potentialRaw / self.featureArea, 2)
+            # self.estimatedCapacityPerArea = round(estimatedRaw / self.featureArea, 2)
+            # self.potentialCapacityPerArea = round(potentialRaw / self.featureArea, 2)
 
         except BaseException as e:
             qgsInfo(f"{self}.recalculate() failed with exception {e}")
         finally:
             # Scoping and QGIS layer ownership design mean layer's (usually) already deleted by here
-            self.recalculateLayer = None
-            # if self.recalculateLayer:
-            #     self.recalculateLayer.detectAndRemove()
+            self.clearRecalculateLayer()
 
         qgsInfo(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, estimatedCapacityPerArea={self.estimatedCapacityPerArea}, potentialCapacityPerArea={self.potentialCapacityPerArea}")
 

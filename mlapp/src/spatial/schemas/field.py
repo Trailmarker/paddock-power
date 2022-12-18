@@ -72,7 +72,9 @@ class Field(QgsField):
         def _getter(feature: QgsFeature):
             val = feature._qgsFeature[self.name()]
             if isinstance(val, QVariant):
-                return val.value() if val.convert(QVariant.Double) else None
+                unboxedVal = val.value() if val.convert(QVariant.Double) else None
+                if unboxedVal == "NULL":
+                    return None
             else:
                 return float(val)
         return _getter

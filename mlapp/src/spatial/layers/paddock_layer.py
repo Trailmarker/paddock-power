@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsProject
 
+from ...utils import qgsDebug
 from ..features.edits import Edits
 from ..features.paddock import Paddock
 from ..schemas.schemas import RECALCULATE_COMPLETE, RECALCULATE_CURRENT
@@ -26,6 +27,10 @@ class PaddockLayer(StatusFeatureLayer):
         self._wateredAreaLayerId = None
         self.conditionTable = conditionTable
 
+        # Recalculate when our dependencies change
+        # self.landSystemLayer.featuresPersisted.connect(self.recalculateAll)
+        # self.conditionTable.conditionRecordsUpdated.connect(self.recalculateId)
+
     @property
     def landSystemLayer(self):
         return QgsProject.instance().mapLayer(self._landSystemLayerId)
@@ -37,9 +42,35 @@ class PaddockLayer(StatusFeatureLayer):
     @wateredAreaLayer.setter
     def wateredAreaLayer(self, wateredAreaLayer):
         self._wateredAreaLayerId = wateredAreaLayer.id()
+        # Recalculate when our dependencies change
+        # wateredAreaLayer.featuresPersisted.connect(self.recalculateAll)
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.landSystemLayer, self.wateredAreaLayer, self.conditionTable, feature)
+
+    @Edits.persistFeatures
+    def recalculateId(self, id):
+        """Recalculate all Paddock metrics for a specific Paddock."""
+        qgsDebug(f"PaddockLayer.recalculateId({id})")
+        # return Edits()
+        try:
+            paddock = self.getFeature(id)
+            if paddock:
+                paddock.recalculate()
+                return Edits.upsert(paddock)
+            else:
+                qgsDebug("Couldn't get matching paddock")
+                return Edits()
+        except BaseException:
+            return Edits()
+
+    @Edits.persistFeatures
+    def recalculateAll(self):
+        """Recalculate all Paddock statistics."""
+        paddocks = [p for p in self.getFeatures()]
+        for paddock in paddocks:
+            paddock.recalculate()
+        return Edits.upsert(*paddocks)
 
     def getRecalculateBatchNumber(self):
         """The lowest Build Order of any Fence in Draft status."""

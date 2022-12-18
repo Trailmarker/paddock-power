@@ -5,7 +5,7 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
-from ..state_tool_bar.state_tool_bar import StateToolBar
+from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 
 
 class PersistedFeatureCollapsibleListItem(QWidget, EditStateMachine):
@@ -28,7 +28,7 @@ class PersistedFeatureCollapsibleListItem(QWidget, EditStateMachine):
 
         self.statusLabel = FeatureStatusLabel(None)
 
-        self.toolBar = StateToolBar(self)
+        self.toolBar = StateMachineToolBar(self)
 
         self.toolBar.addStateAction(EditAction.edit, ':/plugins/mlapp/images/edit-item.png', lambda *_: self.editItem())
         self.toolBar.addStateAction(

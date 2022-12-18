@@ -29,10 +29,6 @@ class Fence(LineFeature):
         return QgsProject.instance().mapLayer(self._paddockLayerId)
 
     @property
-    def title(self):
-        return f"Fence {self.buildOrder}: ({self.featureLength} km)"
-
-    @property
     def isInfrastructure(self):
         """Return True for Fence."""
         return True

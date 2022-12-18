@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal
-
-from ..state_tool_bar.state_tool_bar import StateToolBar
+from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 
 
-class FeatureToolBar(StateToolBar):
+class StatusFeatureToolBar(StateMachineToolBar):
     def __init__(self, feature, parent=None):
         super().__init__(feature, parent)
 

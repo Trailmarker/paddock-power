@@ -31,7 +31,7 @@
         <file>src/views/feature_view/feature_view.qss</file>
         <file>src/widgets/condition_type_label/condition_type_label.qss</file>
         <file>src/widgets/feature_status_label/feature_status_label.qss</file>
-        <file>src/widgets/state_tool_bar/state_tool_bar.qss</file>
+        <file>src/widgets/state_machine_tool_bar/state_machine_tool_bar.qss</file>
 
     </qresource>
 </RCC>

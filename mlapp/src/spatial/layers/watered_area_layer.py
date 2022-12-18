@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from ...utils import PLUGIN_NAME
 from ..features.watered_area import WateredArea
 from .derived_watered_area_layer import DerivedWateredAreaLayer

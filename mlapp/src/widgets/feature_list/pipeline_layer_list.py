@@ -8,6 +8,6 @@ class PipelineLayerList(PersistedFeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        def listItemFactory(pipeline): return FeatureListItem(pipeline)
+        def listItemFactory(pipeline): return FeatureListItem(pipeline, parent=parent)
 
         super().__init__(listItemFactory, parent)

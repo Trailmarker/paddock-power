@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from ...utils import qgsDebug
 from ..paddock_land_system_details.paddock_land_system_details import PaddockLandSystemDetails
 from ..paddock_land_system_details.paddock_land_system_details_edit import PaddockLandSystemDetailsEdit
-from .paddock_land_system_list_item import PaddockLandSystemListItem
 from .feature_layer_list import FeatureLayerList
+from .feature_list_item import FeatureListItem
 
 
 class PaddockLandSystemsLayerList(FeatureLayerList):
@@ -13,7 +12,7 @@ class PaddockLandSystemsLayerList(FeatureLayerList):
 
         def listItemFactory(paddockLandSystem):
             paddockLandSystem.featureUpdated.connect(self.refreshUi)
-            return PaddockLandSystemListItem(paddockLandSystem, PaddockLandSystemDetails,
-                                             PaddockLandSystemDetailsEdit, parent)
+            return FeatureListItem(paddockLandSystem, detailsWidgetFactory=PaddockLandSystemDetails,
+                                   editWidgetFactory=PaddockLandSystemDetailsEdit, parent=parent)
 
         super().__init__(listItemFactory, parent)

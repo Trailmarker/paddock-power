@@ -23,7 +23,7 @@ class GenericToolBarAction(QAction):
         self.triggered.connect(callback)
 
 
-class StateToolBar(QToolBar):
+class StateMachineToolBar(QToolBar):
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, machine, parent=None):

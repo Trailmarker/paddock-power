@@ -1,11 +1,15 @@
 
 import sqlite3
 
+from qgis.PyQt.QtCore import QObject, pyqtSignal
+
 from ...utils import qgsInfo, PLUGIN_NAME
 from ..schemas.condition_type import ConditionType
 
 
-class ConditionTable:
+class ConditionTable(QObject):
+    conditionRecordsUpdated = pyqtSignal(int)
+
     EXISTS = """
 SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'
 """
@@ -63,6 +67,8 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
             conn.execute(self.DROP.format(tableName=tableName))
 
     def __init__(self, project, gpkgFile, tableName):
+        super().__init__()
+
         # Stash the Paddock Power project
         assert(project is not None)
         self._project = project
@@ -114,6 +120,7 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
                     paddockId=paddockId,
                     landSystemId=landSystemId,
                     conditionType=conditionType.name))
+        # self.conditionRecordsUpdated.emit(paddockId) TODO
 
     def delete(self, paddockId, landSystemId):
         with sqlite3.connect(self.gpkgFile) as conn:
