@@ -3,12 +3,11 @@ from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ..collapse.collapse import Collapse
-from ..condition_type_label.condition_type_label import ConditionTypeLabel
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..state_tool_bar.state_tool_bar import StateToolBar
 
 
-class FeatureCollapsibleListItem(QWidget, EditStateMachine):
+class PaddockLandSystemListItem(QWidget, EditStateMachine):
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, DetailsWidget, EditWidget, parent=None):
@@ -26,8 +25,6 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
         self.collapseLayout.addWidget(self.featureEdit)
         self.collapseLayout.addStretch()
 
-        self.conditionTypeLabel = ConditionTypeLabel(None)
-
         self.toolBar = StateToolBar(self)
 
         self.toolBar.addStateAction(EditAction.edit, ':/plugins/mlapp/images/edit-item.png', lambda *_: self.editItem())
@@ -43,7 +40,6 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
 
         self.collapse = Collapse(self)
         self.collapse.setContentLayout(self.collapseLayout)
-        self.collapse.addHeaderWidget(self.conditionTypeLabel)
         self.collapse.addHeaderWidget(self.toolBar)
 
         layout = QVBoxLayout()
@@ -81,9 +77,7 @@ class FeatureCollapsibleListItem(QWidget, EditStateMachine):
     def refreshUi(self):
         # Set title to paddock name with some details
         self.collapse.setTitle(
-            f"{self.feature.name} ({self.feature.featureArea:.2f} km², ~{self.feature.estimatedCapacity:.0f} AE)")
-
-        self.conditionTypeLabel.conditionType = self.feature.conditionType
+            f"{self.feature.name} ({self.feature.featureArea} km², {self.feature.estimatedCapacity:g} AE)")
 
         # Hide or show forms
         editing = self.status == EditStatus.Editing

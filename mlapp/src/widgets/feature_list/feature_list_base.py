@@ -11,7 +11,7 @@ class FeatureListBase(QListWidget):
         """Constructor."""
         super().__init__(parent)
 
-        self.featureListItemFactory = listItemFactory
+        self.listItemFactory = listItemFactory
 
         self.setFrameStyle(QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -59,7 +59,7 @@ class FeatureListBase(QListWidget):
 
         # Repopulate list since we have Features
         for feature in features:
-            widget = self.featureListItemFactory(feature)
+            widget = self.listItemFactory(feature)
             item = QListWidgetItem(self)
             item.setSizeHint(widget.sizeHint())
 

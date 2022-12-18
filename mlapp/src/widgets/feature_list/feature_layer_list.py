@@ -3,7 +3,6 @@ from qgis.PyQt.QtCore import pyqtSlot
 
 from qgis.core import QgsProject
 
-from ...spatial.features.feature import Feature
 from .feature_list_base import FeatureListBase
 
 

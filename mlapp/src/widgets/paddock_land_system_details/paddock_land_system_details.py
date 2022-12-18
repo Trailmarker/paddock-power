@@ -10,18 +10,18 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class PaddockLandSystemDetails(QWidget, FORM_CLASS):
 
-    def __init__(self, condition, parent=None):
+    def __init__(self, paddockLandSystem, parent=None):
         """Constructor."""
         super().__init__(parent)
 
         self.setupUi(self)
 
-        self.condition = condition
-        if self.condition is not None:
-            self.landSystemNameText.setValue(self.condition.landSystemName, "{0}")
-            self.conditionTypeText.setValue(self.condition.conditionType.value, "{0}")
-            self.areaText.setValue(self.condition.featureArea, "{0:2f}")
-            self.estimatedCapacityText.setValue(self.condition.estimatedCapacity, "{0:g}")
-            self.potentialCapacityText.setValue(self.condition.potentialCapacity, "{0:g}")
-            self.estimatedCapacityPerAreaText.setValue(self.condition.estimatedCapacityPerArea, "{0:1f}")
-            self.potentialCapacityPerAreaText.setValue(self.condition.potentialCapacityPerArea, "{0:1f}")
+        self.paddockLandSystem = paddockLandSystem
+        if self.paddockLandSystem is not None:
+            self.landSystemNameText.setValue(self.paddockLandSystem.landSystemName, "{0}")
+            self.conditionTypeText.setValue(self.paddockLandSystem.conditionType.value, "{0}")
+            self.areaText.setValue(self.paddockLandSystem.featureArea, "{0:2f}")
+            self.estimatedCapacityText.setValue(self.paddockLandSystem.estimatedCapacity, "{0:g}")
+            self.potentialCapacityText.setValue(self.paddockLandSystem.potentialCapacity, "{0:g}")
+            self.estimatedCapacityPerAreaText.setValue(self.paddockLandSystem.estimatedCapacityPerArea, "{0:1f}")
+            self.potentialCapacityPerAreaText.setValue(self.paddockLandSystem.potentialCapacityPerArea, "{0:1f}")
