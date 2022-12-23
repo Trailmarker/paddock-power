@@ -21,7 +21,7 @@ class PersistedFeatureLayerList(FeatureLayerList):
         if featureLayer:
             self._featureLayerId = featureLayer.id()
             self.featureLayer.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
-            self.featureLayer.featuresPersisted.connect(self.refreshUi)
+            self.featureLayer.featuresPersisted.connect(lambda featureLayer, idList: self.refreshUi())
         else:
             self._featureLayerId = None
         self.refreshUi()

@@ -31,11 +31,12 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         # Optionally applies a style
         super().__init__(project, gpkgFile, layerName, styleName=styleName)
 
-        # Connect persistence on upstream PersistedFeatureLayers to the deriveFeatures slot
+        # Connect persistence on upstream PersistedFeatureLayers to the repersistDerivedFeatures slot
         for featureLayer in self.derivedLayer.persistedFeatureLayers:
-            featureLayer.featuresPersisted.connect(self.repersistDerivedFeatures)
+            featureLayer.featuresPersisted.connect(lambda idList: self.repersistDerivedFeatures(featureLayer, idList))
 
-        self.repersistDerivedFeatures()
+        # Initial persistence
+        self.repersistDerivedFeatures(None, [])
 
         self.setReadOnly(True)  # TODO?
 
@@ -45,7 +46,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         return QgsProject.instance().mapLayer(self._derivedLayerId)
 
     @pyqtSlot()
-    def repersistDerivedFeatures(self):
+    def repersistDerivedFeatures(self, layer, idList):
         """Derive all Features to be persisted from the source DerivedFeatureLayer."""
         qgsInfo(f"Repersisting derived features for layer {self.name()} …")
         self.setReadOnly(False)
@@ -56,5 +57,5 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
                 self.addFeatures(features)
         finally:
             self.setReadOnly(True)
-            self.featuresPersisted.emit()
+            self.featuresPersisted.emit([])
             self.triggerRepaint()

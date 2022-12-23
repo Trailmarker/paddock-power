@@ -20,7 +20,7 @@ PADDOCK_POWER_EPSG = 7845
 
 class PersistedFeatureLayer(FeatureLayer):
 
-    featuresPersisted = pyqtSignal()
+    featuresPersisted = pyqtSignal(list)
 
     def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
