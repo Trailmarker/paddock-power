@@ -2,6 +2,7 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
+from ...utils import PLUGIN_FOLDER
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
@@ -27,14 +28,14 @@ class PaddockLandSystemListItem(QWidget, EditStateMachine):
 
         self.toolBar = StateMachineToolBar(self)
 
-        self.toolBar.addStateAction(EditAction.edit, ':/plugins/mlapp/images/edit-item.png', lambda *_: self.editItem())
+        self.toolBar.addStateAction(EditAction.edit, f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png', lambda *_: self.editItem())
         self.toolBar.addStateAction(
             EditAction.cancelEdit,
-            ':/plugins/mlapp/images/cancel-edit-item.png',
+            f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
             lambda *_: self.cancelEditItem())
-        self.toolBar.addStateAction(EditAction.save, ':/plugins/mlapp/images/save-item.png', lambda *_: self.saveItem())
+        self.toolBar.addStateAction(EditAction.save, f':/plugins/{PLUGIN_FOLDER}/images/save-item.png', lambda *_: self.saveItem())
         self.toolBar.addGenericAction(
-            ':/plugins/mlapp/images/zoom-item.png',
+            f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
             f"Zoom to {self.feature.displayName()}",
             lambda *_: self.selectFeature())
 

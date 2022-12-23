@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QToolBar
 
-from ...utils import getComponentStyleSheet
+from ...utils import getComponentStyleSheet, PLUGIN_FOLDER
 from ..view_base import ViewBase
 from ..fence_view.fence_widget import FenceWidget
 from ..paddock_view.paddock_widget import PaddockWidget
@@ -35,10 +35,10 @@ class FeatureView(ViewBase, FORM_CLASS):
         self.pipelineTab = PipelineWidget(project, self.tabWidget)
         self.waterpointTab = WaterpointWidget(project, self.tabWidget)
 
-        self.tabWidget.addTab(self.paddockTab, QIcon(":/plugins/mlapp/images/paddock.png"), 'Paddocks')
-        self.tabWidget.addTab(self.fenceTab, QIcon(":/plugins/mlapp/images/fence.png"), 'Fences')
-        self.tabWidget.addTab(self.pipelineTab, QIcon(":/plugins/mlapp/images/pipeline-dashed.png"), 'Pipelines')
-        self.tabWidget.addTab(self.waterpointTab, QIcon(":/plugins/mlapp/images/waterpoint.png"), 'Waterpoints')
+        self.tabWidget.addTab(self.paddockTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
+        self.tabWidget.addTab(self.fenceTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
+        self.tabWidget.addTab(self.pipelineTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pipeline-dashed.png"), 'Pipelines')
+        self.tabWidget.addTab(self.waterpointTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png"), 'Waterpoints')
 
         self.sketchFenceButton.clicked.connect(self.fenceTab.sketchFence)
         self.sketchPipelineButton.clicked.connect(self.pipelineTab.sketchPipeline)

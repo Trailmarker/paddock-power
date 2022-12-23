@@ -3,6 +3,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
 
 from ..spatial.features.feature import Feature
 from ..spatial.layers.feature_layer import FeatureLayer
+from ..spatial.schemas.timeframe import Timeframe
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME
 from ..views.feature_view.feature_view import FeatureView
@@ -18,15 +19,15 @@ class Project(ProjectBase):
 
     # emit this signal when a selected PersistedFeature is updated
     selectedFeatureChanged = pyqtSignal(Feature)
+    currentTimeframeChanged = pyqtSignal(Timeframe)
     projectUnloading = pyqtSignal()
 
     def __init__(self, iface, gpkgFile=None, projectName=None):
         super().__init__(gpkgFile, projectName)
 
         self.iface = iface
-
         self.currentTool = None
-
+        self.currentTimeframe = Timeframe.Current
         self.views = {}
 
     def setTool(self, tool):
@@ -45,6 +46,11 @@ class Project(ProjectBase):
             self.currentTool.dispose()
             self.iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
+
+    def setCurrentTimeFrame(self, timeframe):
+        if self.currentTimeframe != timeframe:
+            self.currentTimeframe = timeframe
+            self.currentTimeframeChanged.emit(timeframe)
 
     def selectFeature(self, feature):
         self.selectedFeatureChanged.emit(feature)

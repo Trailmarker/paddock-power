@@ -69,7 +69,7 @@ select
 from "{BUFFERS}"
 inner join "{IN_PADDOCKS}"
 on "{BUFFERS}"."{WATERPOINT}" = "{IN_PADDOCKS}"."{WATERPOINT}"
-and st_area(st_intersection("{BUFFERS}".geometry, "{IN_PADDOCKS}".geometry)) >= {Calculator.MINIMUM_AREA_M2}
+and st_area(st_intersection("{BUFFERS}".geometry, "{IN_PADDOCKS}".geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 """
 
     def getFeatureType(self):

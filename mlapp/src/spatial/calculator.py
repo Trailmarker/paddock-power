@@ -22,7 +22,7 @@ def makeDistanceAreaCalculator():
 
 
 class Calculator:
-    MINIMUM_AREA_M2 = 10.0  # 10 m² is the smallest analytic area we care about
+    MINIMUM_PLANAR_AREA_M2 = 10.0  # 10 m² is the smallest analytic area we care about
     QGIS_CALCULATOR = makeDistanceAreaCalculator()
 
     @staticmethod

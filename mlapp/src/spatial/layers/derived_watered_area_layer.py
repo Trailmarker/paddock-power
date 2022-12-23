@@ -55,7 +55,7 @@ inner join {NEAR_WATERED_AREA}
 	on {FAR_WATERED_AREA}.{STATUS} = {NEAR_WATERED_AREA}.{STATUS}
 	and {FAR_WATERED_AREA}.{PADDOCK} = {NEAR_WATERED_AREA}.{PADDOCK}
 	and st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry) is not null
-	and st_area(st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_AREA_M2}
+	and st_area(st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 union
 select
 	0 as {FID},
@@ -68,7 +68,7 @@ from "{{0}}"
 inner join {FAR_WATERED_AREA}
 	on "{{0}}".{FID} = {FAR_WATERED_AREA}.{PADDOCK}
 	and st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry) is not null
-	and st_area(st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_AREA_M2}
+	and st_area(st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 union
 select
 	0 as {FID},

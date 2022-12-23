@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ...utils import PLUGIN_FOLDER
 from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 
 
@@ -10,7 +11,7 @@ class StatusFeatureToolBar(StateMachineToolBar):
 
     def addSelectAction(self):
         self.addGenericAction(
-            ':/plugins/mlapp/images/zoom-item.png',
+            f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
             f"Zoom to {self.machine.displayName()}",
             self.selectFeature)
 

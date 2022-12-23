@@ -6,13 +6,14 @@ from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, QTranslator, 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
-from qgis.core import QgsProject
+from qgis.core import QgsExpression, QgsProject
 
 from .resources_rc import *
 
+from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.models.glitch import Glitch
 from .src.models.project import Project
-from .src.utils import guiError, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_NAME
+from .src.utils import guiError, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
@@ -41,6 +42,9 @@ class PaddockPower(QObject):
             self.translator = QTranslator()
             self.translator.load(localePath)
             QCoreApplication.installTranslator(self.translator)
+
+        # Register QGIS expression extensions (used in symbology etc)
+        self.registerFunctions()
 
         QgsProject.instance().cleared.connect(self.unloadProject)
         QgsProject.instance().readProject.connect(self.detectProject)
@@ -86,19 +90,19 @@ class PaddockPower(QObject):
         self.actions = []
 
         self.addAction(
-            QIcon(":/plugins/mlapp/images/paddock-power.png"),
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock-power.png"),
             text=f"Open {PLUGIN_NAME} …",
             callback=self.openFeatureView,
             parent=self.iface.mainWindow())
 
         self.addAction(
-            QIcon(":/plugins/mlapp/images/refresh-paddock-power.png"),
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
             text=f"Refresh {PLUGIN_NAME} Project …",
             callback=lambda *_: self.detectProject(),
             parent=self.iface.mainWindow())
 
         self.addAction(
-            QIcon(":/plugins/mlapp/images/new-paddock-power.png"),
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/new-paddock-power.png"),
             text=f"Create {PLUGIN_NAME} Project …",
             callback=lambda *_: self.createProject(),
             parent=self.iface.mainWindow())
@@ -154,15 +158,26 @@ class PaddockPower(QObject):
         except BaseException:
             pass
 
-        # try:
-        #     # Remove processing provider
-        #     QgsApplication.processingRegistry().removeProvider(self.provider)
-        # except BaseException:
-        #     pass
+        try:
+            # Unregister the extension functions
+            self.unregisterFunctions()
+        except BaseException:
+            pass
 
         PaddockPower.restoreSystemExceptionHook()
 
+    def registerFunctions(self):
+        f"""Register the extension functions used by {PLUGIN_NAME}."""
+        for paddockPowerFunction in PaddockPowerFunctions:
+            QgsExpression.registerFunction(paddockPowerFunction)
+
+    def unregisterFunctions(self):
+        f"""Register the extension functions used by {PLUGIN_NAME}."""
+        for paddockPowerFunction in PaddockPowerFunctions:
+            QgsExpression.unregisterFunction(paddockPowerFunction)
+
     # @Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
+
     def detectProject(self, _=None):
         f"""Detect a {PLUGIN_NAME} Project in the current QGIS project."""
 

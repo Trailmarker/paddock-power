@@ -27,7 +27,7 @@ FencePaddockChanges {
 }
 
 /* QSplitter::handle { 
-    image: url(:/plugins/mlapp/images/splitter.png);
+    image: url(:/plugins/{PLUGIN_FOLDER}/images/splitter.png);
 } */
 
 QSplitter::handle:horizontal {

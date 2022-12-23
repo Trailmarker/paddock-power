@@ -1,18 +1,24 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable" labelsEnabled="0" readOnly="0" version="3.28.1-Firenze">
+<qgis readOnly="0" version="3.22.13-Białowieża" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable" labelsEnabled="0">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <renderer-v2 type="singleSymbol" symbollevels="0" forceraster="0" enableorderby="0" referencescale="-1">
+  <renderer-v2 symbollevels="0" type="singleSymbol" referencescale="-1" enableorderby="0" forceraster="0">
     <symbols>
-      <symbol type="line" frame_rate="10" is_animated="0" name="0" alpha="1" clip_to_extent="1" force_rhr="0">
+      <symbol alpha="1" type="line" name="0" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
             <Option type="QString" name="name" value=""/>
-            <Option name="properties"/>
+            <Option type="Map" name="properties">
+              <Option type="Map" name="alpha">
+                <Option type="bool" name="active" value="true"/>
+                <Option type="QString" name="expression" value="case &#xd;&#xa;when matchCurrentFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end"/>
+                <Option type="int" name="type" value="3"/>
+              </Option>
+            </Option>
             <Option type="QString" name="type" value="collection"/>
           </Option>
         </data_defined_properties>
@@ -46,6 +52,33 @@
             <Option type="QString" name="use_custom_dash" value="0"/>
             <Option type="QString" name="width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
           </Option>
+          <prop k="align_dash_pattern" v="0"/>
+          <prop k="capstyle" v="round"/>
+          <prop k="customdash" v="5;2"/>
+          <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="customdash_unit" v="MM"/>
+          <prop k="dash_pattern_offset" v="0"/>
+          <prop k="dash_pattern_offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="dash_pattern_offset_unit" v="MM"/>
+          <prop k="draw_inside_polygon" v="0"/>
+          <prop k="joinstyle" v="round"/>
+          <prop k="line_color" v="0,0,0,255"/>
+          <prop k="line_style" v="solid"/>
+          <prop k="line_width" v="2.06"/>
+          <prop k="line_width_unit" v="MM"/>
+          <prop k="offset" v="0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="ring_filter" v="0"/>
+          <prop k="trim_distance_end" v="0"/>
+          <prop k="trim_distance_end_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="trim_distance_end_unit" v="MM"/>
+          <prop k="trim_distance_start" v="0"/>
+          <prop k="trim_distance_start_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="trim_distance_start_unit" v="MM"/>
+          <prop k="tweak_dash_pattern_on_corners" v="0"/>
+          <prop k="use_custom_dash" v="0"/>
+          <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <data_defined_properties>
             <Option type="Map">
               <Option type="QString" name="name" value=""/>
@@ -84,6 +117,33 @@
             <Option type="QString" name="use_custom_dash" value="1"/>
             <Option type="QString" name="width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
           </Option>
+          <prop k="align_dash_pattern" v="0"/>
+          <prop k="capstyle" v="square"/>
+          <prop k="customdash" v="5;3"/>
+          <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="customdash_unit" v="MM"/>
+          <prop k="dash_pattern_offset" v="0"/>
+          <prop k="dash_pattern_offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="dash_pattern_offset_unit" v="MM"/>
+          <prop k="draw_inside_polygon" v="0"/>
+          <prop k="joinstyle" v="round"/>
+          <prop k="line_color" v="31,120,180,255"/>
+          <prop k="line_style" v="dash"/>
+          <prop k="line_width" v="1.46"/>
+          <prop k="line_width_unit" v="MM"/>
+          <prop k="offset" v="0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="ring_filter" v="0"/>
+          <prop k="trim_distance_end" v="0"/>
+          <prop k="trim_distance_end_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="trim_distance_end_unit" v="MM"/>
+          <prop k="trim_distance_start" v="0"/>
+          <prop k="trim_distance_start_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="trim_distance_start_unit" v="MM"/>
+          <prop k="tweak_dash_pattern_on_corners" v="0"/>
+          <prop k="use_custom_dash" v="1"/>
+          <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <data_defined_properties>
             <Option type="Map">
               <Option type="QString" name="name" value=""/>
@@ -108,13 +168,6 @@
       </editWidget>
     </field>
     <field configurationFlags="None" name="Name">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="Length (km)">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -152,39 +205,46 @@
         </config>
       </editWidget>
     </field>
+    <field configurationFlags="None" name="Length (km)">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
   </fieldConfiguration>
   <aliases>
-    <alias field="fid" name="" index="0"/>
-    <alias field="Name" name="" index="1"/>
-    <alias field="Length (km)" name="" index="2"/>
-    <alias field="Status" name="" index="3"/>
+    <alias field="fid" index="0" name=""/>
+    <alias field="Name" index="1" name=""/>
+    <alias field="Status" index="2" name=""/>
+    <alias field="Length (km)" index="3" name=""/>
   </aliases>
   <defaults>
     <default expression="" field="fid" applyOnUpdate="0"/>
     <default expression="" field="Name" applyOnUpdate="0"/>
-    <default expression="" field="Length (km)" applyOnUpdate="0"/>
     <default expression="Undefined" field="Status" applyOnUpdate="0"/>
+    <default expression="" field="Length (km)" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" field="fid" constraints="3" unique_strength="1" exp_strength="0"/>
-    <constraint notnull_strength="0" field="Name" constraints="0" unique_strength="0" exp_strength="0"/>
-    <constraint notnull_strength="0" field="Length (km)" constraints="0" unique_strength="0" exp_strength="0"/>
-    <constraint notnull_strength="1" field="Status" constraints="1" unique_strength="0" exp_strength="0"/>
+    <constraint unique_strength="1" field="fid" notnull_strength="1" exp_strength="0" constraints="3"/>
+    <constraint unique_strength="0" field="Name" notnull_strength="0" exp_strength="0" constraints="0"/>
+    <constraint unique_strength="0" field="Status" notnull_strength="1" exp_strength="0" constraints="1"/>
+    <constraint unique_strength="0" field="Length (km)" notnull_strength="0" exp_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
     <constraint field="fid" desc="" exp=""/>
     <constraint field="Name" desc="" exp=""/>
-    <constraint field="Length (km)" desc="" exp=""/>
     <constraint field="Status" desc="" exp=""/>
+    <constraint field="Length (km)" desc="" exp=""/>
   </constraintExpressions>
   <expressionfields/>
-  <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="">
+  <attributetableconfig sortExpression="" sortOrder="0" actionWidgetStyle="dropDown">
     <columns>
       <column type="actions" hidden="1" width="-1"/>
-      <column type="field" hidden="0" width="-1" name="fid"/>
-      <column type="field" hidden="0" width="-1" name="Name"/>
-      <column type="field" hidden="0" width="-1" name="Status"/>
-      <column type="field" hidden="0" width="-1" name="Length (km)"/>
+      <column type="field" hidden="0" name="fid" width="-1"/>
+      <column type="field" hidden="0" name="Name" width="-1"/>
+      <column type="field" hidden="0" name="Status" width="-1"/>
+      <column type="field" hidden="0" name="Length (km)" width="-1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -216,60 +276,37 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <attributeEditorForm>
-    <labelStyle overrideLabelFont="0" labelColor="0,0,0,255" overrideLabelColor="0">
-      <labelFont description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style="" underline="0" bold="0" italic="0" strikethrough="0"/>
-    </labelStyle>
-    <attributeEditorField name="Name" index="1" showLabel="1">
-      <labelStyle overrideLabelFont="0" labelColor="0,0,0,255" overrideLabelColor="0">
-        <labelFont description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style="" underline="0" bold="0" italic="0" strikethrough="0"/>
-      </labelStyle>
-    </attributeEditorField>
-    <attributeEditorField name="Status" index="3" showLabel="1">
-      <labelStyle overrideLabelFont="0" labelColor="0,0,0,255" overrideLabelColor="0">
-        <labelFont description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style="" underline="0" bold="0" italic="0" strikethrough="0"/>
-      </labelStyle>
-    </attributeEditorField>
-    <attributeEditorField name="Date Commisioned" index="-1" showLabel="1">
-      <labelStyle overrideLabelFont="0" labelColor="0,0,0,255" overrideLabelColor="0">
-        <labelFont description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style="" underline="0" bold="0" italic="0" strikethrough="0"/>
-      </labelStyle>
-    </attributeEditorField>
-    <attributeEditorField name="Date Decommisioned" index="-1" showLabel="1">
-      <labelStyle overrideLabelFont="0" labelColor="0,0,0,255" overrideLabelColor="0">
-        <labelFont description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style="" underline="0" bold="0" italic="0" strikethrough="0"/>
-      </labelStyle>
-    </attributeEditorField>
-    <attributeEditorField name="Length (km)" index="2" showLabel="1">
-      <labelStyle overrideLabelFont="0" labelColor="0,0,0,255" overrideLabelColor="0">
-        <labelFont description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style="" underline="0" bold="0" italic="0" strikethrough="0"/>
-      </labelStyle>
-    </attributeEditorField>
+    <attributeEditorField showLabel="1" index="1" name="Name"/>
+    <attributeEditorField showLabel="1" index="2" name="Status"/>
+    <attributeEditorField showLabel="1" index="-1" name="Date Commisioned"/>
+    <attributeEditorField showLabel="1" index="-1" name="Date Decommisioned"/>
+    <attributeEditorField showLabel="1" index="3" name="Length (km)"/>
   </attributeEditorForm>
   <editable>
-    <field name="Date Commisioned" editable="1"/>
-    <field name="Date Decommisioned" editable="1"/>
-    <field name="Date Edited" editable="1"/>
-    <field name="Length (km)" editable="1"/>
-    <field name="Length (km²)" editable="1"/>
-    <field name="Name" editable="1"/>
-    <field name="Status" editable="1"/>
-    <field name="fid" editable="1"/>
+    <field editable="1" name="Date Commisioned"/>
+    <field editable="1" name="Date Decommisioned"/>
+    <field editable="1" name="Date Edited"/>
+    <field editable="1" name="Length (km)"/>
+    <field editable="1" name="Length (km²)"/>
+    <field editable="1" name="Name"/>
+    <field editable="1" name="Status"/>
+    <field editable="1" name="fid"/>
   </editable>
   <labelOnTop>
-    <field name="Date Commisioned" labelOnTop="1"/>
-    <field name="Date Decommisioned" labelOnTop="1"/>
-    <field name="Date Edited" labelOnTop="1"/>
-    <field name="Length (km)" labelOnTop="1"/>
-    <field name="Length (km²)" labelOnTop="0"/>
-    <field name="Name" labelOnTop="1"/>
-    <field name="Status" labelOnTop="1"/>
-    <field name="fid" labelOnTop="1"/>
+    <field labelOnTop="1" name="Date Commisioned"/>
+    <field labelOnTop="1" name="Date Decommisioned"/>
+    <field labelOnTop="1" name="Date Edited"/>
+    <field labelOnTop="1" name="Length (km)"/>
+    <field labelOnTop="0" name="Length (km²)"/>
+    <field labelOnTop="1" name="Name"/>
+    <field labelOnTop="1" name="Status"/>
+    <field labelOnTop="1" name="fid"/>
   </labelOnTop>
   <reuseLastValue>
-    <field name="Length (km)" reuseLastValue="0"/>
-    <field name="Name" reuseLastValue="0"/>
-    <field name="Status" reuseLastValue="0"/>
-    <field name="fid" reuseLastValue="0"/>
+    <field reuseLastValue="0" name="Length (km)"/>
+    <field reuseLastValue="0" name="Name"/>
+    <field reuseLastValue="0" name="Status"/>
+    <field reuseLastValue="0" name="fid"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>

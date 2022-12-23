@@ -28,7 +28,7 @@ with {paddockConditionTempView} as
 	from "{{1}}"
 	inner join "{{2}}"
 		on st_intersects("{{1}}".geometry, "{{2}}".geometry)
-		and st_area(st_intersection("{{1}}".geometry, "{{2}}".geometry)) >= {Calculator.MINIMUM_AREA_M2}
+		and st_area(st_intersection("{{1}}".geometry, "{{2}}".geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 	inner join "{{0}}"
 		on "{{0}}".{FID} = "{{2}}".{PADDOCK}
 		)

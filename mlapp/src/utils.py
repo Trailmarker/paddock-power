@@ -13,6 +13,7 @@ from qgis.core import Qgis, QgsMessageLog, QgsProject
 
 
 PLUGIN_NAME = "MLA Paddock Power"
+PLUGIN_FOLDER = "mlapp"
 
 # 16777215
 MAX_QT_DIMENSION = (2 * 24 - 1)
@@ -110,7 +111,7 @@ def getComponentStyleSheet(componentFile):
     dir = path.dirname(componentFile)
     styleSheetFilename = path.join(dir, f"{path.splitext(path.basename(componentFile))[0]}.qss")
     styleSheetPath = path.relpath(styleSheetFilename, resolvePluginPath()).replace("\\", "/")
-    resource = f":/plugins/mlapp/{styleSheetPath}"
+    resource = f":/plugins/{PLUGIN_FOLDER}/{styleSheetPath}"
     resourceFile = QFile(resource)
     if not resourceFile.exists():
         raise Exception(f"Stylesheet file {resource} not found.")

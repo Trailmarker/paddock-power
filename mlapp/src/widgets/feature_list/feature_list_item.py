@@ -7,6 +7,7 @@ from ...spatial.features.feature_action import FeatureAction
 from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.status_feature import StatusFeature
 from ...spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
+from ...utils import PLUGIN_FOLDER
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -53,23 +54,23 @@ class FeatureListItem(QWidget, EditStateMachine):
 
             self.statusToolBar.addStateAction(
                 FeatureAction.undoPlan,
-                ':/plugins/mlapp/images/undo-plan-feature.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/undo-plan-feature.png',
                 lambda _: self.feature.undoPlanFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.plan,
-                ':/plugins/mlapp/images/plan-feature.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/plan-feature.png',
                 lambda _: self.feature.planFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.undoBuild,
-                ':/plugins/mlapp/images/undo-build-feature.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/undo-build-feature.png',
                 lambda _: self.feature.undoBuildFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.build,
-                ':/plugins/mlapp/images/build-feature.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/build-feature.png',
                 lambda _: self.feature.buildFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.trash,
-                ':/plugins/mlapp/images/trash-feature.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/trash-feature.png',
                 lambda _: self.feature.trashFeature())
 
             self.collapse.addHeaderWidget(self.statusLabel)
@@ -82,19 +83,19 @@ class FeatureListItem(QWidget, EditStateMachine):
 
             self.editToolBar.addStateAction(
                 EditAction.edit,
-                ':/plugins/mlapp/images/edit-item.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png',
                 lambda *_: self.editItem())
             self.editToolBar.addStateAction(
                 EditAction.cancelEdit,
-                ':/plugins/mlapp/images/cancel-edit-item.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
                 lambda *_: self.cancelEditItem())
             self.editToolBar.addStateAction(
                 EditAction.save,
-                ':/plugins/mlapp/images/save-item.png',
+                f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
                 lambda *_: self.saveItem())
 
         self.editToolBar.addGenericAction(
-            ':/plugins/mlapp/images/zoom-item.png',
+            f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
             f"Zoom to {self.feature.displayName()}",
             lambda *_: self.selectFeature())
 
