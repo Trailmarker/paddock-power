@@ -4,6 +4,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsFeature, QgsFields
 
 from ...models.glitch import Glitch
+from ...utils import qgsDebug, qgsInfo
 from .feature import Feature
 from ..schemas.schemas import PersistedFeatureSchema
 

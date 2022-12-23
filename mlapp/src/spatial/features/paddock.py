@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsFeatureRequest, QgsProject
+from qgis.core import QgsProject
 
-from ...utils import qgsDebug, qgsInfo, randomString
+from ...utils import qgsDebug, qgsInfo
 from ..layers.condition_table import ConditionTable
-from ..layers.land_system_layer import LandSystemLayer
+from ..layers.paddock_land_systems_layer import PaddockLandSystemsLayer
 from ..layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
-from ..layers.watered_area_layer import WateredAreaLayer
 from ..schemas.schemas import PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits
@@ -24,13 +23,12 @@ class Paddock(AreaFeature):
     def twoPhaseRecalculate(self):
         return True
 
-    def __init__(self, featureLayer, landSystemLayer: LandSystemLayer, wateredAreaLayer: WateredAreaLayer,
+    def __init__(self, featureLayer, paddockLandSystemsLayer: PaddockLandSystemsLayer,
                  conditionTable: ConditionTable, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
-        self._landSystemLayerId = landSystemLayer.id()
-        self._wateredAreaLayerId = wateredAreaLayer.id()
+        self._paddockLandSystemsLayerId = paddockLandSystemsLayer.id()
         self.conditionTable = conditionTable
 
         self._popupLayerId = None
@@ -41,12 +39,8 @@ class Paddock(AreaFeature):
         return f"{self.name} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
 
     @property
-    def landSystemLayer(self):
-        return QgsProject.instance().mapLayer(self._landSystemLayerId)
-
-    @property
-    def wateredAreaLayer(self):
-        return QgsProject.instance().mapLayer(self._wateredAreaLayerId)
+    def paddockLandSystemsLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLandSystemsLayerId)
 
     @property
     def popupLayer(self):
@@ -75,9 +69,7 @@ class Paddock(AreaFeature):
         #     self.featureLayer.getPaddockPowerProject(),
         #     f"Paddock{self.id}Recalculate{randomString()}",
         #     self,
-        #     self.featureLayer,
-        #     self.landSystemLayer,
-        #     self.wateredAreaLayer,
+        #     self.paddockLandSystemsLayer,
         #     self.conditionTable)
 
         # self._recalculateLayerId = recalculateLayer.id()
@@ -127,9 +119,7 @@ class Paddock(AreaFeature):
                 self.featureLayer.getPaddockPowerProject(),
                 f"{self.name} Land Systems",
                 self,
-                self.featureLayer,
-                self.landSystemLayer,
-                self.wateredAreaLayer,
+                self.paddockLandSystemsLayer,
                 self.conditionTable)
 
             group = item.parent()

@@ -9,6 +9,7 @@ from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.land_system_layer import LandSystemLayer
+from ..spatial.layers.paddock_land_systems_layer import PaddockLandSystemsLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
@@ -44,7 +45,6 @@ class ProjectBase(QObject):
             self,
             self.gpkgFile,
             paddockLayerName,
-            self.landSystemLayer,
             self.conditionTable)
 
         waterpointLayerName = f"Waterpoints"
@@ -55,7 +55,7 @@ class ProjectBase(QObject):
             self, self.gpkgFile, waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
 
         # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
-        # Same goes for Paddocks and Watered Areas
+        # Same goes for Paddocks and Paddock Land Systems
         self.waterpointLayer.waterpointBufferLayer = self.waterpointBufferLayer
 
         wateredAreaLayerName = f"Watered Areas"
@@ -66,8 +66,6 @@ class ProjectBase(QObject):
             self.paddockLayer,
             self.waterpointBufferLayer)
 
-        self.paddockLayer.wateredAreaLayer = self.wateredAreaLayer
-
         fenceLayerName = f"Fences"
         self.fenceLayer = FenceLayer(self, self.gpkgFile, fenceLayerName,
                                      self.paddockLayer,
@@ -75,6 +73,10 @@ class ProjectBase(QObject):
 
         boundaryLayerName = f"Boundary"
         self.boundaryLayer = BoundaryLayer(self, boundaryLayerName, self.paddockLayer)
+
+        paddockLandSystemsLayerName = f"Paddock Land Systems"
+        self.paddockLandSystemsLayer = PaddockLandSystemsLayer(self, self.gpkgFile, paddockLandSystemsLayerName, self.paddockLayer, self.landSystemLayer, self.wateredAreaLayer, self.conditionTable)
+        self.paddockLayer.paddockLandSystemsLayer = self.paddockLandSystemsLayer
 
     def findGroup(self):
         """Find this Project's group in the Layers panel."""
@@ -96,6 +98,7 @@ class ProjectBase(QObject):
         self.wateredAreaLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
+        self.paddockLandSystemsLayer.addToMap(group)
         self.paddockLayer.addToMap(group)
 
         if self.elevationLayer is not None:

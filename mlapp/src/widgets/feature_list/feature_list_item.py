@@ -6,6 +6,7 @@ from ...spatial.features.edits import Edits
 from ...spatial.features.feature_action import FeatureAction
 from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.status_feature import StatusFeature
+from ...spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -146,7 +147,7 @@ class FeatureListItem(QWidget, EditStateMachine):
     def saveItem(self):
         self.featureEdit.saveFeature()
 
-        if isinstance(self.feature, PersistedFeature):
+        if isinstance(self.feature, PersistedFeature) and not isinstance(self.feature.featureLayer, PersistedDerivedFeatureLayer):
             return Edits.upsert(self.feature)
         else:
             return Edits()

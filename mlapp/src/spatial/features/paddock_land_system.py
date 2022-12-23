@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from .feature import Feature
+from .persisted_feature import PersistedFeature
 from ..schemas.schemas import PaddockLandSystemSchema
 
 
 @PaddockLandSystemSchema.addSchema()
-class PaddockLandSystem(Feature):
+class PaddockLandSystem(PersistedFeature):
     featureUpdated = pyqtSignal()
 
     def __init__(self, featureLayer, conditionTable, existingFeature):

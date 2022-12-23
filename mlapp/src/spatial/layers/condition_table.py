@@ -8,7 +8,7 @@ from ..schemas.condition_type import ConditionType
 
 
 class ConditionTable(QObject):
-    conditionRecordsUpdated = pyqtSignal(int)
+    featuresPersisted = pyqtSignal(list)
 
     EXISTS = """
 SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'
@@ -120,7 +120,7 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
                     paddockId=paddockId,
                     landSystemId=landSystemId,
                     conditionType=conditionType.name))
-        # self.conditionRecordsUpdated.emit(paddockId) TODO
+        self.featuresPersisted.emit([paddockId])
 
     def delete(self, paddockId, landSystemId):
         with sqlite3.connect(self.gpkgFile) as conn:

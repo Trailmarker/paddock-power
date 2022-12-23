@@ -152,33 +152,6 @@ WaterpointTypeField = DomainField(
 
 AreaFeatureSchema = Schema([Fid, Name, Status, Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
 BoundarySchema = Schema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
-PaddockConditionSchema = Schema([Fid,
-                                 Area,
-                                 EstimatedCapacityPerArea,
-                                 PotentialCapacityPerArea,
-                                 EstimatedCapacity,
-                                 PotentialCapacity,
-                                 ConditionTypeField,
-                                 Paddock,
-                                 PaddockName,
-                                 LandSystem,
-                                 LandSystemName,
-                                 WateredTypeField,
-                                 WateredAreaStatus],
-                                wkbType=QgsWkbTypes.MultiPolygon)
-PaddockLandSystemSchema = Schema([Fid,
-                                  Area,
-                                  EstimatedCapacityPerArea,
-                                  PotentialCapacityPerArea,
-                                  EstimatedCapacity,
-                                  PotentialCapacity,
-                                  ConditionTypeField,
-                                  Paddock,
-                                  PaddockName,
-                                  LandSystem,
-                                  LandSystemName,
-                                  WateredAreaStatus],
-                                 wkbType=QgsWkbTypes.MultiPolygon)
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)
 LandSystemSchema = Schema([Fid, Name, Area, Perimeter, EstimatedCapacityPerArea, MapUnit, LandscapeClass,
@@ -197,6 +170,35 @@ PaddockSchema = Schema([Fid,
                         RecalculateCurrent,
                         RecalculateComplete],
                        wkbType=QgsWkbTypes.MultiPolygon)
+PaddockConditionSchema = Schema([Fid,
+                                 Area,
+                                 EstimatedCapacityPerArea,
+                                 PotentialCapacityPerArea,
+                                 EstimatedCapacity,
+                                 PotentialCapacity,
+                                 ConditionTypeField,
+                                 Paddock,
+                                 PaddockName,
+                                 LandSystem,
+                                 LandSystemName,
+                                 WateredTypeField,
+                                 WateredAreaStatus],
+                                wkbType=QgsWkbTypes.MultiPolygon)
+
+PaddockLandSystemSchema = Schema([Fid,
+                                  Area,
+                                  EstimatedCapacityPerArea,
+                                  PotentialCapacityPerArea,
+                                  EstimatedCapacity,
+                                  PotentialCapacity,
+                                  ConditionTypeField,
+                                  Paddock,
+                                  PaddockName,
+                                  PaddockStatus,
+                                  LandSystem,
+                                  LandSystemName,
+                                  WateredAreaStatus],
+                                 wkbType=QgsWkbTypes.MultiPolygon)
 PersistedFeatureSchema = Schema([Fid], wkbType=QgsWkbTypes.MultiPolygon)
 PipelineSchema = LineFeatureSchema
 PointFeatureSchema = Schema([Fid, Name, Status, Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)

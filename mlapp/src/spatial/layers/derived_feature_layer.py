@@ -3,6 +3,7 @@ from urllib.parse import quote
 
 from qgis.core import QgsProject
 
+from .condition_table import ConditionTable
 from .feature_layer import FeatureLayer
 from .persisted_feature_layer import PersistedFeatureLayer
 
@@ -30,7 +31,7 @@ class DerivedFeatureLayer(FeatureLayer):
     @property
     def persistedFeatureLayers(self):
         """Return the instances of Paddock Power PersistedFeatureLayers used to derive this layer."""
-        return [f for f in self.featureLayers if isinstance(f, PersistedFeatureLayer)]
+        return [f for f in self.featureLayers if isinstance(f, PersistedFeatureLayer) or isinstance(f, ConditionTable)]
 
     @property
     def nonDerivedFeatureLayers(self):

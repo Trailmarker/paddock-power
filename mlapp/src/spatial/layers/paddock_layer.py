@@ -17,36 +17,24 @@ class PaddockLayer(StatusFeatureLayer):
     def getFeatureType(self):
         return Paddock
 
-    def __init__(self, project, gpkgFile, layerName, landSystemLayer: LandSystemLayer,
-                 conditionTable: ConditionTable):
+    def __init__(self, project, gpkgFile, layerName, conditionTable: ConditionTable):
         """Create or open a Paddock layer."""
 
         super().__init__(project, gpkgFile, layerName, styleName=PaddockLayer.STYLE)
 
-        self._landSystemLayerId = landSystemLayer.id()
-        self._wateredAreaLayerId = None
+        self._paddockLandSystemsLayerId = None
         self.conditionTable = conditionTable
 
-        # Recalculate when our dependencies change
-        # self.landSystemLayer.featuresPersisted.connect(self.recalculateAll)
-        # self.conditionTable.conditionRecordsUpdated.connect(self.recalculateId)
-
     @property
-    def landSystemLayer(self):
-        return QgsProject.instance().mapLayer(self._landSystemLayerId)
+    def paddockLandSystemsLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLandSystemsLayerId) if self._paddockLandSystemsLayerId else None
 
-    @property
-    def wateredAreaLayer(self):
-        return QgsProject.instance().mapLayer(self._wateredAreaLayerId) if self._wateredAreaLayerId else None
-
-    @wateredAreaLayer.setter
-    def wateredAreaLayer(self, wateredAreaLayer):
-        self._wateredAreaLayerId = wateredAreaLayer.id()
-        # Recalculate when our dependencies change
-        # wateredAreaLayer.featuresPersisted.connect(self.recalculateAll)
+    @paddockLandSystemsLayer.setter
+    def paddockLandSystemsLayer(self, paddockLandSystemsLayer):
+        self._paddockLandSystemsLayerId = paddockLandSystemsLayer.id()
 
     def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.landSystemLayer, self.wateredAreaLayer, self.conditionTable, feature)
+        return self.getFeatureType()(self, self.paddockLandSystemsLayer, self.conditionTable, feature)
 
     @Edits.persistFeatures
     def recalculateId(self, id):
