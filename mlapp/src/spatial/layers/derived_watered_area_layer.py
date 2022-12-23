@@ -69,6 +69,16 @@ inner join {FAR_WATERED_AREA}
 	on "{{0}}".{FID} = {FAR_WATERED_AREA}.{PADDOCK}
 	and st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry) is not null
 	and st_area(st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_AREA_M2}
+union
+select
+	0 as {FID},
+	st_multi({{0}}.geometry) as geometry,
+	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	"{{0}}".{STATUS} as {STATUS},
+	"{{0}}".{FID} as {PADDOCK},
+	"{{0}}".{STATUS} as "{PADDOCK_STATUS}"
+from "{{0}}"
+where not exists (select 1 from "{{1}}" where "{{1}}".{PADDOCK} = "{{0}}".{FID})
 """
 
     def getFeatureType(cls):

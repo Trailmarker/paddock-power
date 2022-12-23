@@ -92,7 +92,7 @@ class ProjectBase(QObject):
         self.pipelineLayer.addToMap(group)
         self.fenceLayer.addToMap(group)
         # Hide Waterpoint Buffers
-        # self.waterpointBufferLayer.addToMap(group)
+        #self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
