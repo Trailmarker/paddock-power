@@ -7,6 +7,7 @@ from ..spatial.layers.condition_table import ConditionTable
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
+from ..spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.land_system_layer import LandSystemLayer
 from ..spatial.layers.paddock_land_systems_layer import PaddockLandSystemsLayer
@@ -75,8 +76,21 @@ class ProjectBase(QObject):
         self.boundaryLayer = BoundaryLayer(self, boundaryLayerName, self.paddockLayer)
 
         paddockLandSystemsLayerName = f"Paddock Land Systems"
-        self.paddockLandSystemsLayer = PaddockLandSystemsLayer(self, self.gpkgFile, paddockLandSystemsLayerName, self.paddockLayer, self.landSystemLayer, self.wateredAreaLayer, self.conditionTable)
+        self.paddockLandSystemsLayer = PaddockLandSystemsLayer(
+            self,
+            self.gpkgFile,
+            paddockLandSystemsLayerName,
+            self.paddockLayer,
+            self.landSystemLayer,
+            self.wateredAreaLayer,
+            self.conditionTable)
         self.paddockLayer.paddockLandSystemsLayer = self.paddockLandSystemsLayer
+
+        derivedMetricPaddockLayerName = f"Paddocks"
+        self.derivedMetricPaddockLayer = DerivedMetricPaddockLayer(
+            self, derivedMetricPaddockLayerName, self.paddockLayer, self.paddockLandSystemsLayer)
+
+        self.paddockLayer.derivedMetricPaddockLayer = self.derivedMetricPaddockLayer
 
     def findGroup(self):
         """Find this Project's group in the Layers panel."""
@@ -93,13 +107,16 @@ class ProjectBase(QObject):
         self.waterpointLayer.addToMap(group)
         self.pipelineLayer.addToMap(group)
         self.fenceLayer.addToMap(group)
-        # Hide Waterpoint Buffers
-        #self.waterpointBufferLayer.addToMap(group)
+        # Hide Waterpoint Buffers layer
+        # self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
         self.landSystemLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
-        self.paddockLandSystemsLayer.addToMap(group)
-        self.paddockLayer.addToMap(group)
+        # Hide Paddock Land Systems layer
+        # self.paddockLandSystemsLayer.addToMap(group)
+        # Replace Paddock layer with Derived Metric Paddock layer in our view
+        # self.paddockLayer.addToMap(group)
+        self.derivedMetricPaddockLayer.addToMap(group)
 
         if self.elevationLayer is not None:
             self.elevationLayer.addToMap(group)

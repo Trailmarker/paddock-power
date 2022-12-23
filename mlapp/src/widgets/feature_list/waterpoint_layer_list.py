@@ -10,6 +10,10 @@ class WaterpointLayerList(PersistedFeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        def listItemFactory(waterpoint): return FeatureListItem(waterpoint, detailsWidgetFactory=WaterpointDetails, editWidgetFactory=WaterpointDetailsEdit, parent=parent)
+        def listItemFactory(waterpoint): return FeatureListItem(
+            waterpoint,
+            detailsWidgetFactory=WaterpointDetails,
+            editWidgetFactory=WaterpointDetailsEdit,
+            parent=parent)
 
         super().__init__(listItemFactory, parent)

@@ -129,3 +129,4 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landSystemId=landSystemId))
+        self.featuresPersisted.emit([paddockId])

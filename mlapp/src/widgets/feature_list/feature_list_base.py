@@ -5,6 +5,7 @@ from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem, QSizePolic
 from ...spatial.features.feature import Feature
 from ...utils import qgsDebug
 
+
 class FeatureListBase(QListWidget):
 
     def __init__(self, listItemFactory, parent=None):

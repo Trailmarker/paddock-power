@@ -10,14 +10,11 @@ from ...models.qt_abstract_meta import QtAbstractMeta
 from ...utils import resolveStylePath, PLUGIN_NAME
 from ..features.feature import Feature
 
+
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
     # emit this signal when a selected Feature is updated
     selectedFeatureChanged = pyqtSignal(Feature)
-
-    def twoPhaseRecalculate(self):
-        """Return True if this layer requires two-phase recalculation."""
-        return self.getFeatureType().twoPhaseRecalculate()
 
     @abstractmethod
     def getFeatureType(self):
@@ -137,23 +134,27 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: hadSelection={hadSelection}")
 
             # Is this our Feature?
-            ourFeature = (feature is not None) and (feature.featureLayer is not None) and (self.id() == feature.featureLayer.id())
+            ourFeature = (
+                feature is not None) and (
+                feature.featureLayer is not None) and (
+                self.id() == feature.featureLayer.id())
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: ourFeature={ourFeature}")
 
             # Are we going to focus based on this new Feature?
             focusOnSelect = (feature is not None) and feature.focusOnSelect
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: focusOnSelect={focusOnSelect}")
- 
+
             # Is it the same one that's already selected?
             sameAsSelected = ourFeature and hadSelection and (self._selectedFeature.id == feature.id)
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: sameAsSelected={sameAsSelected}")
-          
-            # If this new feature has focusOnSelect, and it's not already selected, clear our selection unless we're selecting the same Feature
+
+            # If this new feature has focusOnSelect, and it's not already selected,
+            # clear our selection unless we're selecting the same Feature
             if hadSelection and focusOnSelect and (not ourFeature or not sameAsSelected):
                 # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: clearing currently selected {self._selectedFeature}")
                 self._selectedFeature.onDeselectFeature()
                 self._selectedFeature = None
-                
+
             if ourFeature:
                 self.selectByIds([feature.id], QgsVectorLayer.SetSelection)
 

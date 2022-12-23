@@ -10,7 +10,7 @@ from ...utils import qgsInfo
 
 
 class Edits:
-    
+
     def __init__(self, upserts=[], deletes=[]):
         def _filter(features=[]):
             return [f for f in (features or []) if isinstance(f, PersistedFeature)]
@@ -90,40 +90,13 @@ class Edits:
             qgsInfo(f"Edits.persistFeatures: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
 
             layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
-            twoPhaseLayers = set()
 
             with Edits.editAndCommit(*layers):
-                upsertsByLayer = defaultdict(list)
                 for feature in edits.upserts:
-                    upsertsByLayer[feature.featureLayer].append(feature)
-
-                for layer, features in upsertsByLayer.items():
-                    for feature in features:
-                        if layer.twoPhaseRecalculate() and feature.id < 0:
-                            batch = layer.getRecalculateBatchNumber()
-                            feature.recalculateCurrent = batch
-                            twoPhaseLayers.add((layer, batch))
-                            # qgsInfo(f"Edits.persistFeatures: two-phase upsert for {feature} in batch {batch}")
-                        else:
-                            feature.recalculate()
-                        feature.upsert()
-
+                    feature.recalculate()
+                    feature.upsert()
                 for feature in edits.deletes:
                     feature.delete()
-
-            with Edits.editAndCommit(*(layer for (layer, _) in twoPhaseLayers)):
-                twoPhaseEdits = Edits()
-                for twoPhaseLayer, batch in twoPhaseLayers:
-                    twoPhaseEdits.editBefore(twoPhaseLayer.getRecalculateBatchEdits(batch))
-                    qgsInfo(
-                        f"Edits.persistFeatures: two-phase upserts={repr(twoPhaseEdits.upserts)}, deletes={repr(twoPhaseEdits.deletes)}")
-
-                    for feature in twoPhaseEdits.upserts:
-                        feature.recalculate()
-                        feature.recalculateComplete = feature.recalculateCurrent
-                        feature.upsert()
-                    for feature in twoPhaseEdits.deletes:
-                        feature.delete()
-
             return None
+
         return callableWithPersistFeatures

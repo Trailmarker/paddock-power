@@ -5,8 +5,9 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-
 from ...spatial.layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
+from ...utils import qgsDebug
+
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_widget_base.ui')))
@@ -22,6 +23,7 @@ class PaddockWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
+        self.paddockList.derivedMetricPaddockLayer = self.project.derivedMetricPaddockLayer
         self.paddockList.featureLayer = self.project.paddockLayer
 
         self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),

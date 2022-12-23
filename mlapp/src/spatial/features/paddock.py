@@ -3,8 +3,9 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsProject
 
-from ...utils import qgsDebug, qgsInfo
+from ...utils import qgsDebug
 from ..layers.condition_table import ConditionTable
+from ..layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from ..layers.paddock_land_systems_layer import PaddockLandSystemsLayer
 from ..layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
 from ..schemas.schemas import PaddockSchema
@@ -19,24 +20,24 @@ class Paddock(AreaFeature):
     popupLayerAdded = pyqtSignal(PaddockLandSystemsPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
-    @classmethod
-    def twoPhaseRecalculate(self):
-        return True
-
-    def __init__(self, featureLayer, paddockLandSystemsLayer: PaddockLandSystemsLayer,
-                 conditionTable: ConditionTable, existingFeature=None):
+    def __init__(self, featureLayer, derivedMetricPaddockLayer: DerivedMetricPaddockLayer,
+                 paddockLandSystemsLayer: PaddockLandSystemsLayer, conditionTable: ConditionTable, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
+        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id()
         self._paddockLandSystemsLayerId = paddockLandSystemsLayer.id()
         self.conditionTable = conditionTable
 
         self._popupLayerId = None
-        self._recalculateLayerId = None
 
     @property
     def title(self):
-        return f"{self.name} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
+        return f"{self.name} ({self.featureArea:.2f} km²)"
+
+    @property
+    def derivedMetricPaddockLayer(self):
+        return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId)
 
     @property
     def paddockLandSystemsLayer(self):
@@ -50,66 +51,12 @@ class Paddock(AreaFeature):
     def popupLayer(self, popupLayer):
         self._popupLayerId = popupLayer.id() if popupLayer else None
 
-    @property
-    def recalculateLayer(self):
-        if self.popupLayer:
-            self._recalculateLayerId = None
-            qgsDebug(f"{self}.recalculateLayer() returning popupLayer")
-            return self.popupLayer
-
-        if self._recalculateLayerId:
-            qgsDebug(f"{self}.recalculateLayer() returning existing recalculate layer")
-            return QgsProject.instance().mapLayer(self._recalculateLayerId)
-
-        qgsDebug(f"{self}.recalculateLayer() would create new recalculate layer")
-
-        return None
-
-        # recalculateLayer = PaddockLandSystemsPopupLayer(
-        #     self.featureLayer.getPaddockPowerProject(),
-        #     f"Paddock{self.id}Recalculate{randomString()}",
-        #     self,
-        #     self.paddockLandSystemsLayer,
-        #     self.conditionTable)
-
-        # self._recalculateLayerId = recalculateLayer.id()
-        # return recalculateLayer
-
-    def clearRecalculateLayer(self):
-        if self._recalculateLayerId:
-            QgsProject.instance().removeMapLayer(self._recalculateLayerId)
-            self._recalculateLayerId
-
-    def recalculate(self):
-        try:
-            super().recalculate()
-
-            foo = self.recalculateLayer
-            # request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
-            # paddockLandSystems = [f for f in self.recalculateLayer.getFeatures(request)]
-
-            # estimatedRaw = sum([c.estimatedCapacity for c in paddockLandSystems])
-            # self.estimatedCapacity = round(estimatedRaw, 2)
-            # potentialRaw = sum([c.potentialCapacity for c in paddockLandSystems])
-            # self.potentialCapacity = round(potentialRaw, 2)
-
-            # self.estimatedCapacityPerArea = round(estimatedRaw / self.featureArea, 2)
-            # self.potentialCapacityPerArea = round(potentialRaw / self.featureArea, 2)
-
-        except BaseException as e:
-            qgsInfo(f"{self}.recalculate() failed with exception {e}")
-        finally:
-            # Scoping and QGIS layer ownership design mean layer's (usually) already deleted by here
-            self.clearRecalculateLayer()
-
-        qgsInfo(f"{self}.recalculate(): estimatedCapacity={self.estimatedCapacity}, potentialCapacity={self.potentialCapacity}, estimatedCapacityPerArea={self.estimatedCapacityPerArea}, potentialCapacityPerArea={self.potentialCapacityPerArea}")
-
     def addPopupLayer(self):
         """Add a condition layer to the project."""
         if not self.popupLayer:
-            item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
+            item = QgsProject.instance().layerTreeRoot().findLayer(self.derivedMetricPaddockLayer)
             if not item:
-                # If the Paddocks layer isn't in the map, don't initialise or add the Paddock Land Systems layer.
+                # If the Metric Paddocks layer isn't in the map, don't initialise or add the Paddock Land Systems layer.
                 return
 
             # Remove any existing Paddock Land Systems popup layers - they don't play nice together
@@ -148,6 +95,7 @@ class Paddock(AreaFeature):
     def onSelectFeature(self):
         """Do the stuff we'd normally do, but also add the Paddock Land Systems popup layer."""
         super().onSelectFeature()
+        qgsDebug(f"{self}.onSelectFeature()")
         self.addPopupLayer()
 
     def onDeselectFeature(self):

@@ -34,7 +34,6 @@ order by "{LAND_SYSTEM_NAME}"
             query,
             PaddockLandSystemsPopupLayer.STYLE,
             paddockLandSystemsLayer)
-		
+
         self.paddockLandSystemsLayer = paddockLandSystemsLayer
         self.conditionTable = conditionTable
-

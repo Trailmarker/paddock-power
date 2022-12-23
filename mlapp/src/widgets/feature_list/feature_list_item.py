@@ -147,7 +147,8 @@ class FeatureListItem(QWidget, EditStateMachine):
     def saveItem(self):
         self.featureEdit.saveFeature()
 
-        if isinstance(self.feature, PersistedFeature) and not isinstance(self.feature.featureLayer, PersistedDerivedFeatureLayer):
+        if isinstance(self.feature, PersistedFeature) and not isinstance(
+                self.feature.featureLayer, PersistedDerivedFeatureLayer):
             return Edits.upsert(self.feature)
         else:
             return Edits()

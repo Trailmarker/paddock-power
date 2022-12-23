@@ -16,7 +16,7 @@ where "{WATERPOINT}" = {waterpointId}
 order by "{GRAZING_RADIUS_TYPE}"
 """
 
-    def getFeatureType(cls):
+    def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return WaterpointBuffer
 

@@ -16,11 +16,6 @@ class PersistedFeature(Feature):
     featureDeleted = pyqtSignal()
     featureSelected = pyqtSignal()
 
-    @classmethod
-    def twoPhaseRecalculate(self):
-        """Return True if the PersistedFeature should be recalculated after data commits."""
-        return False
-
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Feature."""
 

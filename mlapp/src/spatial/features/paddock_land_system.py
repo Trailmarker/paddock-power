@@ -21,7 +21,7 @@ class PaddockLandSystem(PersistedFeature):
 
     @property
     def title(self):
-        return f"{self.landSystemName} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE) {self.id}"
+        return f"{self.landSystemName} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
 
     @property
     def focusOnSelect(self):

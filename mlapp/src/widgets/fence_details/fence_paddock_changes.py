@@ -22,11 +22,14 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         self.project = None
 
         self.setupUi(self)
+
         self.refreshUi()
 
     def setProject(self, project):
         """Set the Project."""
         self.project = project
+        self.supersededPaddockMiniList.derivedMetricPaddockLayer = self.project.derivedMetricPaddockLayer
+        self.plannedPaddockMiniList.derivedMetricPaddockLayer = self.project.derivedMetricPaddockLayer
         self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self.refreshUi()
 
