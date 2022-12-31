@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..features.boundary import Boundary
+from ..schemas.schemas import STATUS, TIMEFRAME
+from ..schemas.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -7,13 +9,13 @@ class BoundaryLayer(DerivedFeatureLayer):
 
     STYLE = "boundary"
 
-    QUERY = """
-select st_union(geometry) as geometry, 'Built' as "Status"
-from "{0}" where "Status" in ('Built', 'BuiltSuperseded')
+    def parameteriseQuery(self, PaddockLayer):
+        return f"""
+select st_union(geometry) as geometry, '{Timeframe.Current.name}' as {TIMEFRAME}
+from "{PaddockLayer}" where {Timeframe.Current.includesStatuses(f'"{PaddockLayer}".{STATUS}')}
 union
-select st_union(geometry) as geometry, 'Planned' as "Status"
-from "{0}" where "Status" in ('Built', 'Planned')
-
+select st_union(geometry) as geometry, '{Timeframe.Future.name}' as {TIMEFRAME}
+from "{PaddockLayer}" where {Timeframe.Future.includesStatuses(f'"{PaddockLayer}".{STATUS}')}
 """
 
     def getFeatureType(self):
@@ -21,4 +23,4 @@ from "{0}" where "Status" in ('Built', 'Planned')
         return Boundary
 
     def __init__(self, project, layerName, paddockLayer):
-        super().__init__(project, layerName, BoundaryLayer.QUERY, BoundaryLayer.STYLE, paddockLayer)
+        super().__init__(project, layerName, self.parameteriseQuery(paddockLayer.name()), BoundaryLayer.STYLE, paddockLayer)

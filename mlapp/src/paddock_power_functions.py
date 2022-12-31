@@ -55,6 +55,7 @@ def ifCurrentFeatureStatus(vals, *_):
         return vals[2]
 
 
+
 @qgsfunction(args=3, group=PLUGIN_NAME)
 def ifCurrentTimeframe(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe."""

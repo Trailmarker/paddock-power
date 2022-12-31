@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from ..calculator import Calculator
 from ..features.waterpoint_buffer import WaterpointBuffer
-from ..schemas.feature_status import FeatureStatus
-from ..schemas.schemas import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, PADDOCK_STATUS, STATUS, WATERPOINT, WATERPOINT_TYPE
+from ..schemas.schemas import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE
 from ..schemas.grazing_radius_type import GrazingRadiusType
+from ..schemas.timeframe import Timeframe
 from ..schemas.waterpoint_type import WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
 
@@ -12,64 +12,77 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 
     STYLE = "waterpoint_buffer"
 
-    BUFFERS = "Buffers"
-    FAR_BUFFER = "FarBuffer"
-    NEAR_BUFFER = "NearBuffer"
-    IN_PADDOCKS = "InPaddocks"
-    RENAMED_WATERPOINTS = "RenamedWaterpoints"
+    def parameteriseQuery(self, PaddockLayer, WaterpointLayer):
+        Buffers = "Buffers"
+        FarBuffer = "FarBuffer"
+        NearBuffer = "NearBuffer"
+        InPaddocks = "InPaddocks"
+        RenamedWaterpoints = "RenamedWaterpoints"
 
-    QUERY = f"""
-with "{IN_PADDOCKS}" as
+        return f"""
+with {InPaddocks} as
     (select
-        "{{1}}".geometry,
-        "{{1}}".fid as "{PADDOCK}",
-        "{{0}}".fid as "{WATERPOINT}",
-        "{{1}}".{STATUS} as "{PADDOCK_STATUS}"
-	 from "{{0}}"
-	 inner join "{{1}}"
-     on "{{0}}"."{STATUS}" in ('{FeatureStatus.Planned.name}', '{FeatureStatus.Built.name}')
-     and "{{1}}"."{STATUS}" in ('{FeatureStatus.Planned.name}', '{FeatureStatus.Built.name}')
-	 and st_contains("{{1}}".geometry, "{{0}}".geometry)
-     where "{{0}}"."{WATERPOINT_TYPE}" in ('{WaterpointType.Dam.name}', '{WaterpointType.Trough.name}', '{WaterpointType.Waterhole.name}')
+        "{PaddockLayer}".geometry,
+        "{PaddockLayer}".{FID} as "{PADDOCK}",
+        "{WaterpointLayer}".{FID} as "{WATERPOINT}",
+        '{Timeframe.Current.name}' as "{TIMEFRAME}"
+	 from "{WaterpointLayer}"
+	 inner join "{PaddockLayer}"
+     on {Timeframe.Current.includesStatuses(f'"{WaterpointLayer}"."{STATUS}"', f'"{PaddockLayer}"."{STATUS}"')}
+	 and st_contains("{PaddockLayer}".geometry, "{WaterpointLayer}".geometry)
+     where {WaterpointType.givesWater(f'"{WaterpointLayer}"."{WATERPOINT_TYPE}"')}
+     union
+     select
+        "{PaddockLayer}".geometry,
+        "{PaddockLayer}".{FID} as "{PADDOCK}",
+        "{WaterpointLayer}".{FID} as "{WATERPOINT}",
+        '{Timeframe.Future.name}' as "{TIMEFRAME}"
+	 from "{WaterpointLayer}"
+	 inner join "{PaddockLayer}"
+     on {Timeframe.Future.includesStatuses(f'"{WaterpointLayer}"."{STATUS}"', f'"{PaddockLayer}"."{STATUS}"')}
+	 and st_contains("{PaddockLayer}".geometry, "{WaterpointLayer}".geometry)
+     where {WaterpointType.givesWater(f'"{WaterpointLayer}"."{WATERPOINT_TYPE}"')}
      ),
-"{RENAMED_WATERPOINTS}" as
+{RenamedWaterpoints} as
      (select
 	     geometry,
 		 {STATUS},
-		 fid,
-		 "{NEAR_GRAZING_RADIUS}" as {NEAR_BUFFER},
-		 "{FAR_GRAZING_RADIUS}" as {FAR_BUFFER}
-	  from "{{0}}"
-      where "{{0}}"."{WATERPOINT_TYPE}" in ('{WaterpointType.Dam.name}', '{WaterpointType.Trough.name}', '{WaterpointType.Waterhole.name}')),
-"{BUFFERS}" as
+		 {FID},
+		 "{NEAR_GRAZING_RADIUS}" as {NearBuffer},
+		 "{FAR_GRAZING_RADIUS}" as {FarBuffer}
+	  from "{WaterpointLayer}"
+      where {WaterpointType.givesWater(f'"{WaterpointLayer}"."{WATERPOINT_TYPE}"')}
+      ),
+{Buffers} as
     (select
-		st_buffer(geometry, {NEAR_BUFFER}) as geometry,
-		fid as "{WATERPOINT}",
+		st_buffer(geometry, {NearBuffer}) as geometry,
+		{FID} as "{WATERPOINT}",
         {STATUS},
         '{GrazingRadiusType.Near.name}' as "{GRAZING_RADIUS_TYPE}",
-        {NEAR_BUFFER} as "{GRAZING_RADIUS}"
-	 from "{RENAMED_WATERPOINTS}"
+        {NearBuffer} as "{GRAZING_RADIUS}"
+	 from {RenamedWaterpoints}
 	 union
      select
-		st_buffer(geometry, {FAR_BUFFER}) as geometry,
-		fid as "{WATERPOINT}",
+		st_buffer(geometry, {FarBuffer}) as geometry,
+		{FID} as "{WATERPOINT}",
         {STATUS},
         '{GrazingRadiusType.Far.name}' as "{GRAZING_RADIUS_TYPE}",
-        {FAR_BUFFER} as "{GRAZING_RADIUS}"
-	 from "{RENAMED_WATERPOINTS}")
+        {FarBuffer} as "{GRAZING_RADIUS}"
+	 from {RenamedWaterpoints})
 select
-    0 as "{FID}",
-    st_multi(st_intersection("{BUFFERS}".geometry, "{IN_PADDOCKS}".geometry)) as geometry,
-    "{IN_PADDOCKS}"."{PADDOCK}",
-    "{IN_PADDOCKS}"."{PADDOCK_STATUS}",
-    "{BUFFERS}"."{WATERPOINT}",
-    {STATUS},
-    "{GRAZING_RADIUS_TYPE}",
-    "{GRAZING_RADIUS}"
-from "{BUFFERS}"
-inner join "{IN_PADDOCKS}"
-on "{BUFFERS}"."{WATERPOINT}" = "{IN_PADDOCKS}"."{WATERPOINT}"
-and st_area(st_intersection("{BUFFERS}".geometry, "{IN_PADDOCKS}".geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+    0 as {FID},
+    st_multi(st_intersection({Buffers}.geometry, {InPaddocks}.geometry)) as geometry,
+    {InPaddocks}."{PADDOCK}",
+    {InPaddocks}.{TIMEFRAME},
+    {Buffers}.{STATUS},
+    {Buffers}."{WATERPOINT}",
+    {Buffers}."{GRAZING_RADIUS_TYPE}",
+    {Buffers}."{GRAZING_RADIUS}"
+from {Buffers}
+inner join {InPaddocks}
+on {Buffers}."{WATERPOINT}" = {InPaddocks}."{WATERPOINT}"
+and st_area(st_intersection({Buffers}.geometry, {InPaddocks}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+and {Timeframe.timeframesIncludeStatuses(f'{InPaddocks}."{TIMEFRAME}"', f'{Buffers}."{STATUS}"')}
 """
 
     def getFeatureType(self):
@@ -85,7 +98,7 @@ and st_area(st_intersection("{BUFFERS}".geometry, "{IN_PADDOCKS}".geometry)) >= 
         super().__init__(
             project,
             layerName,
-            DerivedWaterpointBufferLayer.QUERY,
+            self.parameteriseQuery(paddockLayer.name(), waterpointLayer.name()),
             DerivedWaterpointBufferLayer.STYLE,
             waterpointLayer,
             paddockLayer)

@@ -2,7 +2,8 @@
 from qgis.core import QgsFeatureRequest
 
 from ..features.metric_paddock import MetricPaddock
-from ..schemas.schemas import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS
+from ..schemas.schemas import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME
+from ..schemas.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -10,24 +11,26 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer):
 
     STYLE = "paddock"
 
-    QUERY = f"""
+    def parameteriseQuery(self, PaddockLayer, PaddockLandSystemsLayer):
+        return f"""
 select
-	"{{0}}".geometry as geometry,
-	0 as "{FID}",
-	"{{0}}".{FID} as {PADDOCK},
-	"{{0}}".{NAME} as {NAME},
-	"{{0}}".{STATUS} as {STATUS},
-	"{{0}}"."{AREA}" as "{AREA}",
-	"{{0}}"."{PERIMETER}" as "{PERIMETER}",
-	"{{0}}"."{BUILD_FENCE}" as "{BUILD_FENCE}",
-	(sum("{{1}}"."{ESTIMATED_CAPACITY}") / nullif("{{0}}"."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
-	sum("{{1}}"."{ESTIMATED_CAPACITY}") as "{ESTIMATED_CAPACITY}",
-	(sum("{{1}}"."{POTENTIAL_CAPACITY}") / nullif("{{0}}"."{AREA}", 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
-	sum("{{1}}"."{POTENTIAL_CAPACITY}") as "{POTENTIAL_CAPACITY}"
-from "{{0}}"
-left join "{{1}}"
-	on "{{0}}".{FID} = "{{1}}".{PADDOCK}
-group by "{{0}}".{FID}
+	"{PaddockLayer}".geometry as geometry,
+	0 as {FID},
+	"{PaddockLayer}".{FID} as {PADDOCK},
+	"{PaddockLayer}".{NAME} as {NAME},
+	"{PaddockLayer}".{STATUS} as {STATUS},
+    "{PaddockLandSystemsLayer}".{TIMEFRAME} as {TIMEFRAME},
+	"{PaddockLayer}"."{AREA}" as "{AREA}",
+	"{PaddockLayer}"."{PERIMETER}" as "{PERIMETER}",
+	"{PaddockLayer}"."{BUILD_FENCE}" as "{BUILD_FENCE}",
+	(sum("{PaddockLandSystemsLayer}"."{ESTIMATED_CAPACITY}") / nullif("{PaddockLayer}"."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
+	sum("{PaddockLandSystemsLayer}"."{ESTIMATED_CAPACITY}") as "{ESTIMATED_CAPACITY}",
+	(sum("{PaddockLandSystemsLayer}"."{POTENTIAL_CAPACITY}") / nullif("{PaddockLayer}"."{AREA}", 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
+	sum("{PaddockLandSystemsLayer}"."{POTENTIAL_CAPACITY}") as "{POTENTIAL_CAPACITY}"
+from "{PaddockLayer}"
+left join "{PaddockLandSystemsLayer}"
+	on "{PaddockLayer}".{FID} = "{PaddockLandSystemsLayer}".{PADDOCK}
+group by "{PaddockLayer}".{FID}
 """
 
     def getFeatureType(self):
@@ -37,14 +40,20 @@ group by "{{0}}".{FID}
     def getFeatureByPaddockId(self, paddockId):
         """Return a MetricPaddock based on a Paddock FID."""
         paddockIdRequest = QgsFeatureRequest().setFilterExpression(f'"{PADDOCK}" = {paddockId}')
-        return next(self.getFeatures(paddockIdRequest))
-
+        features = [f for f in self.getFeatures(paddockIdRequest)]
+        if not features:
+            return None
+        else:
+            for f in features:
+                if Timeframe[f.timeframe.name] == Timeframe[self.getPaddockPowerProject().currentTimeframe.name]:
+                    return f 
+       
     def __init__(self, project, layerName, paddockLayer, paddockLandSystemsLayer):
 
         super().__init__(
             project,
             layerName,
-            DerivedMetricPaddockLayer.QUERY,
+            self.parameteriseQuery(paddockLayer.name(), paddockLandSystemsLayer.name()),
             DerivedMetricPaddockLayer.STYLE,
             paddockLayer,
             paddockLandSystemsLayer)

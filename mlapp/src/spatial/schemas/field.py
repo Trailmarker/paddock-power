@@ -100,19 +100,40 @@ class Field(QgsField):
         if self._defaultValue:
             self.__makeSetter()(feature, self._defaultValue)
 
-    def addReadOnlyFieldProperty(self, cls):
-        """Add a read-only Python property to a Feature class for this Field."""
-        setattr(cls, self._propertyName, property(self.__makeGetter()))
-
     def addFieldProperty(self, cls):
         """Add a Python property to a Feature class for this Field."""
         setattr(cls, self._propertyName, property(self.__makeGetter(), self.__makeSetter()))
 
+    def setupLayer(self, layer):
+        """Set up this Field in a FeatureLayer."""
+        fieldIndex = layer.fields().indexFromName(self.name())
+        layer.setEditorWidgetSetup(fieldIndex, self.editorWidgetSetup())
+        layer.setDefaultValueDefinition(fieldIndex, self.defaultValueDefinition())
 
 class MeasureField(Field):
-    def __init__(self, propertyName, name, *args, **kwargs):
+    def __init__(self, propertyName, name, dps=2, *args, **kwargs):
         super().__init__(propertyName=propertyName, name=name, type=QVariant.Double,
                          typeName="Real", len=0, prec=0, comment="", subType=QVariant.Invalid, *args, **kwargs)
+
+        self._dps = dps
+
+    def setupLayer(self, layer):
+        """Set up this Field in a FeatureLayer."""
+        # Default setup
+        super().setupLayer(layer)
+
+        # Create a separate, rounded expression field and add that as an expression field
+        # roundedField = QgsField(f"Rounded {self.name()}", QVariant.Double)
+        # roundedField.setAlias(self.name())
+        # layer.addExpressionField(f"round(\"{self.name()}\", {self._dps})", roundedField)
+
+        # # Hide this 'raw' field from the attribute table
+        # config = layer.attributeTableConfig()
+        # columns = config.columns()
+        # column = next(c for c in columns if c.name == self.name())
+        # column.hidden = True
+        # config.setColumns(columns)
+        # layer.setAttributeTableConfig(config)
 
 
 class StringField(Field):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..features.paddock_land_system import PaddockLandSystem
-from ..schemas.schemas import LAND_SYSTEM_NAME, PADDOCK
+from ..schemas.schemas import LAND_SYSTEM_NAME, PADDOCK, TIMEFRAME
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -8,11 +8,12 @@ class PaddockLandSystemsPopupLayer(DerivedFeatureLayer):
 
     STYLE = "paddock_land_systems_popup"
 
-    def parameteriseQuery(self, paddockId):
+    def parameteriseQuery(self, paddockId, timeframe):
         return f"""
 select *
 from "{{0}}"
 where "{PADDOCK}" = {paddockId}
+and "{TIMEFRAME}" = '{timeframe.name}'
 order by "{LAND_SYSTEM_NAME}"
 """
 
@@ -26,7 +27,7 @@ order by "{LAND_SYSTEM_NAME}"
 
     def __init__(self, project, layerName, paddock, paddockLandSystemsLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
-        query = self.parameteriseQuery(paddockId=paddock.id)
+        query = self.parameteriseQuery(paddockId=paddock.id, timeframe=project.currentTimeframe)
 
         super().__init__(
             project,

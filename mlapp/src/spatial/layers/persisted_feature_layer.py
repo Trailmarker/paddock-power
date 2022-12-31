@@ -7,7 +7,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
-from ...utils import PLUGIN_NAME, qgsInfo, qgsDebug
+from ...utils import PLUGIN_NAME, qgsInfo
 from ..features.persisted_feature import Feature
 from ..layers.feature_layer import FeatureLayer
 
@@ -113,11 +113,9 @@ class PersistedFeatureLayer(FeatureLayer):
             self.dataProvider().deleteAttributes([self.fields().indexFromName(f.name()) for f in extraFields])
             self.commitChanges()
 
-        # Apply editor widgets
+        # Apply editor widgets and other Field-specific layer setup
         for field in self.getFeatureType().getSchema():
-            fieldIndex = self.fields().indexFromName(field.name())
-            self.setEditorWidgetSetup(fieldIndex, field.editorWidgetSetup())
-            self.setDefaultValueDefinition(fieldIndex, field.defaultValueDefinition())
+            field.setupLayer(self)
 
         self.detectAndRemove()
         QgsProject.instance().addMapLayer(self, False)

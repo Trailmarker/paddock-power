@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from ..calculator import Calculator
 from ..features.watered_area import WateredArea
-from ..schemas.schemas import FID, PADDOCK, PADDOCK_STATUS, STATUS, GRAZING_RADIUS_TYPE, WATERED_TYPE
+from ..schemas.feature_status import FeatureStatus
+from ..schemas.schemas import FID, PADDOCK, STATUS, GRAZING_RADIUS_TYPE, TIMEFRAME, WATERED_TYPE
+from ..schemas.timeframe import Timeframe
 from ..schemas.grazing_radius_type import GrazingRadiusType
 from ..schemas.watered_type import WateredType
 from .derived_feature_layer import DerivedFeatureLayer
@@ -11,74 +13,89 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
 
     STYLE = "watered_area"
 
-    NEAR_WATERED_AREA = "NearWateredArea"
-    FAR_WATERED_AREA = "FarWateredArea"
 
-    QUERY = f"""
+    def parameteriseQuery(self, PaddockLayer, WaterpointBufferLayer):
+        NearWateredArea = "NearWateredArea"
+        FarWateredArea = "FarWateredArea"
+
+        return f"""
 with
-  {NEAR_WATERED_AREA} as
+  {NearWateredArea} as
 	(select
-	 st_union(geometry) as geometry,
-	 {PADDOCK},
-	 {STATUS},
-	 "{PADDOCK_STATUS}"
-	 from "{{1}}"
+		st_union(geometry) as geometry,
+		{PADDOCK},
+		{TIMEFRAME}
+	 from "{WaterpointBufferLayer}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Near.name}'
-	 group by {PADDOCK}, {STATUS})
-, {FAR_WATERED_AREA} as
+	 group by {PADDOCK}, {TIMEFRAME})
+, {FarWateredArea} as
 	(select
-	 st_union(geometry) as geometry,
-	 {PADDOCK},
-	 {STATUS},
-	 "{PADDOCK_STATUS}"
-	 from "{{1}}"
+		st_union(geometry) as geometry,
+		{PADDOCK},
+		{TIMEFRAME}
+	 from "{WaterpointBufferLayer}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Far.name}'
-	 group by {PADDOCK}, {STATUS})
+	 group by {PADDOCK}, {TIMEFRAME})
 select
 	0 as {FID},
 	st_multi(geometry) as geometry,
 	'{WateredType.Near.name}' as {WATERED_TYPE},
-	{NEAR_WATERED_AREA}.{STATUS},
-	{NEAR_WATERED_AREA}.{PADDOCK},
-	{NEAR_WATERED_AREA}."{PADDOCK_STATUS}"
-from {NEAR_WATERED_AREA}
+	{NearWateredArea}.{TIMEFRAME},
+	{NearWateredArea}.{PADDOCK}
+from {NearWateredArea}
 union
 select
 	0 as {FID},
-	st_multi(st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry)) as geometry,
+	st_multi(st_difference({FarWateredArea}.geometry, {NearWateredArea}.geometry)) as geometry,
 	'{WateredType.Far.name}' as {WATERED_TYPE},
-	{FAR_WATERED_AREA}.{STATUS},
-	{FAR_WATERED_AREA}.{PADDOCK},
-	{FAR_WATERED_AREA}."{PADDOCK_STATUS}"
-from {FAR_WATERED_AREA}
-inner join {NEAR_WATERED_AREA}
-	on {FAR_WATERED_AREA}.{STATUS} = {NEAR_WATERED_AREA}.{STATUS}
-	and {FAR_WATERED_AREA}.{PADDOCK} = {NEAR_WATERED_AREA}.{PADDOCK}
-	and st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry) is not null
-	and st_area(st_difference({FAR_WATERED_AREA}.geometry, {NEAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+	{FarWateredArea}.{TIMEFRAME},
+	{FarWateredArea}.{PADDOCK}
+from {FarWateredArea}
+inner join {NearWateredArea}
+	on {FarWateredArea}.{TIMEFRAME} = {NearWateredArea}.{TIMEFRAME}
+	and {FarWateredArea}.{PADDOCK} = {NearWateredArea}.{PADDOCK}
+	and st_difference({FarWateredArea}.geometry, {NearWateredArea}.geometry) is not null
+	and st_area(st_difference({FarWateredArea}.geometry, {NearWateredArea}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 union
 select
 	0 as {FID},
-	st_multi(st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry)) as geometry,
+	st_multi(st_difference({PaddockLayer}.geometry, {FarWateredArea}.geometry)) as geometry,
 	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	{FAR_WATERED_AREA}.{STATUS},
-	{FAR_WATERED_AREA}.{PADDOCK},
-	"{{0}}".{STATUS} as "{PADDOCK_STATUS}"
-from "{{0}}"
-inner join {FAR_WATERED_AREA}
-	on "{{0}}".{FID} = {FAR_WATERED_AREA}.{PADDOCK}
-	and st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry) is not null
-	and st_area(st_difference({{0}}.geometry, {FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+	{FarWateredArea}.{TIMEFRAME},
+	{FarWateredArea}.{PADDOCK}
+from "{PaddockLayer}"
+inner join {FarWateredArea}
+	on "{PaddockLayer}".{FID} = {FarWateredArea}.{PADDOCK}
+	and st_difference({PaddockLayer}.geometry, {FarWateredArea}.geometry) is not null
+	and st_area(st_difference({PaddockLayer}.geometry, {FarWateredArea}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+	and {Timeframe.timeframesIncludeStatuses(f'"{FarWateredArea}"."{TIMEFRAME}"', f'"{PaddockLayer}"."{STATUS}"')}
 union
 select
 	0 as {FID},
-	st_multi({{0}}.geometry) as geometry,
+	st_multi({PaddockLayer}.geometry) as geometry,
 	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	"{{0}}".{STATUS} as {STATUS},
-	"{{0}}".{FID} as {PADDOCK},
-	"{{0}}".{STATUS} as "{PADDOCK_STATUS}"
-from "{{0}}"
-where not exists (select 1 from "{{1}}" where "{{1}}".{PADDOCK} = "{{0}}".{FID})
+	'{Timeframe.Current.name}' as {TIMEFRAME},
+	"{PaddockLayer}".{FID} as {PADDOCK}
+from "{PaddockLayer}", "{WaterpointBufferLayer}"
+where not exists (
+	select 1 
+	from "{WaterpointBufferLayer}" 
+	where "{WaterpointBufferLayer}".{PADDOCK} = "{PaddockLayer}".{FID}
+	and {Timeframe.Current.timeframeIncludesStatuses(f'"{WaterpointBufferLayer}".{TIMEFRAME}', f'"{PaddockLayer}".{STATUS}')})
+union
+select
+	0 as {FID},
+	st_multi({PaddockLayer}.geometry) as geometry,
+	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	'{Timeframe.Future.name}' as {TIMEFRAME},
+	"{PaddockLayer}".{FID} as {PADDOCK}
+from "{PaddockLayer}", "{WaterpointBufferLayer}"
+where not exists (
+	select 1 
+	from "{WaterpointBufferLayer}" 
+	where "{WaterpointBufferLayer}".{PADDOCK} = "{PaddockLayer}".{FID}
+	and {Timeframe.Future.timeframeIncludesStatuses(f'"{WaterpointBufferLayer}".{TIMEFRAME}', f'"{PaddockLayer}".{STATUS}')})
+
 """
 
     def getFeatureType(self):
@@ -94,7 +111,7 @@ where not exists (select 1 from "{{1}}" where "{{1}}".{PADDOCK} = "{{0}}".{FID})
         super().__init__(
             project,
             layerName,
-            DerivedWateredAreaLayer.QUERY,
+            self.parameteriseQuery(paddockLayer.name(), waterpointBufferLayer.name()),
             DerivedWateredAreaLayer.STYLE,
             paddockLayer,
             waterpointBufferLayer)

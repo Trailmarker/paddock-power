@@ -4,31 +4,16 @@ from qgis.core import QgsWkbTypes
 from .condition_type import ConditionType
 from .feature_status import FeatureStatus
 from .field import DomainField, IdField, MeasureField, StringField
+from .timeframe import Timeframe
 from .watered_type import WateredType
 from .grazing_radius_type import GrazingRadiusType
 from .waterpoint_type import WaterpointType
 
 
-class ReadOnlySchema(list):
+class Schema(list):
     def __init__(self, fieldList, wkbType=None):
         super().__init__(fieldList)
         self._wkbType = wkbType
-
-    def addSchema(self):
-        def _addSchema(cls):
-            for field in self:
-                if field._propertyName is not None:
-                    field.addReadOnlyFieldProperty(cls)
-                setattr(cls, "getSchema", classmethod(lambda _: self))
-            if self._wkbType is not None:
-                setattr(cls, "getWkbType", classmethod(lambda _: self._wkbType))
-            return cls
-        return _addSchema
-
-
-class Schema(ReadOnlySchema):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def addSchema(self):
         def _addSchema(cls):
@@ -75,6 +60,7 @@ POTENTIAL_CAPACITY = "Potential AE"
 POTENTIAL_CAPACITY_PER_AREA = "Potential AE/km²"
 REFERENCE = "Reference"
 STATUS = "Status"
+TIMEFRAME = "Timeframe"
 WATERED_AREA_STATUS = "Watered Area Status"
 WATERED_DISCOUNT = "Watered Discount"
 WATERED_TYPE = "Watered"
@@ -123,6 +109,11 @@ PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIA
 PotentialCapacityPerArea = MeasureField(propertyName="potentialCapacityPerArea", name=POTENTIAL_CAPACITY_PER_AREA)
 Reference = StringField(propertyName="reference", name=REFERENCE)
 Status = DomainField(propertyName="status", name=STATUS, domainType=FeatureStatus, defaultValue=FeatureStatus.Undefined)
+TimeframeField = DomainField(
+    propertyName="timeframe",
+    name=TIMEFRAME,
+    domainType=Timeframe,
+    defaultValue=Timeframe.Undefined)
 WateredTypeField = DomainField(
     propertyName="wateredType",
     name=WATERED_TYPE,
@@ -147,7 +138,7 @@ WaterpointTypeField = DomainField(
     defaultValue=WaterpointType.Bore)
 
 AreaFeatureSchema = Schema([Fid, Name, Status, Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
-BoundarySchema = Schema([Fid, Status], wkbType=QgsWkbTypes.MultiPolygon)
+BoundarySchema = Schema([Fid, TimeframeField], wkbType=QgsWkbTypes.MultiPolygon)
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)
 LandSystemSchema = Schema([Fid, Name, Area, Perimeter, EstimatedCapacityPerArea, MapUnit, LandscapeClass,
@@ -169,15 +160,15 @@ PaddockLandSystemSchema = Schema([Fid,
                                   ConditionTypeField,
                                   Paddock,
                                   PaddockName,
-                                  PaddockStatus,
                                   LandSystem,
                                   LandSystemName,
-                                  WateredAreaStatus],
+                                  TimeframeField],
                                  wkbType=QgsWkbTypes.MultiPolygon)
 MetricPaddockSchema = Schema([Fid,
                               Paddock,
                               Name,
                               Status,
+                              TimeframeField,
                               Area,
                               Perimeter,
                               BuildFence,
@@ -191,9 +182,9 @@ PipelineSchema = LineFeatureSchema
 PointFeatureSchema = Schema([Fid, Name, Status, Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)
 StatusFeatureSchema = Schema([Fid, Name, Status])
 WaterpointBufferSchema = Schema(
-    [Fid, Status, Paddock, Waterpoint, GrazingRadiusTypeField, GrazingRadius, PaddockStatus],
+    [Fid, TimeframeField, Paddock, Status, Waterpoint, GrazingRadiusTypeField, GrazingRadius],
     wkbType=QgsWkbTypes.MultiPolygon)
-WateredAreaSchema = Schema([Fid, WateredTypeField, Status, Paddock, PaddockStatus], wkbType=QgsWkbTypes.MultiPolygon)
+WateredAreaSchema = Schema([Fid, WateredTypeField, Paddock, TimeframeField], wkbType=QgsWkbTypes.MultiPolygon)
 WaterpointSchema = Schema([Fid,
                            Name,
                            Status,
