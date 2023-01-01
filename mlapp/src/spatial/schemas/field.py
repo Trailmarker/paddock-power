@@ -110,6 +110,7 @@ class Field(QgsField):
         layer.setEditorWidgetSetup(fieldIndex, self.editorWidgetSetup())
         layer.setDefaultValueDefinition(fieldIndex, self.defaultValueDefinition())
 
+
 class MeasureField(Field):
     def __init__(self, propertyName, name, dps=2, *args, **kwargs):
         super().__init__(propertyName=propertyName, name=name, type=QVariant.Double,
@@ -123,17 +124,19 @@ class MeasureField(Field):
         super().setupLayer(layer)
 
         # Create a separate, rounded expression field and add that as an expression field
-        # roundedField = QgsField(f"Rounded {self.name()}", QVariant.Double)
-        # roundedField.setAlias(self.name())
-        # layer.addExpressionField(f"round(\"{self.name()}\", {self._dps})", roundedField)
+        roundedField = QgsField(f"Rounded {self.name()}", QVariant.Double)
+        roundedField.setAlias(self.name())
+        layer.addExpressionField(f"round(\"{self.name()}\", {self._dps})", roundedField)
 
-        # # Hide this 'raw' field from the attribute table
-        # config = layer.attributeTableConfig()
-        # columns = config.columns()
-        # column = next(c for c in columns if c.name == self.name())
-        # column.hidden = True
-        # config.setColumns(columns)
-        # layer.setAttributeTableConfig(config)
+        # Hide this 'raw' field from the attribute table
+        config = layer.attributeTableConfig()
+        columns = config.columns()
+        matches = [c for c in columns if c.name == self.name()]
+        if matches:
+            column = matches[0]
+            column.hidden = True
+            config.setColumns(columns)
+            layer.setAttributeTableConfig(config)
 
 
 class StringField(Field):

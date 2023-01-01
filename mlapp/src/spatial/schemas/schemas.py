@@ -46,9 +46,9 @@ GRAZING_RADIUS_TYPE = "Grazing Radius Type"
 LAND_SYSTEM = "Land System"
 LAND_SYSTEM_NAME = "Land System Name"
 LANDSCAPE_CLASS = "Landscape Class"
-LATITUDE = "Latitude"
+LATITUDE = "Latitude" # Weirdly, changing this to "Latitude (°)" broke stuff? TODO
 LENGTH = "Length (km)"
-LONGITUDE = "Longitude"
+LONGITUDE = "Longitude" 
 MAP_UNIT = "Map Unit"
 NAME = "Name"
 NEAR_GRAZING_RADIUS = "Near Grazing Radius (m)"
@@ -70,10 +70,10 @@ WATERPOINT_START_MONTH = "Waterpoint Start Month"
 WATERPOINT_TYPE = "Waterpoint Type"
 
 
-Area = MeasureField(propertyName="featureArea", name=AREA)
+Area = MeasureField(propertyName="featureArea", name=AREA, dps=2)
 BoreReportUrl = StringField(propertyName="boreReportUrl", name=BORE_REPORT_URL)
 BoreYield = MeasureField(propertyName="boreYield", name=BORE_YIELD)
-GrazingRadius = MeasureField(propertyName="grazingRadius", name=GRAZING_RADIUS)
+GrazingRadius = MeasureField(propertyName="grazingRadius", name=GRAZING_RADIUS, dps=0)
 BuildFence = IdField(propertyName="buildFence", name=BUILD_FENCE)
 BuildOrder = IdField(propertyName="buildOrder", name=BUILD_ORDER)
 ClassDescription = StringField(propertyName="classDescription", name=CLASS_DESCRIPTION)
@@ -82,21 +82,21 @@ ConditionTypeField = DomainField(
     name=CONDITION_TYPE,
     domainType=ConditionType,
     defaultValue=ConditionType.A)
-Elevation = MeasureField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'))
+Elevation = MeasureField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'), dps=1)
 ErosionRisk = StringField(propertyName="erosionRisk", name=EROSION_RISK)
-EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=ESTIMATED_CAPACITY)
-EstimatedCapacityPerArea = MeasureField(propertyName="estimatedCapacityPerArea", name=ESTIMATED_CAPACITY_PER_AREA)
-FarGrazingRadius = MeasureField(propertyName="farGrazingRadius", name=FAR_GRAZING_RADIUS, defaultValue="5000.0")
+EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=ESTIMATED_CAPACITY, dps=0)
+EstimatedCapacityPerArea = MeasureField(propertyName="estimatedCapacityPerArea", name=ESTIMATED_CAPACITY_PER_AREA, dps=1)
+FarGrazingRadius = MeasureField(propertyName="farGrazingRadius", name=FAR_GRAZING_RADIUS, defaultValue="5000.0", dps=0)
 Fid = IdField("id", name=FID)
 LandscapeClass = StringField(propertyName="landscapeClass", name=LANDSCAPE_CLASS)
 LandSystem = IdField(propertyName="landSystem", name=LAND_SYSTEM)
 LandSystemName = StringField(propertyName="landSystemName", name=LAND_SYSTEM_NAME)
-Latitude = MeasureField(propertyName="featureLatitude", name=LATITUDE, defaultValue=float('NaN'))
-Length = MeasureField(propertyName="featureLength", name=LENGTH)
-Longitude = MeasureField(propertyName="featureLongitude", name=LONGITUDE, defaultValue=float('NaN'))
+Latitude = MeasureField(propertyName="featureLatitude", name=LATITUDE, defaultValue=float('NaN'), dps=2)
+Length = MeasureField(propertyName="featureLength", name=LENGTH, dps=2)
+Longitude = MeasureField(propertyName="featureLongitude", name=LONGITUDE, defaultValue=float('NaN'), dps=2)
 MapUnit = StringField(propertyName="mapUnit", name=MAP_UNIT)
 Name = StringField(propertyName="name", name=NAME)
-NearGrazingRadius = MeasureField(propertyName="nearGrazingRadius", name=NEAR_GRAZING_RADIUS, defaultValue="3000.0")
+NearGrazingRadius = MeasureField(propertyName="nearGrazingRadius", name=NEAR_GRAZING_RADIUS, defaultValue="3000.0", dps=0)
 Paddock = IdField(propertyName="paddock", name=PADDOCK)
 PaddockName = StringField(propertyName="paddockName", name=PADDOCK_NAME)
 PaddockStatus = DomainField(
@@ -104,9 +104,9 @@ PaddockStatus = DomainField(
     name=PADDOCK_STATUS,
     domainType=FeatureStatus,
     defaultValue=FeatureStatus.Undefined)
-Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER)
-PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY)
-PotentialCapacityPerArea = MeasureField(propertyName="potentialCapacityPerArea", name=POTENTIAL_CAPACITY_PER_AREA)
+Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER, dps=2)
+PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY, dps=0)
+PotentialCapacityPerArea = MeasureField(propertyName="potentialCapacityPerArea", name=POTENTIAL_CAPACITY_PER_AREA, dps=1)
 Reference = StringField(propertyName="reference", name=REFERENCE)
 Status = DomainField(propertyName="status", name=STATUS, domainType=FeatureStatus, defaultValue=FeatureStatus.Undefined)
 TimeframeField = DomainField(

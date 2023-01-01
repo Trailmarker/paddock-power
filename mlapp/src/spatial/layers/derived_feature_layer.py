@@ -20,6 +20,10 @@ class DerivedFeatureLayer(FeatureLayer):
 
         super().__init__(project, init, layerName, "virtual", styleName=styleName)
 
+        # Apply editor widgets and other Field-specific layer setup
+        for field in self.getFeatureType().getSchema():
+            field.setupLayer(self)
+
         self.detectAndRemove()
         QgsProject.instance().addMapLayer(self, False)
 
