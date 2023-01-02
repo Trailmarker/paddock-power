@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSlot
-
 from qgis.core import QgsProject
 
 from .feature_list_base import FeatureListBase
@@ -26,6 +24,7 @@ class FeatureLayerList(FeatureListBase):
         if featureLayer:
             self._featureLayerId = featureLayer.id()
             self.featureLayer.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+            self.featureLayer.currentTimeframeChanged.connect(lambda _: self.refreshUi())
         else:
             self._featureLayerId = None
         self.refreshUi()
@@ -33,6 +32,6 @@ class FeatureLayerList(FeatureListBase):
     def getFeatures(self):
         """Get the Features."""
         if self.featureLayer:
-            return [feature for feature in self.featureLayer.getFeatures()]
+            return [feature for feature in self.featureLayer.getFeaturesInCurrentTimeframe()]
         else:
             return []

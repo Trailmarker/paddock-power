@@ -10,7 +10,7 @@ class MetricPaddock(Feature):
         """Initialise a new Metric Paddock."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
-    @property
-    def focusOnSelect(self):
-        """Return True if the app should focus on this Feature when selected."""
+    @classmethod
+    def focusOnSelect(cls):
+        """Return True if the app should focus on this type of Feature when selected."""
         return False

@@ -10,7 +10,7 @@ class Boundary(Feature):
         """Create a new AreaFeature."""
         super().__init__(featureLayer, existingFeature)
 
-    @property
-    def focusOnSelect(self):
-        """Return True if the app should focus on this Feature when selected."""
+    @classmethod
+    def focusOnSelect(cls):
+        """Return True if the app should focus on this type of Feature when selected."""
         return False

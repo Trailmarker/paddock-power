@@ -22,13 +22,14 @@ class PersistedFeatureLayerList(FeatureLayerList):
             self._featureLayerId = featureLayer.id()
             self.featureLayer.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
             self.featureLayer.featuresPersisted.connect(lambda _: self.refreshUi())
+            self.featureLayer.currentTimeframeChanged.connect(lambda _: self.refreshUi())
         else:
             self._featureLayerId = None
         self.refreshUi()
 
-    def getFeatures(self):
-        """Get the Features."""
-        if self.featureLayer:
-            return [feature for feature in self.featureLayer.getFeaturesByStatus(*self.featureLayer.displayFilter)]
-        else:
-            return []
+    # def getFeatures(self):
+    #     """Get the Features."""
+    #     if self.featureLayer:
+    #         return [feature for feature in self.featureLayer.getFeaturesByStatus(*self.featureLayer.displayFilter)]
+    #     else:
+    #         return []

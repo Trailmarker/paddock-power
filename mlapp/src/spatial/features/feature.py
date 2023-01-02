@@ -5,7 +5,8 @@ from re import finditer
 from qgis.core import QgsFeature, QgsProject, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ..schemas.schemas import FID, FeatureSchema
+from ..schemas.schemas import FID, STATUS, TIMEFRAME, FeatureSchema
+from ..schemas.timeframe import Timeframe
 
 
 @FeatureSchema.addSchema()
@@ -21,6 +22,11 @@ class Feature(QObject):
     def getWkbType(cls):
         """Return the Feature's wkbType."""
         raise NotImplementedError("Feature.getWkbType: must be implemented in subclass")
+
+    @classmethod
+    def focusOnSelect(cls):
+        """Return True if the app should focus on this type of Feature when selected."""
+        return True
 
     @classmethod
     def checkSchema(cls, fieldsToCheck):
@@ -85,9 +91,22 @@ class Feature(QObject):
         return False
 
     @property
-    def focusOnSelect(self):
-        """Return True if the app should focus on this Feature when selected."""
-        return True
+    def hasTimeframe(self):
+        """Return True if this layer has a """
+        return TIMEFRAME in [field.name() for field in type(self).getSchema()]
+
+    @property
+    def hasStatus(self):
+        return STATUS in [field.name() for field in type(self).getSchema()]
+
+    def matchTimeframe(self, timeframe):
+        """Return True if this feature's timeframe or status matches the supplied timeframe."""
+        if self.hasTimeframe:
+            return Timeframe[self.timeframe.name] == Timeframe[timeframe.name]
+        elif self.hasStatus:
+            return timeframe.matchFeatureStatus(self.status)
+        else:
+            return False
 
     @pyqtSlot()
     def selectFeature(self):

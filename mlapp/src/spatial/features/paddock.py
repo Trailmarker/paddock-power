@@ -95,7 +95,7 @@ class Paddock(AreaFeature):
     def onSelectFeature(self):
         """Do the stuff we'd normally do, but also add the Paddock Land Systems popup layer."""
         super().onSelectFeature()
-        qgsDebug(f"{self}.onSelectFeature()")
+        # qgsDebug(f"{self}.onSelectFeature()")
         self.addPopupLayer()
 
     def onDeselectFeature(self):
