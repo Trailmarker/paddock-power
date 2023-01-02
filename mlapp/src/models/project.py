@@ -5,7 +5,7 @@ from ..spatial.features.feature import Feature
 from ..spatial.layers.feature_layer import FeatureLayer
 from ..spatial.schemas.timeframe import Timeframe
 from ..tools.map_tool import MapTool
-from ..utils import PLUGIN_NAME
+from ..utils import PLUGIN_NAME, qgsDebug
 from ..views.feature_view.feature_view import FeatureView
 from .glitch import Glitch
 from .project_base import ProjectBase
@@ -47,7 +47,7 @@ class Project(ProjectBase):
             self.iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
 
-    def setCurrentTimeFrame(self, timeframe):
+    def setCurrentTimeframe(self, timeframe):
         if self.currentTimeframe != timeframe:
             self.currentTimeframe = timeframe
             self.currentTimeframeChanged.emit(timeframe)

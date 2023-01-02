@@ -3,8 +3,10 @@
         <file>images/build-feature.png</file>
         <file>images/cancel-edit-item.png</file>
         <file>images/clear-text.png</file>
+        <file>images/current.png</file>
         <file>images/edit-item.png</file>
         <file>images/fence.png</file>
+        <file>images/future.png</file>
         <file>images/icon.png</file>
         <file>images/new-fence.png</file>
         <file>images/new-paddock-power.png</file>
@@ -32,6 +34,5 @@
         <file>src/widgets/condition_type_label/condition_type_label.qss</file>
         <file>src/widgets/feature_status_label/feature_status_label.qss</file>
         <file>src/widgets/state_machine_tool_bar/state_machine_tool_bar.qss</file>
-
     </qresource>
 </RCC>

@@ -52,6 +52,46 @@
        </spacer>
       </item>
       <item>
+       <widget class="QToolButton" name="currentTimeframeButton">
+        <property name="toolTip">
+         <string>Show the Property as it is now</string>
+        </property>
+        <property name="text">
+         <string>Current</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/current.png</normaloff>../../../images/current.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="futureTimeframeButton">
+        <property name="toolTip">
+         <string>Show the Property with all Planned features</string>
+        </property>
+        <property name="text">
+         <string>Future</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../images/future.png</normaloff>../../../images/future.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="sketchFenceButton">
         <property name="toolTip">
          <string>Sketch a Fence …</string>
@@ -60,7 +100,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources.qrc">
+         <iconset>
           <normaloff>:/plugins/mlapp/images/new-fence.png</normaloff>:/plugins/mlapp/images/new-fence.png</iconset>
         </property>
        </widget>
@@ -74,7 +114,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources.qrc">
+         <iconset>
           <normaloff>:/plugins/mlapp/images/new-pipeline.png</normaloff>:/plugins/mlapp/images/new-pipeline.png</iconset>
         </property>
        </widget>
@@ -88,7 +128,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources.qrc">
+         <iconset>
           <normaloff>:/plugins/mlapp/images/new-waterpoint.png</normaloff>:/plugins/mlapp/images/new-waterpoint.png</iconset>
         </property>
        </widget>

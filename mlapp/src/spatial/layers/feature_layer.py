@@ -9,6 +9,7 @@ from ...models.glitch import Glitch
 from ...models.qt_abstract_meta import QtAbstractMeta
 from ...utils import resolveStylePath, PLUGIN_NAME
 from ..features.feature import Feature
+from ..schemas.timeframe import Timeframe
 
 
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
@@ -42,6 +43,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         # Project for *all* Paddock Power FeatureLayers
         self.connectedToProject = True
         self._project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+        self._project.currentTimeframeChanged.connect(self.onCurrentTimeframeChanged)
         self.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(selection))
 
     def detectAndRemove(self):
@@ -172,3 +174,8 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
         finally:
             self.connectedToProject = True
+
+    @pyqtSlot(Timeframe)
+    def onCurrentTimeframeChanged(self, _):
+        """Handle the current timeframe changing."""
+        self.triggerRepaint(deferredUpdate=False)
