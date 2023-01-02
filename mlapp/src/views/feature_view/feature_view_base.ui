@@ -74,7 +74,7 @@
       <item>
        <widget class="QToolButton" name="futureTimeframeButton">
         <property name="toolTip">
-         <string>Show the Property with all Planned features</string>
+         <string>Show the Property with all planned changes</string>
         </property>
         <property name="text">
          <string>Future</string>
