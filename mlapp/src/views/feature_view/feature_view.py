@@ -8,10 +8,10 @@ from qgis.PyQt.QtWidgets import QToolBar
 
 from ...utils import getComponentStyleSheet, PLUGIN_FOLDER
 from ..view_base import ViewBase
-from ..fence_view.fence_widget import FenceWidget
-from ..paddock_view.paddock_widget import PaddockWidget
-from ..pipeline_view.pipeline_widget import PipelineWidget
-from ..waterpoint_view.waterpoint_widget import WaterpointWidget
+from ..fence_widget import FenceWidget
+from ..paddock_widget import PaddockWidget
+from ..pipeline_widget import PipelineWidget
+from ..waterpoint_widget import WaterpointWidget
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'feature_view_base.ui')))

@@ -7,7 +7,7 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from qgis.core import QgsGeometry
 
-from ...tools.sketch_point_tool import SketchPointTool
+from ..tools.sketch_point_tool import SketchPointTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'waterpoint_widget_base.ui')))

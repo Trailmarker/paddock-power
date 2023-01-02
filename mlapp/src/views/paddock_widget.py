@@ -5,8 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
-from ...utils import qgsDebug
+from ..spatial.layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(

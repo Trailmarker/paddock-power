@@ -7,9 +7,9 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from qgis.core import QgsGeometry
 
-from ...spatial.features.fence import Fence
-from ...spatial.features.persisted_feature import Feature
-from ...tools.sketch_line_tool import SketchLineTool
+from ..spatial.features.fence import Fence
+from ..spatial.features.persisted_feature import Feature
+from ..tools.sketch_line_tool import SketchLineTool
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_widget_base.ui')))
