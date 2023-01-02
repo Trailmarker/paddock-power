@@ -4,7 +4,7 @@ from math import hypot
 from shapely.wkb import loads
 from shapely.wkt import dumps
 
-from qgis.core import QgsCoordinateReferenceSystem, QgsDistanceArea, QgsGeometry, QgsPoint, QgsPointXY, QgsProject, QgsRaster
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsDistanceArea, QgsGeometry, QgsPoint, QgsPointXY, QgsProject, QgsRaster
 
 from ..utils import PLUGIN_NAME
 from ..models.glitch import Glitch
@@ -37,6 +37,22 @@ class Calculator:
         pointXY = point.asPoint()
         dataProvider = elevationLayer.dataProvider()
         return dataProvider.identify(pointXY, QgsRaster.IdentifyFormatValue).results()[1]
+
+    @staticmethod
+    def calculateLongitudeAndLatitudeAtPoint(point):
+        if not isinstance(point, QgsGeometry):
+            raise Glitch(
+                "Calculator.calculateCoordinatesAtPoint: point is not a QgsGeometry.")
+
+        copy = QgsGeometry(point)
+
+        destCrs = QgsCoordinateReferenceSystem('EPSG:7844')
+        sourceCrs = QgsCoordinateReferenceSystem('EPSG:7845')
+        transform = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+        copy.transform(transform)
+
+        outputPoint = copy.asPoint()
+        return (outputPoint.x(), outputPoint.y())
 
     @staticmethod
     def calculateProfile(line, elevationLayer=None):

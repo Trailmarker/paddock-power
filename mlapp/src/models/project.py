@@ -29,6 +29,9 @@ class Project(ProjectBase):
         self.currentTool = None
         self.currentTimeframe = Timeframe.Current
         self.views = {}
+        self.selectedFeature = None
+
+        self.currentTimeframeChanged.connect(self.deselectFeature)
 
     def setTool(self, tool):
         """Set the current tool for this Project."""
@@ -49,10 +52,22 @@ class Project(ProjectBase):
 
     def setCurrentTimeframe(self, timeframe):
         if self.currentTimeframe != timeframe:
+            # If our current feature is not in the new timeframe, deselect it
+            if self.selectedFeature and not self.selectedFeature.matchTimeframe(timeframe):
+                qgsDebug("Deselecting feature because it is not in the new timeframe")
+                self.deselectFeature()
+
+            # qgsDebug(f"Setting project timeframe to: {timeframe}")
             self.currentTimeframe = timeframe
             self.currentTimeframeChanged.emit(timeframe)
 
+    def deselectFeature(self):
+        """Deselect any current feature."""
+        self.selectedFeatureChanged.emit(None)
+
     def selectFeature(self, feature):
+        """Select a feature."""
+        self.selectedFeature = feature
         self.selectedFeatureChanged.emit(feature)
 
     @pyqtSlot()
@@ -71,7 +86,7 @@ class Project(ProjectBase):
         if len(selection) == 1:
             feature = layer.getFeature(selection[0])
             if feature is not None:
-                self.selectFeature(feature)
+                self.selectFeature(feature)        
 
     def openView(self, viewType, dockArea):
         if viewType not in self.views:

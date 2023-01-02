@@ -130,7 +130,11 @@ class FeatureListItem(QWidget, EditStateMachine):
 
     @property
     def hasStatus(self):
-        return isinstance(self.feature, StatusFeature)
+        return self.feature and self.feature.hasStatus
+
+    @property
+    def hasTimeFrame(self):
+        return self.feature and self.feature.hasTimeframe
 
     @property
     def isEditable(self):

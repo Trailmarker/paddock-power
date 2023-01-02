@@ -7,7 +7,7 @@ from qgis.core import QgsProject, QgsVectorLayer
 
 from ...models.glitch import Glitch
 from ...models.qt_abstract_meta import QtAbstractMeta
-from ...utils import resolveStylePath, PLUGIN_NAME
+from ...utils import qgsDebug, resolveStylePath, PLUGIN_NAME
 from ..features.feature import Feature
 from ..schemas.timeframe import Timeframe
 
@@ -15,6 +15,7 @@ from ..schemas.timeframe import Timeframe
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
     # emit this signal when a selected Feature is updated
+    currentTimeframeChanged = pyqtSignal(Timeframe)
     selectedFeatureChanged = pyqtSignal(Feature)
 
     @abstractmethod
@@ -45,6 +46,10 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         self._project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self._project.currentTimeframeChanged.connect(self.onCurrentTimeframeChanged)
         self.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(selection))
+
+    @property
+    def currentTimeframe(self):
+        return self._project.currentTimeframe
 
     def detectAndRemove(self):
         """Detect if a layer is already in the map, and if so, remove it."""
@@ -99,6 +104,12 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         """Get the PaddockPowerProject for this layer."""
         return self._project
 
+    def getFeaturesInCurrentTimeframe(self, request=None):
+        """Get the features in this layer that are in the current timeframe."""
+        features = self.getFeatures(request)
+        # qgsDebug(f"{self.__class__.__name__}.getFeaturesInCurrentTimeframe({self.currentTimeframe})")
+        return [f for f in features if f.matchTimeframe(self.currentTimeframe)]
+
     def getFeature(self, fid):
         """Get a feature by its ID."""
         feature = super().getFeature(fid)
@@ -114,6 +125,10 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
     def featureCount(self):
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
+
+    def focusOnSelect(self):
+        """Return True if the type of Feature in this FeatureLayer should be focused when selected."""
+        return self.getFeatureType().focusOnSelect()
 
     @pyqtSlot(list)
     def onLayerSelectionChanged(self, selection):
@@ -143,7 +158,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: ourFeature={ourFeature}")
 
             # Are we going to focus based on this new Feature?
-            focusOnSelect = (feature is not None) and feature.focusOnSelect
+            focusOnSelect = self.focusOnSelect()
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: focusOnSelect={focusOnSelect}")
 
             # Is it the same one that's already selected?
@@ -176,6 +191,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             self.connectedToProject = True
 
     @pyqtSlot(Timeframe)
-    def onCurrentTimeframeChanged(self, _):
+    def onCurrentTimeframeChanged(self, timeframe):
         """Handle the current timeframe changing."""
         self.triggerRepaint(deferredUpdate=False)
+        self.currentTimeframeChanged.emit(timeframe)

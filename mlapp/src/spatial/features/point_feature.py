@@ -24,6 +24,8 @@ class PointFeature(StatusFeature):
 
     def recalculate(self):
         """Recalculate the longitude, latitude and elevation of the PointFeature."""
-        elevation = round(Calculator.calculateElevationAtPoint(self.geometry, self.elevationLayer), 2)
-        # TODO Latitude and Longitude
+        elevation = Calculator.calculateElevationAtPoint(self.geometry, self.elevationLayer)
+        (longitude, latitude) = Calculator.calculateLongitudeAndLatitudeAtPoint(self.geometry)
+        self.longitude = longitude
+        self.latitude = latitude
         self.featureElevation = elevation

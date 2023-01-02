@@ -23,9 +23,9 @@ class PaddockLandSystem(PersistedFeature):
     def title(self):
         return f"{self.landSystemName} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
 
-    @property
-    def focusOnSelect(self):
-        """Return True if the app should focus on this Feature when selected."""
+    @classmethod
+    def focusOnSelect(cls):
+        """Return True if the app should focus on this type of Feature when selected."""
         return False
 
     def upsertCondition(self, conditionType):
