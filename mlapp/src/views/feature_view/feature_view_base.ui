@@ -61,7 +61,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../../images/current.png</normaloff>../../../images/current.png</iconset>
+          <normaloff>:/plugins/mlapp/images/current.png</normaloff>:/plugins/mlapp/images/current.png</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -81,7 +81,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../../images/future.png</normaloff>../../../images/future.png</iconset>
+          <normaloff>:/plugins/mlapp/images/future.png</normaloff>:/plugins/mlapp/images/future.png</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
