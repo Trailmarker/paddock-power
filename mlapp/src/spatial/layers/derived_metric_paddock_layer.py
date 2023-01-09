@@ -2,8 +2,8 @@
 from qgis.core import QgsFeatureRequest
 
 from ..features.metric_paddock import MetricPaddock
-from ..schemas.schemas import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME
-from ..schemas.timeframe import Timeframe
+from ..fields.names import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME
+from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
 

@@ -3,11 +3,11 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsProject
 
+from ..fields.schemas import WaterpointSchema
 from ..layers.waterpoint_popup_layer import WaterpointPopupLayer
 from .edits import Edits
 from .feature_action import FeatureAction
 from .point_feature import PointFeature
-from ..schemas.schemas import WaterpointSchema
 
 
 @WaterpointSchema.addSchema()

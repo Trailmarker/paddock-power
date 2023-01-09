@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ...models.state_machine import StateMachine
 from .feature_action import FeatureAction
-from ..schemas.feature_status import FeatureStatus
+from ..fields.feature_status import FeatureStatus
 
 
 class FeatureStateMachine(StateMachine):

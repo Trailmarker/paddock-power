@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from ..calculator import Calculator
 from ..features.watered_area import WateredArea
-from ..schemas.feature_status import FeatureStatus
-from ..schemas.schemas import FID, PADDOCK, STATUS, GRAZING_RADIUS_TYPE, TIMEFRAME, WATERED_TYPE
-from ..schemas.timeframe import Timeframe
-from ..schemas.grazing_radius_type import GrazingRadiusType
-from ..schemas.watered_type import WateredType
+from ..fields.names import FID, PADDOCK, STATUS, GRAZING_RADIUS_TYPE, TIMEFRAME, WATERED_TYPE
+from ..fields.timeframe import Timeframe
+from ..fields.grazing_radius_type import GrazingRadiusType
+from ..fields.watered_type import WateredType
 from .derived_feature_layer import DerivedFeatureLayer
 
 

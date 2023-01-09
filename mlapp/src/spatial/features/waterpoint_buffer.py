@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..schemas.schemas import WaterpointBufferSchema
+from ..fields.schemas import WaterpointBufferSchema
 from .persisted_feature import PersistedFeature
 
 

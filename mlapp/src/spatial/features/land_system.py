@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .persisted_feature import PersistedFeature
-from ..schemas.schemas import LandSystemSchema
+from ..fields.schemas import LandSystemSchema
 
 
 @LandSystemSchema.addSchema()

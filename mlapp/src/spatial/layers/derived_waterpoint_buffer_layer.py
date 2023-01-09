@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from ..calculator import Calculator
 from ..features.waterpoint_buffer import WaterpointBuffer
-from ..schemas.schemas import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE
-from ..schemas.grazing_radius_type import GrazingRadiusType
-from ..schemas.timeframe import Timeframe
-from ..schemas.waterpoint_type import WaterpointType
+from ..fields.names import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE
+from ..fields.grazing_radius_type import GrazingRadiusType
+from ..fields.timeframe import Timeframe
+from ..fields.waterpoint_type import WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..features.paddock_land_system import PaddockLandSystem
-from ..schemas.schemas import LAND_SYSTEM_NAME, PADDOCK, TIMEFRAME
+from ..fields.schemas import LAND_SYSTEM_NAME, PADDOCK, TIMEFRAME
 from .derived_feature_layer import DerivedFeatureLayer
 
 

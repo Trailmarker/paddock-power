@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.schemas.condition_type import ConditionType
+from ...spatial.fields.condition_type import ConditionType
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_land_system_details_edit_base.ui')))

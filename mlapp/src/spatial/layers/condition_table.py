@@ -4,7 +4,7 @@ import sqlite3
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from ...utils import qgsInfo, PLUGIN_NAME
-from ..schemas.condition_type import ConditionType
+from ..fields.condition_type import ConditionType
 
 
 class ConditionTable(QObject):

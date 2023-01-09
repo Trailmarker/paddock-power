@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint_buffer import WaterpointBuffer
-from ..schemas.schemas import GRAZING_RADIUS_TYPE, WATERPOINT
+from ..fields.schemas import GRAZING_RADIUS_TYPE, WATERPOINT
 from .derived_feature_layer import DerivedFeatureLayer
 
 

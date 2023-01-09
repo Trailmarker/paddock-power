@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..features.boundary import Boundary
-from ..schemas.schemas import STATUS, TIMEFRAME
-from ..schemas.timeframe import Timeframe
+from ..fields.schemas import STATUS, TIMEFRAME
+from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
 

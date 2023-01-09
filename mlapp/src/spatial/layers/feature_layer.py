@@ -9,7 +9,7 @@ from ...models.glitch import Glitch
 from ...models.qt_abstract_meta import QtAbstractMeta
 from ...utils import qgsDebug, resolveStylePath, PLUGIN_NAME
 from ..features.feature import Feature
-from ..schemas.timeframe import Timeframe
+from ..fields.timeframe import Timeframe
 
 
 class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .feature import Feature
-from ..schemas.schemas import BoundarySchema
+from ..fields.schemas import BoundarySchema
 
 
 @BoundarySchema.addSchema()

@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsCategorizedSymbolRenderer
 
 from ...utils import PLUGIN_NAME
-from ..schemas.feature_status import FeatureStatus
+from ..fields.feature_status import FeatureStatus
 from .persisted_feature_layer import PersistedFeatureLayer
 
 

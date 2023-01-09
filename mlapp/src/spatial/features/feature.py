@@ -5,8 +5,9 @@ from re import finditer
 from qgis.core import QgsFeature, QgsProject, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ..schemas.schemas import FID, STATUS, TIMEFRAME, FeatureSchema
-from ..schemas.timeframe import Timeframe
+from ..fields.names import STATUS, TIMEFRAME
+from ..fields.schemas import FeatureSchema
+from ..fields.timeframe import Timeframe
 
 
 @FeatureSchema.addSchema()

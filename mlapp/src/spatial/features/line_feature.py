@@ -2,7 +2,7 @@
 from qgis.core import QgsProject
 
 from ..calculator import Calculator
-from ..schemas.schemas import LineFeatureSchema
+from ..fields.schemas import LineFeatureSchema
 from .status_feature import StatusFeature
 
 

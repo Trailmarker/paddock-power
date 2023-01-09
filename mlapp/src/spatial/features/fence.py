@@ -7,9 +7,9 @@ from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
 from .edits import Edits
 from .feature_action import FeatureAction
-from ..schemas.feature_status import FeatureStatus
+from ..fields.feature_status import FeatureStatus
 from .line_feature import LineFeature
-from ..schemas.schemas import FenceSchema, BUILD_FENCE
+from ..fields.schemas import FenceSchema, BUILD_FENCE
 
 
 @FenceSchema.addSchema()

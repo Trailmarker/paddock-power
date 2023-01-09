@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
 
 from ..spatial.features.feature import Feature
 from ..spatial.layers.feature_layer import FeatureLayer
-from ..spatial.schemas.timeframe import Timeframe
+from ..spatial.fields.timeframe import Timeframe
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, qgsDebug
 from ..views.feature_view.feature_view import FeatureView

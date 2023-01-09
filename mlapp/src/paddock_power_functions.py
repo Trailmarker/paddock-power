@@ -2,9 +2,9 @@
 from qgis.core import qgsfunction
 from qgis.utils import plugins
 
-from .spatial.schemas.feature_status import FeatureStatus
-from .spatial.schemas.timeframe import Timeframe
-from .spatial.schemas.waterpoint_type import WaterpointType
+from .spatial.fields.feature_status import FeatureStatus
+from .spatial.fields.timeframe import Timeframe
+from .spatial.fields.waterpoint_type import WaterpointType
 from .utils import PLUGIN_FOLDER, PLUGIN_NAME
 
 

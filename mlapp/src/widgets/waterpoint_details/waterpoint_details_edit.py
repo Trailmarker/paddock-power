@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
 from ...spatial.features.waterpoint import Waterpoint
-from ...spatial.schemas.waterpoint_type import WaterpointType
+from ...spatial.fields.waterpoint_type import WaterpointType
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'waterpoint_details_edit_base.ui')))

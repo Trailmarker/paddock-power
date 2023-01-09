@@ -2,8 +2,8 @@
 from .edits import Edits
 from .persisted_feature import PersistedFeature
 from .feature_action import FeatureAction
-from ..schemas.schemas import StatusFeatureSchema
-from ..schemas.timeframe import Timeframe
+from ..fields.schemas import StatusFeatureSchema
+from ..fields.timeframe import Timeframe
 from .feature_state_machine import FeatureStateMachine
 
 

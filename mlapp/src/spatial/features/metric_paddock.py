@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..schemas.schemas import MetricPaddockSchema
+from ..fields.schemas import MetricPaddockSchema
 from .feature import Feature
 
 

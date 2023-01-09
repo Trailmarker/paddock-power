@@ -2,7 +2,7 @@
 from qgis.core import QgsFeatureRequest, QgsProject
 
 from ...models.glitch import Glitch
-from ..schemas.feature_status import FeatureStatus
+from ..fields.feature_status import FeatureStatus
 from ..features.fence import Fence
 from .status_feature_layer import StatusFeatureLayer
 

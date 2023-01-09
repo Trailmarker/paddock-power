@@ -2,7 +2,7 @@
 from .edits import Edits
 from .feature_action import FeatureAction
 from .line_feature import LineFeature
-from ..schemas.schemas import PipelineSchema
+from ..fields.schemas import PipelineSchema
 
 
 @PipelineSchema.addSchema()

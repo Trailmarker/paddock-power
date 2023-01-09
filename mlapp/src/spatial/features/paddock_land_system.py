@@ -2,7 +2,7 @@
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .persisted_feature import PersistedFeature
-from ..schemas.schemas import PaddockLandSystemSchema
+from ..fields.schemas import PaddockLandSystemSchema
 
 
 @PaddockLandSystemSchema.addSchema()

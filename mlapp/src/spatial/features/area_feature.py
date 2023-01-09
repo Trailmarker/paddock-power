@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..calculator import Calculator
-from ..schemas.schemas import AreaFeatureSchema
+from ..fields.schemas import AreaFeatureSchema
 from .status_feature import StatusFeature
 
 
