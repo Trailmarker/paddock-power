@@ -74,6 +74,8 @@ class FeatureView(ViewBase, FORM_CLASS):
         self.tabWidget.setCornerWidget(self.toolBar)
 
         self.refreshUi()
+        
+        self.project.currentTimeframeChanged.connect(lambda _: self.refreshUi())
 
         # Experimentation with customising the tab bar
         # self.tabWidget.setCornerWidget(QPushButton('Add Feature'), Qt.TopLeftCorner)

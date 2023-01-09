@@ -49,7 +49,12 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
     @property
     def currentTimeframe(self):
+        """Get the current timeframe for this layer (same as that of the project)."""
         return self._project.currentTimeframe
+
+    def setCurrentTimeframe(self, timeframe):
+        """Set the current timeframe for this layer. This will also set the current timeframe for the project."""
+        self._project.setCurrentTimeframe(timeframe)
 
     def detectAndRemove(self):
         """Detect if a layer is already in the map, and if so, remove it."""
