@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from ...models.state_machine import StateMachine
-from .feature_action import FeatureAction
 from ..fields.feature_status import FeatureStatus
+from ..fields.timeframe import Timeframe
+from .feature_action import FeatureAction
 
 
 class FeatureStateMachine(StateMachine):
@@ -32,6 +33,26 @@ class FeatureStateMachine(StateMachine):
         (FeatureStatus.BuiltSuperseded, FeatureAction.undoSupersede): FeatureStatus.Built,
         (FeatureStatus.BuiltSuperseded, FeatureAction.archive): FeatureStatus.Archived,
     }
+
+    def doAction(self, action):
+        """Perform an action on the Feature state machine and update the current timeframe if necessary."""
+        newTimeframe = self.featureLayer.currentTimeframe
+        actionPermitted = self.isPermitted(action)
+
+        if actionPermitted:
+            newStatus = self.transitions[(self.status, action)]
+
+            if not newTimeframe.matchFeatureStatus(newStatus):
+
+                for tf in [Timeframe.Current, Timeframe.Future]:
+                    if tf.matchFeatureStatus(newStatus):
+                        newTimeframe = tf
+                        break
+
+        super().doAction(action)
+
+        if actionPermitted:
+            self.featureLayer.setCurrentTimeframe(newTimeframe)
 
     @property
     def transitions(self):

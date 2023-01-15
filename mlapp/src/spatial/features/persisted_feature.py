@@ -22,7 +22,7 @@ class PersistedFeature(Feature):
         if not existingFeature:
             # Build an empty QgsFeature and wrap it up
             fields = QgsFields()
-            for field in self.getSchema():
+            for field in featureLayer.fields():
                 fields.append(field)
             qgsFeature = QgsFeature(fields)
 
