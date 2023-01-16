@@ -4,10 +4,10 @@ from ..fields.schemas import LandTypeSchema
 
 
 @LandTypeSchema.addSchema()
-class LandSystem(PersistedFeature):
+class LandType(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
-        """Create a new LandSystem."""
+        """Create a new LandType."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
     @classmethod

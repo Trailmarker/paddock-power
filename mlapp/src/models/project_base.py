@@ -9,8 +9,8 @@ from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from ..spatial.layers.fence_layer import FenceLayer
-from ..spatial.layers.land_type_layer import LandSystemLayer
-from ..spatial.layers.paddock_land_types_layer import PaddockLandSystemsLayer
+from ..spatial.layers.land_type_layer import LandTypeLayer
+from ..spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
@@ -37,7 +37,7 @@ class ProjectBase(QObject):
                                            self.elevationLayer)
 
         landTypeLayerName = "Land Types"
-        self.landTypeLayer = LandSystemLayer(self, self.gpkgFile, landTypeLayerName)
+        self.landTypeLayer = LandTypeLayer(self, self.gpkgFile, landTypeLayerName)
 
         self.conditionTable = ConditionTable(self, self.gpkgFile, "Condition Table")
 
@@ -56,7 +56,7 @@ class ProjectBase(QObject):
             self, self.gpkgFile, waterpointBufferLayerName, self.waterpointLayer, self.paddockLayer)
 
         # Waterpoints and Waterpoint Buffers are closely linked, not sure how to make this neater
-        # Same goes for Paddocks and Paddock Land Systems
+        # Same goes for Paddocks and Paddock Land Types
         self.waterpointLayer.waterpointBufferLayer = self.waterpointBufferLayer
 
         wateredAreaLayerName = f"Watered Areas"
@@ -75,20 +75,20 @@ class ProjectBase(QObject):
         boundaryLayerName = f"Boundary"
         self.boundaryLayer = BoundaryLayer(self, boundaryLayerName, self.paddockLayer)
 
-        paddockLandSystemsLayerName = f"Paddock Land Types"
-        self.paddockLandSystemsLayer = PaddockLandSystemsLayer(
+        paddockLandTypesLayerName = f"Paddock Land Types"
+        self.paddockLandTypesLayer = PaddockLandTypesLayer(
             self,
             self.gpkgFile,
-            paddockLandSystemsLayerName,
+            paddockLandTypesLayerName,
             self.paddockLayer,
             self.landTypeLayer,
             self.wateredAreaLayer,
             self.conditionTable)
-        self.paddockLayer.paddockLandSystemsLayer = self.paddockLandSystemsLayer
+        self.paddockLayer.paddockLandTypesLayer = self.paddockLandTypesLayer
 
         derivedMetricPaddockLayerName = f"Paddocks"
         self.derivedMetricPaddockLayer = DerivedMetricPaddockLayer(
-            self, derivedMetricPaddockLayerName, self.paddockLayer, self.paddockLandSystemsLayer)
+            self, derivedMetricPaddockLayerName, self.paddockLayer, self.paddockLandTypesLayer)
 
         self.paddockLayer.derivedMetricPaddockLayer = self.derivedMetricPaddockLayer
 
@@ -112,8 +112,8 @@ class ProjectBase(QObject):
         self.wateredAreaLayer.addToMap(group)
         self.landTypeLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
-        # Hide Paddock Land Systems layer
-        # self.paddockLandSystemsLayer.addToMap(group)
+        # Hide Paddock Land Types layer
+        # self.paddockLandTypessLayer.addToMap(group)
         # Replace Paddock layer with Derived Metric Paddock layer in our view
         # self.paddockLayer.addToMap(group)
         self.derivedMetricPaddockLayer.addToMap(group)

@@ -33,7 +33,7 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Land system</string>
+        <string notr="true">Land type</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

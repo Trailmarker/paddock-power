@@ -8,7 +8,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_land_type_details_base.ui')))
 
 
-class PaddockLandSystemDetails(QWidget, FORM_CLASS):
+class PaddockLandTypeDetails(QWidget, FORM_CLASS):
 
     def __init__(self, paddockLandType, parent=None):
         """Constructor."""
@@ -24,4 +24,4 @@ class PaddockLandSystemDetails(QWidget, FORM_CLASS):
             self.estimatedCapacityText.setValue(self.paddockLandType.estimatedCapacity, "{0:.0f}")
             self.potentialCapacityText.setValue(self.paddockLandType.potentialCapacity, "{0:.0f}")
             self.estimatedCapacityPerAreaText.setValue(self.paddockLandType.estimatedCapacityPerArea, "{0:.1f}")
-            # self.potentialCapacityPerAreaText.setValue(self.paddockLandSystem.potentialCapacityPerArea, "{0:.1f}")
+            # self.potentialCapacityPerAreaText.setValue(self.paddockLandType.potentialCapacityPerArea, "{0:.1f}")

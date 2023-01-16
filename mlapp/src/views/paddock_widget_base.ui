@@ -82,7 +82,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="paddockLandSystemListGroupBox">
+     <widget class="QGroupBox" name="paddockLandTypeListGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
@@ -90,9 +90,9 @@
        </sizepolicy>
       </property>
       <property name="title">
-       <string>Paddock Land Systems</string>
+       <string>Paddock Land Types</string>
       </property>
-      <layout class="QVBoxLayout" name="paddockLandSystemsVerticalLayout">
+      <layout class="QVBoxLayout" name="paddockLandTypesVerticalLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -106,7 +106,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockLandSystemsLayerList" name="paddockLandSystemList"/>
+        <widget class="PaddockLandTypesLayerList" name="paddockLandTypeList"/>
        </item>
       </layout>
      </widget>
@@ -129,7 +129,7 @@
    <header>mlapp/src/widgets/feature_list/paddock_layer_list</header>
   </customwidget>
   <customwidget>
-   <class>PaddockLandSystemsLayerList</class>
+   <class>PaddockLandTypesLayerList</class>
    <extends>QListWidget</extends>
    <header>mlapp/src/widgets/feature_list/paddock_land_types_layer_list</header>
   </customwidget>

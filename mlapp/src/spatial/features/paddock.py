@@ -6,8 +6,8 @@ from qgis.core import QgsProject
 from ...utils import qgsDebug
 from ..layers.condition_table import ConditionTable
 from ..layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
-from ..layers.paddock_land_types_layer import PaddockLandSystemsLayer
-from ..layers.paddock_land_types_popup_layer import PaddockLandSystemsPopupLayer
+from ..layers.paddock_land_types_layer import PaddockLandTypesLayer
+from ..layers.paddock_land_types_popup_layer import PaddockLandTypesPopupLayer
 from ..fields.schemas import PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits
@@ -17,16 +17,16 @@ from .feature_action import FeatureAction
 @PaddockSchema.addSchema()
 class Paddock(AreaFeature):
 
-    popupLayerAdded = pyqtSignal(PaddockLandSystemsPopupLayer)
+    popupLayerAdded = pyqtSignal(PaddockLandTypesPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
     def __init__(self, featureLayer, derivedMetricPaddockLayer: DerivedMetricPaddockLayer,
-                 paddockLandSystemsLayer: PaddockLandSystemsLayer, conditionTable: ConditionTable, existingFeature=None):
+                 paddockLandTypesLayer: PaddockLandTypesLayer, conditionTable: ConditionTable, existingFeature=None):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
         self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id()
-        self._paddockLandSystemsLayerId = paddockLandSystemsLayer.id()
+        self._paddockLandTypesLayerId = paddockLandTypesLayer.id()
         self.conditionTable = conditionTable
 
         self._popupLayerId = None
@@ -40,8 +40,8 @@ class Paddock(AreaFeature):
         return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId)
 
     @property
-    def paddockLandSystemsLayer(self):
-        return QgsProject.instance().mapLayer(self._paddockLandSystemsLayerId)
+    def paddockLandTypesLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLandTypesLayerId)
 
     @property
     def popupLayer(self):
@@ -56,17 +56,17 @@ class Paddock(AreaFeature):
         if not self.popupLayer:
             item = QgsProject.instance().layerTreeRoot().findLayer(self.derivedMetricPaddockLayer)
             if not item:
-                # If the Metric Paddocks layer isn't in the map, don't initialise or add the Paddock Land Systems layer.
+                # If the Metric Paddocks layer isn't in the map, don't initialise or add the Paddock Land Types layer.
                 return
 
-            # Remove any existing Paddock Land Systems popup layers - they don't play nice together
-            PaddockLandSystemsPopupLayer.detectAndRemoveAllOfType()
+            # Remove any existing Paddock Land Types popup layers - they don't play nice together
+            PaddockLandTypesPopupLayer.detectAndRemoveAllOfType()
 
-            self.popupLayer = PaddockLandSystemsPopupLayer(
+            self.popupLayer = PaddockLandTypesPopupLayer(
                 self.featureLayer.getPaddockPowerProject(),
-                f"{self.name} Land Systems",
+                f"{self.name} Land Types",
                 self,
-                self.paddockLandSystemsLayer,
+                self.paddockLandTypesLayer,
                 self.conditionTable)
 
             group = item.parent()
@@ -93,13 +93,13 @@ class Paddock(AreaFeature):
             self.popupLayer = None
 
     def onSelectFeature(self):
-        """Do the stuff we'd normally do, but also add the Paddock Land Systems popup layer."""
+        """Do the stuff we'd normally do, but also add the Paddock Land Types popup layer."""
         super().onSelectFeature()
         # qgsDebug(f"{self}.onSelectFeature()")
         self.addPopupLayer()
 
     def onDeselectFeature(self):
-        """Do the stuff we'd normally do, but also remove the Paddock Land Systems popup layer."""
+        """Do the stuff we'd normally do, but also remove the Paddock Land Types popup layer."""
         super().onDeselectFeature()
         self.removePopupLayer()
 

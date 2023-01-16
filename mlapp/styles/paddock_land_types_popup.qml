@@ -416,14 +416,14 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Land System">
+    <field configurationFlags="None" name="Land Type">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Land System Name">
+    <field configurationFlags="None" name="Land Type Name">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -448,8 +448,8 @@
     <alias field="Condition" name="" index="6"/>
     <alias field="Paddock" name="" index="7"/>
     <alias field="Paddock Name" name="" index="8"/>
-    <alias field="Land System" name="" index="9"/>
-    <alias field="Land System Name" name="" index="10"/>
+    <alias field="Land Type" name="" index="9"/>
+    <alias field="Land Type Name" name="" index="10"/>
     <alias field="Timeframe" name="" index="11"/>
   </aliases>
   <defaults>
@@ -462,8 +462,8 @@
     <default applyOnUpdate="0" expression="" field="Condition"/>
     <default applyOnUpdate="0" expression="" field="Paddock"/>
     <default applyOnUpdate="0" expression="" field="Paddock Name"/>
-    <default applyOnUpdate="0" expression="" field="Land System"/>
-    <default applyOnUpdate="0" expression="" field="Land System Name"/>
+    <default applyOnUpdate="0" expression="" field="Land Type"/>
+    <default applyOnUpdate="0" expression="" field="Land Type Name"/>
     <default applyOnUpdate="0" expression="" field="Timeframe"/>
   </defaults>
   <constraints>
@@ -476,8 +476,8 @@
     <constraint constraints="0" field="Condition" exp_strength="0" unique_strength="0" notnull_strength="0"/>
     <constraint constraints="0" field="Paddock" exp_strength="0" unique_strength="0" notnull_strength="0"/>
     <constraint constraints="0" field="Paddock Name" exp_strength="0" unique_strength="0" notnull_strength="0"/>
-    <constraint constraints="0" field="Land System" exp_strength="0" unique_strength="0" notnull_strength="0"/>
-    <constraint constraints="0" field="Land System Name" exp_strength="0" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" field="Land Type" exp_strength="0" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" field="Land Type Name" exp_strength="0" unique_strength="0" notnull_strength="0"/>
     <constraint constraints="0" field="Timeframe" exp_strength="0" unique_strength="0" notnull_strength="0"/>
   </constraints>
   <constraintExpressions>
@@ -490,8 +490,8 @@
     <constraint desc="" field="Condition" exp=""/>
     <constraint desc="" field="Paddock" exp=""/>
     <constraint desc="" field="Paddock Name" exp=""/>
-    <constraint desc="" field="Land System" exp=""/>
-    <constraint desc="" field="Land System Name" exp=""/>
+    <constraint desc="" field="Land Type" exp=""/>
+    <constraint desc="" field="Land Type Name" exp=""/>
     <constraint desc="" field="Timeframe" exp=""/>
   </constraintExpressions>
   <expressionfields/>
@@ -499,8 +499,8 @@
     <columns>
       <column width="-1" hidden="0" name="Paddock" type="field"/>
       <column width="369" hidden="0" name="Paddock Name" type="field"/>
-      <column width="296" hidden="0" name="Land System" type="field"/>
-      <column width="243" hidden="0" name="Land System Name" type="field"/>
+      <column width="296" hidden="0" name="Land Type" type="field"/>
+      <column width="243" hidden="0" name="Land Type Name" type="field"/>
       <column width="280" hidden="0" name="AE/km²" type="field"/>
       <column width="-1" hidden="0" name="Condition" type="field"/>
       <column width="-1" hidden="0" name="fid" type="field"/>
@@ -546,8 +546,8 @@ def my_form_open(dialog, layer, feature):
     <field editable="1" name="Area (km²)"/>
     <field editable="1" name="Condition"/>
     <field editable="1" name="Grazing Radius Type"/>
-    <field editable="1" name="Land System"/>
-    <field editable="1" name="Land System Name"/>
+    <field editable="1" name="Land Type"/>
+    <field editable="1" name="Land Type Name"/>
     <field editable="1" name="Paddock"/>
     <field editable="1" name="Paddock Name"/>
     <field editable="1" name="Paddock Status"/>
@@ -564,8 +564,8 @@ def my_form_open(dialog, layer, feature):
     <field name="Area (km²)" labelOnTop="0"/>
     <field name="Condition" labelOnTop="0"/>
     <field name="Grazing Radius Type" labelOnTop="0"/>
-    <field name="Land System" labelOnTop="0"/>
-    <field name="Land System Name" labelOnTop="0"/>
+    <field name="Land Type" labelOnTop="0"/>
+    <field name="Land Type Name" labelOnTop="0"/>
     <field name="Paddock" labelOnTop="0"/>
     <field name="Paddock Name" labelOnTop="0"/>
     <field name="Paddock Status" labelOnTop="0"/>
@@ -582,8 +582,8 @@ def my_form_open(dialog, layer, feature):
     <field name="Area (km²)" reuseLastValue="0"/>
     <field name="Condition" reuseLastValue="0"/>
     <field name="Grazing Radius Type" reuseLastValue="0"/>
-    <field name="Land System" reuseLastValue="0"/>
-    <field name="Land System Name" reuseLastValue="0"/>
+    <field name="Land Type" reuseLastValue="0"/>
+    <field name="Land Type Name" reuseLastValue="0"/>
     <field name="Paddock" reuseLastValue="0"/>
     <field name="Paddock Name" reuseLastValue="0"/>
     <field name="Paddock Status" reuseLastValue="0"/>

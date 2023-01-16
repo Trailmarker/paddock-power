@@ -8,7 +8,7 @@ from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 
 
-class PaddockLandSystemListItem(QWidget, EditStateMachine):
+class PaddockLandTypeListItem(QWidget, EditStateMachine):
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, DetailsWidget, EditWidget, parent=None):
@@ -92,7 +92,7 @@ class PaddockLandSystemListItem(QWidget, EditStateMachine):
         self.layoutRefreshNeeded.emit()
 
     def selectFeature(self):
-        """Select this Paddock Land System and zoom to it."""
+        """Select this Paddock Land Type and zoom to it."""
         self.feature.selectFeature()
 
     def sizeHint(self):

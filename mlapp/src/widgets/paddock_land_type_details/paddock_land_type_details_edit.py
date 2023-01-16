@@ -11,16 +11,16 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_land_type_details_edit_base.ui')))
 
 
-class PaddockLandSystemDetailsEdit(QWidget, FORM_CLASS):
+class PaddockLandTypeDetailsEdit(QWidget, FORM_CLASS):
 
-    def __init__(self, paddockLandSystem, parent=None):
+    def __init__(self, paddockLandType, parent=None):
         """Constructor."""
         super().__init__(parent)
 
         self.setupUi(self)
 
-        self.paddockLandSystem = paddockLandSystem
-        self._conditionType = paddockLandSystem.conditionType
+        self.paddockLandType = paddockLandType
+        self._conditionType = paddockLandType.conditionType
 
         for conditionType in ConditionType:
             self.conditionTypeComboBox.addItem(conditionType.value, conditionType)
@@ -36,5 +36,5 @@ class PaddockLandSystemDetailsEdit(QWidget, FORM_CLASS):
 
     @pyqtSlot()
     def saveFeature(self):
-        """Save the Paddock Land System details, updating the Condition Type."""
-        self.paddockLandSystem.upsertCondition(self._conditionType)
+        """Save the Paddock Land Type details, updating the Condition Type."""
+        self.paddockLandType.upsertCondition(self._conditionType)

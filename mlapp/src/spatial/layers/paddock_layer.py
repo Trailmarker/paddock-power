@@ -19,17 +19,17 @@ class PaddockLayer(StatusFeatureLayer):
 
         super().__init__(project, gpkgFile, layerName, styleName=PaddockLayer.STYLE)
 
-        self._paddockLandSystemsLayerId = None
+        self._paddockLandTypesLayerId = None
         self._derivedMetricPaddockLayerId = None
         self.conditionTable = conditionTable
 
     @property
-    def paddockLandSystemsLayer(self):
-        return QgsProject.instance().mapLayer(self._paddockLandSystemsLayerId) if self._paddockLandSystemsLayerId else None
+    def paddockLandTypesLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLandTypesLayerId) if self._paddockLandTypesLayerId else None
 
-    @paddockLandSystemsLayer.setter
-    def paddockLandSystemsLayer(self, paddockLandSystemsLayer):
-        self._paddockLandSystemsLayerId = paddockLandSystemsLayer.id()
+    @paddockLandTypesLayer.setter
+    def paddockLandTypesLayer(self, paddockLandTypesLayer):
+        self._paddockLandTypesLayerId = paddockLandTypesLayer.id()
 
     @property
     def derivedMetricPaddockLayer(self):
@@ -40,4 +40,4 @@ class PaddockLayer(StatusFeatureLayer):
         self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
 
     def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.derivedMetricPaddockLayer, self.paddockLandSystemsLayer, self.conditionTable, feature)
+        return self.getFeatureType()(self, self.derivedMetricPaddockLayer, self.paddockLandTypesLayer, self.conditionTable, feature)

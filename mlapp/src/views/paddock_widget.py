@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ..spatial.layers.paddock_land_types_popup_layer import PaddockLandSystemsPopupLayer
+from ..spatial.layers.paddock_land_types_popup_layer import PaddockLandTypesPopupLayer
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -26,26 +26,26 @@ class PaddockWidget(QWidget, FORM_CLASS):
         self.paddockList.featureLayer = self.project.paddockLayer
 
         self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),
-                               self.paddockLandSystemListGroupBox.sizeHint().width()])
+                               self.paddockLandTypeListGroupBox.sizeHint().width()])
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, True)
 
-        self.paddockList.popupLayerAdded.connect(self.setPaddockLandSystemsLayer)
-        self.paddockList.popupLayerRemoved.connect(self.clearPaddockLandSystemsLayer)
+        self.paddockList.popupLayerAdded.connect(self.setPaddockLandTypesLayer)
+        self.paddockList.popupLayerRemoved.connect(self.clearPaddockLandTypesLayer)
 
         self.paddockFilterLineEdit.textChanged.connect(
             self.onPaddockFilterChanged)
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
 
-    @pyqtSlot(PaddockLandSystemsPopupLayer)
-    def setPaddockLandSystemsLayer(self, layer=None):
-        self.paddockLandSystemList.featureLayer = layer
+    @pyqtSlot(PaddockLandTypesPopupLayer)
+    def setPaddockLandTypesLayer(self, layer=None):
+        self.paddockLandTypeList.featureLayer = layer
 
     @pyqtSlot()
-    def clearPaddockLandSystemsLayer(self):
-        self.paddockLandSystemList.featureLayer = None
+    def clearPaddockLandTypesLayer(self):
+        self.paddockLandTypeList.featureLayer = None
 
     def onPaddockFilterChanged(self, text):
         self.paddockList.filterByName(text)

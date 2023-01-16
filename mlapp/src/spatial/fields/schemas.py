@@ -18,7 +18,7 @@ PaddockSchema = Schema([Fid,
                         Perimeter,
                         BuildFence],
                        wkbType=QgsWkbTypes.MultiPolygon)
-PaddockLandSystemSchema = Schema([Fid,
+PaddockLandTypeSchema = Schema([Fid,
                                   Area,
                                   EstimatedCapacityPerArea,
                                   PotentialCapacityPerArea,

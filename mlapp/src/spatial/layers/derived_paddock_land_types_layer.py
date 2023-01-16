@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from ...utils import randomString
 from ..calculator import Calculator
-from ..features.paddock_land_type import PaddockLandSystem
+from ..features.paddock_land_type import PaddockLandType
 from ..fields.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_TYPE, LAND_TYPE_NAME, NAME, OPTIMAL_CAPACITY_PER_AREA, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
 from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
 
-class DerivedPaddockLandSystemsLayer(DerivedFeatureLayer):
+class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 
     STYLE = "paddock_land_types_popup"
 
-    def parameteriseQuery(self, PaddockLayer, LandSystemLayer, WateredAreaLayer, ConditionTable):
-        PaddockLandSystems = f"PaddockLandSystems{randomString()}"
+    def parameteriseQuery(self, PaddockLayer, LandTypeLayer, WateredAreaLayer, ConditionTable):
+        PaddockLandTypes = f"PaddockLandTypes{randomString()}"
         PaddockWateredAreas = f"PaddockWateredAreas{randomString()}"
 
         return f"""
@@ -28,20 +28,20 @@ with {PaddockWateredAreas} as
 		on "{PaddockLayer}".{FID} = "{WateredAreaLayer}".{PADDOCK}
 		and {Timeframe.timeframesIncludeStatuses(f'"{WateredAreaLayer}".{TIMEFRAME}', f'"{PaddockLayer}".{STATUS}')}
 	),
-{PaddockLandSystems} as
+{PaddockLandTypes} as
 	(select
-		st_intersection("{LandSystemLayer}".geometry, {PaddockWateredAreas}.geometry) as geometry,
+		st_intersection("{LandTypeLayer}".geometry, {PaddockWateredAreas}.geometry) as geometry,
 		{PaddockWateredAreas}.{PADDOCK},
 		{PaddockWateredAreas}.{NAME} as "{PADDOCK_NAME}",
 		{PaddockWateredAreas}."{WATERED_TYPE}",
 		{PaddockWateredAreas}.{TIMEFRAME},
-		"{LandSystemLayer}".{FID} as "{LAND_TYPE}",
-		"{LandSystemLayer}".{NAME} as "{LAND_TYPE_NAME}",
-		"{LandSystemLayer}"."{OPTIMAL_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}"
-	from "{LandSystemLayer}"
+		"{LandTypeLayer}".{FID} as "{LAND_TYPE}",
+		"{LandTypeLayer}".{NAME} as "{LAND_TYPE_NAME}",
+		"{LandTypeLayer}"."{OPTIMAL_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}"
+	from "{LandTypeLayer}"
 	inner join {PaddockWateredAreas}
-		on st_intersects("{LandSystemLayer}".geometry, {PaddockWateredAreas}.geometry)
-		and st_area(st_intersection("{LandSystemLayer}".geometry, {PaddockWateredAreas}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+		on st_intersects("{LandTypeLayer}".geometry, {PaddockWateredAreas}.geometry)
+		and st_area(st_intersection("{LandTypeLayer}".geometry, {PaddockWateredAreas}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 	)
 select
 	st_multi(st_collectionextract(st_union(geometry), 3)) as geometry,
@@ -60,13 +60,13 @@ select
 from
 	(select
 		0 as {FID},
-		{PaddockLandSystems}.geometry,
-		{PaddockLandSystems}.{PADDOCK},
-		{PaddockLandSystems}."{PADDOCK_NAME}",
-		{PaddockLandSystems}."{LAND_TYPE}",
+		{PaddockLandTypes}.geometry,
+		{PaddockLandTypes}.{PADDOCK},
+		{PaddockLandTypes}."{PADDOCK_NAME}",
+		{PaddockLandTypes}."{LAND_TYPE}",
 		"{LAND_TYPE_NAME}",
 		"{ESTIMATED_CAPACITY_PER_AREA}" as "{POTENTIAL_CAPACITY_PER_AREA}",
-		st_area({PaddockLandSystems}.geometry) / 1000000 as "{AREA}",
+		st_area({PaddockLandTypes}.geometry) / 1000000 as "{AREA}",
 		ifnull("{ConditionTable}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
 		case ifnull("{ConditionTable}"."{CONDITION_TYPE}", 'A')
 			when 'A' then 1.0
@@ -75,25 +75,25 @@ from
 			when 'D' then 0.20
 			else 0.0
 		end as "{CONDITION_DISCOUNT}",
-		{PaddockLandSystems}."{WATERED_TYPE}",
-		case {PaddockLandSystems}."{WATERED_TYPE}"
+		{PaddockLandTypes}."{WATERED_TYPE}",
+		case {PaddockLandTypes}."{WATERED_TYPE}"
 			when 'Near' then 1.0
 			when 'Far' then 0.5
 			when 'Unwatered' then 0.0
 			else 0.0
 		end as "{WATERED_DISCOUNT}",
 		{TIMEFRAME}
-	 from {PaddockLandSystems}
+	 from {PaddockLandTypes}
 	 left outer join "{ConditionTable}"
-	 	on {PaddockLandSystems}.{PADDOCK} = "{ConditionTable}"."{PADDOCK}"
-	 	and {PaddockLandSystems}."{LAND_TYPE}" = "{ConditionTable}"."{LAND_TYPE}")
+	 	on {PaddockLandTypes}.{PADDOCK} = "{ConditionTable}"."{PADDOCK}"
+	 	and {PaddockLandTypes}."{LAND_TYPE}" = "{ConditionTable}"."{LAND_TYPE}")
 where geometry is not null
 group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 """
 
     def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
-        return PaddockLandSystem
+        return PaddockLandType
 
     def __init__(self, project, layerName, paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
@@ -103,7 +103,7 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
             project,
             layerName,
             query,
-            DerivedPaddockLandSystemsLayer.STYLE,
+            DerivedPaddockLandTypesLayer.STYLE,
             paddockLayer,
             landTypeLayer,
             wateredAreaLayer,
@@ -114,4 +114,4 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
     def wrapFeature(self, feature):
         # Burn in the FID that gets generated by QGIS for consistency
         feature.setAttribute(FID, feature.id())
-        return PaddockLandSystem(self, self.conditionTable, feature)
+        return PaddockLandType(self, self.conditionTable, feature)
