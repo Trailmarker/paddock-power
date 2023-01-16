@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import QWidget
 from ...spatial.fields.condition_type import ConditionType
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'paddock_land_system_details_edit_base.ui')))
+    os.path.dirname(__file__), 'paddock_land_type_details_edit_base.ui')))
 
 
 class PaddockLandSystemDetailsEdit(QWidget, FORM_CLASS):

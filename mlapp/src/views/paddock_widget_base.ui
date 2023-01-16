@@ -131,7 +131,7 @@
   <customwidget>
    <class>PaddockLandSystemsLayerList</class>
    <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/paddock_land_systems_layer_list</header>
+   <header>mlapp/src/widgets/feature_list/paddock_land_types_layer_list</header>
   </customwidget>
  </customwidgets>
  <resources/>

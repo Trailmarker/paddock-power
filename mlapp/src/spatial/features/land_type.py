@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from .persisted_feature import PersistedFeature
-from ..fields.schemas import LandSystemSchema
+from ..fields.schemas import LandTypeSchema
 
 
-@LandSystemSchema.addSchema()
+@LandTypeSchema.addSchema()
 class LandSystem(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):

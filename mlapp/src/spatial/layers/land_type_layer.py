@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from ..features.land_system import LandSystem
+from ..features.land_type import LandSystem
 from .persisted_feature_layer import PersistedFeatureLayer
 
 
 class LandSystemLayer(PersistedFeatureLayer):
 
-    STYLE = "land_system"
+    STYLE = "land_type"
 
     def getFeatureType(self):
         return LandSystem

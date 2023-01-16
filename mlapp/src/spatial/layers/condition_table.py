@@ -5,52 +5,60 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from ...utils import qgsInfo, PLUGIN_NAME
 from ..fields.condition_type import ConditionType
+from ..fields.names import LAND_TYPE, PADDOCK, CONDITION_TYPE
 
 
 class ConditionTable(QObject):
     featuresPersisted = pyqtSignal(list)
 
-    EXISTS = """
+    def makeExistsQuery(self, tableName):
+        return f"""
 SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'
 """
 
-    CREATE = """
+    def makeCreateQuery(self, tableName):
+        return f"""
 CREATE TABLE "{tableName}" (
-    "Paddock" INTEGER NOT NULL,
-    "Land System" INTEGER NOT NULL,
-    "Condition" TEXT NOT NULL,
-    CONSTRAINT "Unique" PRIMARY KEY ("Paddock", "Land System")
+    "{PADDOCK}" INTEGER NOT NULL,
+    "{LAND_TYPE}" INTEGER NOT NULL,
+    "{CONDITION_TYPE}" TEXT NOT NULL,
+    CONSTRAINT "Unique" PRIMARY KEY ("{PADDOCK}", "{LAND_TYPE})
 )
 """
 
-    DROP = """
+    def makeDropQuery(self, tableName):
+        return f"""
 DROP TABLE IF EXISTS "{tableName}"
-    """
-
-    GET_RECORD = """
-SELECT * FROM "{tableName}"
-WHERE "Paddock" = {paddockId} AND "Land System" = {landSystemId}
-    """
-
-    GET_BY_PADDOCK = """
-SELECT * FROM "{tableName}"
-WHERE "Paddock" = {paddockId}
 """
 
-    UPSERT = """
-INSERT INTO "{tableName}"("Paddock", "Land System", "Condition") VALUES({paddockId}, {landSystemId}, '{conditionType}')
-ON CONFLICT("Paddock", "Land System") DO UPDATE SET "Condition"='{conditionType}';
+    def makeGetRecordQuery(self, tableName, paddockId, landTypeId):
+        return f"""
+SELECT * FROM "{tableName}"
+WHERE "{PADDOCK}" = {paddockId} AND "{LAND_TYPE}" = {landTypeId}
 """
 
-    DELETE = """
-DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSystemId};
+    def makeGetByPaddockQuery(self, tableName, paddockId):
+        return f"""
+SELECT * FROM "{tableName}"
+WHERE "{PADDOCK}" = {paddockId}
+"""
+
+    def makeUpsertQuery(self, tableName, paddockId, landTypeId, conditionType):
+        return f"""
+INSERT INTO "{tableName}"("{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}") VALUES({paddockId}, {landTypeId}, '{conditionType}')
+ON CONFLICT("{PADDOCK}", "{LAND_TYPE}") DO UPDATE SET "{CONDITION_TYPE}"='{conditionType}';
+"""
+
+    def makeDeleteQuery(self, tableName, paddockId, landTypeId):
+        return f"""
+DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTypeId};
 """
 
     def detectInGeoPackage(self, gpkgFile, tableName):
         """Detect a matching ConditionTable in a GeoPackage."""
         try:
             with sqlite3.connect(gpkgFile) as conn:
-                cursor = conn.execute(ConditionTable.EXISTS.format(tableName=tableName))
+                cursor = conn.execute(self.makeExistsQuery(tableName=tableName))
                 return cursor.fetchone() is not None
         except BaseException:
             pass
@@ -59,12 +67,12 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
     def createInGeoPackage(self, gpkgFile, tableName):
         """Create a new ConditionTable in the GeoPackage file."""
         with sqlite3.connect(gpkgFile) as conn:
-            conn.execute(self.CREATE.format(tableName=tableName))
+            conn.execute(self.makeCreateQuery(tableName=tableName))
 
     def deleteFromGeoPackage(self, gpkgFile, tableName):
         """Delete a ConditionTable from the GeoPackage file."""
         with sqlite3.connect(gpkgFile) as conn:
-            conn.execute(self.DROP.format(tableName=tableName))
+            conn.execute(self.makeDropQuery(tableName=tableName))
 
     def __init__(self, project, gpkgFile, tableName):
         super().__init__()
@@ -85,22 +93,22 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
     def name(self):
         return self.tableName
 
-    def getRecord(self, paddockId, landSystemId):
+    def getRecord(self, paddockId, landTypeId):
         with sqlite3.connect(self.gpkgFile) as conn:
             cursor = conn.execute(
-                self.GET_RECORD.format(
+                self.makeGetRecordQuery(
                     tableName=self.tableName,
                     paddockId=paddockId,
-                    landSystemId=landSystemId))
+                    landTypeId=landTypeId))
             return cursor.fetchone()
 
-    def getCondition(self, paddockId, landSystemId):
+    def getCondition(self, paddockId, landTypeId):
         with sqlite3.connect(self.gpkgFile) as conn:
             cursor = conn.execute(
-                self.GET_RECORD.format(
+                self.makeGetRecordQuery(
                     tableName=self.tableName,
                     paddockId=paddockId,
-                    landSystemId=landSystemId))
+                    landTypeId=landTypeId))
             row = cursor.fetchone()
             if row is None:
                 return ConditionType.A
@@ -109,24 +117,24 @@ DELETE FROM "{tableName}" WHERE "Paddock"={paddockId} AND "Land System"={landSys
 
     def getByPaddockId(self, paddockId):
         with sqlite3.connect(self.gpkgFile) as conn:
-            cursor = conn.execute(self.GET_BY_PADDOCK.format(tableName=self.tableName, paddockId=paddockId))
+            cursor = conn.execute(self.makeGetByPaddockQuery(tableName=self.tableName, paddockId=paddockId))
             return cursor.fetchall()
 
-    def upsert(self, paddockId, landSystemId, conditionType):
+    def upsert(self, paddockId, landTypeId, conditionType):
         with sqlite3.connect(self.gpkgFile) as conn:
             conn.execute(
-                self.UPSERT.format(
+                self.makeUpsertQuery(
                     tableName=self.tableName,
                     paddockId=paddockId,
-                    landSystemId=landSystemId,
+                    landTypeId=landTypeId,
                     conditionType=conditionType.name))
         self.featuresPersisted.emit([paddockId])
 
-    def delete(self, paddockId, landSystemId):
+    def delete(self, paddockId, landTypeId):
         with sqlite3.connect(self.gpkgFile) as conn:
             conn.execute(
-                self.DELETE.format(
+                self.makeDeleteQuery(
                     tableName=self.tableName,
                     paddockId=paddockId,
-                    landSystemId=landSystemId))
+                    landTypeId=landTypeId))
         self.featuresPersisted.emit([paddockId])

@@ -17,11 +17,11 @@ class PaddockLandSystem(PersistedFeature):
 
     @property
     def name(self):
-        return f"{self.landSystemName}"
+        return f"{self.landTypeName}"
 
     @property
     def title(self):
-        return f"{self.landSystemName} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
+        return f"{self.landTypeName} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
 
     @classmethod
     def focusOnSelect(cls):
@@ -30,6 +30,6 @@ class PaddockLandSystem(PersistedFeature):
 
     def upsertCondition(self, conditionType):
         """Update the Condition table."""
-        self.conditionTable.upsert(self.paddock, self.landSystem, conditionType)
+        self.conditionTable.upsert(self.paddock, self.landType, conditionType)
         self.conditionType = conditionType
         self.featureUpdated.emit()

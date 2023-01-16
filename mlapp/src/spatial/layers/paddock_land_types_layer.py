@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
 from ...utils import PLUGIN_NAME
-from ..features.paddock_land_system import PaddockLandSystem
-from .derived_paddock_land_systems_layer import DerivedPaddockLandSystemsLayer
+from ..features.paddock_land_type import PaddockLandSystem
+from .derived_paddock_land_types_layer import DerivedPaddockLandSystemsLayer
 from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
 
 class PaddockLandSystemsLayer(PersistedDerivedFeatureLayer):
 
-    STYLE = "paddock_land_systems_popup"
+    STYLE = "paddock_land_types_popup"
 
-    def __init__(self, project, gpkgFile, layerName, paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable):
+    def __init__(self, project, gpkgFile, layerName, paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable):
         f"""Create a new {PLUGIN_NAME} Paddock Land Systems layer."""
 
         derivedPaddockLandSystemsLayer = DerivedPaddockLandSystemsLayer(
-            project, f"Derived {layerName}", paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable)
+            project, f"Derived {layerName}", paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable)
 
         super().__init__(project, gpkgFile, layerName, derivedPaddockLandSystemsLayer, styleName=PaddockLandSystemsLayer.STYLE)
 

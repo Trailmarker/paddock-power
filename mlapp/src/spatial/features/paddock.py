@@ -6,8 +6,8 @@ from qgis.core import QgsProject
 from ...utils import qgsDebug
 from ..layers.condition_table import ConditionTable
 from ..layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
-from ..layers.paddock_land_systems_layer import PaddockLandSystemsLayer
-from ..layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
+from ..layers.paddock_land_types_layer import PaddockLandSystemsLayer
+from ..layers.paddock_land_types_popup_layer import PaddockLandSystemsPopupLayer
 from ..fields.schemas import PaddockSchema
 from .area_feature import AreaFeature
 from .edits import Edits

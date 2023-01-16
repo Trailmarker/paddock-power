@@ -5,7 +5,7 @@ from qgis.core import QgsProject
 
 from ...spatial.features.feature import Feature
 from ...spatial.features.paddock import Paddock
-from ...spatial.layers.paddock_land_systems_popup_layer import PaddockLandSystemsPopupLayer
+from ...spatial.layers.paddock_land_types_popup_layer import PaddockLandSystemsPopupLayer
 from .paddock_list_item import PaddockListItem
 from .persisted_feature_layer_list import PersistedFeatureLayerList
 

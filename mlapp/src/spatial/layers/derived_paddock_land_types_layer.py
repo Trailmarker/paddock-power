@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from ...utils import randomString
 from ..calculator import Calculator
-from ..features.paddock_land_system import PaddockLandSystem
-from ..fields.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_SYSTEM, LAND_SYSTEM_NAME, NAME, OPTIMAL_CAPACITY_PER_AREA, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
+from ..features.paddock_land_type import PaddockLandSystem
+from ..fields.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_TYPE, LAND_TYPE_NAME, NAME, OPTIMAL_CAPACITY_PER_AREA, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
 from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
 
 class DerivedPaddockLandSystemsLayer(DerivedFeatureLayer):
 
-    STYLE = "paddock_land_systems_popup"
+    STYLE = "paddock_land_types_popup"
 
     def parameteriseQuery(self, PaddockLayer, LandSystemLayer, WateredAreaLayer, ConditionTable):
         PaddockLandSystems = f"PaddockLandSystems{randomString()}"
@@ -35,8 +35,8 @@ with {PaddockWateredAreas} as
 		{PaddockWateredAreas}.{NAME} as "{PADDOCK_NAME}",
 		{PaddockWateredAreas}."{WATERED_TYPE}",
 		{PaddockWateredAreas}.{TIMEFRAME},
-		"{LandSystemLayer}".{FID} as "{LAND_SYSTEM}",
-		"{LandSystemLayer}".{NAME} as "{LAND_SYSTEM_NAME}",
+		"{LandSystemLayer}".{FID} as "{LAND_TYPE}",
+		"{LandSystemLayer}".{NAME} as "{LAND_TYPE_NAME}",
 		"{LandSystemLayer}"."{OPTIMAL_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}"
 	from "{LandSystemLayer}"
 	inner join {PaddockWateredAreas}
@@ -54,8 +54,8 @@ select
 	"{CONDITION_TYPE}",
 	{PADDOCK},
 	"{PADDOCK_NAME}",
-	"{LAND_SYSTEM}",
-	"{LAND_SYSTEM_NAME}",
+	"{LAND_TYPE}",
+	"{LAND_TYPE_NAME}",
 	{TIMEFRAME} as {TIMEFRAME}
 from
 	(select
@@ -63,8 +63,8 @@ from
 		{PaddockLandSystems}.geometry,
 		{PaddockLandSystems}.{PADDOCK},
 		{PaddockLandSystems}."{PADDOCK_NAME}",
-		{PaddockLandSystems}."{LAND_SYSTEM}",
-		"{LAND_SYSTEM_NAME}",
+		{PaddockLandSystems}."{LAND_TYPE}",
+		"{LAND_TYPE_NAME}",
 		"{ESTIMATED_CAPACITY_PER_AREA}" as "{POTENTIAL_CAPACITY_PER_AREA}",
 		st_area({PaddockLandSystems}.geometry) / 1000000 as "{AREA}",
 		ifnull("{ConditionTable}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
@@ -86,18 +86,18 @@ from
 	 from {PaddockLandSystems}
 	 left outer join "{ConditionTable}"
 	 	on {PaddockLandSystems}.{PADDOCK} = "{ConditionTable}"."{PADDOCK}"
-	 	and {PaddockLandSystems}."{LAND_SYSTEM}" = "{ConditionTable}"."{LAND_SYSTEM}")
+	 	and {PaddockLandSystems}."{LAND_TYPE}" = "{ConditionTable}"."{LAND_TYPE}")
 where geometry is not null
-group by "{PADDOCK}", "{LAND_SYSTEM}", "{CONDITION_TYPE}", {TIMEFRAME}
+group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 """
 
     def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
         return PaddockLandSystem
 
-    def __init__(self, project, layerName, paddockLayer, landSystemLayer, wateredAreaLayer, conditionTable):
+    def __init__(self, project, layerName, paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
-        query = self.parameteriseQuery(paddockLayer.name(), landSystemLayer.name(), wateredAreaLayer.name(), conditionTable.name())
+        query = self.parameteriseQuery(paddockLayer.name(), landTypeLayer.name(), wateredAreaLayer.name(), conditionTable.name())
 
         super().__init__(
             project,
@@ -105,7 +105,7 @@ group by "{PADDOCK}", "{LAND_SYSTEM}", "{CONDITION_TYPE}", {TIMEFRAME}
             query,
             DerivedPaddockLandSystemsLayer.STYLE,
             paddockLayer,
-            landSystemLayer,
+            landTypeLayer,
             wateredAreaLayer,
             conditionTable)
 

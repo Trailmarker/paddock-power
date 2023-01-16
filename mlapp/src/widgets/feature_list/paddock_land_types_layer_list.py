@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from ..paddock_land_system_details.paddock_land_system_details import PaddockLandSystemDetails
-from ..paddock_land_system_details.paddock_land_system_details_edit import PaddockLandSystemDetailsEdit
+from ..paddock_land_type_details.paddock_land_type_details import PaddockLandSystemDetails
+from ..paddock_land_type_details.paddock_land_type_details_edit import PaddockLandSystemDetailsEdit
 from .feature_layer_list import FeatureLayerList
 from .feature_list_item import FeatureListItem
 

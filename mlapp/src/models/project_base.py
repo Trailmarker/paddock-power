@@ -9,8 +9,8 @@ from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.boundary_layer import BoundaryLayer
 from ..spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from ..spatial.layers.fence_layer import FenceLayer
-from ..spatial.layers.land_system_layer import LandSystemLayer
-from ..spatial.layers.paddock_land_systems_layer import PaddockLandSystemsLayer
+from ..spatial.layers.land_type_layer import LandSystemLayer
+from ..spatial.layers.paddock_land_types_layer import PaddockLandSystemsLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
@@ -36,8 +36,8 @@ class ProjectBase(QObject):
         self.pipelineLayer = PipelineLayer(self, self.gpkgFile, pipelineLayerName,
                                            self.elevationLayer)
 
-        landSystemLayerName = "Land Systems"
-        self.landSystemLayer = LandSystemLayer(self, self.gpkgFile, landSystemLayerName)
+        landTypeLayerName = "Land Types"
+        self.landTypeLayer = LandSystemLayer(self, self.gpkgFile, landTypeLayerName)
 
         self.conditionTable = ConditionTable(self, self.gpkgFile, "Condition Table")
 
@@ -75,13 +75,13 @@ class ProjectBase(QObject):
         boundaryLayerName = f"Boundary"
         self.boundaryLayer = BoundaryLayer(self, boundaryLayerName, self.paddockLayer)
 
-        paddockLandSystemsLayerName = f"Paddock Land Systems"
+        paddockLandSystemsLayerName = f"Paddock Land Types"
         self.paddockLandSystemsLayer = PaddockLandSystemsLayer(
             self,
             self.gpkgFile,
             paddockLandSystemsLayerName,
             self.paddockLayer,
-            self.landSystemLayer,
+            self.landTypeLayer,
             self.wateredAreaLayer,
             self.conditionTable)
         self.paddockLayer.paddockLandSystemsLayer = self.paddockLandSystemsLayer
@@ -110,7 +110,7 @@ class ProjectBase(QObject):
         # Hide Waterpoint Buffers layer
         # self.waterpointBufferLayer.addToMap(group)
         self.wateredAreaLayer.addToMap(group)
-        self.landSystemLayer.addToMap(group)
+        self.landTypeLayer.addToMap(group)
         self.boundaryLayer.addToMap(group)
         # Hide Paddock Land Systems layer
         # self.paddockLandSystemsLayer.addToMap(group)

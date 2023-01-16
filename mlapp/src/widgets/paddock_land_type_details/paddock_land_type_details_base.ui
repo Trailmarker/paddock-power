@@ -20,7 +20,7 @@
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item row="1" column="0">
-      <widget class="QLabel" name="landSystemNameLabel">
+      <widget class="QLabel" name="landTypeNameLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -83,7 +83,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="FormattedValue" name="landSystemNameText">
+      <widget class="FormattedValue" name="landTypeNameText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
