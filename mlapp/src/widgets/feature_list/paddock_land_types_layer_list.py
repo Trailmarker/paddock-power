@@ -10,9 +10,9 @@ class PaddockLandTypesLayerList(FeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        def listItemFactory(paddockLandSystem):
-            paddockLandSystem.featureUpdated.connect(self.refreshUi)
-            return FeatureListItem(paddockLandSystem, detailsWidgetFactory=PaddockLandTypeDetails,
+        def listItemFactory(paddockLandType):
+            paddockLandType.featureUpdated.connect(self.refreshUi)
+            return FeatureListItem(paddockLandType, detailsWidgetFactory=PaddockLandTypeDetails,
                                    editWidgetFactory=PaddockLandTypeDetailsEdit, parent=parent)
 
         super().__init__(listItemFactory, parent)
