@@ -147,7 +147,7 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Watered stocking rate (AE/km²)</string>
+        <string notr="true">Watered carrying capacity (AE/km²)</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
