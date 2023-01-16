@@ -29,6 +29,8 @@ class StateMachineToolBar(QToolBar):
     def __init__(self, machine, parent=None):
         super().__init__(parent)
 
+        self._showStateActions = True
+
         self.machine = machine
 
         self.stateActions = []
@@ -51,6 +53,10 @@ class StateMachineToolBar(QToolBar):
         self.genericActions.append(action)
         self.refreshUi()
 
+    def hideStateActions(self):
+        self._showStateActions = False
+        self.refreshUi()
+
     def refreshUi(self):
         """Refresh the UI based on the current state of the fence."""
 
@@ -59,8 +65,9 @@ class StateMachineToolBar(QToolBar):
         permitted = self.machine.allPermitted()
         permittedStateActions = [a for a in self.stateActions if a.stateAction.match(*permitted)]
 
-        for action in permittedStateActions:
-            self.addAction(action)
+        if self._showStateActions:
+            for action in permittedStateActions:
+                self.addAction(action)
 
         for action in self.genericActions:
             self.addAction(action)

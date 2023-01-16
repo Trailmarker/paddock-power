@@ -14,8 +14,11 @@ class PaddockMiniList(FeatureMiniList):
         self._derivedMetricPaddockLayerId = None
 
         def listItemFactory(paddock):
-            return FeatureListItem(paddock, detailsWidgetFactory=(lambda feature: self.makeDetailsWidget(feature)),
+            item = FeatureListItem(paddock, detailsWidgetFactory=(lambda feature: self.makeDetailsWidget(feature)),
                                    editWidgetFactory=PaddockDetailsEdit, parent=parent)
+            # Hide the status controls in the Paddock mini list (PP-67)
+            item.hideStatusControls()
+            return item
 
         super().__init__(listItemFactory, parent)
 

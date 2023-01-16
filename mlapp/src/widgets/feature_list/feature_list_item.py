@@ -49,9 +49,8 @@ class FeatureListItem(QWidget, EditStateMachine):
         # Create toolbar for Feature workflow
         if self.hasStatus:
             self.statusLabel = FeatureStatusLabel(None)
-
             self.statusToolBar = StatusFeatureToolBar(self.feature)
-
+    
             self.statusToolBar.addStateAction(
                 FeatureAction.undoPlan,
                 f':/plugins/{PLUGIN_FOLDER}/images/undo-plan-feature.png',
@@ -79,25 +78,26 @@ class FeatureListItem(QWidget, EditStateMachine):
         # Create toolbar for Feature editing (if applicable)
         self.editToolBar = StateMachineToolBar(self)
 
-        if self.isEditable:
-
-            self.editToolBar.addStateAction(
-                EditAction.edit,
-                f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png',
-                lambda *_: self.editItem())
-            self.editToolBar.addStateAction(
-                EditAction.cancelEdit,
-                f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
-                lambda *_: self.cancelEditItem())
-            self.editToolBar.addStateAction(
-                EditAction.save,
-                f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
-                lambda *_: self.saveItem())
+        self.editToolBar.addStateAction(
+            EditAction.edit,
+            f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png',
+            lambda *_: self.editItem())
+        self.editToolBar.addStateAction(
+            EditAction.cancelEdit,
+            f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
+            lambda *_: self.cancelEditItem())
+        self.editToolBar.addStateAction(
+            EditAction.save,
+            f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
+            lambda *_: self.saveItem())
 
         self.editToolBar.addGenericAction(
             f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
             f"Zoom to {self.feature.displayName()}",
             lambda *_: self.selectFeature())
+
+        if not self.isEditable:
+            self.editToolBar.hideStateActions()
 
         self.collapse.addHeaderWidget(self.editToolBar)
 
@@ -140,6 +140,16 @@ class FeatureListItem(QWidget, EditStateMachine):
     def isEditable(self):
         return self.featureEdit is not None
 
+    def hideStatusControls(self):
+        """Hide the status controls (e.g. for a specific list widget)."""
+        self.statusToolBar.hideStateActions()
+        self.refreshUi()
+        
+    def hideEditControls(self):
+        """Hide the edit controls (e.g. for a specific list widget)."""
+        self.editToolBar.hideStateActions()
+        self.refreshUi()
+
     def displayName(self):
         return self.feature.displayName()
 
@@ -175,9 +185,8 @@ class FeatureListItem(QWidget, EditStateMachine):
         if self.hasStatus:
             self.statusLabel.status = self.feature.status
             self.statusToolBar.refreshUi()
-
+        
         if self.isEditable:
-
             # Hide or show forms
             editing = self.status == EditStatus.Editing
             self.featureDetails.setVisible(not editing)
@@ -187,7 +196,7 @@ class FeatureListItem(QWidget, EditStateMachine):
             if self.hasStatus:
                 self.statusToolBar.setVisible(not editing)
 
-            self.editToolBar.refreshUi()
+        self.editToolBar.refreshUi()
 
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
