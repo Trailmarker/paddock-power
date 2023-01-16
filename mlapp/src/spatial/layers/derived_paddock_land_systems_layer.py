@@ -2,7 +2,7 @@
 from ...utils import randomString
 from ..calculator import Calculator
 from ..features.paddock_land_system import PaddockLandSystem
-from ..fields.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_SYSTEM, LAND_SYSTEM_NAME, NAME, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
+from ..fields.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_SYSTEM, LAND_SYSTEM_NAME, NAME, OPTIMAL_CAPACITY_PER_AREA, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
 from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
@@ -37,7 +37,7 @@ with {PaddockWateredAreas} as
 		{PaddockWateredAreas}.{TIMEFRAME},
 		"{LandSystemLayer}".{FID} as "{LAND_SYSTEM}",
 		"{LandSystemLayer}".{NAME} as "{LAND_SYSTEM_NAME}",
-		"{LandSystemLayer}"."{ESTIMATED_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}"
+		"{LandSystemLayer}"."{OPTIMAL_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}"
 	from "{LandSystemLayer}"
 	inner join {PaddockWateredAreas}
 		on st_intersects("{LandSystemLayer}".geometry, {PaddockWateredAreas}.geometry)
