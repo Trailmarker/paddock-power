@@ -271,7 +271,7 @@ class Fence(LineFeature):
                     # the Paddock is derived in a dodgy way using splitFeatures
                     splitPaddock.status = FeatureStatus.Drafted
                     splitPaddock.recalculate()
-                    edits.editBefore(splitPaddock.planFeature(self))
+                    edits.editBefore(splitPaddock.planFeature(self, crossedPaddock))
 
         _, newPaddocks = self.getNewPaddocks()
 

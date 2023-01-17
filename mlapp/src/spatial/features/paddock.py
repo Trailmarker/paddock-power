@@ -25,6 +25,8 @@ class Paddock(AreaFeature):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature=existingFeature)
 
+        self.crossedPaddockId = None
+
         self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id()
         self._paddockLandTypesLayerId = paddockLandTypesLayer.id()
         self.conditionTable = conditionTable
@@ -111,8 +113,9 @@ class Paddock(AreaFeature):
         return Edits.upsert(self)
 
     @FeatureAction.plan.handler()
-    def planFeature(self, fence):
+    def planFeature(self, fence, crossedPaddock=None):
         self.buildFence = fence.buildOrder
+        self.crossedPaddockId = crossedPaddock.id if crossedPaddock else None
         return Edits.upsert(self)
 
     @FeatureAction.undoPlan.handler()

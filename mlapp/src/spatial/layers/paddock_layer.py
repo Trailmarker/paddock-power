@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProject
 
-from ..features.edits import Edits
+from ...utils import qgsDebug
 from ..features.paddock import Paddock
 from .condition_table import ConditionTable
 from .status_feature_layer import StatusFeatureLayer
@@ -41,3 +41,12 @@ class PaddockLayer(StatusFeatureLayer):
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.derivedMetricPaddockLayer, self.paddockLandTypesLayer, self.conditionTable, feature)
+
+    def addFeature(self, feature):
+        """Add a new Paddock to the layer."""
+        super().addFeature(feature)
+        
+        if feature.crossedPaddockId:
+            qgsDebug(f"PaddockLayer.addFeature({feature}): upsertSplit({feature.id}, {feature.crossedPaddockId})")
+            self.conditionTable.upsertSplit(feature.id, feature.crossedPaddockId)
+        

@@ -43,10 +43,10 @@ SELECT * FROM "{tableName}"
 WHERE "{PADDOCK}" = {paddockId}
 """
 
-    def makeUpsertQuery(self, tableName, paddockId, landTypeId, conditionType):
+    def makeUpsertQuery(self, tableName, paddockId, landTypeId, condition):
         return f"""
-INSERT INTO "{tableName}"("{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}") VALUES({paddockId}, {landTypeId}, '{conditionType}')
-ON CONFLICT("{PADDOCK}", "{LAND_TYPE}") DO UPDATE SET "{CONDITION_TYPE}"='{conditionType}';
+INSERT INTO "{tableName}"("{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}") VALUES({paddockId}, {landTypeId}, '{condition}')
+ON CONFLICT("{PADDOCK}", "{LAND_TYPE}") DO UPDATE SET "{CONDITION_TYPE}"='{condition}';
 """
 
     def makeDeleteQuery(self, tableName, paddockId, landTypeId):
@@ -127,8 +127,37 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landTypeId=landTypeId,
-                    conditionType=conditionType.name))
+                    condition=conditionType.name))
         self.featuresPersisted.emit([paddockId])
+
+    def upsertSplit(self, splitPaddockId, crossedPaddockId):
+        """Upsert the condition data for a paddock to the new paddocks into which it will be split."""
+
+        with sqlite3.connect(self.gpkgFile) as conn:
+            conn.isolation_level = None
+            cursor = conn.cursor()
+
+            cursor.execute("begin")
+
+            try:
+                # Get any existing land type records for the crossed paddock
+                paddockLandTypeConditions = cursor.execute(
+                    self.makeGetByPaddockQuery(
+                        tableName=self.tableName,
+                        paddockId=crossedPaddockId)).fetchall()
+                
+                # Upsert the land type records for the split paddock
+                for paddockLandTypeCondition in paddockLandTypeConditions:
+                    cursor.execute(
+                        self.makeUpsertQuery(
+                            tableName=self.tableName,
+                            paddockId=splitPaddockId,
+                            landTypeId=paddockLandTypeCondition[1],
+                            condition=paddockLandTypeCondition[2]))
+                cursor.execute("commit")
+            except BaseException:
+                cursor.execute("rollback")
+                raise Exception("Error upserting split paddock condition data")
 
     def delete(self, paddockId, landTypeId):
         with sqlite3.connect(self.gpkgFile) as conn:
