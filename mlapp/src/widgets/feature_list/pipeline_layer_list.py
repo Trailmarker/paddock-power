@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .feature_list_item import FeatureListItem
+from .infrastructure_list_item import InfrastructureListItem
 from .persisted_feature_layer_list import PersistedFeatureLayerList
 
 
@@ -8,6 +8,6 @@ class PipelineLayerList(PersistedFeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        def listItemFactory(pipeline): return FeatureListItem(pipeline, parent=parent)
+        def listItemFactory(pipeline): return InfrastructureListItem(pipeline, parent=parent)
 
         super().__init__(listItemFactory, parent)

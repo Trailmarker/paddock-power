@@ -13,21 +13,12 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 
 class ProfileDetailsDialog(QDialog, FORM_CLASS):
-    def __init__(self, project, parent=None):
+    def __init__(self, feature, parent=None):
         """Constructor."""
         super().__init__(parent)
 
+        self.feature = feature
         self.setupUi(self)
 
-        project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
-
-        self.profileDetails.setProject(project)
-        self.profileDetails.refreshUi()
-
-    @pyqtSlot(Feature)
-    def onSelectedFeatureChanged(self, feature):
-        """Change the ProfileDetailsDialog title depending on the new selected Feature."""
-        if feature and feature.isInfrastructure:
-            self.setWindowTitle(f"Elevation Profile - {feature.title}")
-        else:
-            self.setWindowTitle(f"Elevation Profile")
+        self.setWindowTitle(f"Elevation Profile - {self.feature.title}")
+        self.profileDetails.setFeature(self.feature)

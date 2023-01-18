@@ -26,7 +26,7 @@ class FenceWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.profileDetailsDialog = ProfileDetailsDialog(self.project, self)
+        # self.profileDetailsDialog = ProfileDetailsDialog(self.project, self)
 
         self.fenceList.featureLayer = self.project.fenceLayer
         self.fencePaddockChanges.setProject(self.project)
@@ -37,7 +37,7 @@ class FenceWidget(QWidget, FORM_CLASS):
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, True)
 
-        self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+        # self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
 
     def sketchFence(self):
         """Sketch and analyse a new Fence."""
@@ -45,11 +45,12 @@ class FenceWidget(QWidget, FORM_CLASS):
         tool.sketchFinished.connect(self.onSketchFenceFinished)
         self.project.setTool(tool)
 
-    @pyqtSlot(Feature)
-    def onSelectedFeatureChanged(self, feature):
-        """Handle a change to the selected Fence."""
-        if isinstance(feature, Fence):
-            self.profileDetailsDialog.show()
+    # @pyqtSlot(Feature)
+    # def onSelectedFeatureChanged(self, feature):
+    #     """Handle a change to the selected Fence."""
+    #     pass
+    #     # if isinstance(feature, Fence):
+    #     #     self.profileDetailsDialog.show()
 
     @pyqtSlot(QgsGeometry)
     def onSketchFenceFinished(self, sketchLine):

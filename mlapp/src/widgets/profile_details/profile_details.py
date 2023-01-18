@@ -25,9 +25,18 @@ class ProfileDetails(QWidget, FORM_CLASS):
         self.infrastructureLengthLabel.setProperty("class", "form-left")
         self.infrastructureLengthText.setProperty("class", "form-right")
 
+        self.feature = None
         self.project = None
-        self.selectedInfrastructure = None
         self.profileCanvas = None
+
+        self.refreshUi()
+
+    def setFeature(self, feature):
+        """Set the Feature."""
+        if feature and feature.isInfrastructure:
+            self.feature = feature
+        else:
+            self.feature = None
 
         self.refreshUi()
 
@@ -42,22 +51,18 @@ class ProfileDetails(QWidget, FORM_CLASS):
         # If we have no current selected infrastructure, hide stuff
         for label in [self.elevationRangeLabel, self.elevationRangeText,
                       self.infrastructureLengthLabel, self.infrastructureLengthText]:
-            label.setVisible(self.selectedInfrastructure is not None)
+            label.setVisible(self.feature is not None)
 
-        if self.project is None or self.selectedInfrastructure is None:
+        if self.feature is None:
             self.cleanupProfileCanvas()
             return
 
-        if self.selectedInfrastructure is not None:
-            if self.project is None:
-                self.selectedInfrastructure = None
-                self.refreshUi()
-                return
+        if self.feature is not None:
 
-            if self.selectedInfrastructure.profile() is None:
-                self.selectedInfrastructure.recalculate()
+            if self.feature.profile() is None:
+                self.feature.recalculate()
 
-            profile = self.selectedInfrastructure.profile()
+            profile = self.feature.profile()
 
             useMetres = (profile.maximumDistance < 1000)
 
@@ -92,9 +97,4 @@ class ProfileDetails(QWidget, FORM_CLASS):
     @pyqtSlot(Feature)
     def onSelectedFeatureChanged(self, feature):
         """Handle a change to the selected Fence."""
-        if feature and feature.isInfrastructure:
-            self.selectedInfrastructure = feature
-        else:
-            self.selectedInfrastructure = None
-
-        self.refreshUi()
+        self.setFeature(feature)

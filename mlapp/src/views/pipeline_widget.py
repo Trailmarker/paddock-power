@@ -27,14 +27,14 @@ class PipelineWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.profileDetailsDialog = ProfileDetailsDialog(self.project, self)
+        # self.profileDetailsDialog = ProfileDetailsDialog(self.project, self)
 
         self.pipelineList.featureLayer = self.project.pipelineLayer
 
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)
 
-        self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+        # self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
@@ -42,11 +42,12 @@ class PipelineWidget(QWidget, FORM_CLASS):
         tool.sketchFinished.connect(self.onSketchPipelineFinished)
         self.project.setTool(tool)
 
-    @pyqtSlot(Feature)
-    def onSelectedFeatureChanged(self, feature):
-        """Handle a change to the selected Pipeline."""
-        if isinstance(feature, Pipeline):
-            self.profileDetailsDialog.show()
+    # @pyqtSlot(Feature)
+    # def onSelectedFeatureChanged(self, feature):
+    #     """Handle a change to the selected Pipeline."""
+    #     # if isinstance(feature, Pipeline):
+    #     #     self.profileDetailsDialog.show()
+    #     pass
 
     @pyqtSlot(QgsGeometry)
     def onSketchPipelineFinished(self, sketchLine):
