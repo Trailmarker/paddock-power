@@ -12,7 +12,7 @@ from ..fields.schemas import PersistedFeatureSchema
 @PersistedFeatureSchema.addSchema()
 class PersistedFeature(Feature):
 
-    featureUpdated = pyqtSignal()
+    featureUpserted = pyqtSignal()
     featureDeleted = pyqtSignal()
     featureSelected = pyqtSignal()
 
@@ -103,16 +103,54 @@ class PersistedFeature(Feature):
         """Recalculate derived data about the PersistedFeature."""
         pass
 
+    def toProviderFeature(self):
+        """Map the PersistedFeature's fields to the provider's fields."""
+        qgsFeature = QgsFeature(self._qgsFeature)
+
+        attributesWithProviderIndices = [
+            (providerIndex,
+             qgsFeature.attribute(index)) for (
+                index,
+                field) in enumerate(
+                qgsFeature.fields()) for (
+                providerIndex,
+                providerField) in enumerate(
+                    self.featureLayer.dataProvider().fields()) if providerField.name() == field.name()]
+
+        # Sort the matched attributes
+        attributesWithProviderIndices.sort(key=lambda x: x[0])
+
+        providerAttributes = [v for (_, v) in attributesWithProviderIndices]
+
+        qgsFeature.setFields(self.featureLayer.dataProvider().fields())
+        qgsFeature.setAttributes(providerAttributes)
+        return qgsFeature
+
     def upsert(self):
         """Add or update the PersistedFeature in the PersistedFeatureLayer."""
+        
+        assert(self.featureLayer.isEditable())
+        
         # # TODO inefficient
         # self.recalculate()
 
         if (self.id >= 0):
             self.featureLayer.updateFeature(self)
+            self.featureUpserted.emit()
+            return self.id
         else:
-            self.featureLayer.addFeature(self)
-        self.featureUpdated.emit()
+            # We use the dataProvider to upsert, because we can get the new FID back this way
+            qf = self.toProviderFeature()
+
+            ((success, [newQf])) = self.featureLayer.dataProvider().addFeatures([qf])
+
+            if success:
+                self.id = newQf.id()
+            else:
+                raise Glitch(f"{self}.upsert: failed with unknown error")
+
+        self.featureUpserted.emit()
+        return self.id
 
     def delete(self):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""

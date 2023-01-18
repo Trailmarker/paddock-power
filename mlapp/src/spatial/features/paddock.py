@@ -53,6 +53,17 @@ class Paddock(AreaFeature):
     def popupLayer(self, popupLayer):
         self._popupLayerId = popupLayer.id() if popupLayer else None
 
+    def upsert(self):
+        """Upsert the Paddock and also upsert a Condition record if the Paddock has been split."""    
+        super().upsert()
+
+        if self.crossedPaddockId:
+            # qgsDebug(f"{self}.conditionTable.upsertSplit({self.id}, {self.crossedPaddockId})")
+            self.conditionTable.upsertSplit(self.id, self.crossedPaddockId)
+
+        self.featureUpserted.emit()
+        return self.id
+
     def addPopupLayer(self):
         """Add a condition layer to the project."""
         if not self.popupLayer:

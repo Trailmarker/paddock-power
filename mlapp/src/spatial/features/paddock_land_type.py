@@ -7,8 +7,7 @@ from ..fields.schemas import PaddockLandTypeSchema
 
 @PaddockLandTypeSchema.addSchema()
 class PaddockLandType(PersistedFeature):
-    featureUpdated = pyqtSignal()
-
+  
     def __init__(self, featureLayer, conditionTable, existingFeature):
         """Create a new Paddock Condition."""
         super().__init__(featureLayer, existingFeature)
@@ -32,4 +31,4 @@ class PaddockLandType(PersistedFeature):
         """Update the Condition table."""
         self.conditionTable.upsert(self.paddock, self.landType, conditionType)
         self.conditionType = conditionType
-        self.featureUpdated.emit()
+        self.featureUpserted.emit()

@@ -41,12 +41,3 @@ class PaddockLayer(StatusFeatureLayer):
 
     def wrapFeature(self, feature):
         return self.getFeatureType()(self, self.derivedMetricPaddockLayer, self.paddockLandTypesLayer, self.conditionTable, feature)
-
-    def addFeature(self, feature):
-        """Add a new Paddock to the layer."""
-        super().addFeature(feature)
-        
-        if feature.crossedPaddockId:
-            qgsDebug(f"PaddockLayer.addFeature({feature}): upsertSplit({feature.id}, {feature.crossedPaddockId})")
-            self.conditionTable.upsertSplit(feature.id, feature.crossedPaddockId)
-        

@@ -31,6 +31,11 @@ CREATE TABLE "{tableName}" (
 DROP TABLE IF EXISTS "{tableName}"
 """
 
+    def makeGetAllRecordsQuery(self, tableName):
+        return f"""
+SELECT * FROM "{tableName}"
+"""
+
     def makeGetRecordQuery(self, tableName, paddockId, landTypeId):
         return f"""
 SELECT * FROM "{tableName}"
@@ -92,6 +97,11 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
 
     def name(self):
         return self.tableName
+
+    def getAllRecords(self):
+        with sqlite3.connect(self.gpkgFile) as conn:
+            cursor = conn.execute(self.makeGetAllRecordsQuery(tableName=self.tableName))
+            return cursor.fetchall()
 
     def getRecord(self, paddockId, landTypeId):
         with sqlite3.connect(self.gpkgFile) as conn:

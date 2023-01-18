@@ -15,7 +15,7 @@ class StatusFeature(PersistedFeature, FeatureStateMachine):
         PersistedFeature.__init__(self, featureLayer, existingFeature)
         FeatureStateMachine.__init__(self)
 
-        self.featureUpdated.connect(lambda: self.stateChanged.emit(self))
+        self.featureUpserted.connect(lambda: self.stateChanged.emit(self))
         self.featureDeleted.connect(lambda: self.stateChanged.emit(self))
 
     def __repr__(self):
