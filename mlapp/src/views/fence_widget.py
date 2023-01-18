@@ -10,6 +10,7 @@ from qgis.core import QgsGeometry
 from ..spatial.features.fence import Fence
 from ..spatial.features.persisted_feature import Feature
 from ..tools.sketch_line_tool import SketchLineTool
+from ..widgets.profile_details.profile_details_dialog import ProfileDetailsDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_widget_base.ui')))
@@ -25,17 +26,16 @@ class FenceWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
+        self.profileDetailsDialog = ProfileDetailsDialog(self.project, self)
+
         self.fenceList.featureLayer = self.project.fenceLayer
-        self.profileDetails.setProject(self.project)
         self.fencePaddockChanges.setProject(self.project)
 
-        self.profileGroupBox.hide()
-
-        # self.splitter.setSizes([self.fenceListGroupBox.sizeHint().width(), 0, self.fencePaddockChanges.sizeHint().width()])
+        self.splitter.setSizes([self.fenceListGroupBox.sizeHint().width(),
+                               self.fencePaddockChanges.sizeHint().width()])
         self.splitter.setCollapsible(0, False)
-        self.splitter.setCollapsible(1, True)
-        self.splitter.setCollapsible(2, False)
-        self.splitter.setCollapsible(3, True)
+        self.splitter.setCollapsible(1, False)
+        self.splitter.setCollapsible(2, True)
 
         self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
 
@@ -49,13 +49,7 @@ class FenceWidget(QWidget, FORM_CLASS):
     def onSelectedFeatureChanged(self, feature):
         """Handle a change to the selected Fence."""
         if isinstance(feature, Fence):
-            self.profileGroupBox.show()
-            self.splitter.setSizes(
-                [self.fenceList.sizeHint().width(),
-                 self.profileGroupBox.sizeHint().width(),
-                 self.fencePaddockChanges.sizeHint().width()])
-        else:
-            self.profileGroupBox.hide()
+            self.profileDetailsDialog.show()
 
     @pyqtSlot(QgsGeometry)
     def onSketchFenceFinished(self, sketchLine):
