@@ -31,13 +31,13 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         self._project = project
         self._selectedFeature = None
 
-        styleName = kwargs.pop("styleName", None)
+        self._styleName = kwargs.pop("styleName", None)
 
         super().__init__(*args, **kwargs)
 
         # Optionally apply a style to the layer
-        if styleName is not None:
-            stylePath = resolveStylePath(styleName)
+        if self._styleName is not None:
+            stylePath = resolveStylePath(self._styleName)
             self.loadNamedStyle(stylePath)
 
         # Route changes to this layer's selection *through* the Paddock Power
@@ -46,6 +46,12 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         self._project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self._project.currentTimeframeChanged.connect(self.onCurrentTimeframeChanged)
         self.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(selection))
+
+    @property
+    def styleName(self):
+        """Return the name of the style applied to this layer."""
+        return self._styleName
+
 
     @property
     def currentTimeframe(self):
