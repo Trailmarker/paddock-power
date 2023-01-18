@@ -598,13 +598,7 @@
     <constraint field="Rounded AE" desc="" exp=""/>
     <constraint field="Rounded Potential AE" desc="" exp=""/>
   </constraintExpressions>
-  <expressionfields>
-    <field typeName="" length="0" expression="round(&quot;Area (km²)&quot;, 2)" precision="0" subType="0" comment="" name="Rounded Area (km²)" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;AE/km²&quot;, 1)" precision="0" subType="0" comment="" name="Rounded AE/km²" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Potential AE/km²&quot;, 1)" precision="0" subType="0" comment="" name="Rounded Potential AE/km²" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;AE&quot;, 0)" precision="0" subType="0" comment="" name="Rounded AE" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Potential AE&quot;, 0)" precision="0" subType="0" comment="" name="Rounded Potential AE" type="6"/>
-  </expressionfields>
+  <expressionfields/>
   <attributeactions/>
   <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
     <columns>
@@ -618,7 +612,8 @@
       <column hidden="1" type="field" name="Area (km²)" width="-1"/>
       <column hidden="1" type="field" name="AE" width="-1"/>
       <column hidden="1" type="field" name="Potential AE" width="-1"/>
-      <column hidden="1" type="field" name="Potential AE/km²" width="262"/>
+      <column hidden="1" type="field" name="Potential AE/km²" width="-1"/>
+      <column hidden="1" type="field" name="Watered Area (km²)" width="-1" />
       <column hidden="0" type="field" name="Timeframe" width="-1"/>
       <column hidden="1" type="actions" width="-1"/>
     </columns>

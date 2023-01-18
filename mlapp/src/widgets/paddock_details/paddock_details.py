@@ -38,9 +38,11 @@ class PaddockDetails(QWidget, FORM_CLASS):
             self.metricPaddock = derivedMetricPaddockLayer.getFeatureByPaddockId(self.paddock.id)
 
             if self.metricPaddock is not None:
-                self.areaText.setValue(self.metricPaddock.featureArea, "{0:.1f}")
+                self.areaText.setValue(self.metricPaddock.featureArea, "{0:.2f}")
+                self.wateredAreaText.setValue(self.metricPaddock.wateredArea, "{0:.2f}")
                 self.perimeterText.setValue(self.metricPaddock.featurePerimeter, "{0:.1f}")
                 self.estimatedCapacityText.setValue(self.metricPaddock.estimatedCapacity, "{0:.0f}")
                 self.potentialCapacityText.setValue(self.metricPaddock.potentialCapacity, "{0:.0f}")
                 self.estimatedCapacityPerAreaText.setValue(self.metricPaddock.estimatedCapacityPerArea, "{0:.1f}")
+                self.wateredAreaText.setValue(self.metricPaddock.wateredArea, "{0:.2f}")
                 # self.potentialCapacityPerAreaText.setValue(self.metricPaddock.potentialCapacityPerArea, "{0:.1f}")

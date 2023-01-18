@@ -96,7 +96,7 @@ class PersistedFeatureLayer(FeatureLayer):
         self._gpkgUrl = f"{gpkgFile}|layername={layerName}"
         super().__init__(project, path=self._gpkgUrl, baseName=layerName, providerLib="ogr", styleName=styleName)
 
-        missingFields, extraFields = self.getFeatureType().checkSchema(self.fields())
+        missingFields, extraFields = self.getFeatureType().checkSchema(self.dataProvider().fields())
 
         if missingFields:
             # Start editing to to expand the schema

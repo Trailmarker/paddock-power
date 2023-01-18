@@ -66,6 +66,10 @@ def byName(name):
     return next(layer for layer in pluginLayers() if layer.name() == name)
 
 
+def show(layer):
+    f"""Show the given layer."""
+    QgsProject.instance().layerTreeRoot().addLayer(layer)
+
 def feature(layer, id):
     f"""Get feature by FID in the given layer."""
     return layer.getFeature(id)

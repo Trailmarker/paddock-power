@@ -47,11 +47,18 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         self._project.currentTimeframeChanged.connect(self.onCurrentTimeframeChanged)
         self.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(selection))
 
+    def __repr__(self):
+        """Return a string representation of the Field."""
+        return f"{self.__class__.__name__}(name={self.name()})"
+
+    def __str__(self):
+        """Convert the Field to a string representation."""
+        return repr(self)
+
     @property
     def styleName(self):
         """Return the name of the style applied to this layer."""
         return self._styleName
-
 
     @property
     def currentTimeframe(self):

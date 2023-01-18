@@ -311,9 +311,7 @@
     <constraint field="Grazing Radius (m)" desc="" exp=""/>
     <constraint field="Rounded Grazing Radius (m)" desc="" exp=""/>
   </constraintExpressions>
-  <expressionfields>
-    <field typeName="" length="0" expression="round(&quot;Grazing Radius (m)&quot;, 0)" precision="0" subType="0" comment="" name="Rounded Grazing Radius (m)" type="6"/>
-  </expressionfields>
+  <expressionfields/>
   <attributeactions/>
   <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
     <columns>

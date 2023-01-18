@@ -2,7 +2,7 @@
 from ...utils import randomString
 from ..calculator import Calculator
 from ..features.paddock_land_type import PaddockLandType
-from ..fields.schemas import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_TYPE, LAND_TYPE_NAME, NAME, OPTIMAL_CAPACITY_PER_AREA, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA_STATUS
+from ..fields.names import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_TYPE, LAND_TYPE_NAME, NAME, OPTIMAL_CAPACITY_PER_AREA, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA
 from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
@@ -14,6 +14,7 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
     def parameteriseQuery(self, PaddockLayer, LandTypeLayer, WateredAreaLayer, ConditionTable):
         PaddockLandTypes = f"PaddockLandTypes{randomString()}"
         PaddockWateredAreas = f"PaddockWateredAreas{randomString()}"
+        WateredFactor = "WateredFactor"
 
         return f"""
 with {PaddockWateredAreas} as
@@ -47,6 +48,7 @@ select
 	st_multi(st_collectionextract(st_union(geometry), 3)) as geometry,
 	0 as {FID},
 	sum("{AREA}") as "{AREA}",
+	sum("{AREA}" * "{WateredFactor}") as "{WATERED_AREA}",
 	(sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
 	(sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
 	((sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{ESTIMATED_CAPACITY}",
@@ -67,7 +69,13 @@ from
 		"{LAND_TYPE_NAME}",
 		"{ESTIMATED_CAPACITY_PER_AREA}" as "{POTENTIAL_CAPACITY_PER_AREA}",
 		st_area({PaddockLandTypes}.geometry) / 1000000 as "{AREA}",
-		ifnull("{ConditionTable}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
+		case {PaddockLandTypes}."{WATERED_TYPE}"
+			when 'Near' then 1.0
+			when 'Far' then 1.0
+			when 'Unwatered' then 0.0
+			else 0.0
+		end as {WateredFactor},
+        ifnull("{ConditionTable}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
 		case ifnull("{ConditionTable}"."{CONDITION_TYPE}", 'A')
 			when 'A' then 1.0
 			when 'B' then 0.75
@@ -97,7 +105,11 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 
     def __init__(self, project, layerName, paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
-        query = self.parameteriseQuery(paddockLayer.name(), landTypeLayer.name(), wateredAreaLayer.name(), conditionTable.name())
+        query = self.parameteriseQuery(
+            paddockLayer.name(),
+            landTypeLayer.name(),
+            wateredAreaLayer.name(),
+            conditionTable.name())
 
         super().__init__(
             project,

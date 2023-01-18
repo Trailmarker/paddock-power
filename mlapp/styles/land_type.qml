@@ -246,11 +246,7 @@
     <constraint field="Rounded Perimeter (km)" desc="" exp=""/>
     <constraint field="Rounded Best AE/km² (if Condition is 'A')" desc="" exp=""/>
   </constraintExpressions>
-  <expressionfields>
-    <field typeName="" length="0" expression="round(&quot;Area (km²)&quot;, 2)" precision="0" subType="0" comment="" name="Rounded Area (km²)" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Perimeter (km)&quot;, 2)" precision="0" subType="0" comment="" name="Rounded Perimeter (km)" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Best AE/km² (if Condition is 'A')&quot;, 1)" precision="0" subType="0" comment="" name="Rounded Best AE/km² (if Condition is 'A')" type="6"/>
-  </expressionfields>
+  <expressionfields/>
   <attributeactions/>
   <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
     <columns>
@@ -259,7 +255,7 @@
       <column hidden="0" type="field" name="Landscape Class" width="-1"/>
       <column hidden="0" type="field" name="Class Description" width="-1"/>
       <column hidden="0" type="field" name="Erosion Risk" width="-1"/>
-      <column hidden="0" type="field" name="AE/km²" width="-1"/>
+      <column hidden="1" type="field" name="Best AE/km² (if Condition is 'A')" width="-1"/>
       <column hidden="1" type="field" name="Area (km²)" width="-1"/>
       <column hidden="1" type="field" name="Perimeter (km)" width="-1"/>
       <column hidden="0" type="field" name="Name" width="-1"/>

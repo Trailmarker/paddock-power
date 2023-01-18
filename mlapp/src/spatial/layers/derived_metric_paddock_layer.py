@@ -2,7 +2,7 @@
 from qgis.core import QgsFeatureRequest
 
 from ..features.metric_paddock import MetricPaddock
-from ..fields.names import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME
+from ..fields.names import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_AREA
 from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 
@@ -21,6 +21,7 @@ select
 	"{PaddockLayer}".{STATUS} as {STATUS},
     "{PaddockLandTypesLayer}".{TIMEFRAME} as {TIMEFRAME},
 	"{PaddockLayer}"."{AREA}" as "{AREA}",
+    sum("{PaddockLandTypesLayer}"."{WATERED_AREA}") as "{WATERED_AREA}",
 	"{PaddockLayer}"."{PERIMETER}" as "{PERIMETER}",
 	"{PaddockLayer}"."{BUILD_FENCE}" as "{BUILD_FENCE}",
 	(sum("{PaddockLandTypesLayer}"."{ESTIMATED_CAPACITY}") / nullif("{PaddockLayer}"."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
@@ -30,7 +31,7 @@ select
 from "{PaddockLayer}"
 left join "{PaddockLandTypesLayer}"
 	on "{PaddockLayer}".{FID} = "{PaddockLandTypesLayer}".{PADDOCK}
-group by "{PaddockLayer}".{FID}
+group by "{PaddockLayer}".{FID}, "{PaddockLandTypesLayer}".{TIMEFRAME}
 """
 
     def getFeatureType(self):

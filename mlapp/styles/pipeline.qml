@@ -264,9 +264,7 @@
     <constraint field="Status" desc="" exp=""/>
     <constraint field="Rounded Length (km)" desc="" exp=""/>
   </constraintExpressions>
-  <expressionfields>
-    <field typeName="" length="0" expression="round(&quot;Length (km)&quot;, 2)" precision="0" subType="0" comment="" name="Rounded Length (km)" type="6"/>
-  </expressionfields>
+  <expressionfields/>
   <attributeactions/>
   <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
     <columns>

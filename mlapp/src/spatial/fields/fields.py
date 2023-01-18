@@ -62,16 +62,12 @@ TimeframeField = DomainField(
     name=TIMEFRAME,
     domainType=Timeframe,
     defaultValue=Timeframe.Undefined)
+WateredArea = MeasureField(propertyName="wateredArea", name=WATERED_AREA, dps=2)
 WateredTypeField = DomainField(
     propertyName="wateredType",
     name=WATERED_TYPE,
     domainType=WateredType,
     defaultValue=WateredType.Unwatered)
-WateredAreaStatus = DomainField(
-    propertyName="wateredAreaStatus",
-    name=WATERED_AREA_STATUS,
-    domainType=FeatureStatus,
-    defaultValue=FeatureStatus.Undefined)
 Waterpoint = IdField(propertyName="waterpoint", name=WATERPOINT)
 GrazingRadiusTypeField = DomainField(
     propertyName="grazingRadiusType",

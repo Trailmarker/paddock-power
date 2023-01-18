@@ -1069,13 +1069,7 @@
     <constraint field="Rounded Near Grazing Radius (m)" desc="" exp=""/>
     <constraint field="Rounded Far Grazing Radius (m)" desc="" exp=""/>
   </constraintExpressions>
-  <expressionfields>
-    <field typeName="" length="0" expression="round(&quot;Longitude&quot;, 2)" precision="0" subType="0" comment="" name="Rounded Longitude" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Latitude&quot;, 2)" precision="0" subType="0" comment="" name="Rounded Latitude" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Elevation (m)&quot;, 1)" precision="0" subType="0" comment="" name="Rounded Elevation (m)" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Near Grazing Radius (m)&quot;, 0)" precision="0" subType="0" comment="" name="Rounded Near Grazing Radius (m)" type="6"/>
-    <field typeName="" length="0" expression="round(&quot;Far Grazing Radius (m)&quot;, 0)" precision="0" subType="0" comment="" name="Rounded Far Grazing Radius (m)" type="6"/>
-  </expressionfields>
+  <expressionfields/>
   <attributeactions/>
   <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
     <columns>
