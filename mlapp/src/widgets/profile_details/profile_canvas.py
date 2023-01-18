@@ -66,7 +66,5 @@ class ProfileCanvas(FigureCanvasQTAgg):
         width = max(200, available.width() / 2)
         height = max(200, width / 3)
         
-        # qgsDebug(f"dimensions: ({width},{height})")
-
         return (width / dpi, height / dpi)
 

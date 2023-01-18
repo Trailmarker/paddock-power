@@ -54,7 +54,7 @@ class Project(ProjectBase):
         if self.currentTimeframe != timeframe:
             # If our current feature is not in the new timeframe, deselect it
             if self.selectedFeature and not self.selectedFeature.matchTimeframe(timeframe):
-                qgsDebug("Deselecting feature because it is not in the new timeframe")
+                # qgsDebug("Deselecting feature because it is not in the new timeframe")
                 self.deselectFeature()
 
             # qgsDebug(f"Setting project timeframe to: {timeframe}")

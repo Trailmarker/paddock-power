@@ -4,7 +4,6 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
 
 from ...models.glitch import Glitch
-from ...utils import qgsInfo
 from .field_domain import FieldDomain
 
 
@@ -115,7 +114,6 @@ class Field(QgsField):
 
     def setupLayer(self, layer):
         """Set up this Field in a FeatureLayer."""
-        qgsInfo(f"{self}.setupLayer({layer})")
         fieldIndex = layer.fields().indexFromName(self.name())
         layer.setEditorWidgetSetup(fieldIndex, self.editorWidgetSetup())
         layer.setDefaultValueDefinition(fieldIndex, self.defaultValueDefinition())
@@ -144,8 +142,8 @@ class MeasureField(Field):
         matches = [c for c in columns if c.name == self.name()]
         if matches:
             column = matches[0]
-            if not column.hidden:
-                qgsInfo(f"{self}.setupLayer({layer}): hiding field {self.name()}")
+            #if not column.hidden:
+            #    qgsInfo(f"{self}.setupLayer({layer}): hiding field {self.name()}")
             column.hidden = True
             config.setColumns(columns)
             layer.setAttributeTableConfig(config)
