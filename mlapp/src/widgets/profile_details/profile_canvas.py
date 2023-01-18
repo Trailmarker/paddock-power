@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsApplication
+
 from ...models.glitch import Glitch
 from ...spatial.elevation_profile import ElevationProfile
 from matplotlib.figure import Figure
@@ -8,6 +10,8 @@ matplotlib.use('Qt5Agg')
 
 
 class ProfileCanvas(FigureCanvasQTAgg):
+
+    ELEVATION_BRACKET = 10.0
 
     def __init__(self, profile):
 
@@ -27,10 +31,15 @@ class ProfileCanvas(FigureCanvasQTAgg):
         msShellDlg = {'fontname': 'MS Shell Dlg 2'}
 
         # Create a figure
-        figure = Figure()
+        [width, height] = self._getPlotDimensionsInches()
+        figure = Figure(figsize=(width, height))
         self.axes = figure.add_subplot(111)
         self.axes.plot(distances, profile.elevations)
-        self.axes.set_ylim(0.0, profile.maximumElevation * 1.5)
+        
+        minElevation = max(0.0, profile.minimumElevation - ProfileCanvas.ELEVATION_BRACKET)
+        maxElevation = profile.maximumElevation + ProfileCanvas.ELEVATION_BRACKET
+        
+        self.axes.set_ylim(minElevation, maxElevation)
         # self.axes.plot([0, maximumDistance], [fencelineProfile.minimumElevation, fencelineProfile.minimumElevation], 'g--', label=f"Min. : {fencelineProfile.minimumElevation}")
         # self.axes.plot([0, maximumDistance], [fencelineProfile.maximumElevation, fencelineProfile.maximumElevation], 'r--', label=f"Max. : {fencelineProfile.maximumElevation}")
         # self.axes.plot([0, maximumDistance], [fencelineProfile.meanElevation, fencelineProfile.meanElevation], 'y--', label=f"Mean : {fencelineProfile.meanElevation}")
@@ -38,10 +47,26 @@ class ProfileCanvas(FigureCanvasQTAgg):
         # self.axes.legend(loc = 1)
         self.axes.set_xlabel(
             f"Distance ({'m' if useMetres else 'km'})", **msShellDlg)
-        self.axes.set_ylabel("Elevation (m)", **msShellDlg)
+        self.axes.set_ylabel("Elevation (m) (truncated)", **msShellDlg)
         self.axes.fill_between(distances,
                                profile.elevations, yMinimum, alpha=0.5)
 
-        figure.tight_layout()
+        # figure.tight_layout()
 
         super().__init__(figure)
+
+
+    def _getPlotDimensionsInches(self):
+        # Set a reasonable initial size
+        screen = QgsApplication.instance().primaryScreen()
+        
+        available = screen.availableGeometry()
+        dpi = screen.physicalDotsPerInch()
+
+        width = max(200, available.width() / 2)
+        height = max(200, width / 3)
+        
+        # qgsDebug(f"dimensions: ({width},{height})")
+
+        return (width / dpi, height / dpi)
+

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>133</height>
+    <width>600</width>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,12 +16,24 @@
   <property name="toolTip">
    <string>This feature shows the elevation profile for a Fence or Pipeline</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
+  </property>
   <property name="modal">
    <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>3</number>
+   </property>
    <property name="topMargin">
-    <number>10</number>
+    <number>3</number>
+   </property>
+   <property name="rightMargin">
+    <number>3</number>
+   </property>
+   <property name="bottomMargin">
+    <number>3</number>
    </property>
    <item>
     <widget class="ProfileDetails" name="profileDetails" native="true"/>

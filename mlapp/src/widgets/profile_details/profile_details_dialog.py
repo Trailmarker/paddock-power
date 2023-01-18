@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 
-
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QDialog
-
-from ...spatial.features.feature import Feature
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'profile_details_dialog_base.ui')))
