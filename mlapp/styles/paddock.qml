@@ -1,11 +1,17 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis version="3.22.13-Białowieża" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable" readOnly="0" labelsEnabled="1">
+<qgis version="3.22.13-Białowieża" styleCategories="AllStyleCategories" readOnly="0" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" simplifyDrawingTol="1" labelsEnabled="1" simplifyDrawingHints="1" symbologyReferenceScale="-1" maxScale="0" simplifyLocal="1" minScale="0" simplifyMaxScale="1">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
+  <temporal accumulate="0" startField="" startExpression="" durationField="" endField="" durationUnit="min" limitMode="0" enabled="0" mode="0" fixedDuration="0" endExpression="">
+    <fixedRange>
+      <start></start>
+      <end></end>
+    </fixedRange>
+  </temporal>
   <renderer-v2 symbollevels="0" forceraster="0" referencescale="-1" enableorderby="0" type="singleSymbol">
     <symbols>
       <symbol clip_to_extent="1" name="0" type="fill" force_rhr="0" alpha="1">
@@ -218,25 +224,28 @@
       </rule>
     </rules>
   </labeling>
+  <customproperties>
+    <Option/>
+  </customproperties>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
+  <layerOpacity>1</layerOpacity>
+  <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
+    <activeChecks/>
+    <checkConfiguration/>
+  </geometryOptions>
+  <legend type="default-vector" showLabelLegend="0"/>
+  <referencedLayers/>
   <fieldConfiguration>
     <field name="fid" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Paddock" configurationFlags="None">
-      <editWidget type="TextEdit">
+      <editWidget type="">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
     <field name="Name" configurationFlags="None">
-      <editWidget type="TextEdit">
+      <editWidget type="">
         <config>
           <Option/>
         </config>
@@ -273,82 +282,22 @@
         </config>
       </editWidget>
     </field>
-    <field name="Timeframe" configurationFlags="None">
-      <editWidget type="ValueMap">
-        <config>
-          <Option type="Map">
-            <Option name="map" type="List">
-              <Option type="Map">
-                <Option name="Historical" type="QString" value="Historical"/>
-              </Option>
-              <Option type="Map">
-                <Option name="Current" type="QString" value="Current"/>
-              </Option>
-              <Option type="Map">
-                <Option name="Future" type="QString" value="Future"/>
-              </Option>
-              <Option type="Map">
-                <Option name="Drafted" type="QString" value="Drafted"/>
-              </Option>
-              <Option type="Map">
-                <Option name="Undefined" type="QString" value="Undefined"/>
-              </Option>
-            </Option>
-          </Option>
-        </config>
-      </editWidget>
-    </field>
     <field name="Area (km²)" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Watered Area (km²)" configurationFlags="None">
-      <editWidget type="TextEdit">
+      <editWidget type="">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
     <field name="Perimeter (km)" configurationFlags="None">
-      <editWidget type="TextEdit">
+      <editWidget type="">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
     <field name="Build Fence" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="AE/km²" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="AE" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Potential AE/km²" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Potential AE" configurationFlags="None">
-      <editWidget type="TextEdit">
+      <editWidget type="">
         <config>
           <Option/>
         </config>
@@ -368,131 +317,52 @@
         </config>
       </editWidget>
     </field>
-    <field name="Rounded AE/km²" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Rounded AE" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Rounded Potential AE/km²" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Rounded Potential AE" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Rounded Watered Area (km²)" configurationFlags="None">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
   </fieldConfiguration>
   <aliases>
     <alias field="fid" index="0" name=""/>
-    <alias field="Paddock" index="1" name=""/>
-    <alias field="Name" index="2" name=""/>
-    <alias field="Status" index="3" name=""/>
-    <alias field="Timeframe" index="4" name=""/>
-    <alias field="Area (km²)" index="5" name=""/>
-    <alias field="Watered Area (km²)" index="6" name=""/>
-    <alias field="Perimeter (km)" index="7" name=""/>
-    <alias field="Build Fence" index="8" name=""/>
-    <alias field="AE/km²" index="9" name=""/>
-    <alias field="AE" index="10" name=""/>
-    <alias field="Potential AE/km²" index="11" name=""/>
-    <alias field="Potential AE" index="12" name=""/>
-    <alias field="Rounded Area (km²)" index="13" name="Area (km²)"/>
-    <alias field="Rounded Perimeter (km)" index="14" name="Perimeter (km)"/>
-    <alias field="Rounded AE/km²" index="15" name="AE/km²"/>
-    <alias field="Rounded AE" index="16" name="AE"/>
-    <alias field="Rounded Potential AE/km²" index="17" name="Potential AE/km²"/>
-    <alias field="Rounded Potential AE" index="18" name="Potential AE"/>
-    <alias field="Rounded Watered Area (km²)" index="19" name="Watered Area (km²)"/>
+    <alias field="Name" index="1" name=""/>
+    <alias field="Status" index="2" name=""/>
+    <alias field="Area (km²)" index="3" name=""/>
+    <alias field="Perimeter (km)" index="4" name=""/>
+    <alias field="Build Fence" index="5" name=""/>
+    <alias field="Rounded Area (km²)" index="6" name="Area (km²)"/>
+    <alias field="Rounded Perimeter (km)" index="7" name="Perimeter (km)"/>
   </aliases>
   <defaults>
     <default expression="" field="fid" applyOnUpdate="0"/>
-    <default expression="" field="Paddock" applyOnUpdate="0"/>
     <default expression="" field="Name" applyOnUpdate="0"/>
     <default expression="Undefined" field="Status" applyOnUpdate="0"/>
-    <default expression="'Undefined'" field="Timeframe" applyOnUpdate="0"/>
     <default expression="" field="Area (km²)" applyOnUpdate="0"/>
-    <default expression="" field="Watered Area (km²)" applyOnUpdate="0"/>
     <default expression="" field="Perimeter (km)" applyOnUpdate="0"/>
     <default expression="" field="Build Fence" applyOnUpdate="0"/>
-    <default expression="" field="AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="AE" applyOnUpdate="0"/>
-    <default expression="" field="Potential AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="Potential AE" applyOnUpdate="0"/>
     <default expression="" field="Rounded Area (km²)" applyOnUpdate="0"/>
     <default expression="" field="Rounded Perimeter (km)" applyOnUpdate="0"/>
-    <default expression="" field="Rounded AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="Rounded AE" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Potential AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Potential AE" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Watered Area (km²)" applyOnUpdate="0"/>
   </defaults>
   <constraints>
     <constraint notnull_strength="1" field="fid" unique_strength="1" exp_strength="0" constraints="3"/>
-    <constraint notnull_strength="0" field="Paddock" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Name" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Status" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Timeframe" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Watered Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Perimeter (km)" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Build Fence" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="AE" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Potential AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Potential AE" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Rounded Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Rounded Perimeter (km)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded AE" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Potential AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Potential AE" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Watered Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="fid" desc=""/>
-    <constraint exp="" field="Paddock" desc=""/>
     <constraint exp="" field="Name" desc=""/>
     <constraint exp="" field="Status" desc=""/>
-    <constraint exp="" field="Timeframe" desc=""/>
     <constraint exp="" field="Area (km²)" desc=""/>
-    <constraint exp="" field="Watered Area (km²)" desc=""/>
     <constraint exp="" field="Perimeter (km)" desc=""/>
     <constraint exp="" field="Build Fence" desc=""/>
-    <constraint exp="" field="AE/km²" desc=""/>
-    <constraint exp="" field="AE" desc=""/>
-    <constraint exp="" field="Potential AE/km²" desc=""/>
-    <constraint exp="" field="Potential AE" desc=""/>
     <constraint exp="" field="Rounded Area (km²)" desc=""/>
     <constraint exp="" field="Rounded Perimeter (km)" desc=""/>
-    <constraint exp="" field="Rounded AE/km²" desc=""/>
-    <constraint exp="" field="Rounded AE" desc=""/>
-    <constraint exp="" field="Rounded Potential AE/km²" desc=""/>
-    <constraint exp="" field="Rounded Potential AE" desc=""/>
-    <constraint exp="" field="Rounded Watered Area (km²)" desc=""/>
   </constraintExpressions>
-  <expressionfields/>
+  <expressionfields>
+    <field comment="" expression="round(&quot;Area (km²)&quot;, 2)" typeName="" name="Rounded Area (km²)" subType="0" precision="0" type="6" length="0"/>
+    <field comment="" expression="round(&quot;Perimeter (km)&quot;, 2)" typeName="" name="Rounded Perimeter (km)" subType="0" precision="0" type="6" length="0"/>
+  </expressionfields>
+  <attributeactions/>
   <attributetableconfig sortExpression="&quot;fid&quot;" sortOrder="0" actionWidgetStyle="dropDown">
     <columns>
       <column hidden="0" width="-1" name="fid" type="field"/>
@@ -622,5 +492,6 @@ def my_form_open(dialog, layer, feature):
   <dataDefinedFieldProperties/>
   <widgets/>
   <previewExpression>"Name"</previewExpression>
+  <mapTip></mapTip>
   <layerGeometryType>2</layerGeometryType>
 </qgis>

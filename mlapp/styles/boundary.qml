@@ -1,62 +1,62 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis simplifyAlgorithm="0" version="3.22.13-Białowieża" maxScale="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingTol="1" simplifyLocal="1" symbologyReferenceScale="-1" minScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" readOnly="0">
+<qgis version="3.22.13-Białowieża" styleCategories="AllStyleCategories" readOnly="0" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" simplifyDrawingTol="1" labelsEnabled="0" simplifyDrawingHints="1" symbologyReferenceScale="-1" maxScale="0" simplifyLocal="1" minScale="0" simplifyMaxScale="1">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <temporal durationUnit="min" startField="" fixedDuration="0" enabled="0" durationField="" mode="0" limitMode="0" startExpression="" endExpression="" accumulate="0" endField="">
+  <temporal accumulate="0" startField="" startExpression="" durationField="" endField="" durationUnit="min" limitMode="0" enabled="0" mode="0" fixedDuration="0" endExpression="">
     <fixedRange>
       <start></start>
       <end></end>
     </fixedRange>
   </temporal>
-  <renderer-v2 forceraster="0" referencescale="-1" enableorderby="0" type="singleSymbol" symbollevels="0">
+  <renderer-v2 symbollevels="0" forceraster="0" referencescale="-1" enableorderby="0" type="singleSymbol">
     <symbols>
-      <symbol alpha="1" clip_to_extent="1" force_rhr="0" type="fill" name="0">
+      <symbol clip_to_extent="1" name="0" type="fill" force_rhr="0" alpha="1">
         <data_defined_properties>
           <Option type="Map">
-            <Option value="" type="QString" name="name"/>
-            <Option type="Map" name="properties">
-              <Option type="Map" name="alpha">
-                <Option value="true" type="bool" name="active"/>
-                <Option value="case &#xd;&#xa;when matchCurrentTimeframe(&quot;Timeframe&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end" type="QString" name="expression"/>
-                <Option value="3" type="int" name="type"/>
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties" type="Map">
+              <Option name="alpha" type="Map">
+                <Option name="active" type="bool" value="true"/>
+                <Option name="expression" type="QString" value="case &#xd;&#xa;when matchCurrentTimeframe(&quot;Timeframe&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end"/>
+                <Option name="type" type="int" value="3"/>
               </Option>
             </Option>
-            <Option value="collection" type="QString" name="type"/>
+            <Option name="type" type="QString" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" class="SimpleLine" enabled="1" pass="0">
+        <layer locked="0" pass="0" enabled="1" class="SimpleLine">
           <Option type="Map">
-            <Option value="0" type="QString" name="align_dash_pattern"/>
-            <Option value="square" type="QString" name="capstyle"/>
-            <Option value="5;2" type="QString" name="customdash"/>
-            <Option value="3x:0,0,0,0,0,0" type="QString" name="customdash_map_unit_scale"/>
-            <Option value="MM" type="QString" name="customdash_unit"/>
-            <Option value="0" type="QString" name="dash_pattern_offset"/>
-            <Option value="3x:0,0,0,0,0,0" type="QString" name="dash_pattern_offset_map_unit_scale"/>
-            <Option value="MM" type="QString" name="dash_pattern_offset_unit"/>
-            <Option value="0" type="QString" name="draw_inside_polygon"/>
-            <Option value="bevel" type="QString" name="joinstyle"/>
-            <Option value="77,175,74,255" type="QString" name="line_color"/>
-            <Option value="solid" type="QString" name="line_style"/>
-            <Option value="0.96" type="QString" name="line_width"/>
-            <Option value="MM" type="QString" name="line_width_unit"/>
-            <Option value="0" type="QString" name="offset"/>
-            <Option value="3x:0,0,0,0,0,0" type="QString" name="offset_map_unit_scale"/>
-            <Option value="MM" type="QString" name="offset_unit"/>
-            <Option value="0" type="QString" name="ring_filter"/>
-            <Option value="0" type="QString" name="trim_distance_end"/>
-            <Option value="3x:0,0,0,0,0,0" type="QString" name="trim_distance_end_map_unit_scale"/>
-            <Option value="MM" type="QString" name="trim_distance_end_unit"/>
-            <Option value="0" type="QString" name="trim_distance_start"/>
-            <Option value="3x:0,0,0,0,0,0" type="QString" name="trim_distance_start_map_unit_scale"/>
-            <Option value="MM" type="QString" name="trim_distance_start_unit"/>
-            <Option value="0" type="QString" name="tweak_dash_pattern_on_corners"/>
-            <Option value="0" type="QString" name="use_custom_dash"/>
-            <Option value="3x:0,0,0,0,0,0" type="QString" name="width_map_unit_scale"/>
+            <Option name="align_dash_pattern" type="QString" value="0"/>
+            <Option name="capstyle" type="QString" value="square"/>
+            <Option name="customdash" type="QString" value="5;2"/>
+            <Option name="customdash_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="customdash_unit" type="QString" value="MM"/>
+            <Option name="dash_pattern_offset" type="QString" value="0"/>
+            <Option name="dash_pattern_offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="dash_pattern_offset_unit" type="QString" value="MM"/>
+            <Option name="draw_inside_polygon" type="QString" value="0"/>
+            <Option name="joinstyle" type="QString" value="bevel"/>
+            <Option name="line_color" type="QString" value="77,175,74,255"/>
+            <Option name="line_style" type="QString" value="solid"/>
+            <Option name="line_width" type="QString" value="0.96"/>
+            <Option name="line_width_unit" type="QString" value="MM"/>
+            <Option name="offset" type="QString" value="0"/>
+            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="offset_unit" type="QString" value="MM"/>
+            <Option name="ring_filter" type="QString" value="0"/>
+            <Option name="trim_distance_end" type="QString" value="0"/>
+            <Option name="trim_distance_end_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="trim_distance_end_unit" type="QString" value="MM"/>
+            <Option name="trim_distance_start" type="QString" value="0"/>
+            <Option name="trim_distance_start_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="trim_distance_start_unit" type="QString" value="MM"/>
+            <Option name="tweak_dash_pattern_on_corners" type="QString" value="0"/>
+            <Option name="use_custom_dash" type="QString" value="0"/>
+            <Option name="width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
           </Option>
           <prop k="align_dash_pattern" v="0"/>
           <prop k="capstyle" v="square"/>
@@ -87,9 +87,9 @@
           <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option value="" type="QString" name="name"/>
+              <Option name="name" type="QString" value=""/>
               <Option name="properties"/>
-              <Option value="collection" type="QString" name="type"/>
+              <Option name="type" type="QString" value="collection"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -99,7 +99,11 @@
     <sizescale/>
   </renderer-v2>
   <customproperties>
-    <Option/>
+    <Option type="Map">
+      <Option name="dualview/previewExpressions" type="List">
+        <Option type="QString" value="&quot;Status&quot;"/>
+      </Option>
+    </Option>
   </customproperties>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
@@ -108,28 +112,28 @@
     <activeChecks/>
     <checkConfiguration/>
   </geometryOptions>
-  <legend showLabelLegend="0" type="default-vector"/>
+  <legend type="default-vector" showLabelLegend="0"/>
   <referencedLayers/>
   <fieldConfiguration>
     <field name="Timeframe" configurationFlags="None">
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
-            <Option type="List" name="map">
+            <Option name="map" type="List">
               <Option type="Map">
-                <Option value="Historical" type="QString" name="Historical"/>
+                <Option name="Historical" type="QString" value="Historical"/>
               </Option>
               <Option type="Map">
-                <Option value="Current" type="QString" name="Current"/>
+                <Option name="Current" type="QString" value="Current"/>
               </Option>
               <Option type="Map">
-                <Option value="Future" type="QString" name="Future"/>
+                <Option name="Future" type="QString" value="Future"/>
               </Option>
               <Option type="Map">
-                <Option value="Drafted" type="QString" name="Drafted"/>
+                <Option name="Drafted" type="QString" value="Drafted"/>
               </Option>
               <Option type="Map">
-                <Option value="Undefined" type="QString" name="Undefined"/>
+                <Option name="Undefined" type="QString" value="Undefined"/>
               </Option>
             </Option>
           </Option>
@@ -141,20 +145,22 @@
     <alias field="Timeframe" index="0" name=""/>
   </aliases>
   <defaults>
-    <default field="Timeframe" applyOnUpdate="0" expression="'Undefined'"/>
+    <default expression="'Undefined'" field="Timeframe" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint field="Timeframe" unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0"/>
+    <constraint notnull_strength="0" field="Timeframe" unique_strength="0" exp_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint field="Timeframe" desc="" exp=""/>
+    <constraint exp="" field="Timeframe" desc=""/>
   </constraintExpressions>
   <expressionfields/>
-  <attributeactions/>
-  <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
+  <attributeactions>
+    <defaultAction key="Canvas" value="{00000000-0000-0000-0000-000000000000}"/>
+  </attributeactions>
+  <attributetableconfig sortExpression="" sortOrder="0" actionWidgetStyle="dropDown">
     <columns>
-      <column hidden="0" type="field" name="Timeframe" width="-1"/>
-      <column hidden="1" type="actions" width="-1"/>
+      <column hidden="0" width="-1" name="Timeframe" type="field"/>
+      <column hidden="1" width="-1" type="actions"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -190,8 +196,8 @@ def my_form_open(dialog, layer, feature):
     <field editable="1" name="Timeframe"/>
   </editable>
   <labelOnTop>
-    <field labelOnTop="0" name="Status"/>
-    <field labelOnTop="0" name="Timeframe"/>
+    <field name="Status" labelOnTop="0"/>
+    <field name="Timeframe" labelOnTop="0"/>
   </labelOnTop>
   <reuseLastValue>
     <field reuseLastValue="0" name="Status"/>
