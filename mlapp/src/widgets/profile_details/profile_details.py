@@ -3,7 +3,7 @@ import os
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
-from qgis.PyQt.QtWidgets import QWidget
+from qgis.PyQt.QtWidgets import QSizePolicy, QWidget
 
 from ...spatial.features.persisted_feature import Feature
 from .profile_canvas import ProfileCanvas
@@ -81,7 +81,8 @@ class ProfileDetails(QWidget, FORM_CLASS):
                 self.infrastructureLengthText.setText(
                     f"{maximumDistance:,.2f}")
 
-            self.refreshProfileCanvas(profile)
+            self.refreshProfileCanvas()
+            self.update()
 
     def cleanupProfileCanvas(self):
         if self.profileCanvas is not None:
@@ -89,10 +90,16 @@ class ProfileDetails(QWidget, FORM_CLASS):
             del self.profileCanvas
             self.profileCanvas = None
 
-    def refreshProfileCanvas(self, profile):
+    def refreshProfileCanvas(self):
         self.cleanupProfileCanvas()
-        self.profileCanvas = ProfileCanvas(profile)
+        self.profileCanvas = ProfileCanvas(self.feature.profile(), layout=self.canvasLayout)
+        self.profileCanvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.canvasLayout.addWidget(self.profileCanvas)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+
+        self.refreshUi()
 
     @pyqtSlot(Feature)
     def onSelectedFeatureChanged(self, feature):

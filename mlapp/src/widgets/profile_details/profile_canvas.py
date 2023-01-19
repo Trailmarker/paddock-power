@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsApplication
+from qgis.utils import iface
 
 from ...models.glitch import Glitch
 from ...spatial.elevation_profile import ElevationProfile
+from ...utils import qgsDebug
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib
@@ -13,11 +14,14 @@ class ProfileCanvas(FigureCanvasQTAgg):
 
     ELEVATION_BRACKET = 10.0
 
-    def __init__(self, profile):
+    def __init__(self, profile, layout=None):
 
         if not isinstance(profile, ElevationProfile):
             raise Glitch(
                 "InfrastructureProfileCanvas.__init__: profile must be a Profile")
+
+        # Keep a reference to the parent layout (bit of a hack)
+        self.layout = layout
 
         useMetres = (profile.maximumDistance < 1000)
 
@@ -31,14 +35,14 @@ class ProfileCanvas(FigureCanvasQTAgg):
         msShellDlg = {'fontname': 'MS Shell Dlg 2'}
 
         # Create a figure
-        [width, height] = self._getPlotDimensionsInches()
-        figure = Figure(figsize=(width, height))
+        [width, height, dpi] = self._getPlotDimensionsInches()
+        figure = Figure(figsize=(width, height), dpi=100)
         self.axes = figure.add_subplot(111)
         self.axes.plot(distances, profile.elevations)
-        
+
         minElevation = max(0.0, profile.minimumElevation - ProfileCanvas.ELEVATION_BRACKET)
         maxElevation = profile.maximumElevation + ProfileCanvas.ELEVATION_BRACKET
-        
+
         self.axes.set_ylim(minElevation, maxElevation)
         # self.axes.plot([0, maximumDistance], [fencelineProfile.minimumElevation, fencelineProfile.minimumElevation], 'g--', label=f"Min. : {fencelineProfile.minimumElevation}")
         # self.axes.plot([0, maximumDistance], [fencelineProfile.maximumElevation, fencelineProfile.maximumElevation], 'r--', label=f"Max. : {fencelineProfile.maximumElevation}")
@@ -55,16 +59,21 @@ class ProfileCanvas(FigureCanvasQTAgg):
 
         super().__init__(figure)
 
-
     def _getPlotDimensionsInches(self):
         # Set a reasonable initial size
-        screen = QgsApplication.instance().primaryScreen()
-        
+        screen = iface.mainWindow().screen()
+
         available = screen.availableGeometry()
         dpi = screen.physicalDotsPerInch()
 
         width = max(200, available.width() / 2)
+        
         height = max(200, width / 3)
         
-        return (width / dpi, height / dpi)
+        if self.layout:
+            # If we have a parent layout, use that to determine the height        
+            height = min(height, self.layout.contentsRect().height())
+        
+        qgsDebug(f"Profile canvas screen metrics: {(width / dpi, height / dpi, dpi)}")
 
+        return (width / dpi, height / dpi, dpi)

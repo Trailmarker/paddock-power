@@ -18,3 +18,7 @@ class ProfileDetailsDialog(QDialog, FORM_CLASS):
 
         self.setWindowTitle(f"Elevation Profile - {self.feature.title}")
         self.profileDetails.setFeature(self.feature)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.profileDetails.refreshProfileCanvas()
