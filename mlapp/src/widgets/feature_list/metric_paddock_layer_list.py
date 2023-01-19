@@ -6,11 +6,11 @@ from qgis.core import QgsProject
 from ...spatial.features.feature import Feature
 from ...spatial.features.paddock import MetricPaddock
 from ...spatial.layers.paddock_land_types_popup_layer import PaddockLandTypesPopupLayer
-from .paddock_list_item import PaddockListItem
-from .persisted_feature_layer_list import PersistedFeatureLayerList
+from .feature_layer_list import FeatureLayerList
+from .metric_paddock_list_item import MetricPaddockListItem
 
 
-class PaddockLayerList(PersistedFeatureLayerList):
+class MetricPaddockLayerList(FeatureLayerList):
 
     popupLayerAdded = pyqtSignal(PaddockLandTypesPopupLayer)
     popupLayerRemoved = pyqtSignal()
@@ -18,22 +18,22 @@ class PaddockLayerList(PersistedFeatureLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        self._derivedMetricPaddockLayerId = None
+        self._paddockLayerId = None
 
-        def listItemFactory(paddock):
-            return PaddockListItem(paddock, self.derivedMetricPaddockLayer, parent=parent)
+        def listItemFactory(metricPaddock):
+            return MetricPaddockListItem(metricPaddock, self.paddockLayer, parent=parent)
 
         super().__init__(listItemFactory, parent)
 
     @property
-    def derivedMetricPaddockLayer(self):
+    def paddockLayer(self):
         """Get the FeatureLayer."""
-        return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId) if self._derivedMetricPaddockLayerId else None
+        return QgsProject.instance().mapLayer(self._paddockLayerId) if self._paddockLayerId else None
 
-    @derivedMetricPaddockLayer.setter
-    def derivedMetricPaddockLayer(self, derivedMetricPaddockLayer):
+    @paddockLayer.setter
+    def paddockLayer(self, paddockLayer):
         """Set the FeatureLayer."""
-        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
+        self._paddockLayerId = paddockLayer.id() if paddockLayer else None
 
     @pyqtSlot(Feature)
     def onSelectedFeatureChanged(self, feature):

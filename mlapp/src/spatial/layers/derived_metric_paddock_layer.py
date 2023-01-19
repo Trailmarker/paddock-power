@@ -20,7 +20,7 @@ select
 	"{PaddockLayer}".{NAME} as {NAME},
 	"{PaddockLayer}".{STATUS} as {STATUS},
     "{PaddockLandTypesLayer}".{TIMEFRAME} as {TIMEFRAME},
-	"{PaddockLayer}"."{AREA}" as "{AREA}",
+	sum("{PaddockLandTypesLayer}"."{AREA}") as "{AREA}",
     sum("{PaddockLandTypesLayer}"."{WATERED_AREA}") as "{WATERED_AREA}",
 	"{PaddockLayer}"."{PERIMETER}" as "{PERIMETER}",
 	"{PaddockLayer}"."{BUILD_FENCE}" as "{BUILD_FENCE}",

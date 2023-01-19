@@ -15,7 +15,7 @@ from .feature_action import FeatureAction
 
 
 @PaddockSchema.addSchema()
-class Paddock(AreaFeature):
+class MetricPaddock(AreaFeature):
 
     popupLayerAdded = pyqtSignal(PaddockLandTypesPopupLayer)
     popupLayerRemoved = pyqtSignal()
