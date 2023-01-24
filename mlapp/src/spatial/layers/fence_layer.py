@@ -18,6 +18,7 @@ class FenceLayer(StatusFeatureLayer):
         super().__init__(project, gpkgFile, layerName, styleName=FenceLayer.STYLE)
 
         self._paddockLayerId = paddockLayer.id()
+        self._derivedMetricPaddockLayerId = None
         self._elevationLayerId = elevationLayer.id() if elevationLayer else None
 
     @property
@@ -25,11 +26,20 @@ class FenceLayer(StatusFeatureLayer):
         return QgsProject.instance().mapLayer(self._paddockLayerId)
 
     @property
+    def derivedMetricPaddockLayer(self):
+        return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId)
+
+    @derivedMetricPaddockLayer.setter
+    def derivedMetricPaddockLayer(self, derivedMetricPaddockLayer):
+        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
+
+
+    @property
     def elevationLayer(self):
         return QgsProject.instance().mapLayer(self._elevationLayerId) if self._elevationLayerId else None
 
     def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.paddockLayer, self.elevationLayer, feature)
+        return self.getFeatureType()(self, self.paddockLayer, self.derivedMetricPaddockLayer, self.elevationLayer, feature)
 
     def getBuildOrder(self):
         """The lowest Build Order of any Fence in Draft status."""

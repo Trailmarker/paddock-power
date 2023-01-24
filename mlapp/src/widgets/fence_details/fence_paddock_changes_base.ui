@@ -38,7 +38,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Paddocks divided by this Fence</string>
+      <string>Current Paddocks that are split by this Fence</string>
      </property>
      <layout class="QVBoxLayout" name="supersededPaddockVerticalLayout">
       <property name="leftMargin">
@@ -75,7 +75,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>New Paddocks after building this Fence</string>
+      <string>Future Paddocks after building this Fence (and Waterpoints)</string>
      </property>
      <layout class="QVBoxLayout" name="plannedPaddocksVerticalLayout">
       <property name="leftMargin">

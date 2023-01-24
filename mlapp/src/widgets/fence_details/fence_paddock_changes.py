@@ -53,7 +53,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.plannedMetricPaddockMiniList.clear()
         else:
             # self.setVisible(True)
-            supersededPaddocks, plannedPaddocks = self.fence.getSupersededAndPlannedPaddocks()
+            supersededPaddocks, plannedPaddocks = self.fence.getCurrentAndFuturePaddocks()
 
             self.supersededMetricPaddockMiniList.setFeatures(supersededPaddocks)
             self.plannedMetricPaddockMiniList.setFeatures(plannedPaddocks)

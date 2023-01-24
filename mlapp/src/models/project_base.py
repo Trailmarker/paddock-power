@@ -90,6 +90,7 @@ class ProjectBase(QObject):
         self.derivedMetricPaddockLayer = DerivedMetricPaddockLayer(
             self, derivedMetricPaddockLayerName, self.paddockLayer, self.paddockLandTypesLayer, self.conditionTable)
 
+        self.fenceLayer.derivedMetricPaddockLayer = self.derivedMetricPaddockLayer
         self.paddockLayer.derivedMetricPaddockLayer = self.derivedMetricPaddockLayer
 
     def findGroup(self):

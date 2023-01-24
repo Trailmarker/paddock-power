@@ -55,6 +55,10 @@ class Timeframe(FieldDomain):
         """Check if a Feature Status corresponds to this Timeframe."""
         return bool([fs for fs in self.matchingFeatureStatuses() if FeatureStatus[featureStatus.name] == FeatureStatus[fs.name]])
 
+    def matchTimeframe(self, timeframe):
+        """Check if a Timeframe corresponds to this Timeframe."""
+        return (Timeframe[self.name] == Timeframe[timeframe.name])
+
     def includesStatus(self, statusTerm):
         """Return a SQLite IN clause matching a Feature Status term against this Timeframe."""
         matchTerms = ", ".join([f"'{status.name}'" for status in self.matchingFeatureStatuses()])

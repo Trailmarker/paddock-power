@@ -5,22 +5,23 @@ from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME
 from ..layers.elevation_layer import ElevationLayer
 from ..layers.paddock_layer import PaddockLayer
+from ..fields.feature_status import FeatureStatus
+from ..fields.schemas import FenceSchema, BUILD_FENCE
+from ..fields.timeframe import Timeframe
 from .edits import Edits
 from .feature_action import FeatureAction
-from ..fields.feature_status import FeatureStatus
 from .line_feature import LineFeature
-from ..fields.schemas import FenceSchema, BUILD_FENCE
 
 
 @FenceSchema.addSchema()
 class Fence(LineFeature):
 
-    def __init__(self, featureLayer, paddockLayer: PaddockLayer,
+    def __init__(self, featureLayer, paddockLayer: PaddockLayer, derivedMetricPaddockLayer,
                  elevationLayer: ElevationLayer = None, existingFeature=None):
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
 
         self._paddockLayerId = paddockLayer.id()
-        self._derivedMetricPaddockLayerId = None
+        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id()
 
         self._supersededPaddocks = []
         self._plannedPaddocks = []
@@ -170,25 +171,26 @@ class Fence(LineFeature):
             return [fenceLine], crossedPaddocks
 
     @Glitch.glitchy()
-    def getSupersededAndPlannedPaddocks(self):
+    def getCurrentAndFuturePaddocks(self):
         """Get the MetricPaddocks with the specified Build Order."""
 
         if self.status == FeatureStatus.Drafted:
-            _, crossedPaddocks = self.getCrossedPaddocks()
-            return crossedPaddocks, []
+            return [], []
+            # _, crossedPaddocks = self.getCrossedPaddocks()
+            # return crossedPaddocks, []
 
         buildOrder = self.buildOrder
 
         if buildOrder <= 0:
             raise Glitch(
-                "Fence.getSupersededAndPlannedPaddocks: buildOrder must be a positive integer")
+                "Fence.getCurrentAndFuturePaddocks: buildOrder must be a positive integer")
 
         buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {buildOrder}')
 
-        paddocks = list(self.derivedMetricPaddockLayer.getFeatures(request=buildFenceRequest))
+        metricPaddocks = list(self.derivedMetricPaddockLayer.getFeatures(request=buildFenceRequest))
 
-        return ([f for f in paddocks if f.status.match(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded)],
-                [f for f in paddocks if f.status == FeatureStatus.Planned])
+        return ([f for f in metricPaddocks if f.timeframe.matchTimeframe(Timeframe.Current)],
+                [f for f in metricPaddocks if f.timeframe.matchTimeframe(Timeframe.Future)])
 
     @Edits.persistFeatures
     @FeatureAction.draft.handler()
@@ -305,7 +307,7 @@ class Fence(LineFeature):
         """Undo the plan of Paddocks implied by a Fence."""
         edits = Edits()
 
-        supersededPaddocks, plannedPaddocks = self.getSupersededAndPlannedPaddocks()
+        supersededPaddocks, plannedPaddocks = self.getCurrentAndFuturePaddocks()
 
         # qgsDebug(f"supersededPaddocks = {str(supersededPaddocks)}")
         # qgsDebug(f"plannedPaddocks = {str(plannedPaddocks)}")
