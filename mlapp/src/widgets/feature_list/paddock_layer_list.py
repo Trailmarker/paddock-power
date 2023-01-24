@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 from qgis.core import QgsProject
 
 from ...spatial.features.feature import Feature
-from ...spatial.features.paddock import MetricPaddock
+from ...spatial.features.paddock import Paddock
 from ...spatial.layers.paddock_land_types_popup_layer import PaddockLandTypesPopupLayer
 from .paddock_list_item import PaddockListItem
 from .persisted_feature_layer_list import PersistedFeatureLayerList
@@ -40,7 +40,7 @@ class PaddockLayerList(PersistedFeatureLayerList):
         """Handle changes to the selected Feature in the underlying Featureayer."""
         super().onSelectedFeatureChanged(feature)
 
-        if isinstance(feature, MetricPaddock):
+        if isinstance(feature, Paddock):
             feature.popupLayerAdded.connect(self.onPopupLayerAdded)
             feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)
             self.onPopupLayerAdded(feature.popupLayer)

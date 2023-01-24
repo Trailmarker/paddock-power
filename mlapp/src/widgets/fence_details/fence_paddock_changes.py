@@ -28,8 +28,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
     def setProject(self, project):
         """Set the Project."""
         self.project = project
-        self.supersededPaddockMiniList.derivedMetricPaddockLayer = self.project.derivedMetricPaddockLayer
-        self.plannedPaddockMiniList.derivedMetricPaddockLayer = self.project.derivedMetricPaddockLayer
+        self.supersededMetricPaddockMiniList.paddockLayer = self.project.paddockLayer
+        self.plannedMetricPaddockMiniList.paddockLayer = self.project.paddockLayer
         self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self.refreshUi()
 
@@ -49,11 +49,11 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         """Show the Paddock View."""
         if self.fence is None:
             # self.setVisible(False)
-            self.supersededPaddockMiniList.clear()
-            self.plannedPaddockMiniList.clear()
+            self.supersededMetricPaddockMiniList.clear()
+            self.plannedMetricPaddockMiniList.clear()
         else:
             # self.setVisible(True)
             supersededPaddocks, plannedPaddocks = self.fence.getSupersededAndPlannedPaddocks()
 
-            self.supersededPaddockMiniList.setFeatures(supersededPaddocks)
-            self.plannedPaddockMiniList.setFeatures(plannedPaddocks)
+            self.supersededMetricPaddockMiniList.setFeatures(supersededPaddocks)
+            self.plannedMetricPaddockMiniList.setFeatures(plannedPaddocks)

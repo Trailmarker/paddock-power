@@ -88,7 +88,7 @@ class ProjectBase(QObject):
 
         derivedMetricPaddockLayerName = f"Paddocks"
         self.derivedMetricPaddockLayer = DerivedMetricPaddockLayer(
-            self, derivedMetricPaddockLayerName, self.paddockLayer, self.paddockLandTypesLayer)
+            self, derivedMetricPaddockLayerName, self.paddockLayer, self.paddockLandTypesLayer, self.conditionTable)
 
         self.paddockLayer.derivedMetricPaddockLayer = self.derivedMetricPaddockLayer
 

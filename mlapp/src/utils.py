@@ -74,6 +74,11 @@ def guiConfirm(question="Are you sure?", title=None):
                                 QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
 
 
+def guiHelpNotYetImplemented():
+    """Show a message saying this help section has not yet been implemented."""
+    QMessageBox.information(None, f"{PLUGIN_NAME} | Help", "This help section has not yet been implemented.")
+
+
 def resolvePluginPath(relative=None, base=None):
     """Resolve a relative path in the plug-in deployment directory."""
     if not base:

@@ -43,7 +43,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockLayerList" name="paddockList">
+        <widget class="MetricPaddockLayerList" name="paddockList">
         </widget>
        </item>
        <item>
@@ -124,9 +124,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PaddockLayerList</class>
+   <class>MetricPaddockLayerList</class>
    <extends>QListView</extends>
-   <header>mlapp/src/widgets/feature_list/paddock_layer_list</header>
+   <header>mlapp/src/widgets/feature_list/metric_paddock_layer_list</header>
   </customwidget>
   <customwidget>
    <class>PaddockLandTypesLayerList</class>

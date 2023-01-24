@@ -25,9 +25,9 @@ order by "{LAND_TYPE_NAME}"
         """Return the type of feature that this layer contains. Override in subclasses"""
         return self.getFeatureType()(self.paddockLandTypesLayer, self.conditionTable, feature)
 
-    def __init__(self, project, layerName, paddock, paddockLandTypesLayer, conditionTable):
+    def __init__(self, project, layerName, metricPaddock, paddockLandTypesLayer, conditionTable):
         # Burn in the Paddock specific parameters first …
-        query = self.parameteriseQuery(paddockId=paddock.id, timeframe=project.currentTimeframe)
+        query = self.parameteriseQuery(paddockId=metricPaddock.paddock, timeframe=project.currentTimeframe)
 
         super().__init__(
             project,

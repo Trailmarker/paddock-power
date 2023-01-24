@@ -54,7 +54,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="PaddockMiniList" name="supersededPaddockMiniList">
+       <widget class="MetricPaddockMiniList" name="supersededMetricPaddockMiniList">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -91,7 +91,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="PaddockMiniList" name="plannedPaddockMiniList">
+       <widget class="MetricPaddockMiniList" name="plannedMetricPaddockMiniList">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -107,9 +107,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PaddockMiniList</class>
+   <class>MetricPaddockMiniList</class>
    <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/paddock_mini_list</header>
+   <header>mlapp/src/widgets/feature_list/metric_paddock_mini_list</header>
   </customwidget>
  </customwidgets>
  <resources/>

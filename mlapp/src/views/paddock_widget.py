@@ -22,8 +22,8 @@ class PaddockWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.paddockList.derivedMetricPaddockLayer = self.project.derivedMetricPaddockLayer
-        self.paddockList.featureLayer = self.project.paddockLayer
+        self.paddockList.paddockLayer = self.project.paddockLayer
+        self.paddockList.featureLayer = self.project.derivedMetricPaddockLayer
 
         self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),
                                self.paddockLandTypeListGroupBox.sizeHint().width()])

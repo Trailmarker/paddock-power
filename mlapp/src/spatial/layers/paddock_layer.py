@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProject
 
-from ...utils import qgsDebug
-from ..features.paddock import MetricPaddock
+from ..features.paddock import Paddock
 from .condition_table import ConditionTable
 from .status_feature_layer import StatusFeatureLayer
 
@@ -12,7 +11,7 @@ class PaddockLayer(StatusFeatureLayer):
     STYLE = "paddock"
 
     def getFeatureType(self):
-        return MetricPaddock
+        return Paddock
 
     def __init__(self, project, gpkgFile, layerName, conditionTable: ConditionTable):
         """Create or open a Paddock layer."""

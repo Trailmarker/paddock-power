@@ -20,6 +20,7 @@ class Fence(LineFeature):
         super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
 
         self._paddockLayerId = paddockLayer.id()
+        self._derivedMetricPaddockLayerId = None
 
         self._supersededPaddocks = []
         self._plannedPaddocks = []
@@ -27,6 +28,14 @@ class Fence(LineFeature):
     @property
     def paddockLayer(self):
         return QgsProject.instance().mapLayer(self._paddockLayerId)
+
+    @property
+    def derivedMetricPaddockLayer(self):
+        return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId) if self._derivedMetricPaddockLayerId else None
+
+    @derivedMetricPaddockLayer.setter
+    def derivedMetricPaddockLayer(self, derivedMetricPaddockLayer):
+        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id()
 
     @property
     def isInfrastructure(self):
@@ -162,7 +171,7 @@ class Fence(LineFeature):
 
     @Glitch.glitchy()
     def getSupersededAndPlannedPaddocks(self):
-        """Get the Paddocks with the specified Build Order."""
+        """Get the MetricPaddocks with the specified Build Order."""
 
         if self.status == FeatureStatus.Drafted:
             _, crossedPaddocks = self.getCrossedPaddocks()
@@ -176,7 +185,7 @@ class Fence(LineFeature):
 
         buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {buildOrder}')
 
-        paddocks = list(self.paddockLayer.getFeatures(request=buildFenceRequest))
+        paddocks = list(self.derivedMetricPaddockLayer.getFeatures(request=buildFenceRequest))
 
         return ([f for f in paddocks if f.status.match(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded)],
                 [f for f in paddocks if f.status == FeatureStatus.Planned])

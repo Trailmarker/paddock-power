@@ -6,8 +6,22 @@ from os import mkdir
 from qgis.core import QgsProject
 from qgis.utils import plugins
 
+from .src.spatial.layers.boundary_layer import BoundaryLayer
+from .src.spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
+from .src.spatial.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
+from .src.spatial.layers.derived_watered_area_layer import DerivedWateredAreaLayer
+from .src.spatial.layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
 from .src.spatial.layers.elevation_layer import ElevationLayer
 from .src.spatial.layers.feature_layer import FeatureLayer
+from .src.spatial.layers.fence_layer import FenceLayer
+from .src.spatial.layers.land_type_layer import LandTypeLayer
+from .src.spatial.layers.paddock_layer import PaddockLayer
+from .src.spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
+from .src.spatial.layers.pipeline_layer import PipelineLayer
+from .src.spatial.layers.watered_area_layer import WateredAreaLayer
+from .src.spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from .src.spatial.layers.waterpoint_layer import WaterpointLayer
+
 from .src.utils import resolvePluginPath, qgsDebug, PLUGIN_NAME
 
 
@@ -61,10 +75,13 @@ def pluginIds():
     return [layer.id() for layer in pluginLayers()]
 
 
-def byName(name):
+def byType(name):
     f"""Get the layer with the given name in the current project."""
     return next(layer for layer in pluginLayers() if layer.name() == name)
 
+def byType(type):
+    f"""Get the layer with the given type in the current project."""
+    return next(layer for layer in pluginLayers() if isinstance(layer, type))
 
 def show(layer):
     f"""Show the given layer."""
@@ -98,25 +115,25 @@ def exportStyles(relativeOutDir, overwrite=False):
                 qgsDebug("Can't save style for layer " + layer.name() + " because the file already exists: " + outFile)
 
 
-layerNames = [
-    'Boundary',
-    'Derived Paddock Land Types',
-    'Derived Watered Areas',
-    'Derived Waterpoint Buffers',
-    'Elevation Mapping',
-    'Fences',
-    'Land Types',
-    'Paddock Land Types',
-    'Paddocks',
-    'Paddocks',
-    'Pipelines',
-    'Watered Areas',
-    'Waterpoint Buffers',
-    'Waterpoints']
+layerTypes = [
+    BoundaryLayer,
+    DerivedMetricPaddockLayer,
+    DerivedPaddockLandTypesLayer,
+    DerivedWateredAreaLayer,
+    DerivedWaterpointBufferLayer,
+    ElevationLayer,
+    FenceLayer,
+    LandTypeLayer,
+    PaddockLayer,
+    PaddockLandTypesLayer,
+    PipelineLayer,
+    WateredAreaLayer,
+    WaterpointBufferLayer,
+    WaterpointLayer]
 
-allLayers = [byName(name) for name in layerNames]
+allLayers = [byType(layerType) for layerType in layerTypes]
 
-[boundary, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation, fences, landTypes,
- paddockLandTypes, derivedPaddocks, paddocks, pipelines, wateredAreas, waterpointBuffers, waterpoints] = allLayers
+[boundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation, fences, landTypes,
+ paddocks, paddockLandTypes, pipelines, wateredAreas, waterpointBuffers, waterpoints] = allLayers
 
 conditionTable = project().conditionTable if project() is not None else None

@@ -119,7 +119,7 @@ class FeatureListItem(QWidget, EditStateMachine):
         # Respond to changes in editing status
         self.stateChanged.connect(self.refreshUi)
 
-        if self.hasStatus:
+        if self.hasStatus and self.feature.stateChanged:
             self.feature.stateChanged.connect(self.refreshUi)
 
         self.refreshUi()

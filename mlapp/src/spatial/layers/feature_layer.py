@@ -151,6 +151,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
     @pyqtSlot(list)
     def onLayerSelectionChanged(self, selection):
         """Handle the QGIS layer selection changing."""
+        # qgsDebug(f"{self.__class__.__name__}.onLayerSelectionChanged({selection})")
         if self.connectedToProject:
             self._project.onLayerSelectionChanged(self, selection)
 
