@@ -173,7 +173,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: ourFeature={ourFeature}")
 
             # Are we going to focus based on this new Feature?
-            focusOnSelect = feature.focusOnSelect()
+            focusOnSelect = feature and feature.focusOnSelect()
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: focusOnSelect={focusOnSelect}")
 
             # Is it the same one that's already selected?
