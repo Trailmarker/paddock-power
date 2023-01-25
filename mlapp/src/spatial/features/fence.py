@@ -305,6 +305,7 @@ class Fence(LineFeature):
     @FeatureAction.undoPlan.handler()
     def undoPlanFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
+
         edits = Edits()
 
         supersededPaddocks, plannedPaddocks = self.getCurrentAndFuturePaddocks()
@@ -312,10 +313,10 @@ class Fence(LineFeature):
         # qgsDebug(f"supersededPaddocks = {str(supersededPaddocks)}")
         # qgsDebug(f"plannedPaddocks = {str(plannedPaddocks)}")
 
-        for paddock in supersededPaddocks:
-            edits = edits.editBefore(paddock.undoSupersedeFeature())
+        for metricPaddock in supersededPaddocks:
+            edits = edits.editBefore(metricPaddock.undoSupersedeFeature())
 
-        for paddock in plannedPaddocks:
-            edits = edits.editBefore(paddock.undoPlanFeature())
+        for metricPaddock in plannedPaddocks:
+            edits = edits.editBefore(metricPaddock.undoPlanFeature())
 
         return Edits.upsert(self).editAfter(edits)
