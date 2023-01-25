@@ -7,6 +7,7 @@ from ..spatial.fields.timeframe import Timeframe
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, qgsDebug
 from ..views.feature_view.feature_view import FeatureView
+from ..widgets.import_dialog.import_dialog import ImportDialog
 from .glitch import Glitch
 from .project_base import ProjectBase
 
@@ -29,6 +30,7 @@ class Project(ProjectBase):
         self.currentTool = None
         self.currentTimeframe = Timeframe.Current
         self.views = {}
+        self.importDialog = None
         self.selectedFeature = None
 
         self.currentTimeframeChanged.connect(self.deselectFeature)
@@ -95,6 +97,13 @@ class Project(ProjectBase):
             self.views[viewType] = view
             self.iface.addDockWidget(dockArea, view)
             view.show()
+
+    @pyqtSlot()
+    def importData(self):
+        """Open the Import dialog for this project."""
+        if not self.importDialog:
+            self.importDialog = ImportDialog(self)
+        self.importDialog.show()       
 
     @pyqtSlot()
     def openFeatureView(self):

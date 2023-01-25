@@ -107,6 +107,12 @@ class PaddockPower(QObject):
             callback=lambda *_: self.createProject(),
             parent=self.iface.mainWindow())
 
+        self.addAction(
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/import.png"),
+            text=f"Import {PLUGIN_NAME} Data …",
+            callback=lambda *_: self.importData(),
+            parent=self.iface.mainWindow())
+
         self.detectProject()
 
     # Override Glitch type exceptions application-wide
@@ -231,6 +237,10 @@ class PaddockPower(QObject):
 
         if self.project is not None:
             self.project.addToMap()
+
+    def importData(self):
+        if self.project is not None:
+            self.project.importData()
 
     def unloadProject(self):
         """Removes the plugin menu item and icon from QGIS interface."""
