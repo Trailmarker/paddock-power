@@ -5,6 +5,8 @@ from qgis.core import QgsProject
 
 from ..fields.schemas import MetricPaddockSchema
 from ..layers.paddock_land_types_popup_layer import PaddockLandTypesPopupLayer
+from .edits import Edits
+from .feature_action import FeatureAction
 from .status_feature import StatusFeature
 
 
@@ -14,10 +16,11 @@ class MetricPaddock(StatusFeature):
     popupLayerAdded = pyqtSignal(PaddockLandTypesPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
-    def __init__(self, featureLayer, paddockLandTypesLayer, conditionTable, existingFeature=None):
+    def __init__(self, featureLayer, paddockLayer, paddockLandTypesLayer, conditionTable, existingFeature=None):
         """Initialise a new Metric Paddock."""
         super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
 
+        self._paddockLayerId = paddockLayer.id()
         self._paddockLandTypesLayerId = paddockLandTypesLayer.id()
         self.conditionTable = conditionTable
 
@@ -26,6 +29,10 @@ class MetricPaddock(StatusFeature):
     @property
     def title(self):
         return f"{self.name} ({self.featureArea:.2f} km²)"
+
+    @property
+    def paddockLayer(self):
+        return QgsProject.instance().mapLayer(self._paddockLayerId)
 
     @property
     def paddockLandTypesLayer(self):
@@ -90,3 +97,29 @@ class MetricPaddock(StatusFeature):
         """Do the stuff we'd normally do, but also remove the Paddock Land Types popup layer."""
         super().onDeselectFeature()
         self.removePopupLayer()
+
+    # All workflow functions are deferred to the underlying Paddock for this MetricPaddock
+    def getPaddock(self):
+        """Get the Paddock that this Metric Paddock is associated with."""
+        return self.paddockLayer.getFeature(self.paddock)
+
+    @FeatureAction.draft.handler()
+    def draftFeature(self, geometry, name):
+        """Draft a Paddock."""
+        return self.getPaddock().draftFeature(geometry, name)
+
+    @FeatureAction.plan.handler()
+    def planFeature(self, fence, crossedPaddock=None):
+        return self.getPaddock().planFeature(fence, crossedPaddock)
+
+    @FeatureAction.undoPlan.handler()
+    def undoPlanFeature(self):
+        return self.getPaddock().undoPlanFeature()
+
+    @FeatureAction.supersede.handler()
+    def supersedeFeature(self, fence):
+        return self.getPaddock().supersedeFeature(fence)
+
+    @FeatureAction.undoSupersede.handler()
+    def undoSupersedeFeature(self):
+        return self.getPaddock().undoSupersedeFeature()

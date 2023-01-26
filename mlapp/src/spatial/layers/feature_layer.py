@@ -144,10 +144,6 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
 
-    def focusOnSelect(self):
-        """Return True if the type of Feature in this FeatureLayer should be focused when selected."""
-        return self.getFeatureType().focusOnSelect()
-
     @pyqtSlot(list)
     def onLayerSelectionChanged(self, selection):
         """Handle the QGIS layer selection changing."""
@@ -177,7 +173,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: ourFeature={ourFeature}")
 
             # Are we going to focus based on this new Feature?
-            focusOnSelect = self.focusOnSelect()
+            focusOnSelect = feature and feature.focusOnSelect()
             # qgsDebug(f"{self.__class__.__name__}.onSelectedFeatureChanged: focusOnSelect={focusOnSelect}")
 
             # Is it the same one that's already selected?

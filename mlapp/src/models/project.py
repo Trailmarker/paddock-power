@@ -65,10 +65,12 @@ class Project(ProjectBase):
 
     def deselectFeature(self):
         """Deselect any current feature."""
+        # qgsDebug(f"{self.__class__.__name__}.deselectFeature()")
         self.selectedFeatureChanged.emit(None)
 
     def selectFeature(self, feature):
         """Select a feature."""
+        # qgsDebug(f"{self.__class__.__name__}.selectFeature({feature})")
         self.selectedFeature = feature
         self.selectedFeatureChanged.emit(feature)
 
