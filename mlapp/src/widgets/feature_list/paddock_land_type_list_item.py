@@ -28,12 +28,18 @@ class PaddockLandTypeListItem(QWidget, EditStateMachine):
 
         self.toolBar = StateMachineToolBar(self)
 
-        self.toolBar.addStateAction(EditAction.edit, f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png', lambda *_: self.editItem())
+        self.toolBar.addStateAction(
+            EditAction.edit,
+            f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png',
+            lambda *_: self.editItem())
         self.toolBar.addStateAction(
             EditAction.cancelEdit,
             f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
             lambda *_: self.cancelEditItem())
-        self.toolBar.addStateAction(EditAction.save, f':/plugins/{PLUGIN_FOLDER}/images/save-item.png', lambda *_: self.saveItem())
+        self.toolBar.addStateAction(
+            EditAction.save,
+            f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
+            lambda *_: self.saveItem())
         self.toolBar.addGenericAction(
             f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
             f"Zoom to {self.feature.displayName()}",

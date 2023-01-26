@@ -6,6 +6,7 @@ from os import mkdir
 from qgis.core import QgsProject
 from qgis.utils import plugins
 
+from .src.spatial.fields.field_map import FieldMap
 from .src.spatial.layers.boundary_layer import BoundaryLayer
 from .src.spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from .src.spatial.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
@@ -75,17 +76,20 @@ def pluginIds():
     return [layer.id() for layer in pluginLayers()]
 
 
-def byType(name):
+def byName(name):
     f"""Get the layer with the given name in the current project."""
-    return next(layer for layer in pluginLayers() if layer.name() == name)
+    return next((layer for layer in pluginLayers() if layer.name() == name), None)
+
 
 def byType(type):
     f"""Get the layer with the given type in the current project."""
-    return next(layer for layer in pluginLayers() if isinstance(layer, type))
+    return next((layer for layer in pluginLayers() if isinstance(layer, type)), None)
+
 
 def show(layer):
     f"""Show the given layer."""
     QgsProject.instance().layerTreeRoot().addLayer(layer)
+
 
 def feature(layer, id):
     f"""Get feature by FID in the given layer."""
@@ -131,9 +135,36 @@ layerTypes = [
     WaterpointBufferLayer,
     WaterpointLayer]
 
-allLayers = [byType(layerType) for layerType in layerTypes]
 
-[boundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation, fences, landTypes,
- paddocks, paddockLandTypes, pipelines, wateredAreas, waterpointBuffers, waterpoints] = allLayers
+def checkLayers():
+    return [byType(layerType) for layerType in layerTypes]
+
+
+[boundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation,
+ fences, landTypes, paddocks, paddockLandTypes, pipelines, wateredAreas, waterpointBuffers, waterpoints] = checkLayers()
+
 
 conditionTable = project().conditionTable if project() is not None else None
+
+
+kidmanPaddocks = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "b_Kidman_Paddocks"), None)
+kidmanLandTypes = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "c_Kidman_30k_land_units"), None)
+kidmanWaterpoints = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "a_Kidman_Waterpoints"), None)
+
+kidmanPaddockFieldMap = FieldMap(kidmanPaddocks, paddocks)
+kidmanLandTypeFieldMap = FieldMap(kidmanLandTypes, landTypes)
+kidmanWaterpointFieldMap = FieldMap(kidmanWaterpoints, waterpoints)
+
+
+def testImportKidmanPaddocks():
+    kidmanPaddockFieldMap["Name"] = "Name"
+    paddocks.importFeatures(kidmanPaddocks, kidmanPaddockFieldMap)
+
+def testImportKidmanLandTypes():
+    kidmanLandTypeFieldMap["LAND_UNIT"] = "Land Type Name"
+    landTypes.importFeatures(kidmanLandTypes, kidmanLandTypeFieldMap)
+    
+def testImportKidmanWaterpoints():
+    kidmanWaterpointFieldMap["NAME"] = "Name"
+    kidmanWaterpointFieldMap["LAYER"] = "Waterpoint Type"
+    waterpoints.importFeatures(kidmanWaterpoints, kidmanWaterpointFieldMap)

@@ -84,6 +84,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             QgsProject.instance().removeMapLayer(layer.id())
 
     def wrapFeature(self, feature):
+        """Wrap a Feature or QgsFeature using the Feature type of this FeatureLayer."""
         return self.getFeatureType()(self, feature)
 
     def addToMap(self, group):

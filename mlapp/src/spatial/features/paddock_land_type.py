@@ -7,7 +7,7 @@ from ..fields.schemas import PaddockLandTypeSchema
 
 @PaddockLandTypeSchema.addSchema()
 class PaddockLandType(PersistedFeature):
-  
+
     def __init__(self, featureLayer, conditionTable, existingFeature):
         """Create a new Paddock Condition."""
         super().__init__(featureLayer, existingFeature)

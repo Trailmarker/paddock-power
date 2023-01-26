@@ -16,9 +16,9 @@ class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
         derivedPaddockLandTypesLayer = DerivedPaddockLandTypesLayer(
             project, f"Derived {layerName}", paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable)
 
-        super().__init__(project, gpkgFile, layerName, derivedPaddockLandTypesLayer, styleName=PaddockLandTypesLayer.STYLE)
-
         self.conditionTable = conditionTable
+
+        super().__init__(project, gpkgFile, layerName, derivedPaddockLandTypesLayer, styleName=PaddockLandTypesLayer.STYLE)
 
     def getFeatureType(self):
         return PaddockLandType

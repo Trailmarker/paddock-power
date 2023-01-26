@@ -50,7 +50,7 @@ class FeatureListItem(QWidget, EditStateMachine):
         if self.hasStatus:
             self.statusLabel = FeatureStatusLabel(None)
             self.statusToolBar = StatusFeatureToolBar(self.feature)
-    
+
             self.statusToolBar.addStateAction(
                 FeatureAction.undoPlan,
                 f':/plugins/{PLUGIN_FOLDER}/images/undo-plan-feature.png',
@@ -144,7 +144,7 @@ class FeatureListItem(QWidget, EditStateMachine):
         """Hide the status controls (e.g. for a specific list widget)."""
         self.statusToolBar.hideStateActions()
         self.refreshUi()
-        
+
     def hideEditControls(self):
         """Hide the edit controls (e.g. for a specific list widget)."""
         self.editToolBar.hideStateActions()
@@ -185,7 +185,7 @@ class FeatureListItem(QWidget, EditStateMachine):
         if self.hasStatus:
             self.statusLabel.status = self.feature.status
             self.statusToolBar.refreshUi()
-        
+
         if self.isEditable:
             # Hide or show forms
             editing = self.status == EditStatus.Editing

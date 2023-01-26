@@ -67,13 +67,13 @@ class ProfileCanvas(FigureCanvasQTAgg):
         dpi = screen.physicalDotsPerInch()
 
         width = max(200, available.width() / 2)
-        
+
         height = max(200, width / 3)
-        
+
         if self.layout:
-            # If we have a parent layout, use that to determine the height        
+            # If we have a parent layout, use that to determine the height
             height = min(height, self.layout.contentsRect().height())
-        
+
         # qgsDebug(f"Profile canvas screen metrics: {(width / dpi, height / dpi, dpi)}")
 
         return (width / dpi, height / dpi, dpi)

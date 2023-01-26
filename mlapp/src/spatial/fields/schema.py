@@ -1,8 +1,25 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsFields
+
+from .field import Field
+
+
 class Schema(list):
-    def __init__(self, fieldList, wkbType=None):
-        super().__init__(fieldList)
+    def __init__(self, fields, wkbType=None):
+        assert isinstance(fields, list)
+        assert all(isinstance(f, Field) for f in fields)
+
+        super().__init__(fields)
         self._wkbType = wkbType
+
+    def hasField(self, field):
+        return any(field == f.name() for f in self)
+    
+    def toQgsFields(self):
+        fields = QgsFields()
+        for f in self:
+            fields.append(f)
+        return fields
 
     def addSchema(self):
         def _addSchema(cls):
@@ -14,4 +31,3 @@ class Schema(list):
                 setattr(cls, "getWkbType", classmethod(lambda _: self._wkbType))
             return cls
         return _addSchema
-

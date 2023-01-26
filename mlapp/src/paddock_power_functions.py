@@ -22,6 +22,7 @@ def currentTimeframe(vals, *_):
     except BaseException:
         return None
 
+
 @qgsfunction(args=1, group=PLUGIN_NAME)
 def matchCurrentFeatureStatus(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
@@ -55,7 +56,6 @@ def ifCurrentFeatureStatus(vals, *_):
         return vals[2]
 
 
-
 @qgsfunction(args=3, group=PLUGIN_NAME)
 def ifCurrentTimeframe(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe."""
@@ -73,8 +73,8 @@ def ifCurrentTimeframe(vals, *_):
 def timeframeWaterpointColour(vals, *_):
     """Convert a Timeframe to a colour for a Waterpoint."""
     try:
-        timeframe = getCurrentProject().currentTimeframe        
-        
+        timeframe = getCurrentProject().currentTimeframe
+
         if timeframe == Timeframe.Current:
             return "#026b7f"
         elif timeframe == Timeframe.Future:

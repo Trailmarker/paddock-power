@@ -155,7 +155,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     self.makeGetByPaddockQuery(
                         tableName=self.tableName,
                         paddockId=crossedPaddockId)).fetchall()
-                
+
                 # Upsert the land type records for the split paddock
                 for paddockLandTypeCondition in paddockLandTypeConditions:
                     cursor.execute(

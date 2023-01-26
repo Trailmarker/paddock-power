@@ -159,8 +159,9 @@ class Calculator:
             raise Glitch(
                 "Calculator.calculateArea: polygon is not a QgsGeometry.")
 
-        calculator = Calculator.QGIS_CALCULATOR
-        return calculator.measureArea(polygon)
+        return polygon.area()
+        # calculator = Calculator.QGIS_CALCULATOR
+        # return calculator.measureArea(polygon)
 
     @staticmethod
     def calculatePerimeter(polygon, elevationLayer=None):
