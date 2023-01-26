@@ -3,14 +3,14 @@ from .names import *
 
 from .condition_type import ConditionType
 from .feature_status import FeatureStatus
-from .field import DomainField, IdField, MeasureField, StringField
+from .field import CalculatedField, DomainField, IdField, MeasureField, StringField
 from .timeframe import Timeframe
 from .watered_type import WateredType
 from .grazing_radius_type import GrazingRadiusType
 from .waterpoint_type import WaterpointType
 
 
-Area = MeasureField(propertyName="featureArea", name=AREA, dps=2)
+Area = CalculatedField(propertyName="featureArea", name=AREA, dps=2)
 BoreReportUrl = StringField(propertyName="boreReportUrl", name=BORE_REPORT_URL)
 BoreYield = MeasureField(propertyName="boreYield", name=BORE_YIELD)
 GrazingRadius = MeasureField(propertyName="grazingRadius", name=GRAZING_RADIUS, dps=0)
@@ -22,19 +22,19 @@ ConditionTypeField = DomainField(
     name=CONDITION_TYPE,
     domainType=ConditionType,
     defaultValue=ConditionType.A)
-Elevation = MeasureField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'), dps=1)
+Elevation = CalculatedField(propertyName="featureElevation", name=ELEVATION, defaultValue=float('NaN'), dps=1)
 ErosionRisk = StringField(propertyName="erosionRisk", name=EROSION_RISK)
-EstimatedCapacity = MeasureField(propertyName="estimatedCapacity", name=ESTIMATED_CAPACITY, dps=0)
-EstimatedCapacityPerArea = MeasureField(propertyName="estimatedCapacityPerArea",
+EstimatedCapacity = CalculatedField(propertyName="estimatedCapacity", name=ESTIMATED_CAPACITY, dps=0)
+EstimatedCapacityPerArea = CalculatedField(propertyName="estimatedCapacityPerArea",
                                         name=ESTIMATED_CAPACITY_PER_AREA, dps=1)
 FarGrazingRadius = MeasureField(propertyName="farGrazingRadius", name=FAR_GRAZING_RADIUS, defaultValue="5000.0", dps=0)
 Fid = IdField("id", name=FID)
 LandscapeClass = StringField(propertyName="landscapeClass", name=LANDSCAPE_CLASS)
 LandType = IdField(propertyName="landType", name=LAND_TYPE)
-LandTypeName = StringField(propertyName="landTypeName", name=LAND_TYPE_NAME)
-Latitude = MeasureField(propertyName="featureLatitude", name=LATITUDE, defaultValue=float('NaN'), dps=2)
-Length = MeasureField(propertyName="featureLength", name=LENGTH, dps=2)
-Longitude = MeasureField(propertyName="featureLongitude", name=LONGITUDE, defaultValue=float('NaN'), dps=2)
+LandTypeName = StringField(propertyName="landTypeName", name=LAND_TYPE_NAME, required=True)
+Latitude = CalculatedField(propertyName="featureLatitude", name=LATITUDE, defaultValue=float('NaN'), dps=2)
+Length = CalculatedField(propertyName="featureLength", name=LENGTH, dps=2)
+Longitude = CalculatedField(propertyName="featureLongitude", name=LONGITUDE, defaultValue=float('NaN'), dps=2)
 MapUnit = StringField(propertyName="mapUnit", name=MAP_UNIT)
 Name = StringField(propertyName="name", name=NAME)
 NearGrazingRadius = MeasureField(
@@ -43,7 +43,7 @@ NearGrazingRadius = MeasureField(
     defaultValue="3000.0",
     dps=0)
 OptimalCapacityPerArea = MeasureField(propertyName="optimalCapacityPerArea",
-                                      name=OPTIMAL_CAPACITY_PER_AREA, dps=1)
+                                      name=OPTIMAL_CAPACITY_PER_AREA, dps=1, required=True)
 Paddock = IdField(propertyName="paddock", name=PADDOCK)
 PaddockName = StringField(propertyName="paddockName", name=PADDOCK_NAME)
 PaddockStatus = DomainField(
@@ -51,18 +51,19 @@ PaddockStatus = DomainField(
     name=PADDOCK_STATUS,
     domainType=FeatureStatus,
     defaultValue=FeatureStatus.Undefined)
-Perimeter = MeasureField(propertyName="featurePerimeter", name=PERIMETER, dps=2)
-PotentialCapacity = MeasureField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY, dps=0)
-PotentialCapacityPerArea = MeasureField(propertyName="potentialCapacityPerArea",
+Perimeter = CalculatedField(propertyName="featurePerimeter", name=PERIMETER, dps=2)
+PotentialCapacity = CalculatedField(propertyName="potentialCapacity", name=POTENTIAL_CAPACITY, dps=0)
+PotentialCapacityPerArea = CalculatedField(propertyName="potentialCapacityPerArea",
                                         name=POTENTIAL_CAPACITY_PER_AREA, dps=1)
 Reference = StringField(propertyName="reference", name=REFERENCE)
+RequiredName = StringField(propertyName="name", name=NAME, required=True)
 Status = DomainField(propertyName="status", name=STATUS, domainType=FeatureStatus, defaultValue=FeatureStatus.Undefined)
 TimeframeField = DomainField(
     propertyName="timeframe",
     name=TIMEFRAME,
     domainType=Timeframe,
     defaultValue=Timeframe.Undefined)
-WateredArea = MeasureField(propertyName="wateredArea", name=WATERED_AREA, dps=2)
+WateredArea = CalculatedField(propertyName="wateredArea", name=WATERED_AREA, dps=2)
 WateredTypeField = DomainField(
     propertyName="wateredType",
     name=WATERED_TYPE,

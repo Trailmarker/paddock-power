@@ -8,7 +8,7 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
     def __init__(self, *args, **kwargs):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""
 
-        super().__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def importFeature(self, fieldMap, qgsFeature):
         f"""Map a QgsFeature to a {PLUGIN_NAME} Feature."""

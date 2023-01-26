@@ -18,16 +18,19 @@ class Field(QgsField):
                 self._propertyName = args[0]._propertyName
                 self._domainType = args[0]._domainType
                 self._defaultValue = args[0]._defaultValue
+                self._required = args[0]._required
             elif isinstance(args[0], QgsField):
                 # Construct from a 'raw' QgsField with a default _propertyName
                 self._propertyName = re.sub('\\W|^(?=\\d)', '_', args[0].name())
                 self._domainType = None
                 self._defaultValue = None
+                self._required = False
         else:
             # Pop off and apply the extra args for Field versus QgsField
             self._propertyName = kwargs.pop("propertyName", None)
             self._domainType = kwargs.pop('domainType', None)
             self._defaultValue = kwargs.pop('defaultValue', None)
+            self._required = kwargs.pop('required', False)
 
         super().__init__(*args, **kwargs)
 
@@ -166,6 +169,12 @@ class MeasureField(Field):
             column.hidden = True
             config.setColumns(columns)
             layer.setAttributeTableConfig(config)
+
+
+class CalculatedField(MeasureField):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class StringField(Field):
