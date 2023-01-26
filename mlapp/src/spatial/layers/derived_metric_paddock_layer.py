@@ -47,9 +47,8 @@ group by "{PaddockLayer}".{FID}, "{PaddockLandTypesLayer}".{TIMEFRAME}
         else:
             for f in features:
                 if Timeframe[f.timeframe.name] == Timeframe[self.getPaddockPowerProject().currentTimeframe.name]:
-                    return f 
-    
-       
+                    return f
+
     def __init__(self, project, layerName, paddockLayer, paddockLandTypesLayer, conditionTable):
 
         super().__init__(
@@ -59,7 +58,7 @@ group by "{PaddockLayer}".{FID}, "{PaddockLandTypesLayer}".{TIMEFRAME}
             DerivedMetricPaddockLayer.STYLE,
             paddockLayer,
             paddockLandTypesLayer)
-        
+
         self._paddockLayerId = paddockLayer.id()
         self._paddockLandTypesLayerId = paddockLandTypesLayer.id()
         self.conditionTable = conditionTable
@@ -67,7 +66,7 @@ group by "{PaddockLayer}".{FID}, "{PaddockLandTypesLayer}".{TIMEFRAME}
     @property
     def paddockLayer(self):
         return QgsProject.instance().mapLayer(self._paddockLayerId)
-        
+
     @property
     def paddockLandTypesLayer(self):
         return QgsProject.instance().mapLayer(self._paddockLandTypesLayerId)

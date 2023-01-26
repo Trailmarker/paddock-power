@@ -79,13 +79,16 @@ def byType(name):
     f"""Get the layer with the given name in the current project."""
     return next(layer for layer in pluginLayers() if layer.name() == name)
 
+
 def byType(type):
     f"""Get the layer with the given type in the current project."""
     return next(layer for layer in pluginLayers() if isinstance(layer, type))
 
+
 def show(layer):
     f"""Show the given layer."""
     QgsProject.instance().layerTreeRoot().addLayer(layer)
+
 
 def feature(layer, id):
     f"""Get feature by FID in the given layer."""
@@ -133,7 +136,7 @@ layerTypes = [
 
 allLayers = [byType(layerType) for layerType in layerTypes]
 
-[boundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation, fences, landTypes,
- paddocks, paddockLandTypes, pipelines, wateredAreas, waterpointBuffers, waterpoints] = allLayers
+[boundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation,
+ fences, landTypes, paddocks, paddockLandTypes, pipelines, wateredAreas, waterpointBuffers, waterpoints] = allLayers
 
 conditionTable = project().conditionTable if project() is not None else None

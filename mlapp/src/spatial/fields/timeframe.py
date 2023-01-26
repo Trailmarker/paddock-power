@@ -53,7 +53,8 @@ class Timeframe(FieldDomain):
 
     def matchFeatureStatus(self, featureStatus):
         """Check if a Feature Status corresponds to this Timeframe."""
-        return bool([fs for fs in self.matchingFeatureStatuses() if FeatureStatus[featureStatus.name] == FeatureStatus[fs.name]])
+        return bool([fs for fs in self.matchingFeatureStatuses()
+                     if FeatureStatus[featureStatus.name] == FeatureStatus[fs.name]])
 
     def matchTimeframe(self, timeframe):
         """Check if a Timeframe corresponds to this Timeframe."""
@@ -79,7 +80,8 @@ class Timeframe(FieldDomain):
     @classmethod
     def timeframesIncludeStatuses(cls, timeframeTerm, *statusTerms):
         """Return a SQLite IN … AND … IN … compound clause matching several interacting Feature Status terms against a Timeframe term."""
-        allTimeframeIncludeStatusesTerms = " or ".join([timeframe.timeframeIncludesStatuses(timeframeTerm, *statusTerms) for timeframe in cls])
+        allTimeframeIncludeStatusesTerms = " or ".join(
+            [timeframe.timeframeIncludesStatuses(timeframeTerm, *statusTerms) for timeframe in cls])
         return f"({allTimeframeIncludeStatusesTerms})"
 
     @classmethod
@@ -90,5 +92,7 @@ class Timeframe(FieldDomain):
     @classmethod
     def statusIncludesTimeframes(cls, statusTerm, *timeframeTerms):
         """Return a SQLite IN … OR … IN … compound clause matching several interacting Timeframe terms against a Feature Status term."""
-        allStatusIncludeTimeframesTerms = " or ".join([f"({statusTerm} = '{status.name}') and {Timeframe.matchingTimeframes(status)}" for status in FeatureStatus])
+        allStatusIncludeTimeframesTerms = " or ".join([
+            f"({statusTerm} = '{status.name}') and {Timeframe.matchingTimeframes(status)}"
+            for status in FeatureStatus])
         return f"({allStatusIncludeTimeframesTerms})"

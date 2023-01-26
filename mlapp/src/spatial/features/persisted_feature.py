@@ -128,9 +128,9 @@ class PersistedFeature(Feature):
 
     def upsert(self):
         """Add or update the PersistedFeature in the PersistedFeatureLayer."""
-        
+
         assert(self.featureLayer.isEditable())
-        
+
         # # TODO inefficient
         # self.recalculate()
 

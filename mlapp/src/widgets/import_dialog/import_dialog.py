@@ -15,4 +15,3 @@ class ImportDialog(QDialog, FORM_CLASS):
 
         self.project = project
         self.setupUi(self)
-

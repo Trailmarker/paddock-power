@@ -12,7 +12,11 @@ class MetricPaddockListItem(FeatureListItem):
 
         self._paddockLayerId = paddockLayer.id()
 
-        super().__init__(metricPaddock, detailsWidgetFactory=MetricPaddockDetails, editWidgetFactory=self.makeEditWidget, parent=parent)
+        super().__init__(
+            metricPaddock,
+            detailsWidgetFactory=MetricPaddockDetails,
+            editWidgetFactory=self.makeEditWidget,
+            parent=parent)
 
     @property
     def paddockLayer(self):

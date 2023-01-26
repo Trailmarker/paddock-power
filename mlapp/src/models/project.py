@@ -90,7 +90,7 @@ class Project(ProjectBase):
         if len(selection) == 1:
             feature = layer.getFeature(selection[0])
             if feature is not None:
-                self.selectFeature(feature)        
+                self.selectFeature(feature)
 
     def openView(self, viewType, dockArea):
         if viewType not in self.views:
@@ -105,7 +105,7 @@ class Project(ProjectBase):
         """Open the Import dialog for this project."""
         if not self.importDialog:
             self.importDialog = ImportDialog(self)
-        self.importDialog.show()       
+        self.importDialog.show()
 
     @pyqtSlot()
     def openFeatureView(self):

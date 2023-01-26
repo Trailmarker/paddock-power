@@ -9,7 +9,7 @@ BoundarySchema = Schema([Fid, TimeframeField], wkbType=QgsWkbTypes.MultiPolygon)
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)
 LandTypeSchema = Schema([Fid, Name, Area, Perimeter, OptimalCapacityPerArea, MapUnit, LandscapeClass,
-                          ClassDescription, ErosionRisk], wkbType=QgsWkbTypes.MultiPolygon)
+                         ClassDescription, ErosionRisk], wkbType=QgsWkbTypes.MultiPolygon)
 LineFeatureSchema = Schema([Fid, Name, Status, Length], wkbType=QgsWkbTypes.LineString)
 PaddockSchema = Schema([Fid,
                         Name,

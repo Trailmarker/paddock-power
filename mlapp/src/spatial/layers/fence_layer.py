@@ -6,6 +6,7 @@ from ..fields.feature_status import FeatureStatus
 from ..features.fence import Fence
 from ..layers.persisted_feature_layer import PersistedFeatureLayer
 
+
 class FenceLayer(PersistedFeatureLayer):
 
     STYLE = "fence"
@@ -31,7 +32,6 @@ class FenceLayer(PersistedFeatureLayer):
     @derivedMetricPaddockLayer.setter
     def derivedMetricPaddockLayer(self, derivedMetricPaddockLayer):
         self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
-
 
     @property
     def elevationLayer(self):

@@ -12,7 +12,6 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
 
     STYLE = "watered_area"
 
-
     def parameteriseQuery(self, PaddockLayer, WaterpointBufferLayer):
         NearWateredArea = "NearWateredArea"
         FarWateredArea = "FarWateredArea"
@@ -77,8 +76,8 @@ select
 	"{PaddockLayer}".{FID} as {PADDOCK}
 from "{PaddockLayer}", "{WaterpointBufferLayer}"
 where not exists (
-	select 1 
-	from "{WaterpointBufferLayer}" 
+	select 1
+	from "{WaterpointBufferLayer}"
 	where "{WaterpointBufferLayer}".{PADDOCK} = "{PaddockLayer}".{FID}
 	and {Timeframe.Current.timeframeIncludesStatuses(f'"{WaterpointBufferLayer}".{TIMEFRAME}', f'"{PaddockLayer}".{STATUS}')})
 union
@@ -90,8 +89,8 @@ select
 	"{PaddockLayer}".{FID} as {PADDOCK}
 from "{PaddockLayer}", "{WaterpointBufferLayer}"
 where not exists (
-	select 1 
-	from "{WaterpointBufferLayer}" 
+	select 1
+	from "{WaterpointBufferLayer}"
 	where "{WaterpointBufferLayer}".{PADDOCK} = "{PaddockLayer}".{FID}
 	and {Timeframe.Future.timeframeIncludesStatuses(f'"{WaterpointBufferLayer}".{TIMEFRAME}', f'"{PaddockLayer}".{STATUS}')})
 

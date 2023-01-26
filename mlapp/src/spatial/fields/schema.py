@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from .field import Field
+
+
 class Schema(list):
     def __init__(self, fields, wkbType=None):
         assert isinstance(fields, list)
         assert all(isinstance(f, Field) for f in fields)
-        
+
         super().__init__(fields)
         self._wkbType = wkbType
 
@@ -21,4 +23,3 @@ class Schema(list):
                 setattr(cls, "getWkbType", classmethod(lambda _: self._wkbType))
             return cls
         return _addSchema
-

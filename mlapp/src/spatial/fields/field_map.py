@@ -10,7 +10,7 @@ class FieldMap(dict):
         """Create a FieldMap."""
         if not isinstance(targetSchema, Schema):
             raise Glitch(f"FieldMap targetSchema must be a Schema instance, not {type(targetSchema)}")
-        
+
         self.targetSchema = targetSchema
         self.update(*args, **kwargs)
 
