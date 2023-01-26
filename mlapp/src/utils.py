@@ -11,13 +11,14 @@ from qgis.PyQt.QtWidgets import QMessageBox
 
 from qgis.core import Qgis, QgsMessageLog, QgsProject
 
+# MLA Paddock Power data is held in the GDA2020 coordinate system
+PADDOCK_POWER_EPSG = 7845
 
 PLUGIN_NAME = "MLA Paddock Power"
 PLUGIN_FOLDER = "mlapp"
 
 # 16777215
 MAX_QT_DIMENSION = (2 * 24 - 1)
-
 
 def formatMessage(message):
     if isinstance(message, str):

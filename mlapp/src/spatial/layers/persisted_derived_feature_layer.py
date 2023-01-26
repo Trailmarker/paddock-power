@@ -47,8 +47,10 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         try:
             with Edits.editAndCommit(self):
                 self.dataProvider().truncate()
-                features = list(self.derivedLayer.getFeatures())
-                self.addFeatures(features)
+                derivedFeatures = list(self.derivedLayer.getFeatures())
+                for derivedFeature in derivedFeatures:
+                    feature = self.copyFeature(derivedFeature)
+                    feature.upsert()
         finally:
             self.setReadOnly(True)
             self.featuresPersisted.emit([])

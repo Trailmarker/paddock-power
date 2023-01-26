@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsFields
+
 from .field import Field
 
 
@@ -11,7 +13,13 @@ class Schema(list):
         self._wkbType = wkbType
 
     def hasField(self, field):
-        return any(field == f.name for f in self)
+        return any(field == f.name() for f in self)
+    
+    def toQgsFields(self):
+        fields = QgsFields()
+        for f in self:
+            fields.append(f)
+        return fields
 
     def addSchema(self):
         def _addSchema(cls):

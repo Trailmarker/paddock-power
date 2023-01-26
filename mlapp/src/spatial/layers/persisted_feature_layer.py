@@ -8,15 +8,12 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
-from ...utils import PLUGIN_NAME, qgsInfo
+from ...utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsInfo
 from ..features.persisted_feature import Feature
 from ..layers.feature_layer import FeatureLayer
 
 QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
     QgsWkbTypes).items() if isinstance(getattr(QgsWkbTypes, v), QgsWkbTypes.Type)])
-
-# MLA Paddock Power data is held in the GDA2020 coordinate system
-PADDOCK_POWER_EPSG = 7845
 
 
 class PersistedFeatureLayer(FeatureLayer):
@@ -137,7 +134,8 @@ class PersistedFeatureLayer(FeatureLayer):
         qgsFeature = self._unwrapQgsFeature(feature)
         copyFeature = self.makeFeature()
         copyQgsFeature = self._unwrapQgsFeature(copyFeature)
-        copyQgsFeature.setAttributes(qgsFeature.attributes())
+        for f in qgsFeature.fields():
+            copyQgsFeature.setAttribute(f.name(), qgsFeature.attribute(f.name()))
         copyQgsFeature.setGeometry(qgsFeature.geometry())
         copyFeature.clearId()
         return copyFeature
