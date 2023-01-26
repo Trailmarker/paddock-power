@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
+from .field import Field
 class Schema(list):
-    def __init__(self, fieldList, wkbType=None):
-        super().__init__(fieldList)
+    def __init__(self, fields, wkbType=None):
+        assert isinstance(fields, list)
+        assert all(isinstance(f, Field) for f in fields)
+        
+        super().__init__(fields)
         self._wkbType = wkbType
+
+    def hasField(self, field):
+        return any(field == f.name for f in self)
 
     def addSchema(self):
         def _addSchema(cls):

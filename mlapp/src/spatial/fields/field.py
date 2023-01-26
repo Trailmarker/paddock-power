@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
+
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
@@ -10,12 +12,19 @@ from .field_domain import FieldDomain
 class Field(QgsField):
 
     def __init__(self, *args, **kwargs):
-        if len(args) == 1 and isinstance(args[0], Field):
-            self._propertyName = args[0]._propertyName
-            self._domainType = args[0]._domainType
-            self._defaultValue = args[0]._defaultValue
+        if len(args) == 1:
+            if isinstance(args[0], Field):
+                # Copy constructor applied below in super().__init__
+                self._propertyName = args[0]._propertyName
+                self._domainType = args[0]._domainType
+                self._defaultValue = args[0]._defaultValue
+            elif isinstance(args[0], QgsField):
+                # Construct from a 'raw' QgsField with a default _propertyName
+                self._propertyName = re.sub('\\W|^(?=\\d)', '_', args[0].name())
+                self._domainType = None
+                self._defaultValue = None
         else:
-            # Pop off the extra args
+            # Pop off and apply the extra args for Field versus QgsField
             self._propertyName = kwargs.pop("propertyName", None)
             self._domainType = kwargs.pop('domainType', None)
             self._defaultValue = kwargs.pop('defaultValue', None)
@@ -37,7 +46,17 @@ class Field(QgsField):
                 self.setDefaultValueDefinition(QgsDefaultValue(str(self._defaultValue)))
         else:
             self.setDefaultValueDefinition(QgsDefaultValue())
-            
+
+    def __eq__(self, other):
+        """Return True if the Field is equal to another Field, False otherwise."""
+        if isinstance(other, Field):
+            return self.name() == other.name()
+        return False
+
+    def __hash__(self):
+        """Return a hash of the Field."""
+        return hash(self.name())
+
     def __repr__(self):
         """Return a string representation of the Field."""
         return f"{self.__class__.__name__}(name={self.name()})"
@@ -142,7 +161,7 @@ class MeasureField(Field):
         matches = [c for c in columns if c.name == self.name()]
         if matches:
             column = matches[0]
-            #if not column.hidden:
+            # if not column.hidden:
             #    qgsInfo(f"{self}.setupLayer({layer}): hiding field {self.name()}")
             column.hidden = True
             config.setColumns(columns)

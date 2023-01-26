@@ -3,10 +3,10 @@ from qgis.core import QgsProject
 
 from ..features.waterpoint import Waterpoint
 from .elevation_layer import ElevationLayer
-from .status_feature_layer import StatusFeatureLayer
+from .imported_feature_layer import ImportedFeatureLayer
 
 
-class WaterpointLayer(StatusFeatureLayer):
+class WaterpointLayer(ImportedFeatureLayer):
 
     STYLE = "waterpoint"
 

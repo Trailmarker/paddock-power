@@ -10,6 +10,10 @@ cd deployment
 cp mlapp/images/icon.png mlapp/icon.png
 rm -rf mlapp/images
 
+# remove unused scripts and bits and pieces
+rm -rf mlapp/uic.bat
+rm -rf mlapp/dev.py
+
 find . -name "*.qss" | xargs rm -f
 
 # zip up the MLA Paddock Power plug-in directory only into a datestamped archive

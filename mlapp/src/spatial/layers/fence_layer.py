@@ -4,10 +4,9 @@ from qgis.core import QgsFeatureRequest, QgsProject
 from ...models.glitch import Glitch
 from ..fields.feature_status import FeatureStatus
 from ..features.fence import Fence
-from .status_feature_layer import StatusFeatureLayer
+from ..layers.persisted_feature_layer import PersistedFeatureLayer
 
-
-class FenceLayer(StatusFeatureLayer):
+class FenceLayer(PersistedFeatureLayer):
 
     STYLE = "fence"
 

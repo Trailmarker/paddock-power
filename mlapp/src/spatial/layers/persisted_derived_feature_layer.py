@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from abc import abstractmethod
 from qgis.PyQt.QtCore import pyqtSlot
 
 from qgis.core import QgsProject
@@ -11,11 +10,6 @@ from ..features.edits import Edits
 
 
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
-
-    @abstractmethod
-    def getFeatureType(self):
-        """Return the type of feature that this layer contains, which depnds on the underlying derived layer. Override in subclasses."""
-        pass
 
     def __init__(self, project, gpkgFile, layerName, derivedLayer, styleName=None):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""

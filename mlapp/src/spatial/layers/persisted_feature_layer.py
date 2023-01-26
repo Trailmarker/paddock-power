@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from abc import abstractmethod
 from os import path
 
 from qgis.PyQt.QtCore import pyqtSignal
@@ -22,9 +23,10 @@ class PersistedFeatureLayer(FeatureLayer):
 
     featuresPersisted = pyqtSignal(list)
 
+    @abstractmethod
     def getFeatureType(self):
         """Return the type of feature that this layer contains. Override in subclasses"""
-        return Feature
+        pass
 
     def detectInGeoPackage(self, gpkgFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""

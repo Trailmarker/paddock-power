@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from ..features.paddock import Paddock
 from .condition_table import ConditionTable
-from .status_feature_layer import StatusFeatureLayer
+from .imported_feature_layer import ImportedFeatureLayer
 
 
-class PaddockLayer(StatusFeatureLayer):
+class PaddockLayer(ImportedFeatureLayer):
 
     STYLE = "paddock"
 
