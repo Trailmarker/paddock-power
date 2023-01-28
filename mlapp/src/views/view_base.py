@@ -11,15 +11,15 @@ class ViewBase(QDockWidget):
 
     closingView = pyqtSignal(type)
 
-    def __init__(self, project, parent=None):
+    def __init__(self, wprkspace, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        if not project:
-            raise Glitch(f"{PLUGIN_NAME} views can't be opened without an open Project")
+        if not wprkspace:
+            raise Glitch(f"{PLUGIN_NAME} views can't be opened without an open Workspace")
 
-        self.project = project
-        self.project.projectUnloading.connect(lambda: self.closeEvent(QCloseEvent()))
+        self.workspace = workspace
+        self.workspace.workspaceUnloading.connect(lambda: self.closeEvent(QCloseEvent()))
 
     def closeEvent(self, event):
         self.closingView.emit(type(self))

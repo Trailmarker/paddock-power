@@ -12,11 +12,13 @@ from .resources_rc import *
 
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.models.glitch import Glitch
-from .src.models.project import Project
-from .src.utils import guiError, qgsInfo, resolveGeoPackageFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
+from .src.models.container import Container
+from .src.utils import guiError, guiInformation, guiWarning, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
+
+    MENU_NAME = f"&{PLUGIN_NAME}"
 
     __GLITCH_HOOK_WRAPPER = "__glitchHookWrapper"
 
@@ -24,6 +26,8 @@ class PaddockPower(QObject):
 
     def __init__(self, iface):
         super().__init__()
+
+        self.workspace = None
 
         self.iface = iface
         self.actions = []
@@ -46,10 +50,17 @@ class PaddockPower(QObject):
         # Register QGIS expression extensions (used in symbology etc)
         self.registerFunctions()
 
-        QgsProject.instance().cleared.connect(self.unloadProject)
-        QgsProject.instance().readProject.connect(self.detectProject)
+        self.container = None
+        self.initContainer()
 
-        self.project = None
+        QgsProject.instance().cleared.connect(self.unloadWorkspace)
+        QgsProject.instance().readProject.connect(self.detectWorkspace)
+
+    def initContainer(self):
+        """Initialise the IoC container."""
+        self.container = Container()
+        self.container.init_resources()
+        self.container.wire(modules=[__name__])
 
     def addAction(self,
                   icon,
@@ -78,11 +89,13 @@ class PaddockPower(QObject):
         self.actions.append(action)
         return action
 
+
     def initGui(self):
-        """The real Paddock Power GUI is initialised when a project is opened,
+        """The real Paddock Power GUI is initialised when a QGIS project is opened,
            but QGIS utilities call this when the plug-in is loaded anyway."""
         # Initialise plug-in menu and toolbar
-        self.menu = Project.MENU_NAME
+        self.menu = PaddockPower.MENU_NAME
+
 
         self.toolbar = self.iface.addToolBar(u"PaddockPower")
         self.toolbar.setObjectName(u"PaddockPower")
@@ -97,14 +110,14 @@ class PaddockPower(QObject):
 
         self.addAction(
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
-            text=f"Refresh {PLUGIN_NAME} Project …",
-            callback=lambda *_: self.detectProject(),
+            text=f"Refresh {PLUGIN_NAME} workspace …",
+            callback=lambda *_: self.detectWorkspace(),
             parent=self.iface.mainWindow())
 
         self.addAction(
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/new-paddock-power.png"),
-            text=f"Create {PLUGIN_NAME} Project …",
-            callback=lambda *_: self.createProject(),
+            text=f"Create {PLUGIN_NAME} workspace …",
+            callback=lambda *_: self.createWorkspace(),
             parent=self.iface.mainWindow())
 
         self.addAction(
@@ -113,7 +126,7 @@ class PaddockPower(QObject):
             callback=lambda *_: self.importData(),
             parent=self.iface.mainWindow())
 
-        self.detectProject()
+        self.detectWorkspace()
 
     # Override Glitch type exceptions application-wide
     def setupGlitchHook(self):
@@ -143,20 +156,20 @@ class PaddockPower(QObject):
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         try:
-            QgsProject.instance().cleared.disconnect(self.unloadProject)
-            QgsProject.instance().readProject.disconnect(self.detectProject)
+            QgsProject.instance().cleared.disconnect(self.unloadWorkspace)
+            QgsProject.instance().readProject.disconnect(self.detectWorkspace)
         except BaseException:
             pass
 
         try:
-            self.unloadProject()
+            self.unloadWorkspace()
         except BaseException:
             pass
 
         try:
             # Remove the plugin menu item and icon
             for action in self.actions:
-                self.iface.removePluginMenu(Project.MENU_NAME, action)
+                self.iface.removePluginMenu(PaddockPower.MENU_NAME, action)
                 self.iface.removeToolBarIcon(action)
 
             # Remove the toolbar
@@ -182,73 +195,63 @@ class PaddockPower(QObject):
         for paddockPowerFunction in PaddockPowerFunctions:
             QgsExpression.unregisterFunction(paddockPowerFunction)
 
-    # @Glitch.glitchy(f"An exception occurred while trying to detect a {PLUGIN_NAME} project.")
+    @Glitch.glitchy(f"An error occurred while scanning for {PLUGIN_NAME} workspaces.")
+    def detectWorkspace(self, _=None):
+        f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
+        
+        # Ground zero
+        self.unloadWorkspace()
+        
+        try:
+            self.workspace = self.container.workspace()
+        except:
+            guiWarning(f"No valid {PLUGIN_NAME} workspace was found.")
+            qgsInfo(f"{PLUGIN_NAME} no workspace detected …")
 
-    def detectProject(self, _=None):
-        f"""Detect a {PLUGIN_NAME} Project in the current QGIS project."""
 
-        self.project = None
-        # try:
-        projectFile = resolveProjectFile()
-        if projectFile is None:
-            qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
-        else:
-            gpkgFile = resolveGeoPackageFile()
-            if gpkgFile is not None and os.path.exists(gpkgFile):
-                qgsInfo(f"{PLUGIN_NAME} loading project …")
-                self.project = Project(self.iface, gpkgFile)
-            else:
-                qgsInfo(f"{PLUGIN_NAME} no GeoPackage file located …")
-        # except BaseException as e:
-        #     qgsInfo(f"{PLUGIN_NAME} exception occurred detecting project:")
-        #     qgsInfo(f"{e}")
-
-        if self.project is not None:
-            self.project.addToMap()
-        else:
-            qgsInfo(f"{PLUGIN_NAME} no project detected …")
-
-    # @Glitch.glitchy(f"An exception occurred while trying to create a {PLUGIN_NAME} project.")
-    def createProject(self):
-        f"""Create a new {PLUGIN_NAME} Project in the current QGIS project."""
-        self.unloadProject()
+    @Glitch.glitchy(f"An error occurred while creating a {PLUGIN_NAME} workspace.")
+    def createWorkspace(self):
+        f"""Create a new {PLUGIN_NAME} workspace in the current QGIS project."""
+        self.unloadWorkspace()
         try:
             projectFile = resolveProjectFile()
             if projectFile is None:
                 qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
-                guiError(f"Please create and save a QGIS project before you try to create a {PLUGIN_NAME} project.")
+                guiError(f"Please create and save a QGIS project file before you try to create a {PLUGIN_NAME} workspace.")
                 return
             else:
-                gpkgFile = resolveGeoPackageFile()
-                if gpkgFile is not None:
-                    if os.path.exists(gpkgFile):
-                        qgsInfo(f"{PLUGIN_NAME} GeoPackage file already exists, not creating project …")
-                        guiError(
-                            f"A {PLUGIN_NAME} project already exists in the filesystem adjacent to your QGIS project file.")
+                workspaceFile = resolveWorkspaceFile()
+                if workspaceFile is not None:
+                    if os.path.exists(workspaceFile):
+                        qgsInfo(f"A {PLUGIN_NAME} workspace (.gpkg) file already exists. Stopping creation …")
+                        guiError(f"A {PLUGIN_NAME} workspace file {os.path.basename(workspaceFile)} already exists alongside your QGIS project file.")
                     else:
-                        qgsInfo(f"{PLUGIN_NAME} creating project …")
-                        self.project = Project(self.iface, gpkgFile)
+                        self.workspace = self.container.workspace()
+                        qgsInfo(f"{PLUGIN_NAME} created workspace …")
+                        guiInformation(f"A new {PLUGIN_NAME} workspace file, {os.path.basename(workspaceFile)} has been created alongside your QGIS project file.")
                 else:
-                    qgsInfo(f"{PLUGIN_NAME} no GeoPackage file located …")
+                    qgsInfo(f"{PLUGIN_NAME} no workspace (.gpkg) file was located …")
         except BaseException as e:
-            qgsInfo(f"{PLUGIN_NAME} exception occurred creating project …")
+            qgsInfo(f"{PLUGIN_NAME} exception occurred creating workspace …")
             qgsInfo(str(e))
+            raise e
             pass
 
-        if self.project is not None:
-            self.project.addToMap()
 
     def importData(self):
-        if self.project is not None:
-            self.project.importData()
+        if self.workspace is not None:
+            self.workspace.importData()
 
-    def unloadProject(self):
+    def unloadWorkspace(self):
         """Removes the plugin menu item and icon from QGIS interface."""
-        if self.project is not None:
-            qgsInfo(f"{PLUGIN_NAME} unloading project …")
-            self.project.unload()
-            self.project = None
+        if self.workspace is not None:
+            qgsInfo(f"{PLUGIN_NAME} unloading workspace …")
+            self.workspace.unload()
+            self.workspace = None
+        
+        # Prime the container for a new workspace
+        self.container.reset_singletons()
 
     def openFeatureView(self):
-        if self.project is not None:
-            self.project.openFeatureView()
+        if self.workspace is not None:
+            self.workspace.openFeatureView()

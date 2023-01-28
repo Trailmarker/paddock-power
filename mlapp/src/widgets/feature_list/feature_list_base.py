@@ -42,7 +42,7 @@ class FeatureListBase(QListWidget):
             # qgsDebug(f"Selecting Feature {feature.id} in {self.__class__.__name__}")
             for item in [self.item(i) for i in range(self.count())]:
                 widget = self.itemWidget(item)
-                if widget.feature.id == feature.id:  # TODO might this lead to "old" copies of the Feature "aliasing"?
+                if widget.feature.FID == feature.FID:  # TODO might this lead to "old" copies of the Feature "aliasing"?
                     self.setCurrentItem(item)
                     return
 

@@ -15,16 +15,15 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
 
         super().__init__(*args, **kwargs)
 
-    def mapFeature(self, qgsFeature, fieldMap):
+    def mapFeature(self, importFeature, fieldMap):
         f"""Map a QgsFeature to a {PLUGIN_NAME} Feature."""
 
         targetFeature = self.makeFeature()
-        targetQgsFeature = self._unwrapQgsFeature(targetFeature)
-        mappedFeature = fieldMap.mapQgsFeature(qgsFeature, targetQgsFeature)
+        mappedFeature = fieldMap.mapFeature(importFeature, targetFeature)
         feature = self.wrapFeature(mappedFeature)
         feature.clearId()
         
-        # Default imported data to 'Built' status
+        # Default imported data to 'Built' status - TODO might need other things here?
         if isinstance(feature, StatusFeature):
             feature.status = FeatureStatus.Built
         

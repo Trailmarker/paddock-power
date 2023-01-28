@@ -15,27 +15,27 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class WaterpointWidget(QWidget, FORM_CLASS):
 
-    def __init__(self, project, parent=None):
+    def __init__(self, workspace, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        self.project = project
+        self.workspace = workspace
 
         self.setupUi(self)
 
-        self.waterpointList.featureLayer = self.project.waterpointLayer
+        self.waterpointList.featureLayer = self.workspace.waterpointLayer
 
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)
 
     def sketchWaterpoint(self):
         """Sketch and analyse a new Fence."""
-        tool = SketchPointTool(self.project)
+        tool = SketchPointTool(self.workspace)
         tool.sketchFinished.connect(self.onSketchWaterpointFinished)
-        self.project.setTool(tool)
+        self.workspace.setTool(tool)
 
     @pyqtSlot(QgsGeometry)
     def onSketchWaterpointFinished(self, sketchPoint):
-        waterpoint = self.project.waterpointLayer.makeFeature()
+        waterpoint = self.workspace.waterpointLayer.makeFeature()
         waterpoint.draftFeature(sketchPoint)
-        self.project.selectFeature(waterpoint)
+        self.workspace.selectFeature(waterpoint)

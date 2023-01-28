@@ -10,7 +10,7 @@ class Schema(list):
         assert all(isinstance(f, Field) for f in fields)
 
         super().__init__(fields)
-        self._wkbType = wkbType
+        self.wkbType = wkbType
 
     def hasField(self, field):
         return any(field == f.name() for f in self)
@@ -26,8 +26,15 @@ class Schema(list):
             for field in self:
                 if field._propertyName is not None:
                     field.addFieldProperty(cls)
-                setattr(cls, "getSchema", classmethod(lambda _: self))
-            if self._wkbType is not None:
-                setattr(cls, "getWkbType", classmethod(lambda _: self._wkbType))
+            setattr(cls, "getSchema", classmethod(lambda _: self))
+            setattr(cls, "getWkbType", classmethod(lambda _: self.wkbType))
             return cls
+        
         return _addSchema
+
+    def checkFields(self, fields):
+        """Check that the given Feature is compatible with this Schema."""
+        missing = [field for field in self if field.name() not in [f.name() for f in fields]]
+        extra = [field for field in fields if field.name() not in [f.name() for f in self]]
+        return missing, extra
+        

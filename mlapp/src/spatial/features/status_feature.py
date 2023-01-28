@@ -2,6 +2,7 @@
 from .edits import Edits
 from .persisted_feature import PersistedFeature
 from .feature_action import FeatureAction
+from ..fields.names import TIMEFRAME
 from ..fields.schemas import StatusFeatureSchema
 from ..fields.timeframe import Timeframe
 from .feature_state_machine import FeatureStateMachine
@@ -20,16 +21,19 @@ class StatusFeature(PersistedFeature, FeatureStateMachine):
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        return f"{self.__class__.__name__}(id={self.id},name='{self.name}',status={self.status})"
+        return f"{self.__class__.__name__}(id={self.FID},name='{self.NAME}',status={self.status})"
 
     def __str__(self):
         """Convert the Feature to a string representation."""
         return repr(self)
 
     @property
-    def timeframe(self):
+    def TIMEFRAME(self):
         """Return the timeframe for the Feature."""
-        return Timeframe.fromFeatureStatus(self.status)
+        if not self.hasTimeframe:
+            return Timeframe.fromFeatureStatus(self.status)
+        else:
+            return self.attribute(TIMEFRAME)
 
     @Edits.persistFeatures
     @FeatureAction.plan.handler()

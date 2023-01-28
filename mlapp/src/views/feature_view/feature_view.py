@@ -23,20 +23,20 @@ STYLESHEET = getComponentStyleSheet(__file__)
 
 class FeatureView(ViewBase, FORM_CLASS):
 
-    def __init__(self, project, parent=None):
+    def __init__(self, workspace, parent=None):
         """Constructor."""
-        super().__init__(project, parent)
+        super().__init__(workspace, parent)
 
-        self.project = project
+        self.workspace = workspace
 
         self.setupUi(self)
 
         self.setStyleSheet(STYLESHEET)
 
-        self.paddockTab = PaddockWidget(project, self.tabWidget)
-        self.fenceTab = FenceWidget(project, self.tabWidget)
-        self.pipelineTab = PipelineWidget(project, self.tabWidget)
-        self.waterpointTab = WaterpointWidget(project, self.tabWidget)
+        self.paddockTab = PaddockWidget(workspace, self.tabWidget)
+        self.fenceTab = FenceWidget(workspace, self.tabWidget)
+        self.pipelineTab = PipelineWidget(workspace, self.tabWidget)
+        self.waterpointTab = WaterpointWidget(workspace, self.tabWidget)
 
         self.tabWidget.addTab(self.paddockTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
         self.tabWidget.addTab(self.fenceTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
@@ -49,8 +49,8 @@ class FeatureView(ViewBase, FORM_CLASS):
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png"),
             'Waterpoints')
 
-        self.currentTimeframeButton.clicked.connect(lambda: self.project.setCurrentTimeframe(Timeframe.Current))
-        self.futureTimeframeButton.clicked.connect(lambda: self.project.setCurrentTimeframe(Timeframe.Future))
+        self.currentTimeframeButton.clicked.connect(lambda: self.workspace.setCurrentTimeframe(Timeframe.Current))
+        self.futureTimeframeButton.clicked.connect(lambda: self.workspace.setCurrentTimeframe(Timeframe.Future))
 
         # Create a button group to control checking of the Timeframe buttons
         self.timeframeButtonGroup = QButtonGroup(exclusive=True)
@@ -75,7 +75,7 @@ class FeatureView(ViewBase, FORM_CLASS):
 
         self.refreshUi()
 
-        self.project.currentTimeframeChanged.connect(lambda _: self.refreshUi())
+        self.workspace.currentTimeframeChanged.connect(lambda _: self.refreshUi())
 
         # Experimentation with customising the tab bar
         # self.tabWidget.setCornerWidget(QPushButton('Add Feature'), Qt.TopLeftCorner)
@@ -84,5 +84,5 @@ class FeatureView(ViewBase, FORM_CLASS):
         # tabBar.hide()
 
     def refreshUi(self):
-        self.currentTimeframeButton.setChecked(self.project.currentTimeframe == Timeframe.Current)
-        self.futureTimeframeButton.setChecked(self.project.currentTimeframe == Timeframe.Future)
+        self.currentTimeframeButton.setChecked(self.workspace.currentTimeframe == Timeframe.Current)
+        self.futureTimeframeButton.setChecked(self.workspace.currentTimeframe == Timeframe.Future)

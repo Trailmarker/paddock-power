@@ -11,10 +11,10 @@ from .map_tool import MapTool
 class SketchLineTool(MapTool):
     sketchFinished = pyqtSignal(QgsGeometry)
 
-    def __init__(self, project):
+    def __init__(self, workspace):
 
-        self.project = project
-        super().__init__(self.project.iface.mapCanvas())
+        self.workspace = workspace
+        super().__init__(self.workspace.iface.mapCanvas())
 
         self.points = []
 
@@ -74,7 +74,7 @@ class SketchLineTool(MapTool):
 
         if e.button() == Qt.RightButton:
             self.capturing = False
-            self.project.unsetTool()
+            self.workspace.unsetTool()
             self.updateLine()
 
     def updateLine(self):

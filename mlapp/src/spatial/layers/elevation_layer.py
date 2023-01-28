@@ -8,22 +8,24 @@ from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME
 
 
-def rasterGpkgUrl(gpkgFile, layerName):
+def rasterGpkgUrl(workspaceFile, layerName):
     """Return a URL for a raster layer in a GeoPackage file."""
     # different from QgsVectorLayer GeoPackage URL format!
-    return f"GPKG:{gpkgFile}:{layerName}"
+    return f"GPKG:{workspaceFile}:{layerName}"
 
 
 class ElevationLayer(QgsRasterLayer):
 
+    NAME = "Elevation Mapping"
+
     @classmethod
-    def detectInGeoPackage(_, gpkgFile):
-        """Find an elevation layer in a project GeoPackage."""
+    def detectInGeoPackage(_, workspaceFile):
+        """Find an elevation layer in a workspace GeoPackage."""
         try:
-            if not path.exists(gpkgFile):
+            if not path.exists(workspaceFile):
                 return None
 
-            db = sqlite3.connect(gpkgFile)
+            db = sqlite3.connect(workspaceFile)
             cursor = db.cursor()
             cursor.execute(
                 "SELECT table_name, data_type FROM gpkg_contents WHERE data_type = '2d-gridded-coverage'")
@@ -35,32 +37,31 @@ class ElevationLayer(QgsRasterLayer):
                 return grids[0][0]
             else:
                 raise Glitch(
-                    f"{PLUGIN_NAME} found multiple possible elevation layers in {gpkgFile}")
+                    f"{PLUGIN_NAME} found multiple possible elevation layers in {workspaceFile}")
         except BaseException:
             return None
 
-    def detectAndRemove(self, gpkgFile, layerName):
-        """Detect if a layer is already in the map, and if so, return it."""
-        rasterUrl = rasterGpkgUrl(gpkgFile, layerName)
+    # def detectAndRemove(self, workspaceFile, layerName):
+    #     """Detect if a layer is already in the map, and if so, return it."""
+    #     rasterUrl = rasterGpkgUrl(workspaceFile, layerName)
 
-        layers = [l for l in QgsProject.instance().mapLayers().values()]
-        for layer in layers:
-            if layer.source() == rasterUrl:
-                QgsProject.instance().removeMapLayer(layer.id())
+    #     layers = [l for l in QgsProject.instance().mapLayers().values()]
+    #     for layer in layers:
+    #         if layer.source() == rasterUrl:
+    #             QgsProject.instance().removeMapLayer(layer.id())
 
-    def __init__(self, project, gpkgFile, layerName):
+    def __init__(self, workspaceFile, layerName=None):
         """Create a new elevation layer."""
 
-        assert(gpkgFile is not None)
-        assert(layerName is not None)
+        assert(workspaceFile is not None)
 
-        self._project = project
+        layerName = layerName or ElevationLayer.NAME
 
         # Note ths URL format is different from QgsVectorLayer!
-        rasterUrl = rasterGpkgUrl(gpkgFile, layerName)
+        rasterUrl = rasterGpkgUrl(workspaceFile, layerName)
         super().__init__(rasterUrl, baseName=layerName)
 
-        self.detectAndRemove(gpkgFile, layerName)
+        # self.detectAndRemove(workspaceFile, layerName)
 
         QgsProject.instance().addMapLayer(self, False)
 

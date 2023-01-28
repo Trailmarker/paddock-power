@@ -5,15 +5,13 @@ from .imported_feature_layer import ImportedFeatureLayer
 
 class LandTypeLayer(ImportedFeatureLayer):
 
+    NAME = "Land Types"
     STYLE = "land_type"
 
-    def getFeatureType(self):
-        return LandType
-
-    def __init__(self, project, gpkgFile, layerName):
-        super().__init__(project,
-                         gpkgFile,
-                         layerName,
+    def __init__(self, workspaceFile):
+        super().__init__(LandType,
+                         workspaceFile,
+                         layerName=LandTypeLayer.NAME,
                          styleName=LandTypeLayer.STYLE)
 
         self.setReadOnly(True)

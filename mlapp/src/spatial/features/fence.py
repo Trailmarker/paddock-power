@@ -3,40 +3,32 @@ from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, Q
 
 from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME
-from ..layers.elevation_layer import ElevationLayer
+from ..layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from ..layers.paddock_layer import PaddockLayer
 from ..fields.feature_status import FeatureStatus
 from ..fields.schemas import FenceSchema, BUILD_FENCE
 from ..fields.timeframe import Timeframe
 from .edits import Edits
 from .feature_action import FeatureAction
-from .line_feature import LineFeature
+from .status_feature import StatusFeature
 
 
 @FenceSchema.addSchema()
-class Fence(LineFeature):
+class Fence(StatusFeature):
 
-    def __init__(self, featureLayer, paddockLayer: PaddockLayer, derivedMetricPaddockLayer,
-                 elevationLayer: ElevationLayer = None, existingFeature=None):
-        super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
-
-        self._paddockLayerId = paddockLayer.id()
-        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id()
+    def __init__(self, featureLayer, existingFeature=None):
+        super().__init__(featureLayer, existingFeature)
 
         self._supersededPaddocks = []
         self._plannedPaddocks = []
 
     @property
     def paddockLayer(self):
-        return QgsProject.instance().mapLayer(self._paddockLayerId)
+        return self.depend(PaddockLayer)
 
     @property
     def derivedMetricPaddockLayer(self):
-        return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId) if self._derivedMetricPaddockLayerId else None
-
-    @derivedMetricPaddockLayer.setter
-    def derivedMetricPaddockLayer(self, derivedMetricPaddockLayer):
-        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id()
+        return self.depend(DerivedMetricPaddockLayer)
 
     @property
     def isInfrastructure(self):
@@ -75,7 +67,7 @@ class Fence(LineFeature):
     def getNewPaddocks(self, geometry=None):
         """Get the paddocks that are newly enclosed by this Fence, and the normalised outer fence lines."""
 
-        fenceLine = geometry or self.geometry
+        fenceLine = geometry or self.GEOMETRY
 
         if not fenceLine or fenceLine.isEmpty():
             return [], []
@@ -113,7 +105,7 @@ class Fence(LineFeature):
                 if splits:
                     paddockGeometry = notPropertyGeometry.difference(splits[0])
                     newPaddock = self.paddockLayer.makeFeature()
-                    newPaddock.draftFeature(paddockGeometry, f"Fence {self.buildOrder} New")
+                    newPaddock.draftFeature(paddockGeometry, f"Fence {self.BUILD_ORDER} New")
                     newPaddocks.append(newPaddock)
 
         # notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=1.0)
@@ -129,7 +121,7 @@ class Fence(LineFeature):
         """Get a tuple representing the restriction of this Fence to only Paddocks it completely crosses,
            and the Paddocks that are completely crossed by the specified line."""
 
-        fenceLine = geometry or self.geometry
+        fenceLine = geometry or self.GEOMETRY
 
         if not fenceLine or fenceLine.isEmpty():
             return [], []
@@ -179,13 +171,11 @@ class Fence(LineFeature):
             # _, crossedPaddocks = self.getCrossedPaddocks()
             # return crossedPaddocks, []
 
-        buildOrder = self.buildOrder
-
-        if buildOrder <= 0:
+        if self.BUILD_ORDER <= 0:
             raise Glitch(
-                "Fence.getCurrentAndFuturePaddocks: buildOrder must be a positive integer")
+                "Fence.getCurrentAndFuturePaddocks: BUILD_ORDER must be a positive integer")
 
-        buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {buildOrder}')
+        buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {self.BUILD_ORDER}')
 
         metricPaddocks = list(self.derivedMetricPaddockLayer.getFeatures(request=buildFenceRequest))
 
@@ -197,7 +187,7 @@ class Fence(LineFeature):
     def draftFeature(self, geometry):
         """Draft a Fence."""
 
-        self.geometry = geometry
+        self.GEOMETRY = geometry
 
         edits = Edits()
 
@@ -223,14 +213,14 @@ class Fence(LineFeature):
             # raise Glitch("The specified Fence does not cross or touch any Built or
             # Planned Paddocks, or enclose any new Paddocks.")
 
-        self.geometry, *fenceLines = fenceLines
+        self.GEOMETRY, *fenceLines = fenceLines
 
         for fenceLine in fenceLines:
             extraFence = self.featureLayer.makeFeature()
             edits = edits.editAfter(extraFence.draftFeature(fenceLine))
 
         currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
-        self.buildOrder = currentBuildOrder + 1
+        self.BUILD_ORDER = currentBuildOrder + 1
 
         return Edits.upsert(self).editBefore(edits)
 
@@ -245,16 +235,16 @@ class Fence(LineFeature):
 
             _, lowestDraftBuildOrder, _ = self.featureLayer.getBuildOrder()
 
-            if self.buildOrder > lowestDraftBuildOrder:
+            if self.BUILD_ORDER > lowestDraftBuildOrder:
                 raise Glitch(
                     "You must Plan your Drafted Fences from first to last according to Build Order.")
 
-            if self.buildOrder <= 0:
+            if self.BUILD_ORDER <= 0:
                 raise Glitch("Fence must have a positive Build Order to be Planned")
 
             _, supersededPaddocks = self.getCrossedPaddocks()
 
-            fenceLine = self.geometry
+            fenceLine = self.GEOMETRY
             polyline = fenceLine.asPolyline()
             points = [QgsPoint(p.x(), p.y()) for p in polyline]
             splitLine = QgsLineString(points)

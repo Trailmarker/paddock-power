@@ -4,8 +4,9 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsProject
 
 from ..fields.schemas import MetricPaddockSchema
-from ..layers.paddock_land_types_popup_layer import PaddockLandTypesPopupLayer
-from .edits import Edits
+from ..layers.metric_paddock_popup_layer import MetricPaddockPopupLayer
+from ..layers.paddock_layer import PaddockLayer
+from ..layers.paddock_land_types_layer import PaddockLandTypesLayer
 from .feature_action import FeatureAction
 from .status_feature import StatusFeature
 
@@ -13,30 +14,26 @@ from .status_feature import StatusFeature
 @MetricPaddockSchema.addSchema()
 class MetricPaddock(StatusFeature):
 
-    popupLayerAdded = pyqtSignal(PaddockLandTypesPopupLayer)
+    popupLayerAdded = pyqtSignal(MetricPaddockPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
-    def __init__(self, featureLayer, paddockLayer, paddockLandTypesLayer, conditionTable, existingFeature=None):
+    def __init__(self, featureLayer, existingFeature=None):
         """Initialise a new Metric Paddock."""
-        super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
-
-        self._paddockLayerId = paddockLayer.id()
-        self._paddockLandTypesLayerId = paddockLandTypesLayer.id()
-        self.conditionTable = conditionTable
+        super().__init__(featureLayer, existingFeature)
 
         self._popupLayerId = None
 
     @property
-    def title(self):
-        return f"{self.name} ({self.featureArea:.2f} km²)"
+    def TITLE(self):
+        return f"{self.NAME} ({self.FEATURE_AREA:.2f} km²)"
 
     @property
     def paddockLayer(self):
-        return QgsProject.instance().mapLayer(self._paddockLayerId)
+        return self.depend(PaddockLayer)
 
     @property
     def paddockLandTypesLayer(self):
-        return QgsProject.instance().mapLayer(self._paddockLandTypesLayerId)
+        return self.depend(PaddockLandTypesLayer)
 
     @property
     def popupLayer(self):
@@ -47,7 +44,7 @@ class MetricPaddock(StatusFeature):
         self._popupLayerId = popupLayer.id() if popupLayer else None
 
     def addPopupLayer(self):
-        """Add a condition layer to the project."""
+        """Add a Metrick Paddock popup layer."""
         if not self.popupLayer:
             item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
             if not item:
@@ -55,11 +52,11 @@ class MetricPaddock(StatusFeature):
                 return
 
             # Remove any existing Paddock Land Types popup layers - they don't play nice together
-            PaddockLandTypesPopupLayer.detectAndRemoveAllOfType()
+            MetricPaddockPopupLayer.detectAndRemoveAllOfType()
 
-            self.popupLayer = PaddockLandTypesPopupLayer(
+            self.popupLayer = MetricPaddockPopupLayer(
                 self.featureLayer.getPaddockPowerProject(),
-                f"{self.name} Land Types",
+                f"{self.NAME} Land Types",
                 self,
                 self.paddockLandTypesLayer,
                 self.conditionTable)
@@ -72,7 +69,7 @@ class MetricPaddock(StatusFeature):
             self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
-        """Remove any Paddock Condition popup layer from the project."""
+        """Remove any Metric Paddock popup layer."""
         try:
             if self.popupLayer:
                 layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)

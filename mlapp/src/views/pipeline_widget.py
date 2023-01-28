@@ -16,27 +16,27 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class PipelineWidget(QWidget, FORM_CLASS):
 
-    def __init__(self, project, parent=None):
+    def __init__(self, wprkspace, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        self.project = project
+        self.wprkspace = wprkspace
 
         self.setupUi(self)
 
-        self.pipelineList.featureLayer = self.project.pipelineLayer
+        self.pipelineList.featureLayer = self.wprkspace.pipelineLayer
 
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)
 
     def sketchPipeline(self):
         """Sketch a new Pipeline."""
-        tool = SketchLineTool(self.project)
+        tool = SketchLineTool(self.wprkspace)
         tool.sketchFinished.connect(self.onSketchPipelineFinished)
-        self.project.setTool(tool)
+        self.wprkspace.setTool(tool)
 
     @pyqtSlot(QgsGeometry)
     def onSketchPipelineFinished(self, sketchLine):
-        pipeline = self.project.pipelineLayer.makeFeature()
+        pipeline = self.wprkspace.pipelineLayer.makeFeature()
         pipeline.planFeature(sketchLine)
-        self.project.selectFeature(pipeline)
+        self.wprkspace.selectFeature(pipeline)

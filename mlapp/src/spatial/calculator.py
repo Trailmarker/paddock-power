@@ -12,7 +12,7 @@ from .elevation_profile import ElevationProfile
 
 
 def makeDistanceAreaCalculator():
-    """Return a QgsDistanceArea object with the correct settings for the project."""
+    """Return a QgsDistanceArea object with the correct settings for the workspace."""
     calculator = QgsDistanceArea()
     calculator.setSourceCrs(QgsCoordinateReferenceSystem(
         'EPSG:7845'), QgsProject.instance().transformContext())
@@ -94,7 +94,7 @@ class Calculator:
             elevations = [0.0 for point in points]
 
         else:
-            # Get points along line at the granularity of the project elevation layer, using Shapely
+            # Get points along line at the granularity of the workspace elevation layer, using Shapely
             lineLength = line.length()
             shapelyLine = loads(
                 bytes(line.asWkb()))

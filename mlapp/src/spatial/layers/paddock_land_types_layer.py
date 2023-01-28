@@ -8,20 +8,18 @@ from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
 class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
 
+    NAME = "Paddock Land Types"
     STYLE = "paddock_land_types_popup"
 
-    def __init__(self, project, gpkgFile, layerName, paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable):
+    def __init__(self,
+                 workspaceFile,
+                 derivedPaddockLandTypesLayer: DerivedPaddockLandTypesLayer):
         f"""Create a new {PLUGIN_NAME} Paddock Land Types layer."""
 
-        derivedPaddockLandTypesLayer = DerivedPaddockLandTypesLayer(
-            project, f"Derived {layerName}", paddockLayer, landTypeLayer, wateredAreaLayer, conditionTable)
+        super().__init__(PaddockLandType,
+                         workspaceFile,
+                         layerName=PaddockLandTypesLayer.NAME,
+                         styleName=PaddockLandTypesLayer.STYLE,
+                         derivedLayer=derivedPaddockLandTypesLayer)
 
-        self.conditionTable = conditionTable
 
-        super().__init__(project, gpkgFile, layerName, derivedPaddockLandTypesLayer, styleName=PaddockLandTypesLayer.STYLE)
-
-    def getFeatureType(self):
-        return PaddockLandType
-
-    def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.conditionTable, feature)

@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ..spatial.layers.paddock_land_types_popup_layer import PaddockLandTypesPopupLayer
+from ..spatial.layers.metric_paddock_popup_layer import MetricPaddockPopupLayer
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -14,16 +14,16 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class PaddockWidget(QWidget, FORM_CLASS):
 
-    def __init__(self, project, parent=None):
+    def __init__(self, wprkspace, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        self.project = project
+        self.wprkspace = wprkspace
 
         self.setupUi(self)
 
-        self.paddockList.paddockLayer = self.project.paddockLayer
-        self.paddockList.featureLayer = self.project.derivedMetricPaddockLayer
+        self.paddockList.paddockLayer = self.wprkspace.paddockLayer
+        self.paddockList.featureLayer = self.wprkspace.derivedMetricPaddockLayer
 
         self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),
                                self.paddockLandTypeListGroupBox.sizeHint().width()])
@@ -39,7 +39,7 @@ class PaddockWidget(QWidget, FORM_CLASS):
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
 
-    @pyqtSlot(PaddockLandTypesPopupLayer)
+    @pyqtSlot(MetricPaddockPopupLayer)
     def setPaddockLandTypesLayer(self, layer=None):
         self.paddockLandTypeList.featureLayer = layer
 

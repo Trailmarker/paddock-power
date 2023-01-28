@@ -5,7 +5,7 @@ from .field_domain import FieldDomain
 
 
 class Timeframe(FieldDomain):
-    f"""The two available timeframes for a {PLUGIN_NAME} project."""
+    f"""The two available timeframes for a {PLUGIN_NAME} workspace."""
     Historical = "Historical"
     Current = "Current"
     Future = "Future"

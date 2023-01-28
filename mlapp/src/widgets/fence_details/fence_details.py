@@ -11,13 +11,13 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class FenceDetails(QgsCollapsibleGroupBox, FORM_CLASS):
 
-    def __init__(self, project, paddock, parent=None):
+    def __init__(self, workspace, paddock, parent=None):
         """Constructor."""
         super().__init__(parent)
 
         self.setupUi(self)
 
-        self.project = project
+        self.workspace = workspace
         self.fence = paddock
 
         self.refreshUi()

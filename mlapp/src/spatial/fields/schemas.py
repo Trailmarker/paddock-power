@@ -4,13 +4,11 @@ from qgis.core import QgsWkbTypes
 from .fields import *
 from .schema import Schema
 
-AreaFeatureSchema = Schema([Fid, Name, Status, Area, Perimeter], wkbType=QgsWkbTypes.MultiPolygon)
 BoundarySchema = Schema([Fid, TimeframeField], wkbType=QgsWkbTypes.MultiPolygon)
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)
 LandTypeSchema = Schema([Fid, LandTypeName, Area, Perimeter, OptimalCapacityPerArea, MapUnit, LandscapeClass,
                          ClassDescription, ErosionRisk], wkbType=QgsWkbTypes.MultiPolygon)
-LineFeatureSchema = Schema([Fid, Name, Status, Length], wkbType=QgsWkbTypes.LineString)
 PaddockSchema = Schema([Fid,
                         Name,
                         Status,
@@ -46,9 +44,7 @@ MetricPaddockSchema = Schema([Fid,
                               PotentialCapacityPerArea,
                               PotentialCapacity],
                              wkbType=QgsWkbTypes.NoGeometry)
-PersistedFeatureSchema = Schema([Fid], wkbType=QgsWkbTypes.MultiPolygon)
-PipelineSchema = LineFeatureSchema
-PointFeatureSchema = Schema([Fid, Name, Status, Longitude, Latitude, Elevation], wkbType=QgsWkbTypes.Point)
+PipelineSchema = Schema([Fid, Name, Status, Length], wkbType=QgsWkbTypes.LineString)
 StatusFeatureSchema = Schema([Fid, Name, Status])
 WaterpointBufferSchema = Schema(
     [Fid, TimeframeField, Paddock, Status, Waterpoint, GrazingRadiusTypeField, GrazingRadius],

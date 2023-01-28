@@ -6,17 +6,17 @@ from .imported_feature_layer import ImportedFeatureLayer
 
 class PaddockLayer(ImportedFeatureLayer):
 
+    NAME = "Paddocks"
     STYLE = "paddock"
 
-    def getFeatureType(self):
-        return Paddock
-
-    def __init__(self, project, gpkgFile, layerName, conditionTable: ConditionTable):
+    def __init__(self,
+                 workspaceFile: str,
+                 conditionTable: ConditionTable):
         """Create or open a Paddock layer."""
 
-        super().__init__(project, gpkgFile, layerName, styleName=PaddockLayer.STYLE)
+        super().__init__(Paddock,
+                         workspaceFile,
+                         layerName=PaddockLayer.NAME,
+                         styleName=PaddockLayer.STYLE)
 
         self.conditionTable = conditionTable
-
-    def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.conditionTable, feature)

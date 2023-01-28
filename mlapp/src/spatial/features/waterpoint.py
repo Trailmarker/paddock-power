@@ -7,11 +7,11 @@ from ..fields.schemas import WaterpointSchema
 from ..layers.waterpoint_popup_layer import WaterpointPopupLayer
 from .edits import Edits
 from .feature_action import FeatureAction
-from .point_feature import PointFeature
+from .status_feature import StatusFeature
 
 
 @WaterpointSchema.addSchema()
-class Waterpoint(PointFeature):
+class Waterpoint(StatusFeature):
 
     NEAREST_GRAZING_RADIUS = 0
     FARTHEST_GRAZING_RADIUS = 20000
@@ -19,16 +19,15 @@ class Waterpoint(PointFeature):
     popupLayerAdded = pyqtSignal(WaterpointPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
-    def __init__(self, featureLayer, waterpointBufferLayer, elevationLayer=None, existingFeature=None):
+    def __init__(self, featureLayer, existingFeature=None):
         """Create a new LineFeature."""
-        super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
-        self._waterpointBufferLayerId = waterpointBufferLayer.id()
+        super().__init__(featureLayer, existingFeature)
 
         self._popupLayerId = None
 
     @property
     def waterpointBufferLayer(self):
-        return QgsProject.instance().mapLayer(self._waterpointBufferLayerId)
+        return self.depend("WaterppintBufferLayer")
 
     @property
     def popupLayer(self):
@@ -39,13 +38,13 @@ class Waterpoint(PointFeature):
         self._popupLayerId = popupLayer.id() if popupLayer else None
 
     @property
-    def title(self):
-        if self.name and self.name != "NULL":
-            return f"{self.name} ({self.waterpointType})"
-        return f"Waterpoint ({self.id}) ({self.waterpointType})"
+    def TITLE(self):
+        if self.NAME and self.NAME != "NULL":
+            return f"{self.NAME} ({self.waterpointType})"
+        return f"Waterpoint ({self.FID}) ({self.waterpointType})"
 
     def addPopupLayer(self):
-        """Add a Waterpoint popup layer to the project."""
+        """Add a Waterpoint popup layer."""
         if not self.popupLayer:
             item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
             if not item:
@@ -56,7 +55,7 @@ class Waterpoint(PointFeature):
 
             self.popupLayer = WaterpointPopupLayer(
                 self.featureLayer.getPaddockPowerProject(),
-                f"{self.waterpointType.value} {self.id} Watered Area",
+                f"{self.waterpointType.value} {self.FID} Watered Area",
                 self,
                 self.waterpointBufferLayer)
             group = item.parent()
@@ -67,7 +66,7 @@ class Waterpoint(PointFeature):
             self.popupLayerAdded.emit(self.popupLayer)
 
     def removePopupLayer(self):
-        """Remove any Waterpoint popup layer from the project."""
+        """Remove any Waterpoint popup layer."""
         try:
             if self.popupLayer:
                 layer = QgsProject.instance().layerTreeRoot().findLayer(self.popupLayer)
@@ -96,6 +95,6 @@ class Waterpoint(PointFeature):
     @FeatureAction.draft.handler()
     def draftFeature(self, point):
         """Draft a Waterpoint."""
-        self.geometry = point
+        self.GEOMETRY = point
 
         return Edits.upsert(self)

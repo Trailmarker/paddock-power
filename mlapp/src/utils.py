@@ -44,6 +44,10 @@ def qgsDebug(message, tag=PLUGIN_NAME, level=Qgis.Info):
             QgsMessageLog.logMessage(m, tag, level)
 
 
+def qgsError(message):
+    """Print a debug message."""
+    qgsDebug(message, PLUGIN_NAME, Qgis.Critical)
+
 def qgsInfo(message):
     """Print a debug message."""
     qgsDebug(message, PLUGIN_NAME, Qgis.Info)
@@ -96,14 +100,15 @@ def resolveProjectFile():
     if projectFilePath is None or projectFilePath == '':
         return None
         # raise Exception(
-        # "Save the current QGIS session as your Paddock Power project before continuing.")
+        # "Save the current QGIS session as your Paddock Power workspace before continuing.")
     return projectFilePath
 
 
-def resolveGeoPackageFile(projectFilePath=None):
+def resolveWorkspaceFile(projectFilePath=None):
     f"""Get where the current {PLUGIN_NAME} GeoPackage should be."""
     projectFilePath = projectFilePath or resolveProjectFile()
     return f"{path.splitext(projectFilePath)[0]}.gpkg" if projectFilePath else None
+             
 
 
 def resolveStylePath(styleName):

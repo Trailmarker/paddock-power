@@ -26,7 +26,7 @@ class ProfileDetails(QWidget, FORM_CLASS):
         self.infrastructureLengthText.setProperty("class", "form-right")
 
         self.feature = None
-        self.project = None
+        self.workspace = None
         self.profileCanvas = None
 
         self.refreshUi()
@@ -40,10 +40,10 @@ class ProfileDetails(QWidget, FORM_CLASS):
 
         self.refreshUi()
 
-    def setProject(self, project):
-        """Set the Project."""
-        self.project = project
-        self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+    def setWorkspace(self, workspace):
+        """Set the Workspace."""
+        self.workspace = workspace
+        self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self.refreshUi()
 
     def refreshUi(self):

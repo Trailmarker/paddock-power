@@ -19,7 +19,7 @@ class MetricPaddockDetails(QWidget, FORM_CLASS):
         self.metricPaddock = metricPaddock
 
         if self.metricPaddock is not None:
-            self.areaText.setValue(self.metricPaddock.featureArea, "{0:.2f}")
+            self.areaText.setValue(self.metricPaddock.FEATURE_AREA, "{0:.2f}")
             self.wateredAreaText.setValue(self.metricPaddock.wateredArea, "{0:.2f}")
             self.perimeterText.setValue(self.metricPaddock.featurePerimeter, "{0:.1f}")
             self.estimatedCapacityText.setValue(self.metricPaddock.estimatedCapacity, "{0:.0f}")

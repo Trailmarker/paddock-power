@@ -2,11 +2,12 @@
 from collections import defaultdict
 
 class TypeDependencyGraph:
+    # See https://favtutor.com/blogs/topological-sort-python
+    # Code is adapted to the below for type dependency management
 
-    def __init__(self, typeFactory):
+    def __init__(self):
         self.graph = defaultdict(list)
         self.nodes = set()
-        self._typeFactory = typeFactory
 
 
     def addDependencies(self, cls, dependentTypes):
@@ -15,6 +16,7 @@ class TypeDependencyGraph:
             self.nodes.add(dependentType)
             
         self.nodes.add(cls)
+
    
     def getDependencies(self, obj):
         if isinstance(obj, type):
@@ -36,7 +38,8 @@ class TypeDependencyGraph:
 
             sorted.insert(0, node)
 
-    def topologicalSort(self):
+    def sort(self):
+        """Do a topological sort of the type dependency graph and return the initialisation order."""
         visited = dict([(node, False) for node in self.nodes])         
         sorted = []
         
@@ -45,3 +48,4 @@ class TypeDependencyGraph:
                 self._sortUtil(node, visited, sorted)
 
         return list(reversed(sorted))
+    

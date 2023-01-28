@@ -22,7 +22,7 @@ class FieldMap(dict):
     @cached_property
     def targetFieldNames(self):
         """Return the target schema's field names as a list."""
-        return [f.name() for f in self.targetLayer.getFeatureType().getSchema()]
+        return [f.name() for f in self.targetLayer.getSchema()]
 
     def __setitem__(self, __key, __value) -> None:
         """Set the mapping for the given Field."""

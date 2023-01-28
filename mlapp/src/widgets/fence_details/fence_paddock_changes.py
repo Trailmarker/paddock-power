@@ -19,18 +19,18 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         super().__init__(parent)
 
         self.fence = None
-        self.project = None
+        self.workspace = None
 
         self.setupUi(self)
 
         self.refreshUi()
 
-    def setProject(self, project):
-        """Set the Project."""
-        self.project = project
-        self.supersededMetricPaddockMiniList.paddockLayer = self.project.paddockLayer
-        self.plannedMetricPaddockMiniList.paddockLayer = self.project.paddockLayer
-        self.project.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+    def setWorkspace(self, workspace):
+        """Set the Workspace."""
+        self.workspace = workspace
+        self.supersededMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
+        self.plannedMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
+        self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self.refreshUi()
 
     @pyqtSlot(Feature)

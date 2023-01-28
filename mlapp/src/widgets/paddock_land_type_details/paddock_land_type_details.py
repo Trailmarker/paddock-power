@@ -20,7 +20,7 @@ class PaddockLandTypeDetails(QWidget, FORM_CLASS):
         if self.paddockLandType is not None:
             self.landTypeNameText.setValue(self.paddockLandType.landTypeName, "{0}")
             self.conditionTypeText.setValue(self.paddockLandType.conditionType.value, "{0}")
-            self.areaText.setValue(self.paddockLandType.featureArea, "{0:.2f}")
+            self.areaText.setValue(self.paddockLandType.FEATURE_AREA, "{0:.2f}")
             self.wateredAreaText.setValue(self.paddockLandType.wateredArea, "{0:.2f}")
             self.estimatedCapacityText.setValue(self.paddockLandType.estimatedCapacity, "{0:.0f}")
             self.potentialCapacityText.setValue(self.paddockLandType.potentialCapacity, "{0:.0f}")

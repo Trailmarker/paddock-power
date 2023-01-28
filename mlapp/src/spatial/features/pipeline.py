@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
+from ..fields.schemas import PipelineSchema
 from .edits import Edits
 from .feature_action import FeatureAction
-from .line_feature import LineFeature
-from ..fields.schemas import PipelineSchema
+from .status_feature import StatusFeature
 
 
 @PipelineSchema.addSchema()
-class Pipeline(LineFeature):
+class Pipeline(StatusFeature):
 
-    def __init__(self, featureLayer, elevationLayer=None, existingFeature=None):
-        """Create a new LineFeature."""
-        super().__init__(featureLayer=featureLayer, elevationLayer=elevationLayer, existingFeature=existingFeature)
+    def __init__(self, featureLayer, existingFeature=None):
+        """Create a new Pipeline."""
+        super().__init__(featureLayer, existingFeature)
 
     @property
-    def title(self):
-        return f"Pipeline ({self.id})  ({self.featureLength} km)"
+    def TITLE(self):
+        return f"Pipeline ({self.FID})  ({self.featureLength} km)"
 
     @property
     def isInfrastructure(self):
@@ -25,14 +25,14 @@ class Pipeline(LineFeature):
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry):
         """Draft a Pipeline."""
-        self.geometry = geometry
+        self.GEOMETRY = geometry
         return Edits.upsert(self)
 
     @Edits.persistFeatures
     @FeatureAction.plan.handler()
     def planFeature(self, geometry):
         """Plan a Pipeline (skip the Draft step)."""
-        self.geometry = geometry
+        self.GEOMETRY = geometry
         return Edits.upsert(self)
 
     @Edits.persistFeatures

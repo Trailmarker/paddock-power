@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal
-
 from .persisted_feature import PersistedFeature
 from ..fields.schemas import PaddockLandTypeSchema
-
+from ..layers.condition_table import ConditionTable
 
 @PaddockLandTypeSchema.addSchema()
 class PaddockLandType(PersistedFeature):
 
-    def __init__(self, featureLayer, conditionTable, existingFeature):
+    def __init__(self, featureLayer, existingFeature=None):
         """Create a new Paddock Condition."""
         super().__init__(featureLayer, existingFeature)
 
-        self.conditionTable = conditionTable
-
     @property
-    def name(self):
+    def NAME(self):
         return f"{self.landTypeName}"
 
     @property
-    def title(self):
-        return f"{self.landTypeName} ({self.featureArea:.2f} km², {self.estimatedCapacity:.1f} AE)"
+    def TITLE(self):
+        return f"{self.landTypeName} ({self.FEATURE_AREA:.2f} km², {self.estimatedCapacity:.1f} AE)"
+
+    @property
+    def conditionTable(self):
+        return self.depend(ConditionTable)
 
     @classmethod
     def focusOnSelect(cls):

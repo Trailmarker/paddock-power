@@ -9,6 +9,9 @@ from ..fields.names import LAND_TYPE, PADDOCK, CONDITION_TYPE
 
 
 class ConditionTable(QObject):
+    
+    NAME = "ConditionTable"
+    
     featuresPersisted = pyqtSignal(list)
 
     def makeExistsQuery(self, tableName):
@@ -59,52 +62,49 @@ ON CONFLICT("{PADDOCK}", "{LAND_TYPE}") DO UPDATE SET "{CONDITION_TYPE}"='{condi
 DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTypeId};
 """
 
-    def detectInGeoPackage(self, gpkgFile, tableName):
+    def detectInGeoPackage(self, workspaceFile, tableName):
         """Detect a matching ConditionTable in a GeoPackage."""
         try:
-            with sqlite3.connect(gpkgFile) as conn:
+            with sqlite3.connect(workspaceFile) as conn:
                 cursor = conn.execute(self.makeExistsQuery(tableName=tableName))
                 return cursor.fetchone() is not None
         except BaseException:
             pass
         return False
 
-    def createInGeoPackage(self, gpkgFile, tableName):
+    def createInGeoPackage(self, workspaceFile, tableName):
         """Create a new ConditionTable in the GeoPackage file."""
-        with sqlite3.connect(gpkgFile) as conn:
+        with sqlite3.connect(workspaceFile) as conn:
             conn.execute(self.makeCreateQuery(tableName=tableName))
 
-    def deleteFromGeoPackage(self, gpkgFile, tableName):
+    def deleteFromGeoPackage(self, workspaceFile, tableName):
         """Delete a ConditionTable from the GeoPackage file."""
-        with sqlite3.connect(gpkgFile) as conn:
+        with sqlite3.connect(workspaceFile) as conn:
             conn.execute(self.makeDropQuery(tableName=tableName))
 
-    def __init__(self, project, gpkgFile, tableName):
+    def __init__(self, workspaceFile):
         super().__init__()
 
-        # Stash the Paddock Power project
-        assert(project is not None)
-        self._project = project
+        self.tableName = ConditionTable.NAME
 
         # If not found, create
-        if not self.detectInGeoPackage(gpkgFile, tableName):
+        if not self.detectInGeoPackage(workspaceFile, self.tableName):
             qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage. Creating new, stand by …")
-            self.createInGeoPackage(gpkgFile, tableName)
+            self.createInGeoPackage(workspaceFile, self.tableName)
 
-        self.gpkgFile = gpkgFile
-        self.tableName = tableName
-        self._gpkgUrl = f"{gpkgFile}|layername={tableName}"
+        self.workspaceFile = workspaceFile
+        self._gpkgUrl = f"{workspaceFile}|layername={self.tableName}"
 
     def name(self):
         return self.tableName
 
     def getAllRecords(self):
-        with sqlite3.connect(self.gpkgFile) as conn:
+        with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(self.makeGetAllRecordsQuery(tableName=self.tableName))
             return cursor.fetchall()
 
     def getRecord(self, paddockId, landTypeId):
-        with sqlite3.connect(self.gpkgFile) as conn:
+        with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(
                 self.makeGetRecordQuery(
                     tableName=self.tableName,
@@ -113,7 +113,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             return cursor.fetchone()
 
     def getCondition(self, paddockId, landTypeId):
-        with sqlite3.connect(self.gpkgFile) as conn:
+        with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(
                 self.makeGetRecordQuery(
                     tableName=self.tableName,
@@ -126,12 +126,12 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                 return row[3]
 
     def getByPaddockId(self, paddockId):
-        with sqlite3.connect(self.gpkgFile) as conn:
+        with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(self.makeGetByPaddockQuery(tableName=self.tableName, paddockId=paddockId))
             return cursor.fetchall()
 
     def upsert(self, paddockId, landTypeId, conditionType):
-        with sqlite3.connect(self.gpkgFile) as conn:
+        with sqlite3.connect(self.workspaceFile) as conn:
             conn.execute(
                 self.makeUpsertQuery(
                     tableName=self.tableName,
@@ -143,7 +143,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
     def upsertSplit(self, splitPaddockId, crossedPaddockId):
         """Upsert the condition data for a paddock to the new paddocks into which it will be split."""
 
-        with sqlite3.connect(self.gpkgFile) as conn:
+        with sqlite3.connect(self.workspaceFile) as conn:
             conn.isolation_level = None
             cursor = conn.cursor()
 
@@ -170,7 +170,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                 raise Exception("Error upserting split paddock condition data")
 
     def delete(self, paddockId, landTypeId):
-        with sqlite3.connect(self.gpkgFile) as conn:
+        with sqlite3.connect(self.workspaceFile) as conn:
             conn.execute(
                 self.makeDeleteQuery(
                     tableName=self.tableName,

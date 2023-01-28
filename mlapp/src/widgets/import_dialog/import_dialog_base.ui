@@ -14,7 +14,7 @@
    <string>MLA Paddock Power | Import</string>
   </property>
   <property name="toolTip">
-   <string>Use this tool to import data to your MLA Paddock Power project</string>
+   <string>Use this tool to import data to your MLA Paddock Power Workspace</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -47,7 +47,7 @@
    <item row="0" column="1" colspan="2">
     <widget class="QgsMapLayerComboBox" name="importLayerComboBox">
      <property name="toolTip">
-      <string>Select a layer from the current project …</string>
+      <string>Select a layer from the current QGIS project …</string>
      </property>
      <property name="editable">
       <bool>true</bool>

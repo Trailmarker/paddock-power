@@ -9,9 +9,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 
 class ImportDialog(QDialog, FORM_CLASS):
-    def __init__(self, project, parent=None):
+    def __init__(self, workspace, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        self.project = project
+        self.workspace = workspace
         self.setupUi(self)

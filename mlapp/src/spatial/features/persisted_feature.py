@@ -4,30 +4,29 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsFeature, QgsFields
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug, qgsInfo
+from ..calculator import Calculator
+from ..fields.names import FID
+from ..layers.elevation_layer import ElevationLayer
 from .feature import Feature
-from ..fields.schemas import PersistedFeatureSchema
 
-
-@PersistedFeatureSchema.addSchema()
 class PersistedFeature(Feature):
 
     featureUpserted = pyqtSignal()
     featureDeleted = pyqtSignal()
     featureSelected = pyqtSignal()
 
-    def __init__(self, featureLayer, existingFeature=None):
+    def __init__(self, featureLayerType, existingFeature=None):
         """Create a new Feature."""
+
+        # This will be unused unless this is a LineFeature
+        self._profile = None
 
         if not existingFeature:
             # Build an empty QgsFeature and wrap it up
-            fields = QgsFields()
-            for field in featureLayer.fields():
-                fields.append(field)
-            qgsFeature = QgsFeature(fields)
+            qgsFeature = QgsFeature(featureLayerType.getSchema().toQgsFields())
 
             # Need to call the superclass __init__ ASAP, otherwise PyQt complains
-            super().__init__(featureLayer, qgsFeature)
+            super().__init__(featureLayerType, qgsFeature)
 
             for field in self.getSchema():
                 field.setDefaultValue(self)
@@ -35,7 +34,7 @@ class PersistedFeature(Feature):
             # Clear FID
             self.clearId()
 
-        elif isinstance(existingFeature, Feature):
+        elif isinstance(existingFeature, QgsFeature):
             # Repeat the constructor for an empty Feature
             # Build an empty QgsFeature and wrap it up
             fields = QgsFields()
@@ -44,10 +43,10 @@ class PersistedFeature(Feature):
             qgsFeature = QgsFeature(fields)
 
             # Need to call the superclass __init__ ASAP, otherwise PyQt complains
-            super().__init__(featureLayer, qgsFeature)
+            super().__init__(featureLayerType, existingFeature)
 
             # Incoming Feature must have compatible schema
-            missingFields, _ = self.checkSchema(existingFeature.getSchema())
+            missingFields, _ = self.getSchema().checkFields(existingFeature.fields())
             if missingFields:
                 raise Glitch(f"{self.__class__.__name__}.__init__: incoming Feature has missing fields: {missingFields}")
 
@@ -55,57 +54,90 @@ class PersistedFeature(Feature):
                 field.setDefaultValue(self)
 
             # Set all attributes and geometry from the incoming Feature
-            self._qgsFeature.setAttributes(existingFeature._qgsFeature.attributes())
-            self._qgsFeature.setGeometry(existingFeature._qgsFeature.geometry())
+            self.setAttributes(existingFeature.attributes())
+            self.setGeometry(existingFeature.geometry())
 
             # Clear FID so that it will be created on upsert
             self.clearId()
 
-        elif isinstance(existingFeature, QgsFeature):
-            super().__init__(featureLayer, existingFeature)
-
         elif existingFeature is not None:
             # What?
             raise Glitch(
-                f"{self.__class__.__name__}.__init__: unexpected type {existingFeature.__class__.__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
+                f"{self._typeName}.__init__: unexpected type {type(existingFeature).__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
 
     @property
-    def id(self):
+    def FID(self):
         """Return the PersistedFeature's fid."""
-        return self._qgsFeature.id()
+        return self.id()
 
-    @id.setter
-    def id(self, fid):
+    @FID.setter
+    def FID(self, fid):
         """Set or the PersistedFeature's id."""
-        self._qgsFeature.setId(fid)
+        self.setId(fid)
 
     def clearId(self):
         """Set or the PersistedFeature's id."""
-        self.id = -1
-        self._qgsFeature.setAttribute('fid', self.id)
+        self.FID = -1
+        self.setAttribute(FID, self.FID)
 
     @property
-    def geometry(self):
-        """Return the PersistedFeature's geometry."""
-        return self._qgsFeature.geometry()
+    def ATTRIBUTES(self):
+        """Return the PersistedFeature's attributes."""
+        return self.attributes()
 
-    @geometry.setter
-    def geometry(self, g):
+    @ATTRIBUTES.setter
+    def GEOMETRY(self, attrs):
         """Set the PersistedFeature's geometry."""
-        self._qgsFeature.setGeometry(g)
+        self.setAttributes(attrs)
 
     @property
-    def isInfrastructure(self):
-        """Return True if the PersistedFeature is infrastructure."""
-        return False
+    def GEOMETRY(self):
+        """Return the PersistedFeature's geometry."""
+        return self.geometry()
+
+    @GEOMETRY.setter
+    def GEOMETRY(self, g):
+        """Set the PersistedFeature's geometry."""
+        self.setGeometry(g)
+
+
 
     def recalculate(self):
-        """Recalculate derived data about the PersistedFeature."""
-        pass
+        """Recalculate the length of this Pipeline."""
+        self._profile = Calculator.calculateProfile(self.GEOMETRY, self.elevationLayer)
+        length = round(self._profile.maximumDistance / 1000, 2)
+        self.featureLength = length
+
+
+
+    def recalculate(self):
+        """Recalculate everything that can be recalculated based on the Feature schema."""
+        
+        if self.GEOMETRY:
+            if self.hasArea:
+                self.AREA = round(Calculator.calculateArea(self.GEOMETRY) / 1000000, 2)
+            if self.hasPerimeter:
+                self.PERIMETER = round(Calculator.calculatePerimeter(self.GEOMETRY) / 1000, 2)
+            if self.hasLongitude or self.hasLatitude:
+                (longitude, latitude) = Calculator.calculateLongitudeAndLatitudeAtPoint(self.GEOMETRY)
+                if self.hasLongitude:
+                    self.LONGITUDE = longitude
+                if self.hasLatitude:
+                    self.LATITUDE = latitude
+            if self.hasElevation or self.hasProfile:
+                elevationLayer = self.depend(ElevationLayer)
+                if self.hasElevation:
+                    self.ELEVATION = Calculator.calculateElevationAtPoint(self.GEOMETRY, elevationLayer)
+                if self.hasLength:
+                    self._profile = Calculator.calculateProfile(self.GEOMETRY, elevationLayer)
+                    length = round(self._profile.maximumDistance / 1000, 2)
+                    self.LENGTH = length
+     
 
     def toProviderFeature(self):
         """Map the PersistedFeature's fields to the provider's fields."""
-        qgsFeature = QgsFeature(self._qgsFeature)
+        # Copy ourselves
+        qgsFeature = QgsFeature(self)
 
         attributesWithProviderIndices = [
             (providerIndex,
@@ -134,10 +166,10 @@ class PersistedFeature(Feature):
         # # TODO inefficient
         self.recalculate()
 
-        if (self.id >= 0):
+        if (self.FID >= 0):
             self.featureLayer.updateFeature(self)
             self.featureUpserted.emit()
-            return self.id
+            return self.FID
         else:
             # We use the dataProvider to upsert, because we can get the new FID back this way
             qf = self.toProviderFeature()
@@ -145,12 +177,12 @@ class PersistedFeature(Feature):
             ((success, [newQf])) = self.featureLayer.dataProvider().addFeatures([qf])
 
             if success:
-                self.id = newQf.id()
+                self.FID = newQf.id()
             else:
                 raise Glitch(f"{self}.upsert: failed with unknown error")
 
         self.featureUpserted.emit()
-        return self.id
+        return self.FID
 
     def delete(self):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""

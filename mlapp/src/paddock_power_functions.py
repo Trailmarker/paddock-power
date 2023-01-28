@@ -8,17 +8,17 @@ from .spatial.fields.waterpoint_type import WaterpointType
 from .utils import PLUGIN_FOLDER, PLUGIN_NAME
 
 
-def getCurrentProject():
-    f"""Get the current {PLUGIN_NAME} Project."""
-    return plugins[PLUGIN_FOLDER].project
+def getWorkspace():
+    f"""Get the current {PLUGIN_NAME} Workspace."""
+    return plugins[PLUGIN_FOLDER].workspace
 
 
 @qgsfunction(args=0, group=PLUGIN_NAME)
 def currentTimeframe(vals, *_):
     f"""Return the current {PLUGIN_NAME} Timeframe."""
     try:
-        project = getCurrentProject()
-        return project.currentTimeframe.name
+        workspace = getWorkspace()
+        return workspace.currentTimeframe.name
     except BaseException:
         return None
 
@@ -27,8 +27,8 @@ def currentTimeframe(vals, *_):
 def matchCurrentFeatureStatus(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
     try:
-        project = getCurrentProject()
-        return project and vals[0] and project.currentTimeframe.matchFeatureStatus(FeatureStatus[vals[0]])
+        workspace = getWorkspace()
+        return workspace and vals[0] and workspace.currentTimeframe.matchFeatureStatus(FeatureStatus[vals[0]])
     except BaseException:
         return False
 
@@ -37,8 +37,8 @@ def matchCurrentFeatureStatus(vals, *_):
 def matchCurrentTimeframe(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe."""
     try:
-        project = getCurrentProject()
-        return project and vals[0] and project.currentTimeframe == Timeframe[vals[0]]
+        workspace = getWorkspace()
+        return workspace and vals[0] and workspace.currentTimeframe == Timeframe[vals[0]]
     except BaseException:
         return False
 
@@ -47,8 +47,8 @@ def matchCurrentTimeframe(vals, *_):
 def ifCurrentFeatureStatus(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
     try:
-        project = getCurrentProject()
-        if project and vals[0] and project.currentTimeframe.matchFeatureStatus(FeatureStatus[vals[0]]):
+        workspace = getWorkspace()
+        if workspace and vals[0] and workspace.currentTimeframe.matchFeatureStatus(FeatureStatus[vals[0]]):
             return vals[1]
         else:
             return vals[2]
@@ -60,8 +60,8 @@ def ifCurrentFeatureStatus(vals, *_):
 def ifCurrentTimeframe(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe."""
     try:
-        project = getCurrentProject()
-        if project and vals[0] and project.currentTimeframe == Timeframe[vals[0]]:
+        workspace = getWorkspace()
+        if workspace and vals[0] and workspace.currentTimeframe == Timeframe[vals[0]]:
             return vals[1]
         else:
             return vals[2]
@@ -73,7 +73,7 @@ def ifCurrentTimeframe(vals, *_):
 def timeframeWaterpointColour(vals, *_):
     """Convert a Timeframe to a colour for a Waterpoint."""
     try:
-        timeframe = getCurrentProject().currentTimeframe
+        timeframe = getWorkspace().currentTimeframe
 
         if timeframe == Timeframe.Current:
             return "#026b7f"
@@ -93,7 +93,7 @@ def timeframeWaterpointColour(vals, *_):
 def timeframeWaterpointForegroundColour(vals, *_):
     """Convert a Timeframe to a foreground colour for a Waterpoint."""
     try:
-        timeframe = getCurrentProject().currentTimeframe
+        timeframe = getWorkspace().currentTimeframe
 
         if timeframe == Timeframe.Current:
             return "#ffffff"

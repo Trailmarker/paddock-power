@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-from abc import abstractmethod
 from os import path
 
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
 from ...utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsInfo
-from ..features.persisted_feature import Feature
 from ..layers.feature_layer import FeatureLayer
 
 QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
@@ -20,15 +18,10 @@ class PersistedFeatureLayer(FeatureLayer):
 
     featuresPersisted = pyqtSignal(list)
 
-    @abstractmethod
-    def getFeatureType(self):
-        """Return the type of feature that this layer contains. Override in subclasses"""
-        pass
-
-    def detectInGeoPackage(self, gpkgFile, layerName):
+    def detectInGeoPackage(self, workspaceFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""
         try:
-            layers = QgsVectorLayer(path=gpkgFile, providerLib="ogr")
+            layers = QgsVectorLayer(path=workspaceFile, providerLib="ogr")
             if not layers.isValid():
                 # GeoPackage file does not yet exist
                 return None
@@ -37,7 +30,7 @@ class PersistedFeatureLayer(FeatureLayer):
                           for l in layers.dataProvider().subLayers()]
 
             if layerName in layerNames:
-                gpkgUrl = f"{gpkgFile}|layername={layerName}"
+                gpkgUrl = f"{workspaceFile}|layername={layerName}"
                 layer = QgsVectorLayer(path=gpkgUrl, baseName=layerName, providerLib="ogr")
                 if layer.isValid():
                     return True
@@ -46,10 +39,9 @@ class PersistedFeatureLayer(FeatureLayer):
 
         return False
 
-    def createInGeoPackage(self, gpkgFile, layerName):
-        featureType = self.getFeatureType()
-        wkbType = featureType.getWkbType()
-        schema = featureType.getSchema()
+    def createInGeoPackage(self, workspaceFile, layerName):
+        wkbType = self.getWkbType()
+        schema = self.getSchema()
 
         assert(layerName is not None)
         assert(wkbType is not None)
@@ -66,58 +58,59 @@ class PersistedFeatureLayer(FeatureLayer):
 
         params = {
             'LAYERS': [layer],
-            'OVERWRITE': not path.exists(gpkgFile),
+            'OVERWRITE': not path.exists(workspaceFile),
             'SAVE_STYLES': False,
-            'OUTPUT': gpkgFile
+            'OUTPUT': workspaceFile
         }
 
         processing.run(
             'native:package', params)
 
-    def deleteFromGeoPackage(self, gpkgFile, layerName):
+    def deleteFromGeoPackage(self, workspaceFile, layerName):
         """Delete this FeatureLayer from the GeoPackage file."""
 
-        #gpkgUrl = f"{gpkgFile}|layername={layerName}"
+        #gpkgUrl = f"{workspaceFile}|layername={layerName}"
 
         processing.run("native:spatialiteexecutesql", {
-            'DATABASE': gpkgFile,
+            'DATABASE': workspaceFile,
             'SQL': 'drop table {0}'.format(layerName)
         })
 
-    def __init__(self, project, gpkgFile, layerName, styleName=None):
+    def __init__(self, featureType, workspaceFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} vector layer."""
 
         # If not found, create
-        if not self.detectInGeoPackage(gpkgFile, layerName):
+        if not self.detectInGeoPackage(workspaceFile, layerName):
             qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage. Creating new, stand by …")
-            self.createInGeoPackage(gpkgFile, layerName)
+            self.createInGeoPackage(workspaceFile, layerName)
 
-        self._gpkgUrl = f"{gpkgFile}|layername={layerName}"
-        super().__init__(project, path=self._gpkgUrl, baseName=layerName, providerLib="ogr", styleName=styleName)
+        self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
+        super().__init__(featureType, path=self.gpkgUrl, baseName=layerName, providerLib="ogr", styleName=styleName)
 
-        missingFields, extraFields = self.getFeatureType().checkSchema(self.dataProvider().fields())
+        # TODO
+        missingFields, extraFields = self.getSchema().checkFields(self.dataProvider().fields())
 
         if missingFields:
             # Start editing to to expand the schema
             qgsInfo(
-                f"Expanding schema for {self.__class__.__name__} to include {str([f.name() for f in missingFields])} …")
+                f"Expanding schema for {self._typeName} to include {str([f.name() for f in missingFields])} …")
             self.startEditing()
             self.dataProvider().addAttributes(missingFields)
             self.commitChanges()
 
         if extraFields:
             # Start editing to to cut down the schema
-            qgsInfo(f"Reducing schema for {self.__class__.__name__} to remove {str([f.name() for f in extraFields])} …")
+            qgsInfo(f"Reducing schema for {self._typeName} to remove {str([f.name() for f in extraFields])} …")
             self.startEditing()
             self.dataProvider().deleteAttributes([self.fields().indexFromName(f.name()) for f in extraFields])
             self.commitChanges()
 
         # Apply editor widgets and other Field-specific layer setup
-        for field in self.getFeatureType().getSchema():
+        for field in self.getSchema():
             field.setupLayer(self)
 
-        self.detectAndRemove()
-        QgsProject.instance().addMapLayer(self, False)
+        # self.detectAndRemove()
+        # QgsProject.instance().addMapLayer(self, False)
 
     def addFeatures(self, features):
         """Add a batch of features to this layer."""
@@ -127,16 +120,14 @@ class PersistedFeatureLayer(FeatureLayer):
 
     def copyFeature(self, feature):
         """Copy a feature using the logic (eg dependent layers) of this layer."""
-        if not isinstance(feature, self.getFeatureType()):
+        if not isinstance(feature, self.featureType):
             raise Glitch(
-                "You can't use a {self.__class__.__name__} to copy an object that isn't a {self.getFeatureType().__name__}")
+                f"You can't use a {self._typeName} to copy an object that isn't a {self.featureType.__name__}")
 
-        qgsFeature = self._unwrapQgsFeature(feature)
         copyFeature = self.makeFeature()
-        copyQgsFeature = self._unwrapQgsFeature(copyFeature)
-        for f in qgsFeature.fields():
-            copyQgsFeature.setAttribute(f.name(), qgsFeature.attribute(f.name()))
-        copyQgsFeature.setGeometry(qgsFeature.geometry())
+        for f in feature.fields():
+            copyFeature.setAttribute(f.name(), feature.attribute(f.name()))
+        copyFeature.setGeometry(copyFeature.geometry())
         copyFeature.clearId()
         return copyFeature
 
@@ -144,41 +135,8 @@ class PersistedFeatureLayer(FeatureLayer):
         """Make a new PersistedFeature in this layer."""
         return self.wrapFeature(None)
 
-    def addFeature(self, feature):
-        """Add a PersistedFeature to the layer."""
-        super().addFeature(self._unwrapQgsFeature(feature))
-
-    def updateFeature(self, feature):
-        """Update a PersistedFeature in the layer."""
-        super().updateFeature(self._unwrapQgsFeature(feature))
-
+    # TODO
     def deleteFeature(self, feature):
         """Delete a PersistedFeature from the layer."""
-        super().deleteFeature(feature.id)
+        super().deleteFeature(feature.FID)
 
-
-# Helper functions - used to convert QgsField objects to code in the console as below
-
-# QVARIANT_TYPES = dict([(getattr(QVariant, v), v) for v, m in vars(
-#     QVariant).items() if isinstance(getattr(QVariant, v), QVariant.Type)])
-
-# def dumpQgsFieldConstructorStatement(field):
-#     """Print a QgsField constructor statement for the given QgsField object."""
-# return f"Field(propertyName="", name=\"{field.name()}\",
-# type=QVariant.{QVARIANT_TYPES[field.type()]},
-# typeName=\"{field.typeName()}\", len={field.length()},
-# prec={field.precision()}, comment=\"{field.comment()}\",
-# subType=QVariant.{QVARIANT_TYPES[field.subType()]})"
-
-
-# def dumpQgsFields(fields):
-#     """Print a list of QgsField constructor statements for the given QgsFields object."""
-#     for field in fields.toList():
-#         print(dumpQgsFieldConstructorStatement(field), ",")
-
-
-# def dumpLayerFieldsByName(layerName):
-#     """Match a map layer by name and dump all its fields as above."""
-#     project = QgsProject.instance()
-#     layer = project.mapLayersByName(layerName)[0]
-#     dumpQgsFields(layer.fields())

@@ -1,52 +1,31 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest, QgsProject
+from qgis.core import QgsFeatureRequest
 
 from ...models.glitch import Glitch
-from ..fields.feature_status import FeatureStatus
 from ..features.fence import Fence
-from ..layers.persisted_feature_layer import PersistedFeatureLayer
-
+from ..fields.feature_status import FeatureStatus
+from ..fields.names import BUILD_ORDER
+from .persisted_feature_layer import PersistedFeatureLayer
 
 class FenceLayer(PersistedFeatureLayer):
 
+    NAME = "Fences"
     STYLE = "fence"
 
-    def getFeatureType(self):
-        return Fence
-
-    def __init__(self, project, gpkgFile, layerName, paddockLayer, elevationLayer):
-        super().__init__(project, gpkgFile, layerName, styleName=FenceLayer.STYLE)
-
-        self._paddockLayerId = paddockLayer.id()
-        self._derivedMetricPaddockLayerId = None
-        self._elevationLayerId = elevationLayer.id() if elevationLayer else None
-
-    @property
-    def paddockLayer(self):
-        return QgsProject.instance().mapLayer(self._paddockLayerId)
-
-    @property
-    def derivedMetricPaddockLayer(self):
-        return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId)
-
-    @derivedMetricPaddockLayer.setter
-    def derivedMetricPaddockLayer(self, derivedMetricPaddockLayer):
-        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
-
-    @property
-    def elevationLayer(self):
-        return QgsProject.instance().mapLayer(self._elevationLayerId) if self._elevationLayerId else None
-
-    def wrapFeature(self, feature):
-        return self.getFeatureType()(self, self.paddockLayer, self.derivedMetricPaddockLayer, self.elevationLayer, feature)
-
+    def __init__(self,
+                 workspaceFile):
+        super().__init__(Fence,
+                         workspaceFile,
+                         layerName=FenceLayer.NAME,
+                         styleName=FenceLayer.STYLE)
+    
     def getBuildOrder(self):
         """The lowest Build Order of any Fence in Draft status."""
         fences = list(self.getFeatures())
         if not fences:
             return (0, 0, 0)
 
-        pairs = [(f.buildOrder, f) for f in fences]
+        pairs = [(f.BUILD_ORDER, f) for f in fences]
         pairs.sort(key=lambda p: p[0])
 
         currentBuildOrder = max([bo for (bo, _) in pairs], default=0)
@@ -60,7 +39,7 @@ class FenceLayer(PersistedFeatureLayer):
     def getFenceByBuildOrder(self, buildOrder):
         """Get a Fence by its Build Order."""
         buildOrderRequest = QgsFeatureRequest().setFilterExpression(
-            f'"{Fence.BUILD_ORDER}" = {buildOrder}')
+            f'"{BUILD_ORDER}" = {buildOrder}')
 
         fences = list(self.getFeatures(buildOrderRequest))
 
@@ -68,6 +47,6 @@ class FenceLayer(PersistedFeatureLayer):
             return None
 
         if len(fences) > 1:
-            raise Glitch(f"Integrity problem: your Project has multiple Fences with Build Order {buildOrder}")
+            raise Glitch(f"Integrity problem: your Workspace has multiple Fences with Build Order {buildOrder}")
 
         return fences[0]

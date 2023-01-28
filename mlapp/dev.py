@@ -7,7 +7,8 @@ from qgis.core import QgsProject
 from qgis.utils import plugins
 
 from .src.spatial.fields.field_map import FieldMap
-from .src.spatial.layers.boundary_layer import BoundaryLayer
+from .src.spatial.layers.condition_table import ConditionTable
+from .src.spatial.layers.derived_boundary_layer import DerivedBoundaryLayer
 from .src.spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from .src.spatial.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
 from .src.spatial.layers.derived_watered_area_layer import DerivedWateredAreaLayer
@@ -31,59 +32,23 @@ def plugin():
     return plugins['mlapp']
 
 
-def project():
-    f"""Get the current {PLUGIN_NAME} Project."""
-    return plugin().project
+def workspace():
+    f"""Get the current {PLUGIN_NAME} Workspace."""
+    return plugin().workspace
 
 
 def layers():
-    f"""Get all layers in the current project."""
+    f"""Get all layers in the current workspace."""
     return QgsProject.instance().mapLayers().values()
 
-
-def isFeatureLayer(layer):
-    f"""Return True if the given layer is a FeatureLayer."""
-    return isinstance(layer, FeatureLayer)
-
-
-def isPluginLayer(layer):
-    f"""Return True if the given layer is a FeatureLayer or ElevationLayer."""
-    return isFeatureLayer(layer) or isinstance(layer, ElevationLayer)
-
-
-def featureLayers():
-    f"""Get all FeatureLayers in the current project."""
-    return [layer for layer in layers() if isFeatureLayer(layer)]
-
-
-def pluginLayers():
-    f"""Get all FeatureLayers and ElevationLayers in the current project."""
-    return [layer for layer in layers() if isPluginLayer(layer)]
-
-
-def notPluginLayers():
-    f"""Get all layers in the current project that are not FeatureLayers or ElevationLayers."""
-    return [layer for layer in layers() if not isPluginLayer(layer)]
-
-
 def ids():
-    f"""Get the IDs of all layers in the current project."""
+    f"""Get the IDs of all layers in the current workspace."""
     return [layer.id() for layer in layers()]
 
 
-def pluginIds():
-    f"""Get the IDs of all FeatureLayers and ElevationLayers in the current project."""
-    return [layer.id() for layer in pluginLayers()]
-
-
-def byName(name):
-    f"""Get the layer with the given name in the current project."""
-    return next((layer for layer in pluginLayers() if layer.name() == name), None)
-
-
-def byType(type):
-    f"""Get the layer with the given type in the current project."""
-    return next((layer for layer in pluginLayers() if isinstance(layer, type)), None)
+def byType(layerType):
+    f"""Get the layer with the given type in the current workspace."""
+    return workspace().workspaceLayers.getLayer(layerType)
 
 
 def show(layer):
@@ -109,7 +74,7 @@ def exportStyles(relativeOutDir, overwrite=False):
     if not path.exists(outputDir):
         mkdir(outputDir)
 
-    for layer in featureLayers():
+    for layer in [l for l in layers() if isinstance(l, FeatureLayer)]:
         if layer.styleName is not None:
             outFile = path.join(outputDir, f"{layer.styleName}.qml")
 
@@ -120,7 +85,8 @@ def exportStyles(relativeOutDir, overwrite=False):
 
 
 layerTypes = [
-    BoundaryLayer,
+    ConditionTable,
+    DerivedBoundaryLayer,
     DerivedMetricPaddockLayer,
     DerivedPaddockLandTypesLayer,
     DerivedWateredAreaLayer,
@@ -140,11 +106,8 @@ def checkLayers():
     return [byType(layerType) for layerType in layerTypes]
 
 
-[boundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation,
+[condition, derivedBoundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation,
  fences, landTypes, paddocks, paddockLandTypes, pipelines, wateredAreas, waterpointBuffers, waterpoints] = checkLayers()
-
-
-conditionTable = project().conditionTable if project() is not None else None
 
 
 kidmanPaddocks = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "b_Kidman_Paddocks"), None)

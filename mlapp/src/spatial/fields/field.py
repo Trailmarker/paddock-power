@@ -82,10 +82,10 @@ class Field(QgsField):
         """Make a getter for the value of a domain-valued field. Should not be called directly."""
         def _getter(feature: QgsFeature):
             try:
-                return self._domainType[str(feature._qgsFeature[self.name()])]
+                return self._domainType[str(feature[self.name()])]
             except BaseException:
                 if self._defaultValue is not None and isinstance(self._defaultValue, self._domainType):
-                    feature._qgsFeature.setAttribute(self.name(), self._defaultValue.name)
+                    feature.setAttribute(self.name(), self._defaultValue.name)
                 return self._defaultValue
         return _getter
 
@@ -94,13 +94,13 @@ class Field(QgsField):
         def _setter(feature: QgsFeature, domainValue):
             if not isinstance(domainValue, self._domainType):
                 raise Glitch(f"{domainValue} must be a {self._domainType.__name__}")
-            feature._qgsFeature.setAttribute(self.name(), domainValue.name)
+            feature.setAttribute(self.name(), domainValue.name)
         return _setter
 
     def __makeRealGetter(self):
         """Make a getter for the value of a real-valued field. Should not be called directly."""
         def _getter(feature: QgsFeature):
-            val = feature._qgsFeature[self.name()]
+            val = feature[self.name()]
             if isinstance(val, QVariant):
                 unboxedVal = val.value() if val.convert(QVariant.Double) else None
                 if unboxedVal == "NULL":
@@ -113,17 +113,17 @@ class Field(QgsField):
         if self._domainType is not None:
             return self.__makeFieldDomainGetter()
         elif self.typeName() == "String":
-            return lambda feature: str(feature._qgsFeature[self.name()])
+            return lambda feature: str(feature[self.name()])
         elif self.typeName() == "Real":
             return self.__makeRealGetter()
         else:
-            return lambda feature: feature._qgsFeature[self.name()]
+            return lambda feature: feature[self.name()]
 
     def __makeSetter(self):
         if self._domainType is not None:
             return self.__makeFieldDomainSetter()
         else:
-            return lambda feature, value: feature._qgsFeature.setAttribute(self.name(), value)
+            return lambda feature, value: feature.setAttribute(self.name(), value)
 
     def setDefaultValue(self, feature):
         """Set the default value of a field on a feature."""

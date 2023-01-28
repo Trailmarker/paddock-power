@@ -65,3 +65,11 @@ class FeatureStateMachine(StateMachine):
     @property
     def statusType(self):
         return FeatureStatus
+    
+    @property
+    def status(self):
+        return self.STATUS
+
+    @status.setter
+    def status(self, s):
+        self.STATUS = s
