@@ -22,11 +22,14 @@ class PopupFeatureMixin:
     def popupLayerTypes(self):
         pass
 
+    @property
+    def relativeLayerPosition(self):
+        """Determines where this layer will be placed in relation to the 'host' FeatureLayer. As per other QGIS
+           innovations, a positive number means it is *below* the host FeatureLayer in the stack—negative is above."""
+        return 1
+
     def __key(self, layerType):
         return layerType.__name__ if isinstance(layerType, type) else layerType
-
-    def __val(self, layer):
-        return layer if isinstance(layer, FeatureLayer) else QgsProject.instance().mapLayer(layer)
 
     def getPopupLayer(self, layerType):
         """Get the popup layer with the given name."""
@@ -38,20 +41,22 @@ class PopupFeatureMixin:
         assert issubclass(layerType, FeatureLayer)
 
         if not self.getPopupLayer(layerType):
-            item = QgsProject.instance().layerTreeRoot().findLayer(self.featureLayer)
+            item = self.featureLayer.findItem()
             if not item:
-                # If this layer isn't in the map, don't initialise or add the Paddock Land Types layer.
+                # This layer isn't in the map, don't create the popup
                 return
-
+            
             # Remove any existing popup layers of this type - they don't play nice together
             layerType.detectAndRemoveAllOfType()
 
             popupLayer = layerType(self)
             self.__popupLayers[self.__key(layerType)] = popupLayer.id()
 
-            # Bit of a hack but it looks nicer if it's above the derived Boundary layer …
             group = item.parent()
-            group.insertLayer(max(0, group.children().index(item) - 1), popupLayer)
+            layerIndex = group.children().index(item)
+
+            # The "relativeLayerPosition determines whether a layer is below or above"
+            group.insertLayer(max(0, layerIndex + self.relativeLayerPosition), popupLayer)
 
             self.featureLayer.popupLayerAdded.emit(self, popupLayer)
 
@@ -82,12 +87,12 @@ class PopupFeatureMixin:
                 self.removePopupLayer(QgsProject.instance().mapLayer(layerId))
 
     def onSelectFeature(self):
-        """Do the stuff we'd normally do, but also add the Paddock Land Types popup layer."""
+        """Do the stuff we'd normally do, but also add the popup layers."""
         super().onSelectFeature()
         for layerType in self.popupLayerTypes:
             self.addPopupLayer(layerType)
 
     def onDeselectFeature(self):
-        """Do the stuff we'd normally do, but also remove the Paddock Land Types popup layer."""
+        """Do the stuff we'd normally do, but also remove the popup layers."""
         super().onDeselectFeature()
         self.removeAllPopupLayers()

@@ -19,9 +19,13 @@ class LayerMixin(AbstractLayerMixin):
         assert isinstance(self, QgsMapLayer)
 
     def findGroup(self, name=None):
-        """Find the group for this layer in the map."""
+        """Find the group for this layer in the layer stack."""
         return QgsProject.instance().layerTreeRoot().findGroup(name) if name else None
 
+    def findItem(self):
+        """Find the item for this layer in the layer stack."""
+        return QgsProject.instance().layerTreeRoot().findLayer(self)
+            
     def addInBackground(self):
         """Add this layer to the map in the background."""
         QgsProject.instance().addMapLayer(self, False)

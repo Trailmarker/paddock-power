@@ -52,7 +52,7 @@ class Workspace(QObject):
 
         self.iface = iface
         self.currentTool = None
-        self.currentTimeframe = Timeframe.Current
+        self.currentTimeframe = Timeframe.Future
         self.view = None
         self.importDialog = None
         self.selectedFeature = None

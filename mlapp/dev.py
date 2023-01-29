@@ -6,6 +6,8 @@ from os import mkdir
 from qgis.core import QgsProject
 from qgis.utils import plugins
 
+from .src.spatial.features.metric_paddock import MetricPaddock
+from .src.spatial.features.waterpoint import Waterpoint
 from .src.spatial.fields.field_map import FieldMap
 from .src.spatial.layers.condition_table import ConditionTable
 from .src.spatial.layers.derived_boundary_layer import DerivedBoundaryLayer
@@ -23,6 +25,8 @@ from .src.spatial.layers.pipeline_layer import PipelineLayer
 from .src.spatial.layers.watered_area_layer import WateredAreaLayer
 from .src.spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from .src.spatial.layers.waterpoint_layer import WaterpointLayer
+from .src.spatial.layers.waterpoint_popup_layer import WaterpointPopupLayer
+from .src.spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
 
 from .src.utils import resolvePluginPath, qgsDebug, PLUGIN_NAME
 

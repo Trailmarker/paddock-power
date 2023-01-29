@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint import Waterpoint
 from ..fields.schemas import WaterpointSchema
+from ..layers.mixins.popup_feature_layer_mixin import PopupFeatureLayerMixin
 from .elevation_layer import ElevationLayer
 from .imported_feature_layer import ImportedFeatureLayer
 
 
-class WaterpointLayer(ImportedFeatureLayer):
+class WaterpointLayer(ImportedFeatureLayer, PopupFeatureLayerMixin):
 
     NAME = "Waterpoints"
     STYLE = "waterpoint"

@@ -1,9 +1,7 @@
 
-from .src.spatial.features.metric_paddock import MetricPaddock
-from .src.spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
 from .dev import * 
 
-def testPopups():
+def testMetricPaddocks():
     p = first(derivedMetricPaddockLayer)
 
     assert isinstance(p, MetricPaddock)
@@ -16,5 +14,12 @@ def testPopups():
     
     for layerType in p.popupLayerTypes:
         p.addPopupLayer(layerType)
+        
+def testWaterpoints():
+    w = first(waterpointLayer)
+    
+    assert isinstance(w, Waterpoint)
+    
+    w.addPopupLayer(WaterpointPopupLayer) 
         
     

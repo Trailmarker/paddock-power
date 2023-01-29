@@ -2,10 +2,9 @@
 from functools import cached_property
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from qgis.core import QgsFeature, QgsProject, QgsVectorLayer
+from qgis.core import QgsFeature, QgsVectorLayer
 
 from ...utils import qgsDebug, resolveStylePath, PLUGIN_NAME
-from ..features.feature import Feature
 from ..fields.timeframe import Timeframe
 from .mixins.layer_mixin import LayerMixin
 from .mixins.workspace_connection_mixin import WorkspaceConnectionMixin
