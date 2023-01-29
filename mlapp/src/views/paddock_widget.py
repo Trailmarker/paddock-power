@@ -5,8 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ..utils import qgsDebug
-from ..spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockLandTypesPopupLayer
+from ..spatial.layers.feature_layer import FeatureLayer
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -40,7 +39,7 @@ class PaddockWidget(QWidget, FORM_CLASS):
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
 
-    @pyqtSlot(MetricPaddockLandTypesPopupLayer)
+    @pyqtSlot(FeatureLayer)
     def setPaddockLandTypesLayer(self, layer=None):
         self.paddockLandTypeList.featureLayer = layer
 

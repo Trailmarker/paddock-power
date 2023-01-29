@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, pyqtSlot
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem, QSizePolicy
 
-from ...spatial.features.feature import Feature
+from ...spatial.layers.mixins.workspace_connection_mixin import WorkspaceConnectionMixin
 from ...utils import qgsDebug
 
 
-class FeatureListBase(QListWidget):
+class FeatureListBase(QListWidget, WorkspaceConnectionMixin):
+
+    @classmethod
+    def getFeatureType(cls):
+        raise NotImplementedError
 
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
@@ -34,18 +38,6 @@ class FeatureListBase(QListWidget):
         """Get the Features."""
         raise NotImplementedError("getFeatures() must be implemented in a subclass")
 
-    @pyqtSlot(list)
-    def onSelectedFeaturesChanged(self, features):
-        """Select the Feature."""
-        self.clearSelection()
-        feature = features[0] if features else None
-        if feature:
-            # qgsDebug(f"Selecting Feature {feature.id} in {self.__class__.__name__}")
-            for item in [self.item(i) for i in range(self.count())]:
-                widget = self.itemWidget(item)
-                if widget.feature.FID == feature.FID:  # TODO might this lead to "old" copies of the Feature "aliasing"?
-                    self.setCurrentItem(item)
-                    return
 
     def refreshUi(self):
         """Show the Feature List."""
@@ -87,3 +79,22 @@ class FeatureListBase(QListWidget):
             0) + self.verticalScrollBar().width())
 
         return hint
+
+
+    # Overriding default WorkspaceMixin behaviour
+    def removeSelection(self):
+        """Clear the selected Feature."""
+        qgsDebug(f"Clearing selection in {self.__class__.__name__}")
+        self.clearSelection()
+    
+    # Overriding default WorkspaceMixin behaviour
+    def changeSelection(self, feature):
+        """Select the Feature."""
+        self.removeSelection()
+        if feature:
+            qgsDebug(f"Selecting Feature {feature.id} in {self.__class__.__name__}")
+            for item in [self.item(i) for i in range(self.count())]:
+                widget = self.itemWidget(item)
+                if widget.feature.FID == feature.id():  # TODO might this lead to "old" copies of the Feature "aliasing"?
+                    self.setCurrentItem(item)
+                    return

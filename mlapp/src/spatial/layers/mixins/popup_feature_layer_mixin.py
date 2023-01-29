@@ -8,7 +8,7 @@ from .layer_mixin import LayerMixin
 
 class PopupFeatureLayerMixin(LayerMixin):
 
-    popupLayerAdded = pyqtSignal(Feature, FeatureLayer)
+    popupLayerAdded = pyqtSignal(FeatureLayer)
     popupLayerRemoved = pyqtSignal(Feature)
 
     def __init__(self):

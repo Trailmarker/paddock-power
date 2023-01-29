@@ -170,6 +170,7 @@ class Feature(QgsFeature):
         else:
             return False
 
+    @classmethod
     def focusOnSelect(self):
         """Return True if the app should focus on this type of Feature when selected."""
         return True

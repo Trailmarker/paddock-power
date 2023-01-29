@@ -58,7 +58,7 @@ class PopupFeatureMixin:
             # The "relativeLayerPosition determines whether a layer is below or above"
             group.insertLayer(max(0, layerIndex + self.relativeLayerPosition), popupLayer)
 
-            self.featureLayer.popupLayerAdded.emit(self, popupLayer)
+            self.featureLayer.popupLayerAdded.emit(popupLayer)
 
     def removePopupLayer(self, obj):
         """Remove any Metric Paddock popup layer."""

@@ -13,9 +13,6 @@ from .metric_paddock_list_item import MetricPaddockListItem
 
 class MetricPaddockLayerList(FeatureLayerList):
 
-    popupLayerAdded = pyqtSignal(MetricPaddockLandTypesPopupLayer)
-    popupLayerRemoved = pyqtSignal()
-
     def __init__(self, parent=None):
         """Constructor."""
 
@@ -36,24 +33,12 @@ class MetricPaddockLayerList(FeatureLayerList):
         """Set the FeatureLayer."""
         self._paddockLayerId = paddockLayer.id() if paddockLayer else None
 
-    @pyqtSlot(list)
-    def onSelectedFeaturesChanged(self, features):
-        """Handle changes to the selected Feature in the underlying Featureayer."""
-        super().onSelectedFeaturesChanged(features)
-        feature = features[0] if features else None
-
-        if isinstance(feature, MetricPaddock):
-            feature.popupLayerAdded.connect(self.onPopupLayerAdded)
-            feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)
-            self.onPopupLayerAdded(feature.popupLayer)
-
-    @pyqtSlot(MetricPaddockLandTypesPopupLayer)
-    def onPopupLayerAdded(self, layer):
-        if layer:
-            # qgsDebug(f"{self.__class__.__name__}:onPopupLayerAdded({layer})")
-            self.popupLayerAdded.emit(layer)
-
-    @pyqtSlot()
-    def onPopupLayerRemoved(self):
-        # qgsDebug(f"{self.__class__.__name__}.onPopupLayerRemoved()")
-        self.popupLayerRemoved.emit()
+    def changeSelection(self, feature):
+        """Change the selection to the specified Feature."""
+        qgsDebug(f"MetricPaddockLayerList.changeSelection({feature}) - something supposed to happen with popup layers here?")
+        super().changeSelection(feature)
+        
+        feature.popupLayerAdded.connect(self.onPopupLayerAdded)
+        feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)
+        self.onPopupLayerAdded(feature.popupLayer)
+        

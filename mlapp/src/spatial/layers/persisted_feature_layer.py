@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import path
 
-from qgis.PyQt.QtCore import pyqtSignal
-
 from qgis.core import QgsVectorLayer, QgsWkbTypes
 import processing
 

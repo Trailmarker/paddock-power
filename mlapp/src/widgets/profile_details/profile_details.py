@@ -101,8 +101,8 @@ class ProfileDetails(QWidget, FORM_CLASS):
 
         self.refreshUi()
 
-    @pyqtSlot(list)
-    def onSelectedFeaturesChanged(self, features):
+    @pyqtSlot(type, list)
+    def onSelectedFeaturesChanged(self, featureLayerType, features):
         """Handle a change to the selected Fence."""
         feature = features[0] if features else None
         self.setFeature(feature)

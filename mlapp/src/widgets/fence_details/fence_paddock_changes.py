@@ -33,8 +33,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         self.workspace.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
         self.refreshUi()
 
-    @pyqtSlot(list)
-    def onSelectedFeaturesChanged(self, features):
+    @pyqtSlot(type, list)
+    def onSelectedFeaturesChanged(self, featureLayerType, features):
         """Handle a change in the selected fence."""
         feature = features[0] if features else None
         if feature is None or isinstance(feature, Fence):

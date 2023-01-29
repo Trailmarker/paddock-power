@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+from abc import abstractproperty
 from qgis.core import QgsProject
 
 from .feature_list_base import FeatureListBase
-
 
 class FeatureLayerList(FeatureListBase):
     def __init__(self, listItemFactory, parent=None):
@@ -10,7 +10,6 @@ class FeatureLayerList(FeatureListBase):
 
         super().__init__(listItemFactory, parent)
 
-        self._featureLayerId = None
         self.refreshUi()
 
     @property
@@ -22,11 +21,7 @@ class FeatureLayerList(FeatureListBase):
     def featureLayer(self, featureLayer):
         """Set the FeatureLayer."""
         if featureLayer:
-            self._featureLayerId = featureLayer.id()
-            self.featureLayer.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
-            self.featureLayer.currentTimeframeChanged.connect(lambda _: self.refreshUi())
-        else:
-            self._featureLayerId = None
+            self.connectWorkspace(featureLayer.workspace)
         self.refreshUi()
 
     def getFeatures(self):

@@ -16,7 +16,6 @@ from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.land_type_layer import LandTypeLayer
 from ..spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
-from ..spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
@@ -36,7 +35,7 @@ from ...resources_rc import *
 
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
-    selectedFeaturesChanged = pyqtSignal(list)
+    selectedFeaturesChanged = pyqtSignal(type, list, bool)
     currentTimeframeChanged = pyqtSignal(Timeframe)
     workspaceUnloading = pyqtSignal()
     
@@ -163,12 +162,17 @@ class Workspace(QObject):
 
     def deselectFeature(self):
         """Deselect any currently selected Feature."""
-        self.selectedFeaturesChanged.emit([])
+        if self.selectedFeature:
+            self.selectedFeature.onDeselectFeature()
+            self.selectedFeature = None
+        self.selectedFeaturesChanged.emit(type(None), [], False)
 
     def selectFeature(self, feature):
         """Select a feature."""
         self.selectedFeature = feature
-        self.selectedFeaturesChanged.emit([feature])
+        self.selectedFeaturesChanged.emit(type(feature.featureLayer), [feature], feature.focusOnSelect())
+        feature.onSelectFeature() 
+            
 
     @pyqtSlot()
     def unload(self):
@@ -187,6 +191,8 @@ class Workspace(QObject):
 
     @pyqtSlot(FeatureLayer, list)
     def onLayerSelectionChanged(self, layer, selection):
+        qgsInfo(f"Workspace.onLayerSelectionChanged({layer.name()}, {selection})")
+        
         if len(selection) == 1:
             feature = layer.getFeature(selection[0])
             if feature:
