@@ -90,9 +90,7 @@ class PersistedFeatureLayer(FeatureLayer):
         if not self.detectInGeoPackage(workspaceFile, layerName):
             qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage, creating new …")
             self.createInGeoPackage(workspaceFile, layerName)
-        else:
-            qgsInfo(f"{self.__class__.__name__} found in {PLUGIN_NAME} GeoPackage, loading …")
-
+       
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
 
         super().__init__(featureType, self.gpkgUrl, layerName, "ogr", styleName=styleName)

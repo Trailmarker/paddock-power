@@ -118,10 +118,10 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
         # Respond to changes in editing status
-        self.statusChanged = self.refreshUi
+        self.statusChanged = lambda _: self.refreshUi()
 
         if self.hasStatus:
-            self.feature.statusChanged = self.refreshUi
+            self.feature.statusChanged = lambda _: self.refreshUi()
 
         self.refreshUi()
 

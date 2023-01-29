@@ -2,11 +2,11 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem, QSizePolicy
 
-from ...spatial.layers.mixins.workspace_connection_mixin import WorkspaceConnectionMixin
+from ...spatial.layers.mixins.interaction_mixin import InteractionMixin
 from ...utils import qgsDebug
 
 
-class FeatureListBase(QListWidget, WorkspaceConnectionMixin):
+class FeatureListBase(QListWidget, InteractionMixin):
 
     @classmethod
     def getFeatureType(cls):
@@ -14,7 +14,8 @@ class FeatureListBase(QListWidget, WorkspaceConnectionMixin):
 
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
-        super().__init__(parent)
+        QListWidget.__init__(self, parent)
+        InteractionMixin.__init__(self)
 
         self.listItemFactory = listItemFactory
 

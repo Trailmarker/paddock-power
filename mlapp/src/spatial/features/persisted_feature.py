@@ -14,9 +14,8 @@ class PersistedFeature(Feature):
         """Create a new Feature."""
 
         super().__init__(featureLayerType, existingFeature)
-     
-        self._featureChangedHandlers = []
-   
+
+
     @property
     def GEOMETRY(self):
         """Return the PersistedFeature's geometry."""
@@ -49,7 +48,7 @@ class PersistedFeature(Feature):
                     self._profile = Calculator.calculateProfile(self.GEOMETRY, elevationLayer)
                     length = round(self._profile.maximumDistance / 1000, 2)
                     self.LENGTH = length
-            
+
     def toProviderFeature(self):
         """Map the PersistedFeature's fields to the provider's fields."""
         # Copy ourselves
@@ -81,7 +80,6 @@ class PersistedFeature(Feature):
 
         if (self.FID >= 0):
             self.featureLayer.updateFeature(self)
-            self.featureChanged()
             return self.FID
         else:
             # We use the dataProvider to upsert, because we can get the new FID back this way
@@ -94,35 +92,8 @@ class PersistedFeature(Feature):
             else:
                 raise Glitch(f"{self}.upsert: failed with unknown error")
 
-        self.featureChanged()
         return self.FID
 
     def delete(self):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""
         self.featureLayer.deleteFeature(self)
-
-
-    @property
-    def featureChanged(self):
-        if not hasattr(self, "_featureChangedHandlers"):
-            setattr(self, "_featureChangedHandlers", [])
-
-        def __callAll():
-            badHandlers = []
-            for handler in self._featureChangedHandlers:
-                try:
-                    handler()
-                except BaseException as e:
-                    badHandlers.append(handler)
-                finally:
-                    self._featureChangedHandlers = [h for h in self._featureChangedHandlers if h not in badHandlers]
-
-        return __callAll
-
-    @featureChanged.setter
-    def featureChanged(self, handler):
-        if not hasattr(self, "_featureChangedHandlers"):
-            setattr(self, "_featureChangedHandlers", [])
-
-        if not handler in self._featureChangedHandlers:
-            self._featureChangedHandlers.append(handler)

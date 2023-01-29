@@ -113,6 +113,12 @@ class PaddockPower(QObject):
             parent=self.iface.mainWindow())
 
         self.addAction(
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
+            text=f"Re-analyse {PLUGIN_NAME} workspace …",
+            callback=lambda *_: self.analyseWorkspace(),
+            parent=self.iface.mainWindow())
+
+        self.addAction(
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/new-paddock-power.png"),
             text=f"Create {PLUGIN_NAME} workspace …",
             callback=lambda *_: self.createWorkspace(),
@@ -193,6 +199,18 @@ class PaddockPower(QObject):
         for paddockPowerFunction in PaddockPowerFunctions:
             QgsExpression.unregisterFunction(paddockPowerFunction)
 
+    def analyseWorkspace(self, warning=False):
+        f"""Analyse the derived data in a {PLUGIN_NAME} workspace."""
+        
+        if self.workspace is None:
+            guiWarning(f"No {PLUGIN_NAME} workspace is currently loaded.")
+            return
+        try:
+            self.workspace.analyseLayers()
+        except:
+            pass
+        
+            
     # @Glitch.glitchy(f"An error occurred while scanning for {PLUGIN_NAME} workspaces.")
     def detectWorkspace(self, warning=False):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
@@ -217,18 +235,16 @@ class PaddockPower(QObject):
     # @Glitch.glitchy(f"An error occurred while creating a {PLUGIN_NAME} workspace.")
     def createWorkspace(self):
         f"""Create a new {PLUGIN_NAME} workspace in the current QGIS project."""
-        # try:
+
         projectFile = resolveProjectFile()
         if projectFile is None:
             qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
-            # guiError(f"Please create and save a QGIS project file before you try to create a {PLUGIN_NAME} workspace.")
             return
         else:
             workspaceFile = resolveWorkspaceFile()
             if workspaceFile is not None:
                 if os.path.exists(workspaceFile):
                     qgsInfo(f"A {PLUGIN_NAME} workspace (.gpkg) file already exists. Stopping creation …")
-                    # guiError(f"A {PLUGIN_NAME} workspace file {os.path.basename(workspaceFile)} already exists alongside your QGIS project file.")
                 else:
                     self.workspace = self.container.workspace()
                     qgsInfo(f"{PLUGIN_NAME} created workspace …")

@@ -183,17 +183,19 @@ class Feature(QgsFeature):
 
     def zoomFeature(self):
         """Zoom to the Feature."""
-        iface = self.featureLayer.getPaddockPowerProject().iface
-        if self.GEOMETRY and iface:
-            featureExtent = QgsRectangle(self.GEOMETRY.boundingBox())
-            featureExtent.scale(1.5)  # Expand by 50%
-            iface.mapCanvas().setExtent(featureExtent)
-            iface.mapCanvas().refresh()
+        if self.featureLayer.connectedToWorkspace:
+            iface = self.featureLayer.workspace.iface
+            if self.GEOMETRY and iface:
+                featureExtent = QgsRectangle(self.GEOMETRY.boundingBox())
+                featureExtent.scale(1.5)  # Expand by 50%
+                iface.mapCanvas().setExtent(featureExtent)
+                iface.mapCanvas().refresh()
 
     def onSelectFeature(self):
         """Called when the Feature is selected."""
+        qgsDebug(f"{self}.onSelectFeature(FID={self.FID})")
         self.zoomFeature()
 
     def onDeselectFeature(self):
         """Called when the Feature is selected."""
-        pass
+        qgsDebug(f"{self}.onDeselectFeature(FID={self.FID})")

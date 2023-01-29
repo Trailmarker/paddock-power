@@ -1,22 +1,41 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
-
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 
-from ..mixins.workspace_connection_mixin import WorkspaceConnectionMixin
+
+from ...fields.timeframe import Timeframe
+from ...layers.mixins.workspace_connection_mixin import WorkspaceConnectionMixin
 
 
-class SelectedFeaturesMixin(WorkspaceConnectionMixin):
+class InteractionMixin(WorkspaceConnectionMixin):
+    selectedFeatureChanged = pyqtSignal(type, int, bool)
 
-   
-  
+    def __init__(self):
+        super().__init__()
+
+        self._selectedFeature = None
+
+    @abstractproperty
+    def featureType(self):
+        pass
+
+    @property
+    def currentTimeframe(self):
+        """Get the current timeframe for this layer (same as that of the workspace)."""
+        return self.workspace.currentTimeframe if self.connectedToWorkspace else Timeframe.Undefined
 
     @pyqtSlot(type, int, bool)
-    def onSelectedFeaturesChanged(self, featureLayerType, fid, changeSelection=True):
+    def onSelectedFeatureChanged(self, featureLayerType, fid, focusOnSelect):
         """Handle a change in the selected Feature."""
 
-        # If featureType is None, then we're clearing the selection
-        if featureLayerType != self.featureType and self.featureType.focusOnSelect():
+        # If featureType is None, then we're clearing the selection on instruction
+        if isinstance(None, featureLayerType) or isinstance(None, featureLayerType):
+            if focusOnSelect:
+                self.removeSelection()
+            return
+
+        # If the incoming Feature type is not ours, and demands focus, then clear our selection
+        if featureLayerType != self.featureType and focusOnSelect:
             self.removeSelection()
             return
 
@@ -34,7 +53,7 @@ class SelectedFeaturesMixin(WorkspaceConnectionMixin):
 
             # Are we going to focus based on this new Feature?
             if not ourFeature:
-                if featureLayerType.focusOnSelect():
+                if focusOnSelect:
                     self.removeSelection()
                 return
 
@@ -59,3 +78,8 @@ class SelectedFeaturesMixin(WorkspaceConnectionMixin):
             self._selectedFeature.onDeselectFeature()
         self._selectedFeature = feature
         self.selectedFeatureChanged.emit(self.featureType, feature.FID, feature.focusOnSelect())
+
+    @pyqtSlot(Timeframe)
+    def onCurrentTimeframeChanged(self, timeframe):
+        """Handle the current timeframe changing."""
+        self.currentTimeframeChanged.emit(timeframe)

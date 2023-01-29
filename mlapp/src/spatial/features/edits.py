@@ -7,7 +7,7 @@ from ...models.glitch import Glitch
 from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 from ...spatial.layers.mixins.workspace_connection_mixin import WorkspaceConnectionMixin
-from ...utils import qgsDebug, qgsInfo
+from ...utils import qgsInfo
 
 
 class Edits:

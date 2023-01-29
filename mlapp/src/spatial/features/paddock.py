@@ -34,7 +34,6 @@ class Paddock(StatusFeature):
             # qgsDebug(f"{self}.conditionTable.upsertSplit({self.id}, {self.crossedPaddockId})")
             self.conditionTable.upsertSplit(self.FID, self.crossedPaddockId)
 
-        self.featureChanged()
         return self.FID
 
     @FeatureAction.draft.handler()

@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
-
 from qgis.core import QgsProject
 
 from ...spatial.features.paddock import Paddock
 from .paddock_list_item import PaddockListItem
-from .persisted_feature_layer_list import PersistedFeatureLayerList
+from .feature_layer_list import FeatureLayerList
 
 
-class PaddockLayerList(PersistedFeatureLayerList):
+class PaddockLayerList(FeatureLayerList):
 
-    popupLayerAdded = pyqtSignal(MetricPaddockLandTypesPopupLayer)
-    popupLayerRemoved = pyqtSignal()
+    @classmethod
+    def getFeatureType(cls):
+        return Paddock
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -33,21 +32,4 @@ class PaddockLayerList(PersistedFeatureLayerList):
         """Set the FeatureLayer."""
         self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
 
-    @pyqtSlot(type, list)
-    def onSelectedFeaturesChanged(self, featureLayerType, features):
-        """Handle changes to the selected Feature in the underlying Featureayer."""
-        super().onSelectedFeaturesChanged(features)
-        feature = features[0] if features else None
-        if isinstance(feature, Paddock):
-            feature.popupLayerAdded.connect(self.onPopupLayerAdded)
-            feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)
-            self.onPopupLayerAdded(feature.popupLayer)
-
-    @pyqtSlot(MetricPaddockLandTypesPopupLayer)
-    def onPopupLayerAdded(self, layer):
-        if layer:
-            self.popupLayerAdded.emit(layer)
-
-    @pyqtSlot()
-    def onPopupLayerRemoved(self):
-        self.popupLayerRemoved.emit()
+   

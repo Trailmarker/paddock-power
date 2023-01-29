@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
-
 from ..models.state_machine import StateMachine, StateMachineAction, StateMachineStatus
 
 

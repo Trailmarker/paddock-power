@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from .infrastructure_list_item import InfrastructureListItem
-from .persisted_feature_layer_list import PersistedFeatureLayerList
+from .feature_layer_list import FeatureLayerList
 
 
-class PipelineLayerList(PersistedFeatureLayerList):
+class PipelineLayerList(FeatureLayerList):
 
     def __init__(self, parent=None):
         """Constructor."""

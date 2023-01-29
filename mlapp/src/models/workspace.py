@@ -35,7 +35,7 @@ from ...resources_rc import *
 
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
-    selectedFeaturesChanged = pyqtSignal(type, list, bool)
+    selectedFeatureChanged = pyqtSignal(type, int, bool)
     currentTimeframeChanged = pyqtSignal(Timeframe)
     workspaceUnloading = pyqtSignal()
     
@@ -60,7 +60,7 @@ class Workspace(QObject):
         self.importDialog = None
         self.selectedFeature = None
 
-        self.currentTimeframeChanged.connect(self.deselectFeature)
+        self.currentTimeframeChanged.connect(self.deselectFeatures)
         self.featuresChanged.connect(self.analyseLayers)
 
         # For convenient reference
@@ -80,12 +80,17 @@ class Workspace(QObject):
         self.pipelineLayer = self.workspaceLayers.layer(PipelineLayer)
         self.derivedBoundarylayer = self.workspaceLayers.layer(DerivedBoundaryLayer)
 
+        qgsInfo(f"{PLUGIN_NAME} analysis layers initialised …")
+
         for layer in self.workspaceLayers.layers():
             layer.connectWorkspace(self)
 
-        self.analyseLayers(self.workspaceLayers.featureLayers())
+        qgsInfo(f"{PLUGIN_NAME} workspace connected …")
 
         self.addToMap()
+        
+        qgsInfo(f"{PLUGIN_NAME} load complete.")
+
 
     def workspaceLayer(self, layerType):
         """Retrieve a layer by type."""
@@ -155,22 +160,22 @@ class Workspace(QObject):
             # If our current feature is not in the new timeframe, deselect it
             if self.selectedFeature and not self.selectedFeature.matchTimeframe(timeframe):
                 # qgsDebug("Deselecting feature because it is not in the new timeframe")
-                self.deselectFeature()
+                self.deselectFeatures()
 
             self.currentTimeframe = timeframe
             self.currentTimeframeChanged.emit(timeframe)
 
-    def deselectFeature(self):
+    def deselectFeatures(self):
         """Deselect any currently selected Feature."""
         if self.selectedFeature:
             self.selectedFeature.onDeselectFeature()
             self.selectedFeature = None
-        self.selectedFeaturesChanged.emit(type(None), [], False)
+        self.selectedFeatureChanged.emit(type(None), [], True)
 
     def selectFeature(self, feature):
         """Select a feature."""
         self.selectedFeature = feature
-        self.selectedFeaturesChanged.emit(type(feature.featureLayer), [feature], feature.focusOnSelect())
+        self.selectedFeatureChanged.emit(type(feature.featureLayer), [feature], feature.focusOnSelect())
         feature.onSelectFeature() 
             
 
@@ -213,11 +218,13 @@ class Workspace(QObject):
         return [self.workspaceLayer(layerType) for layerType in updateOrder]
         
     @pyqtSlot(list)
-    def analyseLayers(self, updatedLayers):
+    def analyseLayers(self, updatedLayers=None):
         """Winnow and re-analyse a batch of updated layers."""        
+        updatedLayers = updatedLayers or self.workspaceLayers.featureLayers()
         updateOrder = self.updateOrder(updatedLayers)
         
         layerNames = ", ".join([layer.name() for layer in updateOrder])   
-        qgsInfo(f"Analysing layers: {layerNames} …")        
+        
+        qgsInfo(f"{PLUGIN_NAME} analysing layers …")        
         Edits.analyseLayers(updateOrder)
-        qgsInfo(f"Analysis complete.")
+        qgsInfo(f"{PLUGIN_NAME} load complete.")

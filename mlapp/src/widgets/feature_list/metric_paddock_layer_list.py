@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
-
 from qgis.core import QgsProject
 
-from ...spatial.features.feature import Feature
 from ...spatial.features.metric_paddock import MetricPaddock
-from ...spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockLandTypesPopupLayer
 from ...utils import qgsDebug
 from .feature_layer_list import FeatureLayerList
 from .metric_paddock_list_item import MetricPaddockListItem
 
 
 class MetricPaddockLayerList(FeatureLayerList):
+
+    @classmethod
+    def getFeatureType(cls):
+        return MetricPaddock
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -38,7 +38,4 @@ class MetricPaddockLayerList(FeatureLayerList):
         qgsDebug(f"MetricPaddockLayerList.changeSelection({feature}) - something supposed to happen with popup layers here?")
         super().changeSelection(feature)
         
-        feature.popupLayerAdded.connect(self.onPopupLayerAdded)
-        feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)
-        self.onPopupLayerAdded(feature.popupLayer)
         

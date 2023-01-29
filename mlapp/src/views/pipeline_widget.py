@@ -24,7 +24,7 @@ class PipelineWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.pipelineList.featureLayer = self.workspace.pipelineLayer
+        self.pipelineList.setFeatureLayer(self.workspace.pipelineLayer)
 
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)

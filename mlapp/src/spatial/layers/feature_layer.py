@@ -9,13 +9,13 @@ from qgis.core import QgsFeature, QgsVectorLayer
 from ...utils import qgsDebug, resolveStylePath, PLUGIN_NAME
 from ..fields.timeframe import Timeframe
 from .mixins.layer_mixin import LayerMixin
-from .mixins.workspace_connection_mixin import WorkspaceConnectionMixin
+from .mixins.interaction_mixin import InteractionMixin
 
 
-class FeatureLayer(QgsVectorLayer, WorkspaceConnectionMixin, LayerMixin):
+class FeatureLayer(QgsVectorLayer, InteractionMixin, LayerMixin):
 
     # Emit this signal when a selected Feature is updated
-    selectedFeaturesChanged = pyqtSignal(list)
+    selectedFeatureChanged = pyqtSignal(type, int, bool)
     currentTimeframeChanged = pyqtSignal(Timeframe)
 
     def __init__(self,

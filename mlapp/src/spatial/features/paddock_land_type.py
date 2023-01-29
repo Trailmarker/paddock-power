@@ -13,11 +13,11 @@ class PaddockLandType(PersistedFeature):
 
     @property
     def NAME(self):
-        return f"{self.landTypeName}"
+        return f"{self.LAND_TYPE_NAME}"
 
     @property
     def TITLE(self):
-        return f"{self.landTypeName} ({self.AREA:.2f} km², {self.estimatedCapacity:.1f} AE)"
+        return f"{self.LAND_TYPE_NAME} ({self.AREA:.2f} km², {self.ESTIMATED_CAPACITY:.1f} AE)"
 
     @property
     def conditionTable(self):
@@ -32,4 +32,3 @@ class PaddockLandType(PersistedFeature):
         """Update the Condition table."""
         self.conditionTable.upsert(self.paddock, self.landType, conditionType)
         self.conditionType = conditionType
-        self.featureChanged()

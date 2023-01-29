@@ -8,10 +8,10 @@ from qgis.core import QgsRasterLayer
 from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME
 from .mixins.layer_mixin import LayerMixin
-from .mixins.workspace_connection_mixin import WorkspaceConnectionMixin
+from .mixins.interaction_mixin import InteractionMixin
 
 
-class ElevationLayer(QgsRasterLayer, WorkspaceConnectionMixin, LayerMixin):
+class ElevationLayer(QgsRasterLayer, InteractionMixin, LayerMixin):
 
     NAME = "Elevation Mapping"
     STYLE = "elevation"

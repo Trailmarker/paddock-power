@@ -2,49 +2,43 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.features.persisted_feature import Feature
-from ...spatial.features.fence import Fence
+from ...spatial.layers.mixins.interaction_mixin import InteractionMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_paddock_changes_base.ui')))
 
 
-class FencePaddockChanges(QWidget, FORM_CLASS):
+class FencePaddockChanges(QWidget, FORM_CLASS, InteractionMixin):
 
     def __init__(self, parent=None):
         """Constructor."""
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
+        InteractionMixin.__init__(self)
 
         self.fence = None
-        self.workspace = None
-
         self.setupUi(self)
-
         self.refreshUi()
 
-    def setWorkspace(self, workspace):
+    def connectWorkspace(self, workspace):
         """Set the Workspace."""
-        self.workspace = workspace
-        self.supersededMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
-        self.plannedMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
-        self.workspace.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
+        InteractionMixin.connectWorkspace(self, workspace)
+        if self.workspace:
+            self.supersededMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
+            self.plannedMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
+            self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self.refreshUi()
 
-    @pyqtSlot(type, list)
-    def onSelectedFeaturesChanged(self, featureLayerType, features):
-        """Handle a change in the selected fence."""
-        feature = features[0] if features else None
-        if feature is None or isinstance(feature, Fence):
-            self.fence = feature
-
-            if self.fence:
-                self.fence.statusChanged = self.refreshUi
-
-            self.refreshUi()
-
+    def changeSelection(self, feature):
+        InteractionMixin.changeSelection(self, feature)
+        self.fence = feature
+        self.fence.statusChanged = lambda _: self.refreshUi()
+        
+    def removeSelection(self):
+        InteractionMixin.removeSelection(self)
+        self.fence = None
+        
     def refreshUi(self):
         """Show the Paddock View."""
         if self.fence is None:

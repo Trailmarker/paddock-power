@@ -19,7 +19,7 @@ class Waterpoint(StatusFeature, PopupFeatureMixin):
         PopupFeatureMixin.__init__(self)
 
     @property
-    def popupLayerTypes(self):
+    def popupLayerTypes(self): 
         return [WaterpointPopupLayer]
 
     @property

@@ -23,8 +23,8 @@ class FenceWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.fenceList.featureLayer = self.workspace.fenceLayer
-        self.fencePaddockChanges.setWorkspace(self.workspace)
+        self.fenceList.setFeatureLayer(self.workspace.fenceLayer)
+        self.fencePaddockChanges.connectWorkspace(self.workspace)
 
         self.splitter.setSizes([self.fenceListGroupBox.sizeHint().width(),
                                self.fencePaddockChanges.sizeHint().width()])

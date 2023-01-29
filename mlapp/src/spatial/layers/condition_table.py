@@ -7,8 +7,10 @@ from ...utils import qgsInfo, PLUGIN_NAME
 from ..fields.condition_type import ConditionType
 from ..fields.names import LAND_TYPE, PADDOCK, CONDITION_TYPE
 from ..fields.timeframe import Timeframe
+from ..layers.mixins.workspace_connection_mixin import WorkspaceConnectionMixin
 
-class ConditionTable:
+
+class ConditionTable(WorkspaceConnectionMixin):
 
     NAME = "ConditionTable"
 
@@ -120,7 +122,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
     def connectWorkspace(self, workspace):
         """Hook it up to uor veins."""
         self._workspace = workspace
-        
+
     def getAllRecords(self):
         with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(self.makeGetAllRecordsQuery(tableName=self.tableName))
@@ -161,6 +163,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     paddockId=paddockId,
                     landTypeId=landTypeId,
                     condition=conditionType.name))
+        self.workspace.featuresChanged.emit([self])
 
     def upsertSplit(self, splitPaddockId, crossedPaddockId):
         """Upsert the condition data for a paddock to the new paddocks into which it will be split."""

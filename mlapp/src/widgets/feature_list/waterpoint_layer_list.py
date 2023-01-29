@@ -2,10 +2,10 @@
 from ..waterpoint_details.waterpoint_details import WaterpointDetails
 from ..waterpoint_details.waterpoint_details_edit import WaterpointDetailsEdit
 from .feature_list_item import FeatureListItem
-from .persisted_feature_layer_list import PersistedFeatureLayerList
+from .feature_layer_list import FeatureLayerList
 
 
-class WaterpointLayerList(PersistedFeatureLayerList):
+class WaterpointLayerList(FeatureLayerList):
 
     def __init__(self, parent=None):
         """Constructor."""

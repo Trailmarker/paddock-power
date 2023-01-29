@@ -23,7 +23,7 @@ class PaddockWidget(QWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.paddockList.paddockLayer = self.workspace.paddockLayer
-        self.paddockList.featureLayer = self.workspace.derivedMetricPaddockLayer
+        self.paddockList.setFeatureLayer(self.workspace.derivedMetricPaddockLayer)
 
         self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),
                                self.paddockLandTypeListGroupBox.sizeHint().width()])
@@ -41,11 +41,11 @@ class PaddockWidget(QWidget, FORM_CLASS):
 
     @pyqtSlot(FeatureLayer)
     def setPaddockLandTypesLayer(self, layer=None):
-        self.paddockLandTypeList.featureLayer = layer
+        self.paddockLandTypeList.setFeatureLayer(layer)
 
     @pyqtSlot()
     def clearPaddockLandTypesLayer(self):
-        self.paddockLandTypeList.featureLayer = None
+        self.paddockLandTypeList.setFeatureLayer(None)
 
     def onPaddockFilterChanged(self, text):
         self.paddockList.filterByName(text)

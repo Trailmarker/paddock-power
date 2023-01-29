@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ...utils import qgsDebug
 from ..fields.schemas import MetricPaddockSchema
 from ..layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
 from ..layers.paddock_layer import PaddockLayer
@@ -16,6 +17,7 @@ class MetricPaddock(StatusFeature, PopupFeatureMixin):
         """Initialise a new Metric Paddock."""
         StatusFeature.__init__(self, featureLayer, existingFeature)
         PopupFeatureMixin.__init__(self)
+
 
     @property
     def TITLE(self):
@@ -59,3 +61,19 @@ class MetricPaddock(StatusFeature, PopupFeatureMixin):
     @FeatureAction.undoSupersede.handler()
     def undoSupersedeFeature(self):
         return self.getPaddock().undoSupersedeFeature()
+
+
+    def onSelectFeature(self):
+        """Do the stuff we'd normally do, but also add the popup layers."""
+        super().onSelectFeature()
+        
+        qgsDebug(f"PopupFeatureMixin.onSelectFeature() - adding popup layers for {self}")
+        for layerType in self.popupLayerTypes:
+            self.addPopupLayer(layerType)
+
+    def onDeselectFeature(self):
+        """Do the stuff we'd normally do, but also remove the popup layers."""
+        super().onDeselectFeature()
+        qgsDebug(f"PopupFeatureMixin.onSelectFeature() - removing popup layers for {self}")
+
+        self.removeAllPopupLayers()

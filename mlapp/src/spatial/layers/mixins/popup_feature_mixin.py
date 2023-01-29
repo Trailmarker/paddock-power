@@ -3,9 +3,9 @@ from abc import abstractproperty
 
 from qgis.core import QgsProject
 
+from ....utils import qgsDebug
 from ...features.feature import Feature
 from ..feature_layer import FeatureLayer
-from .popup_feature_layer_mixin import PopupFeatureLayerMixin
 
 
 class PopupFeatureMixin:
@@ -14,7 +14,6 @@ class PopupFeatureMixin:
         super().__init__()
 
         assert isinstance(self, Feature)
-        assert isinstance(self.featureLayer, PopupFeatureLayerMixin)
 
         self.__popupLayers = {}
 
@@ -86,13 +85,17 @@ class PopupFeatureMixin:
             if layerId in QgsProject.instance().mapLayers():
                 self.removePopupLayer(QgsProject.instance().mapLayer(layerId))
 
-    def onSelectFeature(self):
-        """Do the stuff we'd normally do, but also add the popup layers."""
-        super().onSelectFeature()
-        for layerType in self.popupLayerTypes:
-            self.addPopupLayer(layerType)
+    # def onSelectFeature(self):
+    #     """Do the stuff we'd normally do, but also add the popup layers."""
+    #     super().onSelectFeature()
+        
+    #     qgsDebug(f"PopupFeatureMixin.onSelectFeature() - adding popup layers for {self}")
+    #     for layerType in self.popupLayerTypes:
+    #         self.addPopupLayer(layerType)
 
-    def onDeselectFeature(self):
-        """Do the stuff we'd normally do, but also remove the popup layers."""
-        super().onDeselectFeature()
-        self.removeAllPopupLayers()
+    # def onDeselectFeature(self):
+    #     """Do the stuff we'd normally do, but also remove the popup layers."""
+    #     super().onDeselectFeature()
+    #     qgsDebug(f"PopupFeatureMixin.onSelectFeature() - removing popup layers for {self}")
+
+    #     self.removeAllPopupLayers()

@@ -23,7 +23,7 @@ class WaterpointWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        self.waterpointList.featureLayer = self.workspace.waterpointLayer
+        self.waterpointList.setFeatureLayer(self.workspace.waterpointLayer)
 
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)
