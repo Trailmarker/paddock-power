@@ -46,7 +46,7 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
                 return features
         finally:
             self.setReadOnly(wasReadOnly)
-            self.featuresPersisted.emit([])
+            self.featuresChanged.emit([])
             self.triggerRepaint()
 
 

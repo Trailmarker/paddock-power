@@ -20,8 +20,8 @@ class PersistedFeatureLayerList(FeatureLayerList):
         """Set the FeatureLayer."""
         if featureLayer:
             self._featureLayerId = featureLayer.id()
-            self.featureLayer.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
-            self.featureLayer.featuresPersisted.connect(lambda _: self.refreshUi())
+            self.featureLayer.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
+            self.featureLayer.featuresChanged.connect(lambda _: self.refreshUi())
             self.featureLayer.currentTimeframeChanged.connect(lambda _: self.refreshUi())
         else:
             self._featureLayerId = None

@@ -14,7 +14,7 @@ class Pipeline(StatusFeature):
 
     @property
     def TITLE(self):
-        return f"Pipeline ({self.FID})  ({self.featureLength} km)"
+        return f"Pipeline ({self.FID})  ({self.LENGTH} km)"
 
     @property
     def isInfrastructure(self):

@@ -35,10 +35,10 @@ class MetricPaddockDetailsEdit(QWidget, FORM_CLASS):
         self._paddockLayerId = paddockLayer.id() if paddockLayer else None
 
         if paddockLayer and self.paddock:
-            self.paddock = paddockLayer.getFeature(self.metricPaddock.id)
-            self.nameLineEdit.setText(self.paddock.name)
+            self.paddock = paddockLayer.getFeature(self.metricPaddock.FID)
+            self.nameLineEdit.setText(self.paddock.NAME)
 
     @pyqtSlot()
     def saveFeature(self):
         """Save the Paddock Details."""
-        self.paddock.name = self.nameLineEdit.text()
+        self.paddock.NAME = self.nameLineEdit.text()

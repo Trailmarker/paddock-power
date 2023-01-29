@@ -28,7 +28,7 @@ from ...resources_rc import *
 
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
-    selectedFeatureChanged = pyqtSignal(Feature)
+    selectedFeaturesChanged = pyqtSignal(list)
     currentTimeframeChanged = pyqtSignal(Timeframe)
     workspaceUnloading = pyqtSignal()
 
@@ -148,13 +148,13 @@ class Workspace(QObject):
 
     def deselectFeature(self):
         """Deselect any currently selected Feature."""
-        self.selectedFeatureChanged.emit(None)
+        self.selectedFeaturesChanged.emit([])
 
 
     def selectFeature(self, feature):
         """Select a feature."""
         self.selectedFeature = feature
-        self.selectedFeatureChanged.emit(feature)
+        self.selectedFeaturesChanged.emit([feature])
 
 
     @pyqtSlot()

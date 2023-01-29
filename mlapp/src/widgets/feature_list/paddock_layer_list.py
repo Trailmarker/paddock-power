@@ -35,11 +35,11 @@ class PaddockLayerList(PersistedFeatureLayerList):
         """Set the FeatureLayer."""
         self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
 
-    @pyqtSlot(Feature)
-    def onSelectedFeatureChanged(self, feature):
+    @pyqtSlot(list)
+    def onSelectedFeaturesChanged(self, features):
         """Handle changes to the selected Feature in the underlying Featureayer."""
-        super().onSelectedFeatureChanged(feature)
-
+        super().onSelectedFeaturesChanged(features)
+        feature = features[0] if features else None
         if isinstance(feature, Paddock):
             feature.popupLayerAdded.connect(self.onPopupLayerAdded)
             feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)

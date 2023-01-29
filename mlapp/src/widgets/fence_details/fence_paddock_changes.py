@@ -30,13 +30,13 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
         self.workspace = workspace
         self.supersededMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
         self.plannedMetricPaddockMiniList.paddockLayer = self.workspace.paddockLayer
-        self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+        self.workspace.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
         self.refreshUi()
 
-    @pyqtSlot(Feature)
-    def onSelectedFeatureChanged(self, feature):
+    @pyqtSlot(list)
+    def onSelectedFeaturesChanged(self, features):
         """Handle a change in the selected fence."""
-
+        feature = features[0] if features else None
         if feature is None or isinstance(feature, Fence):
             self.fence = feature
 

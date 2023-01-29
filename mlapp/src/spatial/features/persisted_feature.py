@@ -104,7 +104,7 @@ class PersistedFeature(Feature):
         """Recalculate the length of this Pipeline."""
         self._profile = Calculator.calculateProfile(self.GEOMETRY, self.elevationLayer)
         length = round(self._profile.maximumDistance / 1000, 2)
-        self.featureLength = length
+        self.LENGTH = length
 
 
 

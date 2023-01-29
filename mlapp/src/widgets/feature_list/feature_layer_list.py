@@ -23,7 +23,7 @@ class FeatureLayerList(FeatureListBase):
         """Set the FeatureLayer."""
         if featureLayer:
             self._featureLayerId = featureLayer.id()
-            self.featureLayer.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+            self.featureLayer.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
             self.featureLayer.currentTimeframeChanged.connect(lambda _: self.refreshUi())
         else:
             self._featureLayerId = None

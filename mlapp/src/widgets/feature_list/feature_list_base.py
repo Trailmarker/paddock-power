@@ -34,10 +34,11 @@ class FeatureListBase(QListWidget):
         """Get the Features."""
         raise NotImplementedError("getFeatures() must be implemented in a subclass")
 
-    @pyqtSlot(Feature)
-    def onSelectedFeatureChanged(self, feature):
+    @pyqtSlot(list)
+    def onSelectedFeaturesChanged(self, features):
         """Select the Feature."""
         self.clearSelection()
+        feature = features[0] if features else None
         if feature:
             # qgsDebug(f"Selecting Feature {feature.id} in {self.__class__.__name__}")
             for item in [self.item(i) for i in range(self.count())]:

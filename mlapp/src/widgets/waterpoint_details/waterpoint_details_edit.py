@@ -29,8 +29,8 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
         self.farGrazingRadiusSpinBox.setMinimum(Waterpoint.NEAREST_GRAZING_RADIUS)
         self.farGrazingRadiusSpinBox.setMaximum(Waterpoint.FARTHEST_GRAZING_RADIUS)
 
-        self.nearGrazingRadiusSpinBox.setValue(int(self.waterpoint.nearGrazingRadius))
-        self.farGrazingRadiusSpinBox.setValue(int(self.waterpoint.farGrazingRadius))
+        self.nearGrazingRadiusSpinBox.setValue(int(self.waterpoint.NEAR_GRAZING_RADIUS))
+        self.farGrazingRadiusSpinBox.setValue(int(self.waterpoint.FAR_GRAZING_RADIUS))
 
         self.nearGrazingRadiusSpinBox.valueChanged.connect(self.adjustMinimumFarGrazingRadius)
         self.farGrazingRadiusSpinBox.valueChanged.connect(self.adjustMaximumNearGrazingRadius)
@@ -66,7 +66,7 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
     def saveFeature(self):
         """Save the Waterpoint, updating the Waterpoint Type."""
 
-        self.waterpoint.name = self.nameLineEdit.text()
-        self.waterpoint.waterpointType = self._waterpointType
-        self.waterpoint.nearGrazingRadius = float(self.nearGrazingRadiusSpinBox.value())
-        self.waterpoint.farGrazingRadius = float(self.farGrazingRadiusSpinBox.value())
+        self.waterpoint.NAME = self.nameLineEdit.text()
+        self.waterpoint.WATERPOINT_TYPE = self._waterpointType
+        self.waterpoint.NEAR_GRAZING_RADIUS = float(self.nearGrazingRadiusSpinBox.value())
+        self.waterpoint.FAR_GRAZING_RADIUS = float(self.farGrazingRadiusSpinBox.value())

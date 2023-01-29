@@ -45,7 +45,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
                     feature.upsert()
         finally:
             self.setReadOnly(True)
-            self.featuresPersisted.emit([])
+            self.featuresChanged.emit([])
             self.triggerRepaint()
             
             

@@ -84,7 +84,6 @@ class Feature(QgsFeature):
         """Return True if the Feature is infrastructure."""
         return False
 
-    @cached_property
     def hasField(self, fieldName):
         """Return True if the Feature's Schema has a Field with the supplied name."""
         return fieldName in [field.name() for field in self.getSchema()]
@@ -132,7 +131,7 @@ class Feature(QgsFeature):
     def matchTimeframe(self, timeframe):
         """Return True if this feature's timeframe or status matches the supplied timeframe."""
         if self.hasTimeframe:
-            return Timeframe[self.timeframe.name] == Timeframe[timeframe.name]
+            return Timeframe[self.TIMEFRAME.name] == Timeframe[timeframe.name]
         elif self.hasStatus:
             return timeframe.matchFeatureStatus(self.status)
         else:

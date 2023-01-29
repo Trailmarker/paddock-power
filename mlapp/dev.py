@@ -32,82 +32,82 @@ def plugin():
     return plugins['mlapp']
 
 
-# def workspace():
-#     f"""Get the current {PLUGIN_NAME} Workspace."""
-#     return plugin().workspace
+def container():
+    f"""Get the {PLUGIN_NAME} container."""
+    return plugin().container
+
+def workspace():
+    f"""Get the current {PLUGIN_NAME} Workspace."""
+    return plugin().workspace
 
 
-# def layers():
-#     f"""Get all layers in the current workspace."""
-#     return QgsProject.instance().mapLayers().values()
+def workspaceLayers():
+    f"""Get all layers in the current workspace."""
+    return workspace().workspaceLayers
 
-# def ids():
-#     f"""Get the IDs of all layers in the current workspace."""
-#     return [layer.id() for layer in layers()]
+def byType(layerType):
+    f"""Get the layer with the given type in the current workspace."""
+    return workspace().workspaceLayers.layer(layerType)
 
-
-# def byType(layerType):
-#     f"""Get the layer with the given type in the current workspace."""
-#     return workspace().workspaceLayers.getLayer(layerType)
-
-
-# def show(layer):
-#     f"""Show the given layer."""
-#     QgsProject.instance().layerTreeRoot().addLayer(layer)
+def show(layer):
+    f"""Show the given layer."""
+    QgsProject.instance().layerTreeRoot().addLayer(layer)
 
 
-# def feature(layer, id):
-#     f"""Get feature by FID in the given layer."""
-#     return layer.getFeature(id)
+def feature(layer, id):
+    f"""Get feature by FID in the given layer."""
+    return layer.getFeature(id)
 
 
-# def first(layer):
-#     f"""Get the first feature in the given layer."""
-#     return next(layer.getFeatures())
+def first(layer):
+    f"""Get the first feature in the given layer."""
+    return next(layer.getFeatures())
 
 
-# def exportStyles(relativeOutDir, overwrite=False):
-#     f"""Export all FeatureLayer styles to the given directory."""
+def exportStyles(relativeOutDir, overwrite=False):
+    f"""Export all FeatureLayer styles to the given directory."""
 
-#     outputDir = resolvePluginPath(relativeOutDir)
+    outputDir = resolvePluginPath(relativeOutDir)
 
-#     if not path.exists(outputDir):
-#         mkdir(outputDir)
+    if not path.exists(outputDir):
+        mkdir(outputDir)
 
-#     for layer in [l for l in layers() if isinstance(l, FeatureLayer)]:
-#         if layer.styleName is not None:
-#             outFile = path.join(outputDir, f"{layer.styleName}.qml")
+    for layer in [l for l in layers() if isinstance(l, FeatureLayer)]:
+        if layer.styleName is not None:
+            outFile = path.join(outputDir, f"{layer.styleName}.qml")
 
-#             if overwrite or not path.exists(outFile):
-#                 layer.saveNamedStyle(outFile)
-#             else:
-#                 qgsDebug("Can't save style for layer " + layer.name() + " because the file already exists: " + outFile)
-
-
-# layerTypes = [
-#     ConditionTable,
-#     DerivedBoundaryLayer,
-#     DerivedMetricPaddockLayer,
-#     DerivedPaddockLandTypesLayer,
-#     DerivedWateredAreaLayer,
-#     DerivedWaterpointBufferLayer,
-#     ElevationLayer,
-#     FenceLayer,
-#     LandTypeLayer,
-#     PaddockLayer,
-#     PaddockLandTypesLayer,
-#     PipelineLayer,
-#     WateredAreaLayer,
-#     WaterpointBufferLayer,
-#     WaterpointLayer]
+            if overwrite or not path.exists(outFile):
+                layer.saveNamedStyle(outFile)
+            else:
+                qgsDebug("Can't save style for layer " + layer.name() + " because the file already exists: " + outFile)
 
 
-# def checkLayers():
-#     return [byType(layerType) for layerType in layerTypes]
+layerTypes = [
+    ConditionTable,
+    DerivedBoundaryLayer,
+    DerivedMetricPaddockLayer,
+    DerivedPaddockLandTypesLayer,
+    DerivedWateredAreaLayer,
+    DerivedWaterpointBufferLayer,
+    ElevationLayer,
+    FenceLayer,
+    LandTypeLayer,
+    PaddockLayer,
+    PaddockLandTypesLayer,
+    PipelineLayer,
+    WateredAreaLayer,
+    WaterpointBufferLayer,
+    WaterpointLayer]
 
 
-# [condition, derivedBoundary, derivedMetricPaddocks, derivedPaddockLandTypes, derivedWateredAreas, derivedWaterpointBuffers, elevation,
-#  fences, landTypes, paddocks, paddockLandTypes, pipelines, wateredAreas, waterpointBuffers, waterpoints] = checkLayers()
+def checkLayers():
+    return [byType(layerType) for layerType in layerTypes]
+
+
+[conditionTable, derivedBoundaryLayer, derivedMetricPaddockLayer, derivedPaddockLandTypeLayer,
+ derivedWateredAreaLayer, derivedWaterpointBufferLayer, elevationLayer,
+ fenceLayer, landTypeLayer, paddockLayer, paddockLandTypeLayer, pipelineLayer,
+ wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
 
 
 # kidmanPaddocks = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "b_Kidman_Paddocks"), None)
@@ -131,5 +131,3 @@ def plugin():
 #     kidmanWaterpointFieldMap["NAME"] = "Name"
 #     kidmanWaterpointFieldMap["LAYER"] = "Waterpoint Type"
 #     waterpoints.importFeatures(kidmanWaterpoints, kidmanWaterpointFieldMap)
-
-container = plugins['mlapp'].container

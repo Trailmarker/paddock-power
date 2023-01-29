@@ -43,7 +43,7 @@ class ProfileDetails(QWidget, FORM_CLASS):
     def setWorkspace(self, workspace):
         """Set the Workspace."""
         self.workspace = workspace
-        self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
+        self.workspace.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
         self.refreshUi()
 
     def refreshUi(self):
@@ -101,7 +101,8 @@ class ProfileDetails(QWidget, FORM_CLASS):
 
         self.refreshUi()
 
-    @pyqtSlot(Feature)
-    def onSelectedFeatureChanged(self, feature):
+    @pyqtSlot(list)
+    def onSelectedFeaturesChanged(self, features):
         """Handle a change to the selected Fence."""
+        feature = features[0] if features else None
         self.setFeature(feature)

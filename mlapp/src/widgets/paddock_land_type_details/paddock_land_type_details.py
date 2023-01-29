@@ -18,11 +18,11 @@ class PaddockLandTypeDetails(QWidget, FORM_CLASS):
 
         self.paddockLandType = paddockLandType
         if self.paddockLandType is not None:
-            self.landTypeNameText.setValue(self.paddockLandType.landTypeName, "{0}")
-            self.conditionTypeText.setValue(self.paddockLandType.conditionType.value, "{0}")
-            self.areaText.setValue(self.paddockLandType.FEATURE_AREA, "{0:.2f}")
-            self.wateredAreaText.setValue(self.paddockLandType.wateredArea, "{0:.2f}")
-            self.estimatedCapacityText.setValue(self.paddockLandType.estimatedCapacity, "{0:.0f}")
-            self.potentialCapacityText.setValue(self.paddockLandType.potentialCapacity, "{0:.0f}")
-            self.estimatedCapacityPerAreaText.setValue(self.paddockLandType.estimatedCapacityPerArea, "{0:.1f}")
+            self.landTypeNameText.setValue(self.paddockLandType.LAND_TYPE_NAME, "{0}")
+            self.conditionTypeText.setValue(self.paddockLandType.CONDITION_TYPE.value, "{0}")
+            self.areaText.setValue(self.paddockLandType.AREA, "{0:.2f}")
+            self.wateredAreaText.setValue(self.paddockLandType.WATERED_AREA, "{0:.2f}")
+            self.estimatedCapacityText.setValue(self.paddockLandType.ESTIMATED_CAPCITY, "{0:.0f}")
+            self.potentialCapacityText.setValue(self.paddockLandType.POTENTIAL_CAPCITY, "{0:.0f}")
+            self.estimatedCapacityPerAreaText.setValue(self.paddockLandType.ESTIMATED_CAPACITY_PER_AREA, "{0:.1f}")
             # self.potentialCapacityPerAreaText.setValue(self.paddockLandType.potentialCapacityPerArea, "{0:.1f}")

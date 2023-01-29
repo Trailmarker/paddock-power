@@ -12,7 +12,7 @@ class ConditionTable:
 
     NAME = "ConditionTable"
 
-    featuresPersisted = pyqtSignal(list)
+    featuresChanged = pyqtSignal(list)
 
     def makeExistsQuery(self, tableName):
         return f"""
@@ -141,7 +141,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     paddockId=paddockId,
                     landTypeId=landTypeId,
                     condition=conditionType.name))
-        self.featuresPersisted.emit([paddockId])
+        self.featuresChanged.emit([paddockId])
 
     def upsertSplit(self, splitPaddockId, crossedPaddockId):
         """Upsert the condition data for a paddock to the new paddocks into which it will be split."""
@@ -179,4 +179,4 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landTypeId=landTypeId))
-        self.featuresPersisted.emit([paddockId])
+        self.featuresChanged.emit([paddockId])

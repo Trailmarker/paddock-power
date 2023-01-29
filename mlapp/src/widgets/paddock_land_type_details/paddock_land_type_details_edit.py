@@ -20,7 +20,7 @@ class PaddockLandTypeDetailsEdit(QWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.paddockLandType = paddockLandType
-        self._conditionType = paddockLandType.conditionType
+        self._conditionType = paddockLandType.CONDITION_TYPE
 
         for conditionType in ConditionType:
             self.conditionTypeComboBox.addItem(conditionType.value, conditionType)

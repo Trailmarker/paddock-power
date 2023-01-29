@@ -16,8 +16,6 @@ QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
 
 class PersistedFeatureLayer(FeatureLayer):
 
-    featuresPersisted = pyqtSignal(list)
-
     def detectInGeoPackage(self, workspaceFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""
         try:

@@ -51,7 +51,7 @@ class Edits:
             yield
             for layer in layers:
                 layer.commitChanges()
-                layer.featuresPersisted.emit([])
+                layer.featuresChanged.emit([])
         except Exception as e:
             qgsInfo("Edits.editAndCommit: Exception raised, rolling back edits")
             for layer in layers:
