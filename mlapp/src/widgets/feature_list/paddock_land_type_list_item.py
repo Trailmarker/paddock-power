@@ -62,7 +62,7 @@ class PaddockLandTypeListItem(QWidget, EditStateMachine):
         self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
         self.statusChanged = self.refreshUi
-        self.feature.featureUpserted = self.refreshUi
+        self.feature.featureChanged = self.refreshUi
 
         self.refreshUi()
 

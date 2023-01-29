@@ -26,11 +26,11 @@ class MetricPaddock(StatusFeature):
 
     @property
     def paddockLayer(self):
-        return self.depend(PaddockLayer)
+        return self.workspaceLayer(PaddockLayer)
 
     @property
     def paddockLandTypesLayer(self):
-        return self.depend(PaddockLandTypesLayer)
+        return self.workspaceLayer(PaddockLandTypesLayer)
 
     @property
     def popupLayer(self):

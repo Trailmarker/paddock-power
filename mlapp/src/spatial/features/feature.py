@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from functools import cached_property
 
-from qgis.PyQt.QtCore import QObject, pyqtSlot
+from qgis.PyQt.QtCore import pyqtSlot
 from re import finditer
 
 from qgis.core import QgsFeature, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
+from ...utils import qgsDebug
 from ..fields.names import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, STATUS, PERIMETER, TIMEFRAME
 from ..fields.timeframe import Timeframe
 
@@ -19,26 +20,39 @@ class Feature(QgsFeature):
         matches = finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', cls.__name__)
         return " ".join(m.group(0) for m in matches)
 
-    def __init__(self, featureLayerType, existingFeature):
+    def __init__(self, featureLayer, existingFeature):
         """Create a new Feature."""
 
-        self.featureLayerType = featureLayerType
+        self.featureLayer = featureLayer
+        
+        # This will be unused unless this is a LineFeature
+        self._profile = None
+
+        if existingFeature is None:
+            # Create a new feature
+            QgsFeature.__init__(self, featureLayer.getSchema().toQgsFields())
+
+            # Set defaults
+            for field in self.getSchema():
+                field.setDefaultValue(self)
+
+            # Clear FID
+            self.clearFid()
 
         if isinstance(existingFeature, QgsFeature):
-            QgsFeature.__init__(self, existingFeature)
-
-            # Incoming QgsFeature must have the correct schema
-            missingFields, _ = self.getSchema().checkFields(self.fields())
+            # Incoming Feature must have compatible schema
+            missingFields, _ = self.getSchema().checkFields(existingFeature.fields())
             if missingFields:
-                raise Glitch(
-                    f"{self.typeName}.__init__({existingFeature}) newly created with missing fields: {missingFields}")
+                raise Glitch(f"{self.typeName}.__init__: incoming Feature has missing fields: {missingFields}")
 
-            self.FID = existingFeature.id()
+            QgsFeature.__init__(self, existingFeature)
+            self.setAttributes(existingFeature.attributes())
+            self.setGeometry(existingFeature.geometry())
 
         elif existingFeature is not None:
             # What?
             raise Glitch(
-                f"{self.typeName}.__init__: unexpected type {type(existingFeature).__name__} for provided existing feature data (should be a QgsFeature instance)")
+                f"{self.typeName}.__init__: unexpected type {type(existingFeature).__name__} (should be a QgsFeature)")
 
     @cached_property
     def typeName(self):
@@ -53,29 +67,32 @@ class Feature(QgsFeature):
         """Convert the Feature to a string representation."""
         return repr(self)
 
-    def depend(self, layerType):
+    def workspaceLayer(self, layerType):
         """Get a layer we depend on to work with by type."""
-        return self.featureLayer.depend(layerType)
-
-    # TODO cache?
-    @property
-    def featureLayer(self):
-        """Return the FeatureLayer that contains this Feature."""
-        return self.depend(self.featureLayerType)
+        return self.featureLayer.workspaceLayer(layerType)
 
     @property
     def FID(self):
-        """Return the PersistedFeature's fid."""
-        if self.hasFid:
-            return self.attribute(FID)
+        # Always keep ID consisted with FID attribute unless we are inserting
+        if self.hasFID:
+            fid, id = self.attribute(FID), self.id()
+            if id <= 0 and fid > 0:
+                self.setId(fid)
+                return fid
+            elif id > 0 and fid <= 0:
+                self.setAttribute(FID, id)
+                return id
         return self.id()
 
     @FID.setter
     def FID(self, fid):
-        """Set or the PersistedFeature's id."""
         if self.hasFid:
             self.setAttribute(FID, fid)
         self.setId(fid)
+
+    def clearFid(self):
+        """Set or the PersistedFeature's id."""
+        self.FID = -1
 
     @property
     def GEOMETRY(self):
@@ -160,7 +177,8 @@ class Feature(QgsFeature):
     @pyqtSlot()
     def selectFeature(self):
         """Select the Feature."""
-        self.featureLayer.selectByIds([self.FID], QgsVectorLayer.SetSelection)
+        qgsDebug(f"{self}.selectFeature(FID={self.FID})")
+        self.featureLayer.selectByIds([self.id()], QgsVectorLayer.SetSelection)
 
     def zoomFeature(self):
         """Zoom to the Feature."""

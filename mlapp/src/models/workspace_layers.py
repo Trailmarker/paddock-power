@@ -35,6 +35,10 @@ class WorkspaceLayers(dict):
         val = self.__getValue(self.get(self.__layerKey(layerType), None))
         return val
 
+    def layers(self):
+        """Get all layers in the registry."""
+        return list(map(self.__getValue, self.values()))
+
     def unloadLayer(self, layerType):
         """Unload the layer of the given type."""
         layer = self.__getValue(self.pop(self.__layerKey(layerType), None))

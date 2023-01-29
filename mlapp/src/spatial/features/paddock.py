@@ -25,7 +25,7 @@ class Paddock(StatusFeature):
     @property
     def conditionTable(self):
         """Return the ConditionTable for this Paddock."""
-        return self.depend(ConditionTable)
+        return self.workspaceLayer(ConditionTable)
 
     def upsert(self):
         """Upsert the Paddock and also upsert a Condition record if the Paddock has been split."""
@@ -35,7 +35,7 @@ class Paddock(StatusFeature):
             # qgsDebug(f"{self}.conditionTable.upsertSplit({self.id}, {self.crossedPaddockId})")
             self.conditionTable.upsertSplit(self.FID, self.crossedPaddockId)
 
-        self.featureUpserted()
+        self.featureChanged()
         return self.FID
 
     @FeatureAction.draft.handler()

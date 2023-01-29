@@ -16,7 +16,7 @@ class DerivedFeatureLayer(FeatureLayer):
         # qgsDebug(f"DerivedFeatureLayer.__init__({featureType}, {layerName}, {styleName}, {dependentLayers})")
 
         # This ends up getting initialised again in onWorkspaceConnectionChanged at the moment
-        self.dependentLayers = dependentLayers
+        self.workspaceLayerentLayers = dependentLayers
         virtualSource = self._makeDerivedFeatureLayerSource(*dependentLayers)
 
         super().__init__(featureType, virtualSource, layerName, "virtual", styleName)
@@ -28,7 +28,7 @@ class DerivedFeatureLayer(FeatureLayer):
     @property
     def persistedDependentLayers(self):
         """Return the instances of Paddock Power PersistedFeatureLayers used to derive this layer."""
-        return [f for f in self.dependentLayers if isinstance(
+        return [f for f in self.workspaceLayerentLayers if isinstance(
             f, PersistedFeatureLayer) or isinstance(f, ConditionTable)]
 
     def names(self, *dependentLayers):

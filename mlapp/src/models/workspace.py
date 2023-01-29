@@ -76,6 +76,9 @@ class Workspace(QObject):
         self.pipelineLayer = self.workspaceLayers.layer(PipelineLayer)
         self.derivedBoundarylayer = self.workspaceLayers.layer(DerivedBoundaryLayer)
 
+        for layer in self.workspaceLayers.layers():
+            layer.connectWorkspace(self)
+
         self.addToMap()
 
     def workspaceLayer(self, layerType):
@@ -179,7 +182,7 @@ class Workspace(QObject):
     def onLayerSelectionChanged(self, layer, selection):
         if len(selection) == 1:
             feature = layer.getFeature(selection[0])
-            if feature is not None:
+            if feature:
                 self.selectFeature(feature)
 
     @pyqtSlot()

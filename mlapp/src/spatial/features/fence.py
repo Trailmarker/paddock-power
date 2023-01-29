@@ -24,16 +24,22 @@ class Fence(StatusFeature):
 
     @property
     def paddockLayer(self):
-        return self.depend(PaddockLayer)
+        return self.workspaceLayer(PaddockLayer)
 
     @property
     def derivedMetricPaddockLayer(self):
-        return self.depend(DerivedMetricPaddockLayer)
+        return self.workspaceLayer(DerivedMetricPaddockLayer)
 
     @property
     def isInfrastructure(self):
         """Return True for Fence."""
         return True
+
+    def profile(self):
+        """Return this Fence's profile."""
+        if not self._profile:
+            self.recalculate()
+        return self._profile
 
     def getPropertyGeometry(self, glitchBuffer=1.0):
         """Get the property geometry for this Fence."""

@@ -6,9 +6,8 @@ from ...models.qt_abstract_meta import QtAbstractMeta
 from ...spatial.features.edits import Edits
 from ...spatial.features.feature_action import FeatureAction
 from ...spatial.features.persisted_feature import PersistedFeature
-from ...spatial.features.status_feature import StatusFeature
 from ...spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
-from ...utils import PLUGIN_FOLDER, qgsDebug
+from ...utils import PLUGIN_FOLDER
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -20,12 +19,8 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
-        qgsDebug(f"{self.__class__.__name__}.__init__()")
-
         QWidget.__init__(self, parent)
         EditStateMachine.__init__(self)
-
-        qgsDebug(f"{self.__class__.__name__}.__inited__()!")
 
         self.feature = feature
 

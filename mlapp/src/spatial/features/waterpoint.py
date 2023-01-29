@@ -27,7 +27,7 @@ class Waterpoint(StatusFeature):
 
     @property
     def waterpointBufferLayer(self):
-        return self.depend("WaterppintBufferLayer")
+        return self.workspaceLayer("WaterppintBufferLayer")
 
     @property
     def popupLayer(self):

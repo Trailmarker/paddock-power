@@ -21,6 +21,12 @@ class Pipeline(StatusFeature):
         """Return True for Pipeline."""
         return True
 
+    def profile(self):
+        """Return this Pipeline's profile."""
+        if not self._profile:
+            self.recalculate()
+        return self._profile
+
     @Edits.persistFeatures
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry):

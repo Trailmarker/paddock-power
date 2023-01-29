@@ -97,9 +97,9 @@ class FeatureLayer(QgsVectorLayer):
     def workspaceLayer(self, layerType):
         """Get a layer we depend on to work with by type."""
         if self.connectedToWorkspace:
-            return self.workspace.workspaceLayers.getLayer(layerType)
+            return self.workspace.workspaceLayers.layer(layerType)
         else:
-            qgsError(f"{self.typeName}.depend({layerType}): no workspace connection")
+            qgsError(f"{self.typeName}.workspaceLayer({layerType}): no workspace connection")
 
     # Map and visibility
     def findGroup(self, name=None):
@@ -174,7 +174,7 @@ class FeatureLayer(QgsVectorLayer):
     @pyqtSlot(list)
     def onLayerSelectionChanged(self, selection):
         """Handle the QGIS layer selection changing."""
-        # qgsDebug(f"{self.__class__.__name__}.onLayerSelectionChanged({selection})")
+        qgsDebug(f"{self.typeName}.onLayerSelectionChanged({selection})")
         if self.connectedToWorkspace:
             self.workspace.onLayerSelectionChanged(self, selection)
 
@@ -191,27 +191,27 @@ class FeatureLayer(QgsVectorLayer):
         try:
             # Was something selected?
             hadSelection = self._selectedFeature is not None
-            # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: hadSelection={hadSelection}")
+            qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: hadSelection={hadSelection}")
 
             # Is this our Feature?
             ourFeature = (
                 feature is not None) and (
                 feature.featureLayer is not None) and (
                 self.id() == feature.featureLayer.id())
-            # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: ourFeature={ourFeature}")
+            qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: ourFeature={ourFeature}")
 
             # Are we going to focus based on this new Feature?
             focusOnSelect = feature and feature.focusOnSelect()
-            # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: focusOnSelect={focusOnSelect}")
+            qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: focusOnSelect={focusOnSelect}")
 
             # Is it the same one that's already selected?
             sameAsSelected = ourFeature and hadSelection and (self._selectedFeature.FID == feature.FID)
-            # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: sameAsSelected={sameAsSelected}")
+            qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: sameAsSelected={sameAsSelected}")
 
             # If this new feature has focusOnSelect, and it's not already selected,
             # clear our selection unless we're selecting the same Feature
             if hadSelection and focusOnSelect and (not ourFeature or not sameAsSelected):
-                # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: clearing currently selected {self._selectedFeature}")
+                qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: clearing currently selected {self._selectedFeature}")
                 self._selectedFeature.onDeselectFeature()
                 self._selectedFeature = None
 
@@ -219,15 +219,15 @@ class FeatureLayer(QgsVectorLayer):
                 self.selectByIds([feature.id], QgsVectorLayer.SetSelection)
 
                 if not sameAsSelected:
-                    # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: selecting {feature}")
+                    qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: selecting {feature}")
                     self._selectedFeature = feature
                     feature.onSelectFeature()
-                    # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: selectedFeaturesChanged.emit(feature)")
+                    qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: selectedFeaturesChanged.emit(feature)")
                     self.selectedFeaturesChanged.emit([feature])
             elif focusOnSelect:
-                # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: clearing QgsVectorLayer selection")
+                qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: clearing QgsVectorLayer selection")
                 self.removeSelection()
-                # qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: selectedFeaturesChanged.emit(None)")
+                qgsDebug(f"{self.__class__.__name__}.onSelectedFeaturesChanged: selectedFeaturesChanged.emit(None)")
                 self.selectedFeaturesChanged.emit([])
 
         finally:

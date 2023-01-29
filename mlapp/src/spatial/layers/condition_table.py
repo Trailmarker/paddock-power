@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from ...utils import qgsInfo, PLUGIN_NAME
 from ..fields.condition_type import ConditionType
 from ..fields.names import LAND_TYPE, PADDOCK, CONDITION_TYPE
-
+from ..fields.timeframe import Timeframe
 
 class ConditionTable:
 
@@ -101,6 +101,26 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
     def id(self):
         return self.tableName
 
+    # Workspace interface
+    @property
+    def connectedToWorkspace(self):
+        """Are we both connected to the workspace and not temporarily blocked."""
+        return self._workspace is not None
+
+    @property
+    def workspace(self):
+        f"""The {PLUGIN_NAME} workspace we are connected to."""
+        return self._workspace
+
+    @property
+    def currentTimeframe(self):
+        """Get the current timeframe for this layer (same as that of the workspace)."""
+        return self.workspace.currentTimeframe if self.connectedToWorkspace else Timeframe.Undefined
+
+    def connectWorkspace(self, workspace):
+        """Hook it up to uor veins."""
+        self._workspace = workspace
+        
     def getAllRecords(self):
         with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(self.makeGetAllRecordsQuery(tableName=self.tableName))

@@ -91,7 +91,7 @@ class ElevationLayer(QgsRasterLayer):
     @property
     def connectedToWorkspace(self):
         """Are we both connected to the workspace and not temporarily blocked."""
-        return self._workspace and not self._blockWorkspaceConnnection
+        return self._workspace is not None
 
     @property
     def workspace(self):
@@ -106,14 +106,13 @@ class ElevationLayer(QgsRasterLayer):
     def connectWorkspace(self, workspace):
         """Hook it up to uor veins."""
         self._workspace = workspace
-        self.workspaceConnectionChanged.emit()
 
     def workspaceLayer(self, layerType):
         """Get a layer we depend on to work with by type."""
         if self.connectedToWorkspace:
-            return self.workspace.workspaceLayers.getLayer(layerType)
+            return self.workspace.workspaceLayers.layer(layerType)
         else:
-            qgsError(f"{self.typeName}.depend({layerType}): no workspace connection")
+            qgsError(f"{self.typeName}.workspaceLayer({layerType}): no workspace connection")
 
     def findGroup(self, name=None):
         """Find the group for this layer in the map."""
@@ -155,7 +154,4 @@ class ElevationLayer(QgsRasterLayer):
         """Handle the current timeframe changing."""
         pass
 
-    @pyqtSlot()
-    def onWorkspaceConnectionChanged(self):
-        """Handle the workspace connection changing."""
-        pass
+ 

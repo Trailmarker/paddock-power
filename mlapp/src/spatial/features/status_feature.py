@@ -14,8 +14,8 @@ class StatusFeature(PersistedFeature, FeatureStateMachine, metaclass=QtAbstractM
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new AreaFeature."""
-        PersistedFeature.__init__(self, featureLayer, existingFeature)
         FeatureStateMachine.__init__(self)
+        PersistedFeature.__init__(self, featureLayer, existingFeature)
 
     def __repr__(self):
         """Return a string representation of the Feature."""

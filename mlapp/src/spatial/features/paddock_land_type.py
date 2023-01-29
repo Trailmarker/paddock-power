@@ -21,7 +21,7 @@ class PaddockLandType(PersistedFeature):
 
     @property
     def conditionTable(self):
-        return self.depend(ConditionTable)
+        return self.workspaceLayer(ConditionTable)
 
     @classmethod
     def focusOnSelect(cls):
@@ -32,4 +32,4 @@ class PaddockLandType(PersistedFeature):
         """Update the Condition table."""
         self.conditionTable.upsert(self.paddock, self.landType, conditionType)
         self.conditionType = conditionType
-        self.featureUpserted()
+        self.featureChanged()

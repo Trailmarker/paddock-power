@@ -133,7 +133,9 @@ class PersistedFeatureLayer(FeatureLayer):
             raise Glitch(
                 f"You can't use a {self.typeName} to copy an object that isn't a {self.featureType.__name__}")
 
-        copyFeature = self.makeFeature()
+        copyFeature = self.wrapFeature(feature)
+        
+        
         for f in feature.getSchema():
             copyFeature.setAttribute(f.name(), feature.attribute(f.name()))
         copyFeature.setGeometry(copyFeature.geometry())
@@ -143,8 +145,6 @@ class PersistedFeatureLayer(FeatureLayer):
     def makeFeature(self):
         """Make a new PersistedFeature in this layer."""
         return self.wrapFeature(None)
-
-    # TODO
 
     def deleteFeature(self, feature):
         """Delete a PersistedFeature from the layer."""
