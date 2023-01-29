@@ -5,12 +5,13 @@ from ..features.metric_paddock import MetricPaddock
 from ..fields.names import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_AREA
 from ..fields.schemas import MetricPaddockSchema
 from ..fields.timeframe import Timeframe
+from .mixins.popup_feature_layer_mixin import PopupFeatureLayerMixin
 from .derived_feature_layer import DerivedFeatureLayer
 from .paddock_layer import PaddockLayer
 from .paddock_land_types_layer import PaddockLandTypesLayer
 
 
-class DerivedMetricPaddockLayer(DerivedFeatureLayer):
+class DerivedMetricPaddockLayer(DerivedFeatureLayer, PopupFeatureLayerMixin):
 
     NAME = "Paddocks"
     STYLE = "paddock"

@@ -15,7 +15,6 @@ class Paddock(StatusFeature):
         """Create a new Paddock."""
         super().__init__(featureLayer, existingFeature)
 
-        self._popupLayerId = None
         self.crossedPaddockId = None
 
     @property

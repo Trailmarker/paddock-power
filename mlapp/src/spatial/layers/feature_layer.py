@@ -4,29 +4,19 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsFeature, QgsProject, QgsVectorLayer
 
-from ...utils import qgsDebug, qgsError, resolveStylePath, PLUGIN_NAME
+from ...utils import qgsDebug, resolveStylePath, PLUGIN_NAME
 from ..features.feature import Feature
 from ..fields.timeframe import Timeframe
+from .mixins.layer_mixin import LayerMixin
+from .mixins.workspace_connection_mixin import WorkspaceConnectionMixin
 
-
-class FeatureLayer(QgsVectorLayer):
+class FeatureLayer(QgsVectorLayer, WorkspaceConnectionMixin, LayerMixin):
 
     # Emit this signal when a selected Feature is updated
     selectedFeaturesChanged = pyqtSignal(list)
     currentTimeframeChanged = pyqtSignal(Timeframe)
-    workspaceConnectionChanged = pyqtSignal()
 
     featuresChanged = pyqtSignal(list)
-
-    popupLayerAdded = pyqtSignal(Feature, QObject)
-    popupLayerRemoved = pyqtSignal(Feature)
-
-    @classmethod
-    def detectAndRemoveAllOfType(cls):
-        """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
-        layers = [l for l in QgsProject.instance().mapLayers().values() if type(l).__name__ == cls.__name__]
-        for layer in layers:
-            QgsProject.instance().removeMapLayer(layer.id())
 
     def __init__(self,
                  featureType,
@@ -72,62 +62,6 @@ class FeatureLayer(QgsVectorLayer):
     def __str__(self):
         """Convert the Field to a string representation."""
         return repr(self)
-
-    # Workspace interface
-    @property
-    def connectedToWorkspace(self):
-        """Are we both connected to the workspace and not temporarily blocked."""
-        return self._workspace and not self._blockWorkspaceConnnection
-
-    @property
-    def workspace(self):
-        f"""The {PLUGIN_NAME} workspace we are connected to."""
-        return self._workspace
-
-    @property
-    def currentTimeframe(self):
-        """Get the current timeframe for this layer (same as that of the workspace)."""
-        return self.workspace.currentTimeframe if self.connectedToWorkspace else Timeframe.Undefined
-
-    def connectWorkspace(self, workspace):
-        """Hook it up to uor veins."""
-        self._workspace = workspace
-        self.workspaceConnectionChanged.emit()
-
-    def workspaceLayer(self, layerType):
-        """Get a layer we depend on to work with by type."""
-        if self.connectedToWorkspace:
-            return self.workspace.workspaceLayers.layer(layerType)
-        else:
-            qgsError(f"{self.typeName}.workspaceLayer({layerType}): no workspace connection")
-
-    # Map and visibility
-    def findGroup(self, name=None):
-        """Find the group for this layer in the map."""
-        return QgsProject.instance().layerTreeRoot().findGroup(name) if name else None
-
-    def addInBackground(self):
-        """Add this layer to the map in the background."""
-        QgsProject.instance().addMapLayer(self, False)
-
-    def addToMap(self, group=None):
-        """Ensure the layer is in the map in the target group, adding it if necessary."""
-        group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
-        group.addLayer(self)
-
-    def removeFromMap(self, group):
-        """Remove the layer from the map in the target group, if it is there."""
-        group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
-        node = group.findLayer(self.id())
-        if node:
-            group.removeChildNode(node)
-
-    def setVisible(self, group, visible):
-        """Set the layer's visibility."""
-        group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
-        node = group.findLayer(self.id())
-        if node:
-            node.setItemVisibilityChecked(visible)
 
     def applyNamedStyle(self, styleName):
         """Apply a style to the layer."""
@@ -232,18 +166,3 @@ class FeatureLayer(QgsVectorLayer):
 
         finally:
             self._blockWorkspaceConnnection = False
-
-    @pyqtSlot(Timeframe)
-    def onCurrentTimeframeChanged(self, timeframe):
-        """Handle the current timeframe changing."""
-        self.triggerRepaint(deferredUpdate=False)
-        self.currentTimeframeChanged.emit(timeframe)
-
-    @pyqtSlot()
-    def onWorkspaceConnectionChanged(self):
-        """Handle the workspace changing."""
-
-        if self.workspace:
-            self.workspace.selectedFeaturesChanged.connect(self.onSelectedFeaturesChanged)
-            self.workspace.currentTimeframeChanged.connect(self.onCurrentTimeframeChanged)
-            self.currentTimeframeChanged.connect(self.workspace.setCurrentTimeframe)

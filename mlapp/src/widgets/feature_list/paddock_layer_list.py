@@ -5,14 +5,14 @@ from qgis.core import QgsProject
 
 from ...spatial.features.feature import Feature
 from ...spatial.features.paddock import Paddock
-from ...spatial.layers.metric_paddock_popup_layer import MetricPaddockPopupLayer
+from ...spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockLandTypesPopupLayer
 from .paddock_list_item import PaddockListItem
 from .persisted_feature_layer_list import PersistedFeatureLayerList
 
 
 class PaddockLayerList(PersistedFeatureLayerList):
 
-    popupLayerAdded = pyqtSignal(MetricPaddockPopupLayer)
+    popupLayerAdded = pyqtSignal(MetricPaddockLandTypesPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -45,7 +45,7 @@ class PaddockLayerList(PersistedFeatureLayerList):
             feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)
             self.onPopupLayerAdded(feature.popupLayer)
 
-    @pyqtSlot(MetricPaddockPopupLayer)
+    @pyqtSlot(MetricPaddockLandTypesPopupLayer)
     def onPopupLayerAdded(self, layer):
         if layer:
             self.popupLayerAdded.emit(layer)

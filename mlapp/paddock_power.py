@@ -13,7 +13,7 @@ from .resources_rc import *
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.models.glitch import Glitch
 from .src.models.container import Container
-from .src.utils import guiError, guiInformation, guiWarning, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
+from .src.utils import guiWarning, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
@@ -51,13 +51,13 @@ class PaddockPower(QObject):
         self.registerFunctions()
 
         self.container = None
-        self.initContainer()
 
         QgsProject.instance().cleared.connect(self.unloadWorkspace)
         QgsProject.instance().readProject.connect(self.detectWorkspace)
 
     def initContainer(self):
         """Initialise the IoC container."""
+        qgsInfo(f"{PLUGIN_NAME} initialising resources …")
         self.container = Container()
         self.container.init_resources()
         self.container.wire(modules=[__name__])
@@ -198,12 +198,13 @@ class PaddockPower(QObject):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
 
         self.unloadWorkspace()
+        self.initContainer()
 
         projectFile = resolveProjectFile()
         if projectFile is None:
             qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
             if warning:
-                guiError(
+                guiWarning(
                     f"Please create and save a QGIS project file before you try to detect a {PLUGIN_NAME} workspace.")
             return
         else:
@@ -244,11 +245,6 @@ class PaddockPower(QObject):
         if self.workspace is not None:
             self.workspace.importData()
 
-    def resetWorkspace(self):
-        # Prime the container for a new workspace
-        if self.container:
-            self.container.reset_singletons()
-
     def unloadWorkspace(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         if self.workspace is not None:
@@ -256,9 +252,8 @@ class PaddockPower(QObject):
             self.workspace.unload()
             self.workspace = None
 
-        # Reset the DI container
-        self.container.reset_singletons()
-
     def openFeatureView(self):
         if self.workspace is not None:
             self.workspace.openFeatureView()
+        else:
+            guiWarning(f"Please create a {PLUGIN_NAME} workspace to get started.")

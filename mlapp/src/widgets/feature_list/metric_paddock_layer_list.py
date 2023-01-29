@@ -5,7 +5,7 @@ from qgis.core import QgsProject
 
 from ...spatial.features.feature import Feature
 from ...spatial.features.metric_paddock import MetricPaddock
-from ...spatial.layers.metric_paddock_popup_layer import MetricPaddockPopupLayer
+from ...spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockLandTypesPopupLayer
 from ...utils import qgsDebug
 from .feature_layer_list import FeatureLayerList
 from .metric_paddock_list_item import MetricPaddockListItem
@@ -13,7 +13,7 @@ from .metric_paddock_list_item import MetricPaddockListItem
 
 class MetricPaddockLayerList(FeatureLayerList):
 
-    popupLayerAdded = pyqtSignal(MetricPaddockPopupLayer)
+    popupLayerAdded = pyqtSignal(MetricPaddockLandTypesPopupLayer)
     popupLayerRemoved = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -47,7 +47,7 @@ class MetricPaddockLayerList(FeatureLayerList):
             feature.popupLayerRemoved.connect(self.onPopupLayerRemoved)
             self.onPopupLayerAdded(feature.popupLayer)
 
-    @pyqtSlot(MetricPaddockPopupLayer)
+    @pyqtSlot(MetricPaddockLandTypesPopupLayer)
     def onPopupLayerAdded(self, layer):
         if layer:
             # qgsDebug(f"{self.__class__.__name__}:onPopupLayerAdded({layer})")
