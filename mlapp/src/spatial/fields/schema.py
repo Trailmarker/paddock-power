@@ -2,6 +2,7 @@
 from qgis.core import QgsFields
 
 from .field import Field
+from .names import FID
 
 
 class Schema(list):
@@ -24,7 +25,7 @@ class Schema(list):
     def addSchema(self):
         def _addSchema(cls):
             for field in self:
-                if field._propertyName is not None:
+                if field._propertyName is not None and field.name() is not FID:
                     field.addFieldProperty(cls)
             setattr(cls, "getSchema", classmethod(lambda _: self))
             setattr(cls, "getWkbType", classmethod(lambda _: self.wkbType))

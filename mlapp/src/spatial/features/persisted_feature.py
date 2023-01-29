@@ -71,13 +71,14 @@ class PersistedFeature(Feature):
     @FID.setter
     def FID(self, fid):
         """Set or the PersistedFeature's id."""
+        if self.hasFid:
+            self.setAttribute(FID, fid)
         self.setId(fid)
 
     def clearId(self):
         """Set or the PersistedFeature's id."""
         self.FID = -1
-        self.setAttribute(FID, self.FID)
-
+        
     @property
     def ATTRIBUTES(self):
         """Return the PersistedFeature's attributes."""

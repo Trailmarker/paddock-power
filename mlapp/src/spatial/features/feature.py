@@ -7,7 +7,7 @@ from re import finditer
 from qgis.core import QgsFeature, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ..fields.names import AREA, ELEVATION, LENGTH, LONGITUDE, LATITUDE, STATUS, PERIMETER, TIMEFRAME
+from ..fields.names import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, STATUS, PERIMETER, TIMEFRAME
 from ..fields.timeframe import Timeframe
 
 
@@ -97,6 +97,11 @@ class Feature(QgsFeature):
     def hasElevation(self):
         """Return True if the Feature has an elevation."""
         return self.hasField(ELEVATION)
+    
+    @cached_property
+    def hasFid(self):
+        """Return True if the Feature has a fid."""
+        return self.hasField(FID)
     
     @cached_property
     def hasLength(self):

@@ -5,6 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
+from ..utils import qgsDebug
 from ..spatial.layers.metric_paddock_popup_layer import MetricPaddockPopupLayer
 
 
@@ -21,6 +22,10 @@ class PaddockWidget(QWidget, FORM_CLASS):
         self.workspace = workspace
 
         self.setupUi(self)
+
+        qgsDebug(f"PaddockWidget.__init__(), self.workspace = {self.workspace}")
+        qgsDebug(f"PaddockWidget.__init__(), self.workspace.paddockLayer = {self.workspace.paddockLayer}")
+        qgsDebug(f"PaddockWidget.__init__(), self.workspace.paddockLayer.countFeatures() = {self.workspace.paddockLayer.countFeatures()}")
 
         self.paddockList.paddockLayer = self.workspace.paddockLayer
         self.paddockList.featureLayer = self.workspace.derivedMetricPaddockLayer

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..features.boundary import Boundary
-from ..fields.schemas import STATUS, TIMEFRAME, BoundarySchema
+from ..fields.schemas import FID, STATUS, TIMEFRAME, BoundarySchema
 from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 from .paddock_layer import PaddockLayer
@@ -15,10 +15,10 @@ class DerivedBoundaryLayer(DerivedFeatureLayer):
         [paddockLayer] = self.names(*dependentLayers)
         
         query = f"""
-select st_union(geometry) as geometry, '{Timeframe.Current.name}' as {TIMEFRAME}
+select st_union(geometry) as geometry, '{Timeframe.Current.name}' as {TIMEFRAME}, 0 as {FID}
 from "{paddockLayer}" where {Timeframe.Current.includesStatuses(f'"{paddockLayer}".{STATUS}')}
 union
-select st_union(geometry) as geometry, '{Timeframe.Future.name}' as {TIMEFRAME}
+select st_union(geometry) as geometry, '{Timeframe.Future.name}' as {TIMEFRAME}, 0 as {FID}
 from "{paddockLayer}" where {Timeframe.Future.includesStatuses(f'"{paddockLayer}".{STATUS}')}
 """
         return super().prepareQuery(query, *dependentLayers)

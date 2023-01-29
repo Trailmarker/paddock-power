@@ -3,15 +3,21 @@ from qgis.PyQt.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsProject
 
-from ..spatial.features.feature import Feature
+from ..spatial.layers.condition_table import ConditionTable
 from ..spatial.layers.derived_boundary_layer import DerivedBoundaryLayer
 from ..spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
+from ..spatial.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
+from ..spatial.layers.derived_watered_area_layer import DerivedWateredAreaLayer
+from ..spatial.layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
 from ..spatial.layers.elevation_layer import ElevationLayer
 from ..spatial.layers.feature_layer import FeatureLayer
 from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.land_type_layer import LandTypeLayer
+from ..spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
+from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
+from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
 from ..spatial.fields.timeframe import Timeframe
 from ..tools.map_tool import MapTool
@@ -47,28 +53,30 @@ class Workspace(QObject):
         self.iface = iface
         self.currentTool = None
         self.currentTimeframe = Timeframe.Current
-        self.views = {}
+        self.view = None
         self.importDialog = None
         self.selectedFeature = None
 
         self.currentTimeframeChanged.connect(self.deselectFeature)
 
+
+
         # For convenient reference
-        [self.landTypeLayer,
-         self.conditionTable,
-         self.paddockLayer,
-         self.elevationLayer,
-         self.waterpointLayer,
-         self.derivedWaterpointBufferLayer,
-         self.waterpointBufferLayer,
-         self.derivedWateredAreaLayer,
-         self.wateredAreaLayer,
-         self.derivedPaddockLandTypesLayer,
-         self.paddockLandTypesLayer,
-         self.derivedMetricPaddockLayer,
-         self.fenceLayer,
-         self.pipelineLayer,
-         self.derivedBoundaryLayer] = [self.workspaceLayer(layerType) for layerType in self.layerDependencyGraph.loadOrder()]
+        self.landTypeLayer = self.workspaceLayers.layer(LandTypeLayer)
+        self.conditionTable = self.workspaceLayers.layer(ConditionTable)
+        self.paddockLayer = self.workspaceLayers.layer(PaddockLayer)
+        self.elevationLayer = self.workspaceLayers.layer(ElevationLayer)
+        self.waterpointLayer = self.workspaceLayers.layer(WaterpointLayer)
+        self.derivedWaterpointBufferLayer = self.workspaceLayers.layer(DerivedWaterpointBufferLayer)
+        self.waterpointBufferLayer = self.workspaceLayers.layer(WaterpointBufferLayer)
+        self.derivedWateredAreaLayer = self.workspaceLayers.layer(DerivedWateredAreaLayer)
+        self.wateredAreaLayer = self.workspaceLayers.layer(WateredAreaLayer)
+        self.derivedPaddockLandTypesLayer = self.workspaceLayers.layer(DerivedPaddockLandTypesLayer)
+        self.paddockLandTypesLayer = self.workspaceLayers.layer(PaddockLandTypesLayer)
+        self.derivedMetricPaddockLayer = self.workspaceLayers.layer(DerivedMetricPaddockLayer)
+        self.fenceLayer = self.workspaceLayers.layer(FenceLayer)
+        self.pipelineLayer = self.workspaceLayers.layer(PipelineLayer)
+        self.derivedBoundarylayer = self.workspaceLayers.layer(DerivedBoundaryLayer)
 
         self.addToMap()
 
@@ -162,11 +170,10 @@ class Workspace(QObject):
         """Removes the plugin menu item and icon from QGIS interface."""
         self.unsetTool()
 
-        for viewType, view in self.views.values():
-            view.close()
-            self.iface.removeDockWidget(view)
-            self.onCloseView(viewType)
-
+        if self.view:
+            self.view.close()
+            self.iface.removeDockWidget(self.view)
+            
         self.removeFromMap()
         
         for layerType in self.layerDependencyGraph.unloadOrder():
@@ -182,24 +189,12 @@ class Workspace(QObject):
                 self.selectFeature(feature)
 
 
-    def openView(self, viewType, dockArea):
-        """There is currently ontly one view type, but there may be more in future."""
-        if viewType not in self.views:
-            view = viewType(self)
-            view.setAttribute(Qt.WA_DeleteOnClose)
-            view.closingView.connect(lambda: self.onCloseView(viewType))
-            self.views[viewType] = view
-            self.iface.addDockWidget(dockArea, view)
-            view.show()
-
-
     @pyqtSlot()
     def openFeatureView(self):
         """Run method that loads and opens the Feature View."""
-        self.openView(FeatureView, Qt.BottomDockWidgetArea)
+        self.view = FeatureView(self)
+        self.view.setAttribute(Qt.WA_DeleteOnClose)
+        self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.view)
+        self.view.show()
+        
 
-
-    @pyqtSlot()
-    def onCloseView(self, viewType):
-        if viewType in self.views:
-            del self.views[viewType]
