@@ -39,7 +39,7 @@ class StateMachineToolBar(QToolBar):
         self.setStyleSheet(STYLESHEET)
         self.setFixedHeight(30)
 
-        self.machine.stateChanged.connect(self.refreshUi)
+        self.machine.statusChanged = self.refreshUi
         self.refreshUi()
 
     def addStateAction(self, stateAction, icon, callback):

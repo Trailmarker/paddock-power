@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
-from .edits import Edits
-from .persisted_feature import PersistedFeature
-from .feature_action import FeatureAction
+from ...models.qt_abstract_meta import QtAbstractMeta
 from ..fields.names import TIMEFRAME
 from ..fields.schemas import StatusFeatureSchema
 from ..fields.timeframe import Timeframe
+from .edits import Edits
+from .feature_action import FeatureAction
 from .feature_state_machine import FeatureStateMachine
+from .persisted_feature import PersistedFeature
 
 
 @StatusFeatureSchema.addSchema()
-class StatusFeature(PersistedFeature, FeatureStateMachine):
+class StatusFeature(PersistedFeature, FeatureStateMachine, metaclass=QtAbstractMeta):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new AreaFeature."""
         PersistedFeature.__init__(self, featureLayer, existingFeature)
         FeatureStateMachine.__init__(self)
-
-        self.featureUpserted.connect(lambda: self.stateChanged.emit(self))
-        self.featureDeleted.connect(lambda: self.stateChanged.emit(self))
 
     def __repr__(self):
         """Return a string representation of the Feature."""
@@ -81,3 +79,4 @@ class StatusFeature(PersistedFeature, FeatureStateMachine):
     def archiveFeature(self):
         """Archive a Feature."""
         return Edits.upsert(self)
+

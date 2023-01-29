@@ -31,4 +31,4 @@ class PaddockLandType(PersistedFeature):
         """Update the Condition table."""
         self.conditionTable.upsert(self.paddock, self.landType, conditionType)
         self.conditionType = conditionType
-        self.featureUpserted.emit()
+        self.featureUpserted()

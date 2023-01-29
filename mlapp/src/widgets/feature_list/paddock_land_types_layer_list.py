@@ -11,7 +11,7 @@ class PaddockLandTypesLayerList(FeatureLayerList):
         """Constructor."""
 
         def listItemFactory(paddockLandType):
-            paddockLandType.featureUpserted.connect(self.refreshUi)
+            paddockLandType.featureUpserted = self.refreshUi
             return FeatureListItem(paddockLandType, detailsWidgetFactory=PaddockLandTypeDetails,
                                    editWidgetFactory=PaddockLandTypeDetailsEdit, parent=parent)
 

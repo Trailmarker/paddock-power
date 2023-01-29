@@ -11,12 +11,10 @@ from .feature import Feature
 
 class PersistedFeature(Feature):
 
-    featureUpserted = pyqtSignal()
-    featureDeleted = pyqtSignal()
-    featureSelected = pyqtSignal()
-
     def __init__(self, featureLayerType, existingFeature=None):
         """Create a new Feature."""
+
+        self._featureUpserteds = []
 
         # This will be unused unless this is a LineFeature
         self._profile = None
@@ -168,7 +166,7 @@ class PersistedFeature(Feature):
 
         if (self.FID >= 0):
             self.featureLayer.updateFeature(self)
-            self.featureUpserted.emit()
+            self.featureUpserted()
             return self.FID
         else:
             # We use the dataProvider to upsert, because we can get the new FID back this way
@@ -181,10 +179,21 @@ class PersistedFeature(Feature):
             else:
                 raise Glitch(f"{self}.upsert: failed with unknown error")
 
-        self.featureUpserted.emit()
+        self.featureUpserted()
         return self.FID
 
     def delete(self):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""
         self.featureLayer.deleteFeature(self)
-        self.featureDeleted.emit()
+        
+    @property
+    def featureUpserted(self):
+        def __callUpsertedHandlers():
+            for func in self._featureUpserteds:
+                func()
+        return __callUpsertedHandlers
+    
+    @featureUpserted.setter
+    def featureUpserted(self, featureUpserted):
+        self._featureUpserteds.append(featureUpserted)
+

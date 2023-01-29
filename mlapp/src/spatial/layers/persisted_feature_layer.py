@@ -41,7 +41,7 @@ class PersistedFeatureLayer(FeatureLayer):
 
     def createInGeoPackage(self, workspaceFile, layerName):
         
-        # qgsDebug(f"{self.__class__.__name__}.createInGeoPackage(workspaceFile={workspaceFile}, layerName={layerName})")
+        qgsDebug(f"{self.__class__.__name__}.createInGeoPackage(workspaceFile={workspaceFile}, layerName={layerName})")
         
         wkbType = self.getWkbType()
         schema = self.getSchema()
@@ -86,12 +86,17 @@ class PersistedFeatureLayer(FeatureLayer):
     def __init__(self, featureType, workspaceFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} vector layer."""
 
-        # qgsDebug(f"{self.typeName}.__init__({featureType}, {workspaceFile}, {layerName}, {styleName})")
+        assert featureType
+        assert workspaceFile
+        assert layerName
 
         # If not found, create
         if not self.detectInGeoPackage(workspaceFile, layerName):
-            qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage. Creating new, stand by …")
+            qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage, creating new …")
             self.createInGeoPackage(workspaceFile, layerName)
+        else:
+            qgsInfo(f"{self.__class__.__name__} found in {PLUGIN_NAME} GeoPackage, loading …")
+            
 
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
         

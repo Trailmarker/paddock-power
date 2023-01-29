@@ -1,9 +1,8 @@
-import os.path
-
 from dependency_injector import containers, providers
 
 from qgis.utils import iface
 
+from ..models.glitch import Glitch
 from ..models.workspace import Workspace
 from ..models.workspace_layers import WorkspaceLayers
 from ..spatial.layers.condition_table import ConditionTable
@@ -21,34 +20,21 @@ from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import PLUGIN_NAME, guiError, guiInformation, qgsInfo, resolveProjectFile, resolveWorkspaceFile
+from ..utils import PLUGIN_NAME, resolveProjectFile, resolveWorkspaceFile
 
 
-def resolveProjectFileWithWarnings(warnUser):
-    projectFile = resolveProjectFile()
-    
-    if not projectFile and warnUser:
-        guiError(f"Please create and save a QGIS project before you try to create a {PLUGIN_NAME} Workspace.")
-        return None
-    return projectFile
-
-
-def resolveWorkspaceFileWithWarnings(projectFile: str):
+def resolveWorkspaceFileOrFail(projectFile: str):
     workspaceFile = resolveWorkspaceFile(projectFilePath=projectFile)
-    
-    # if workspaceFile is not None and os.path.exists(workspaceFile):
-        # guiInformation(f"Found existing {PLUGIN_NAME} Workspace file: {workspaceFile}")
-        # qgsInfo(f"{PLUGIN_NAME} loading workspace …")
+    if workspaceFile is None:
+        raise Glitch(f"Could not resolve {PLUGIN_NAME} workspace file.")
     return workspaceFile
-    
 
 class Container(containers.DeclarativeContainer):
     
-    projectFile                   = providers.Factory(resolveProjectFileWithWarnings,
-                                                        False)
+    projectFile                   = providers.Factory(resolveProjectFile)
     
-    workspaceFile                 = providers.Factory(resolveWorkspaceFileWithWarnings,
-                                                        projectFile)
+    workspaceFile                 = providers.Factory(resolveWorkspaceFileOrFail,
+                                                      projectFile)
     
     qgisInterface                 = providers.Singleton(lambda: iface)
         
@@ -107,23 +93,6 @@ class Container(containers.DeclarativeContainer):
   
     derivedBoundaryLayer          = providers.Singleton(DerivedBoundaryLayer,
                                                         paddockLayer)
-    
-    # workingLayers                 = providers.Singleton(WorkspaceLayers,
-    #                                                     *[landTypeLayer,
-    #                                                       conditionTable,
-    #                                                       paddockLayer,
-    #                                                       elevationLayer,
-    #                                                       waterpointLayer,
-    #                                                       derivedWaterpointBufferLayer,
-    #                                                       waterpointBufferLayer,
-    #                                                       derivedWateredAreaLayer,
-    #                                                       wateredAreaLayer,
-    #                                                       derivedPaddockLandTypesLayer,
-    #                                                       paddockLandTypesLayer,
-    #                                                       derivedMetricPaddockLayer])#,
-    #                                                     #   fenceLayer,
-    #                                                     #   pipelineLayer,
-    #                                                     #   derivedBoundaryLayer])
     
     workspaceLayers               = providers.Singleton(WorkspaceLayers,
                                                         *[landTypeLayer,

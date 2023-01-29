@@ -14,9 +14,6 @@ from .status_feature import StatusFeature
 @MetricPaddockSchema.addSchema()
 class MetricPaddock(StatusFeature):
 
-    popupLayerAdded = pyqtSignal(MetricPaddockPopupLayer)
-    popupLayerRemoved = pyqtSignal()
-
     def __init__(self, featureLayer, existingFeature=None):
         """Initialise a new Metric Paddock."""
         super().__init__(featureLayer, existingFeature)

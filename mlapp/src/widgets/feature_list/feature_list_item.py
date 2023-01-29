@@ -2,6 +2,7 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
+from ...models.qt_abstract_meta import QtAbstractMeta
 from ...spatial.features.edits import Edits
 from ...spatial.features.feature_action import FeatureAction
 from ...spatial.features.persisted_feature import PersistedFeature
@@ -15,7 +16,7 @@ from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 from .status_feature_tool_bar import StatusFeatureToolBar
 
 
-class FeatureListItem(QWidget, EditStateMachine):
+class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
@@ -117,10 +118,10 @@ class FeatureListItem(QWidget, EditStateMachine):
             self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
         # Respond to changes in editing status
-        self.stateChanged.connect(self.refreshUi)
+        self.statusChanged.connect(self.refreshUi)
 
-        if self.hasStatus and self.feature.stateChanged:
-            self.feature.stateChanged.connect(self.refreshUi)
+        if self.hasStatus:
+            self.feature.statusChanged = self.refreshUi
 
         self.refreshUi()
 

@@ -106,7 +106,6 @@ where not exists (
     def __init__(self,
                  paddockLayer: PaddockLayer,
                  waterpointBufferLayer: WaterpointBufferLayer):
-        qgsDebug(f"DerivedwateredArea.__init__({paddockLayer}, {waterpointBufferLayer})")
 
         super().__init__(
             WateredArea,

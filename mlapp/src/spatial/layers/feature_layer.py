@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import cached_property
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsFeature, QgsProject, QgsVectorLayer
 
@@ -15,6 +15,11 @@ class FeatureLayer(QgsVectorLayer):
     selectedFeatureChanged = pyqtSignal(Feature)
     currentTimeframeChanged = pyqtSignal(Timeframe)
     workspaceConnectionChanged = pyqtSignal()
+        
+    featureStateChanged = pyqtSignal(Feature)
+    
+    popupLayerAdded = pyqtSignal(Feature, QObject)
+    popupLayerRemoved = pyqtSignal(Feature)
 
     @classmethod
     def detectAndRemoveAllOfType(cls):

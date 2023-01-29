@@ -53,22 +53,22 @@ class Workspace(QObject):
 
         self.currentTimeframeChanged.connect(self.deselectFeature)
 
-        # [self.landTypeLayer,
-        #  self.conditionTable,
-        #  self.paddockLayer,
-        #  self.elevationLayer,
-        #  self.waterpointLayer,
-        #  self.derivedWaterpointBufferLayer,
-        #  self.waterpointBufferLayer,
-        #  self.derivedWateredAreaLayer,
-        #  self.wateredAreaLayer,
-        #  self.derivedPaddockLandTypesLayer,
-        #  self.paddockLandTypesLayer,
-        #  self.derivedMetricPaddockLayer,
-        #  self.fenceLayer,
-        #  self.pipelineLayer,
-        #  self.derivedBoundaryLayer] = [self.workspaceLayer(layerType) for layerType in self.layerDependencyGraph.buildOrder()]
-
+        # For convenient reference
+        [self.landTypeLayer,
+         self.conditionTable,
+         self.paddockLayer,
+         self.elevationLayer,
+         self.waterpointLayer,
+         self.derivedWaterpointBufferLayer,
+         self.waterpointBufferLayer,
+         self.derivedWateredAreaLayer,
+         self.wateredAreaLayer,
+         self.derivedPaddockLandTypesLayer,
+         self.paddockLandTypesLayer,
+         self.derivedMetricPaddockLayer,
+         self.fenceLayer,
+         self.pipelineLayer,
+         self.derivedBoundaryLayer] = [self.workspaceLayer(layerType) for layerType in self.layerDependencyGraph.loadOrder()]
 
         self.addToMap()
 
@@ -163,7 +163,7 @@ class Workspace(QObject):
         self.unsetTool()
 
         for viewType, view in self.views.values():
-            view.hide()
+            view.close()
             self.iface.removeDockWidget(view)
             self.onCloseView(viewType)
 

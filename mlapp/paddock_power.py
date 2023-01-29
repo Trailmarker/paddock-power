@@ -54,7 +54,7 @@ class PaddockPower(QObject):
         self.initContainer()
 
         QgsProject.instance().cleared.connect(self.unloadWorkspace)
-        # QgsProject.instance().readProject.connect(self.detectWorkspace)
+        QgsProject.instance().readProject.connect(self.detectWorkspace)
 
     def initContainer(self):
         """Initialise the IoC container."""
@@ -89,13 +89,11 @@ class PaddockPower(QObject):
         self.actions.append(action)
         return action
 
-
     def initGui(self):
         """The real Paddock Power GUI is initialised when a QGIS project is opened,
            but QGIS utilities call this when the plug-in is loaded anyway."""
         # Initialise plug-in menu and toolbar
         self.menu = PaddockPower.MENU_NAME
-
 
         self.toolbar = self.iface.addToolBar(u"PaddockPower")
         self.toolbar.setObjectName(u"PaddockPower")
@@ -111,7 +109,7 @@ class PaddockPower(QObject):
         self.addAction(
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
             text=f"Refresh {PLUGIN_NAME} workspace …",
-            callback=lambda *_: self.detectWorkspace(),
+            callback=lambda *_: self.detectWorkspace(warning=True),
             parent=self.iface.mainWindow())
 
         self.addAction(
@@ -126,7 +124,7 @@ class PaddockPower(QObject):
             callback=lambda *_: self.importData(),
             parent=self.iface.mainWindow())
 
-        # self.detectWorkspace()
+        self.detectWorkspace()
 
     # Override Glitch type exceptions application-wide
     def setupGlitchHook(self):
@@ -162,11 +160,6 @@ class PaddockPower(QObject):
             pass
 
         try:
-            self.unloadWorkspace()
-        except BaseException:
-            pass
-
-        try:
             # Remove the plugin menu item and icon
             for action in self.actions:
                 self.iface.removePluginMenu(PaddockPower.MENU_NAME, action)
@@ -174,6 +167,11 @@ class PaddockPower(QObject):
 
             # Remove the toolbar
             del self.toolbar
+        except BaseException:
+            pass
+
+        try:
+            self.unloadWorkspace()
         except BaseException:
             pass
 
@@ -196,23 +194,29 @@ class PaddockPower(QObject):
             QgsExpression.unregisterFunction(paddockPowerFunction)
 
     # @Glitch.glitchy(f"An error occurred while scanning for {PLUGIN_NAME} workspaces.")
-    def detectWorkspace(self, _=None):
+    def detectWorkspace(self, warning=False):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
-        
-        # Ground zero
+
         self.unloadWorkspace()
         
-        # Reset the container
-        self.container.reset_singletons()
-        self.workspace = self.container.workspace()
-        #except BaseException as e:
-        #    qgsException()
-
+        projectFile = resolveProjectFile()
+        if projectFile is None:
+            qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
+            if warning:
+                guiError(
+                    f"Please create and save a QGIS project file before you try to detect a {PLUGIN_NAME} workspace.")
+            return
+        else:
+            workspaceFile = resolveWorkspaceFile()
+            if workspaceFile and os.path.exists(workspaceFile):
+                self.workspace = self.container.workspace()
+            else:
+                qgsInfo(f"{PLUGIN_NAME} no workspace (.gpkg) file was located …")
 
     # @Glitch.glitchy(f"An error occurred while creating a {PLUGIN_NAME} workspace.")
     def createWorkspace(self):
         f"""Create a new {PLUGIN_NAME} workspace in the current QGIS project."""
-        #try:
+        # try:
         projectFile = resolveProjectFile()
         if projectFile is None:
             qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")
@@ -236,17 +240,14 @@ class PaddockPower(QObject):
         #     raise e
         #     pass
 
-
     def importData(self):
         if self.workspace is not None:
             self.workspace.importData()
-
 
     def resetWorkspace(self):
         # Prime the container for a new workspace
         if self.container:
             self.container.reset_singletons()
-
 
     def unloadWorkspace(self):
         """Removes the plugin menu item and icon from QGIS interface."""
@@ -254,6 +255,9 @@ class PaddockPower(QObject):
             qgsInfo(f"{PLUGIN_NAME} unloading workspace …")
             self.workspace.unload()
             self.workspace = None
+
+        # Reset the DI container
+        self.container.reset_singletons()
 
     def openFeatureView(self):
         if self.workspace is not None:

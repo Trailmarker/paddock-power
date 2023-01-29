@@ -1,21 +1,18 @@
 # -*- coding: utf-8 -*-
-from abc import ABC, abstractmethod
 from functools import cached_property
 
-from qgis.PyQt.QtCore import pyqtSlot
+from qgis.PyQt.QtCore import QObject, pyqtSlot
 from re import finditer
 
-from qgis.core import QgsFeature, QgsProject, QgsRectangle, QgsVectorLayer
+from qgis.core import QgsFeature, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ...models.qt_abstract_meta import QtAbstractMeta
 from ..fields.names import AREA, ELEVATION, LENGTH, LONGITUDE, LATITUDE, STATUS, PERIMETER, TIMEFRAME
-from ..fields.schemas import FeatureSchema
 from ..fields.timeframe import Timeframe
 
 
 
-class Feature(ABC, QgsFeature, metaclass=QtAbstractMeta):
+class Feature(QgsFeature):
 
     @classmethod
     def displayName(cls):
@@ -25,10 +22,11 @@ class Feature(ABC, QgsFeature, metaclass=QtAbstractMeta):
 
     def __init__(self, featureLayerType, existingFeature):
         """Create a new Feature."""
+        
         self.featureLayerType = featureLayerType
 
         if isinstance(existingFeature, QgsFeature):
-            super().__init__(existingFeature)
+            QgsFeature.__init__(self, existingFeature)
             
             # Incoming QgsFeature must have the correct schema
             missingFields, _ = self.getSchema().checkFields(self.fields())

@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-from abc import ABC, abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 from enum import Enum
 from functools import partial
 
-from qgis.PyQt.QtCore import pyqtSignal
-
 from ..models.glitch import Glitch
 from ..utils import qgsInfo
-from .qt_abstract_meta import QtAbstractMeta
 
 
 class StateMachineEnum(Enum):
@@ -45,8 +42,7 @@ class StateMachineAction(StateMachineEnum):
         return partial(actionHandler, self)
 
 
-class StateMachine(ABC, metaclass=QtAbstractMeta):
-    stateChanged = pyqtSignal(object)
+class StateMachine(ABC):
 
     @abstractproperty
     def transitions(self):
@@ -68,6 +64,31 @@ class StateMachine(ABC, metaclass=QtAbstractMeta):
     def status(self, _):
         pass
 
+    @property
+    def statusChanged(self):
+        if not hasattr(self, "_statusChangedHandlers"):
+            setattr(self, "_statusChangedHandlers", [])
+        
+        def __callAll():
+            badHandlers = []
+            for handler in self._statusChangedHandlers:
+                try:
+                    handler()
+                except BaseException as e:
+                    badHandlers.append(handler)
+                finally:
+                    self._statusChangedHandlers = [h for h in self._statusChangedHandlers if h not in badHandlers]
+                    
+        return __callAll    
+
+    @statusChanged.setter
+    def statusChanged(self, handler):
+        if not hasattr(self, "_statusChangedHandlers"):
+            setattr(self, "_statusChangedHandlers", [])
+        
+        if not handler in self._statusChangedHandlers:
+            self._statusChangedHandlers.append(handler)
+
     def isPermitted(self, action):
         """Return True if the action is enabled for the current status."""
         if not isinstance(action, self.actionType):
@@ -83,7 +104,7 @@ class StateMachine(ABC, metaclass=QtAbstractMeta):
             newStatus = self.transitions[(self.status, action)]
             qgsInfo(f"{self}: {self.status} → {action} → {newStatus}")
             self.status = newStatus
-            self.stateChanged.emit(self)
+            self.statusChanged()
         else:
             qgsInfo(f"{self}: {self.status} → {action} → {newStatus} not permitted")
             # raise Glitch(f"An error happened trying to {action} a {self}")

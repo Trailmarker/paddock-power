@@ -41,7 +41,7 @@ class FencePaddockChanges(QWidget, FORM_CLASS):
             self.fence = feature
 
             if self.fence:
-                self.fence.stateChanged.connect(self.refreshUi)
+                self.fence.statusChanged = self.refreshUi
 
             self.refreshUi()
 
