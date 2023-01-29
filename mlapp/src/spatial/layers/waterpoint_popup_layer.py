@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint_buffer import WaterpointBuffer
-from ..fields.schemas import GRAZING_RADIUS_TYPE, WATERPOINT
+from ..fields.schemas import GRAZING_RADIUS_TYPE, WATERPOINT, WaterpointBufferSchema
 from .derived_feature_layer import DerivedFeatureLayer
 
 class WaterpointPopupLayer(DerivedFeatureLayer):
 
     STYLE = "waterpoint_popup"
 
-    def prepareQuery(self, query=None):
+    def prepareQuery(self, query, *dependentLayers):
         waterpointId = self.waterpoint.FID
         
         query = f"""
@@ -22,3 +22,13 @@ order by "{GRAZING_RADIUS_TYPE}"
         # Burn in the Waterpoint specific parameters first …
         self.waterpoint = waterpoint
         super().__init__(WaterpointBuffer, layerName, WaterpointPopupLayer.STYLE, ["WaterpointBufferLayer"])
+
+    
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        return WaterpointBufferSchema
+    
+        
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        return WaterpointBufferSchema.wkbType

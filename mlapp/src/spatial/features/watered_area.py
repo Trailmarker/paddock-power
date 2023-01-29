@@ -8,7 +8,7 @@ class WateredArea(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new WateredArea."""
-        super().__init__(featureLayer=featureLayer, existingFeature=existingFeature)
+        super().__init__(featureLayer, existingFeature)
 
     @classmethod
     def focusOnSelect(cls):

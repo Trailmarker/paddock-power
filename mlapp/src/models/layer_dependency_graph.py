@@ -34,7 +34,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(WateredAreaLayer, [DerivedWateredAreaLayer])
         self.addDependencies(DerivedPaddockLandTypesLayer, [ConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
         self.addDependencies(PaddockLandTypesLayer, [DerivedPaddockLandTypesLayer])          
-        self.addDependencies(DerivedMetricPaddockLayer, [ConditionTable, PaddockLayer, PaddockLandTypesLayer])
+        self.addDependencies(DerivedMetricPaddockLayer, [PaddockLayer, PaddockLandTypesLayer])
         self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, DerivedMetricPaddockLayer])  
         self.addDependencies(PipelineLayer, [ElevationLayer])
         self.addDependencies(DerivedBoundaryLayer, [PaddockLayer])

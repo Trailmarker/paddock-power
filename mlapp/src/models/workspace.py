@@ -53,7 +53,29 @@ class Workspace(QObject):
 
         self.currentTimeframeChanged.connect(self.deselectFeature)
 
+        # [self.landTypeLayer,
+        #  self.conditionTable,
+        #  self.paddockLayer,
+        #  self.elevationLayer,
+        #  self.waterpointLayer,
+        #  self.derivedWaterpointBufferLayer,
+        #  self.waterpointBufferLayer,
+        #  self.derivedWateredAreaLayer,
+        #  self.wateredAreaLayer,
+        #  self.derivedPaddockLandTypesLayer,
+        #  self.paddockLandTypesLayer,
+        #  self.derivedMetricPaddockLayer,
+        #  self.fenceLayer,
+        #  self.pipelineLayer,
+        #  self.derivedBoundaryLayer] = [self.workspaceLayer(layerType) for layerType in self.layerDependencyGraph.buildOrder()]
+
+
         self.addToMap()
+
+
+    def workspaceLayer(self, layerType):
+        """Retrieve a layer by type."""
+        return self.workspaceLayers.layer(layerType)
 
 
     @pyqtSlot()
@@ -80,7 +102,7 @@ class Workspace(QObject):
         group = group or self.findGroup()
   
         layerStackingOrder = [WaterpointLayer, PipelineLayer, FenceLayer, WateredAreaLayer, LandTypeLayer, DerivedBoundaryLayer, DerivedMetricPaddockLayer, ElevationLayer]
-        availableLayers = map(lambda layerType: self.workspaceLayers.getLayer(layerType), layerStackingOrder)
+        availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in layerStackingOrder] if l]
                
         for layer in availableLayers:
             layer.addToMap(group)  

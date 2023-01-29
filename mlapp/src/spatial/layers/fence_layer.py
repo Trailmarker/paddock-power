@@ -5,6 +5,7 @@ from ...models.glitch import Glitch
 from ..features.fence import Fence
 from ..fields.feature_status import FeatureStatus
 from ..fields.names import BUILD_ORDER
+from ..fields.schemas import FenceSchema
 from .persisted_feature_layer import PersistedFeatureLayer
 
 class FenceLayer(PersistedFeatureLayer):
@@ -18,6 +19,17 @@ class FenceLayer(PersistedFeatureLayer):
                          workspaceFile,
                          layerName=FenceLayer.NAME,
                          styleName=FenceLayer.STYLE)
+    
+    
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        return FenceSchema
+        
+    
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        return FenceSchema.wkbType
+    
     
     def getBuildOrder(self):
         """The lowest Build Order of any Fence in Draft status."""

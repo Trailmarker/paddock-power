@@ -7,7 +7,7 @@ from qgis.core import QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ...models.glitch import Glitch
-from ...utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsInfo
+from ...utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsDebug, qgsException, qgsInfo
 from ..layers.feature_layer import FeatureLayer
 
 QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
@@ -40,12 +40,13 @@ class PersistedFeatureLayer(FeatureLayer):
         return False
 
     def createInGeoPackage(self, workspaceFile, layerName):
+        
+        # qgsDebug(f"{self.__class__.__name__}.createInGeoPackage(workspaceFile={workspaceFile}, layerName={layerName})")
+        
         wkbType = self.getWkbType()
         schema = self.getSchema()
 
-        assert(layerName is not None)
-        assert(wkbType is not None)
-        assert(schema is not None)
+        assert layerName and wkbType and schema
 
         layerDefinition = f"{QGSWKB_TYPES[wkbType]}?crs=epsg:{PADDOCK_POWER_EPSG}"
 
@@ -55,6 +56,12 @@ class PersistedFeatureLayer(FeatureLayer):
         layer.startEditing()
         layer.dataProvider().addAttributes(schema)
         layer.commitChanges()
+
+        # layer.startEditing()
+        
+        # for field in self.getSchema():
+        #     field.setupLayer(layer)
+        # layer.commitChanges()
 
         params = {
             'LAYERS': [layer],
@@ -79,13 +86,16 @@ class PersistedFeatureLayer(FeatureLayer):
     def __init__(self, featureType, workspaceFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} vector layer."""
 
+        # qgsDebug(f"{self.typeName}.__init__({featureType}, {workspaceFile}, {layerName}, {styleName})")
+
         # If not found, create
         if not self.detectInGeoPackage(workspaceFile, layerName):
             qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage. Creating new, stand by …")
             self.createInGeoPackage(workspaceFile, layerName)
 
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
-        super().__init__(featureType, path=self.gpkgUrl, baseName=layerName, providerLib="ogr", styleName=styleName)
+        
+        super().__init__(featureType, self.gpkgUrl, layerName, "ogr", styleName=styleName)
 
         # TODO
         missingFields, extraFields = self.getSchema().checkFields(self.dataProvider().fields())
@@ -93,14 +103,14 @@ class PersistedFeatureLayer(FeatureLayer):
         if missingFields:
             # Start editing to to expand the schema
             qgsInfo(
-                f"Expanding schema for {self._typeName} to include {str([f.name() for f in missingFields])} …")
+                f"Expanding schema for {self.typeName} to include {str([f.name() for f in missingFields])} …")
             self.startEditing()
             self.dataProvider().addAttributes(missingFields)
             self.commitChanges()
 
         if extraFields:
             # Start editing to to cut down the schema
-            qgsInfo(f"Reducing schema for {self._typeName} to remove {str([f.name() for f in extraFields])} …")
+            qgsInfo(f"Reducing schema for {self.typeName} to remove {str([f.name() for f in extraFields])} …")
             self.startEditing()
             self.dataProvider().deleteAttributes([self.fields().indexFromName(f.name()) for f in extraFields])
             self.commitChanges()
@@ -109,8 +119,6 @@ class PersistedFeatureLayer(FeatureLayer):
         for field in self.getSchema():
             field.setupLayer(self)
 
-        # self.detectAndRemove()
-        # QgsProject.instance().addMapLayer(self, False)
 
     def addFeatures(self, features):
         """Add a batch of features to this layer."""
@@ -118,22 +126,25 @@ class PersistedFeatureLayer(FeatureLayer):
             f.clearId()
             self.addFeature(f)
 
+
     def copyFeature(self, feature):
         """Copy a feature using the logic (eg dependent layers) of this layer."""
         if not isinstance(feature, self.featureType):
             raise Glitch(
-                f"You can't use a {self._typeName} to copy an object that isn't a {self.featureType.__name__}")
+                f"You can't use a {self.typeName} to copy an object that isn't a {self.featureType.__name__}")
 
         copyFeature = self.makeFeature()
-        for f in feature.fields():
+        for f in feature.getSchema():
             copyFeature.setAttribute(f.name(), feature.attribute(f.name()))
         copyFeature.setGeometry(copyFeature.geometry())
         copyFeature.clearId()
         return copyFeature
 
+
     def makeFeature(self):
         """Make a new PersistedFeature in this layer."""
         return self.wrapFeature(None)
+
 
     # TODO
     def deleteFeature(self, feature):

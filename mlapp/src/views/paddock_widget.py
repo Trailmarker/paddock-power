@@ -14,16 +14,16 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class PaddockWidget(QWidget, FORM_CLASS):
 
-    def __init__(self, wprkspace, parent=None):
+    def __init__(self, workspace, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        self.wprkspace = wprkspace
+        self.workspace = workspace
 
         self.setupUi(self)
 
-        self.paddockList.paddockLayer = self.wprkspace.paddockLayer
-        self.paddockList.featureLayer = self.wprkspace.derivedMetricPaddockLayer
+        self.paddockList.paddockLayer = self.workspace.paddockLayer
+        self.paddockList.featureLayer = self.workspace.derivedMetricPaddockLayer
 
         self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),
                                self.paddockLandTypeListGroupBox.sizeHint().width()])

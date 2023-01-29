@@ -2,6 +2,7 @@
 
 from ...utils import PLUGIN_NAME
 from ..features.paddock_land_type import PaddockLandType
+from ..fields.schemas import PaddockLandTypeSchema
 from .derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
 from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
@@ -22,4 +23,11 @@ class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
                          styleName=PaddockLandTypesLayer.STYLE,
                          derivedLayer=derivedPaddockLandTypesLayer)
 
-
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        return PaddockLandTypeSchema
+        
+    
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        return PaddockLandTypeSchema.wkbType

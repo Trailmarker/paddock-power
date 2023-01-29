@@ -15,15 +15,14 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         # Adjusts the schema to match the feature type
         # Applies the editor widgets (TODO need to make read only for a derived layer?)
         # Optionally applies a style
-        self._derivedLayer = derivedLayer
+        self.derivedLayer = derivedLayer
         
         super().__init__(featureType, workspaceFile, layerName, styleName)
         self.setReadOnly(True)  # TODO?
-
-    @property
-    def derivedLayer(self):
-        """Return the DerivedFeatureLayer that this layer persists features from."""
-        return self._derivedLayer
+        
+        # Initial persistence
+        # self.repersistDerivedFeatures(None, [])
+  
 
     @pyqtSlot()
     def repersistDerivedFeatures(self, layer, idList):
@@ -50,10 +49,8 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
             self.triggerRepaint()
             
             
-    # @pyqtSlot()
-    # def onWorkspaceConnectionChanged(self):
-    #     # if self.workspace:       
-    #         # Initial persistence
-    #         # self.repersistDerivedFeatures(None, [])
-        
-    #     return super().onWorkspaceConnectionChanged()
+    @pyqtSlot()
+    def onWorkspaceConnectionChanged(self):      
+        return super().onWorkspaceConnectionChanged()
+    
+    

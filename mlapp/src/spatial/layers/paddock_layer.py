@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from ..features.paddock import Paddock
+from ..fields.schemas import PaddockSchema
 from .condition_table import ConditionTable
 from .imported_feature_layer import ImportedFeatureLayer
-
 
 class PaddockLayer(ImportedFeatureLayer):
 
@@ -20,3 +20,13 @@ class PaddockLayer(ImportedFeatureLayer):
                          styleName=PaddockLayer.STYLE)
 
         self.conditionTable = conditionTable
+
+
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        return PaddockSchema
+        
+    
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        return PaddockSchema.wkbType

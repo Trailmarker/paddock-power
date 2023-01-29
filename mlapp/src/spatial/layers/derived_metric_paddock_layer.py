@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest, QgsProject
+from qgis.core import QgsFeatureRequest
 
 from ..features.metric_paddock import MetricPaddock
 from ..fields.names import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_AREA
+from ..fields.schemas import MetricPaddockSchema
 from ..fields.timeframe import Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
 from .paddock_layer import PaddockLayer
@@ -14,8 +15,8 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer):
     NAME = "Paddocks"
     STYLE = "paddock"
 
-    def prepareQuery(self, query=None):
-        [paddockLayer, paddockLandTypesLayer] = self.names(PaddockLayer, PaddockLandTypesLayer)
+    def prepareQuery(self, query, *dependentLayers):
+        [paddockLayer, paddockLandTypesLayer] = self.names(*dependentLayers)
         
         query = f"""
 select
@@ -38,7 +39,7 @@ inner join "{paddockLandTypesLayer}"
 	on "{paddockLayer}".{FID} = "{paddockLandTypesLayer}".{PADDOCK}
 group by "{paddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
 """
-        return super().prepareQuery(query)
+        return super().prepareQuery(query, *dependentLayers)
 
     def getFeatureByPaddockId(self, paddockId):
         """Return a MetricPaddock based on a Paddock FID."""
@@ -51,12 +52,22 @@ group by "{paddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
                 if Timeframe[f.timeframe.name] == Timeframe[self.currentTimeframe.name]:
                     return f
 
-    def __init__(self):
-
+    def __init__(self,
+                 paddockLayer: PaddockLayer,
+                 paddockLandTypesLayer: PaddockLandTypesLayer):
+        
         super().__init__(MetricPaddock,
                          DerivedMetricPaddockLayer.NAME,
                          DerivedMetricPaddockLayer.STYLE,
-                         [PaddockLayer, PaddockLandTypesLayer])
+                         paddockLayer,
+                         paddockLandTypesLayer)
 
-  
 
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        return MetricPaddockSchema
+        
+    
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        return MetricPaddockSchema.wkbType

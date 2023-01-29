@@ -63,7 +63,7 @@ class PersistedFeature(Feature):
         elif existingFeature is not None:
             # What?
             raise Glitch(
-                f"{self._typeName}.__init__: unexpected type {type(existingFeature).__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
+                f"{self.typeName}.__init__: unexpected type {type(existingFeature).__name__} for provided existing feature data (should be a Feature subclass or QgsFeature)")
 
     @property
     def FID(self):
@@ -161,7 +161,7 @@ class PersistedFeature(Feature):
     def upsert(self):
         """Add or update the PersistedFeature in the PersistedFeatureLayer."""
 
-        # assert(self.featureLayer.isEditable())
+        # assert self.featureLayer.isEditable()
 
         # # TODO inefficient
         self.recalculate()

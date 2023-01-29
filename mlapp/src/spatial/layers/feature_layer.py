@@ -1,91 +1,20 @@
 # -*- coding: utf-8 -*-
-from abc import ABC
 from functools import cached_property
-
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 
 from qgis.core import QgsFeature, QgsProject, QgsVectorLayer
 
-from ...models.glitch import Glitch
-from ...models.qt_abstract_meta import QtAbstractMeta
 from ...utils import qgsDebug, qgsError, resolveStylePath, PLUGIN_NAME
 from ..features.feature import Feature
 from ..fields.timeframe import Timeframe
 
 
-class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
+class FeatureLayer(QgsVectorLayer):
 
-    # emit this signal when a selected Feature is updated
-    currentTimeframeChanged = pyqtSignal(Timeframe)
+    # Emit this signal when a selected Feature is updated
     selectedFeatureChanged = pyqtSignal(Feature)
+    currentTimeframeChanged = pyqtSignal(Timeframe)
     workspaceConnectionChanged = pyqtSignal()
-
-    def __init__(self, featureType, *args, **kwargs):
-        f"""Create a new {PLUGIN_NAME} vector layer."""
-
-        self.featureType = featureType
-        self._selectedFeature = None
-        self._workspace = None
-
-        # Route changes to this layer's selection *through* the Paddock Power
-        # Workspace for *all* Paddock Power FeatureLayers
-        self._blockWorkspaceConnnection = False
-
-        self._styleName = kwargs.pop("styleName", None)
-
-        super().__init__(*args, **kwargs)
-
-        # Optionally apply a style to the layer
-        if self._styleName is not None:
-            stylePath = resolveStylePath(self._styleName)
-            self.loadNamedStyle(stylePath)
-
-        self.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(selection))
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return self.featureType.getSchema()
-  
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return self.featureType.getWkbType()
-        
-    @cached_property
-    def _typeName(self):
-        """Return the FeatureLayer's type name."""
-        return type(self).__name__
-
-    def __repr__(self):
-        """Return a string representation of the Field."""
-        return f"{self._typeName}(name={self.name()})"
-
-    def __str__(self):
-        """Convert the Field to a string representation."""
-        return repr(self)
-
-    @property
-    def styleName(self):
-        """Return the name of the style applied to this layer."""
-        return self._styleName
-
-    def connectWorkspace(self, workspace):
-        self._workspace = workspace
-        self.workspaceConnectionChanged.emit()
-
-    @property
-    def connectedToWorkspace(self):
-        return self._workspace and not self._blockWorkspaceConnnection
-
-    @property
-    def workspace(self):
-        return self._workspace
-
-    # def detectAndRemove(self):
-    #     """Detect if a layer is already in the map, and if so, remove it."""
-    #     layers = [l for l in QgsProject.instance().mapLayers().values()]
-    #     for layer in layers:
-    #         if layer.source() == self.source():
-    #             QgsProject.instance().removeMapLayer(layer.id())
 
     @classmethod
     def detectAndRemoveAllOfType(cls):
@@ -94,51 +23,121 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         for layer in layers:
             QgsProject.instance().removeMapLayer(layer.id())
 
+    def __init__(self,
+                 featureType,
+                 path,
+                 layerName,
+                 providerLib,
+                 styleName=None,
+                 *args, **kwargs):
+        f"""Create a new {PLUGIN_NAME} vector layer."""
+
+        self.featureType = featureType
+
+        self._workspace = None
+        # Route changes to this layer *through* the Paddock Power
+        # workspace so other objects can respond
+        self._blockWorkspaceConnnection = False
+
+        self._selectedFeature = None
+
+        super().__init__(path, layerName, providerLib, *args, **kwargs)
+
+        self.applyNamedStyle(styleName)
+        self.addInBackground()
+        self.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(selection))
+
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        raise NotImplementedError
+
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        raise NotImplementedError
+
+    @cached_property
+    def typeName(self):
+        """Return the FeatureLayer's type name."""
+        return type(self).__name__
+
+    def __repr__(self):
+        """Return a string representation of the Field."""
+        return f"{self.typeName}(name={self.name()})"
+
+    def __str__(self):
+        """Convert the Field to a string representation."""
+        return repr(self)
+
+    # Workspace interface
+    @property
+    def connectedToWorkspace(self):
+        """Are we both connected to the workspace and not temporarily blocked."""
+        return self._workspace and not self._blockWorkspaceConnnection
+
+    @property
+    def workspace(self):
+        f"""The {PLUGIN_NAME} workspace we are connected to."""
+        return self._workspace
+
     @property
     def currentTimeframe(self):
         """Get the current timeframe for this layer (same as that of the workspace)."""
         return self.workspace.currentTimeframe if self.connectedToWorkspace else Timeframe.Undefined
 
-    def depend(self, layerType):
+    def connectWorkspace(self, workspace):
+        """Hook it up to uor veins."""
+        self._workspace = workspace
+        self.workspaceConnectionChanged.emit()
+
+    def workspaceLayer(self, layerType):
         """Get a layer we depend on to work with by type."""
         if self.connectedToWorkspace:
             return self.workspace.workspaceLayers.getLayer(layerType)
         else:
-            qgsError(f"{self._typeName}.depend({layerType}): no workspace connection")
-            
-    def depends(self, *layerTypes):
-        """Get a collection of layers we depend on to work with by their types."""
-        return list(self.depend(layerType) for layerType in layerTypes)
+            qgsError(f"{self.typeName}.depend({layerType}): no workspace connection")
 
-    def setCurrentTimeframe(self, timeframe):
-        """Set the current timeframe for this layer. This will also set the current timeframe for the workspace."""
-        if self.connectedToWorkspace:
-            self.workspace.setCurrentTimeframe(timeframe)
+    # Map and visibility
+    def findGroup(self, name=None):
+        """Find the group for this layer in the map."""
+        return QgsProject.instance().layerTreeRoot().findGroup(name) if name else None
 
-    def wrapFeature(self, feature):
-        """Wrap a QgsFeature using the Feature type of this FeatureLayer."""
-        assert isinstance(feature, QgsFeature)
-        return self.featureType(self, feature)
+    def addInBackground(self):
+        """Add this layer to the map in the background."""
+        QgsProject.instance().addMapLayer(self, False)
 
-    def addToMap(self, group):
+    def addToMap(self, group=None):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
-        if group is None:
-            raise Glitch(
-                "FeatureLayer.addToMap: the layer group is not present")
-
+        group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
         group.addLayer(self)
 
     def removeFromMap(self, group):
+        """Remove the layer from the map in the target group, if it is there."""
+        group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
         node = group.findLayer(self.id())
         if node:
             group.removeChildNode(node)
 
     def setVisible(self, group, visible):
         """Set the layer's visibility."""
+        group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
         node = group.findLayer(self.id())
         if node:
             node.setItemVisibilityChecked(visible)
-    
+
+    def applyNamedStyle(self, styleName):
+        """Apply a style to the layer."""
+        # Optionally apply a style to the layer
+        if styleName:
+            stylePath = resolveStylePath(styleName)
+            self.loadNamedStyle(stylePath)
+        self.triggerRepaint()
+
+    # Feature interface
+    def wrapFeature(self, feature):
+        """Wrap a QgsFeature using the Feature type of this FeatureLayer."""
+        assert (not feature) or isinstance(feature, QgsFeature)
+        return self.featureType(self, feature)
+
     def _wrapFeatures(self, features):
         """Adapt the features in this layer."""
         for feature in features:
@@ -163,7 +162,7 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
 
         return self._wrapFeatures(super().getFeatures(request))
 
-    def featureCount(self):
+    def countFeatures(self):
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
 
@@ -228,7 +227,6 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
         finally:
             self._blockWorkspaceConnnection = False
 
-
     @pyqtSlot(Timeframe)
     def onCurrentTimeframeChanged(self, timeframe):
         """Handle the current timeframe changing."""
@@ -243,9 +241,3 @@ class FeatureLayer(ABC, QgsVectorLayer, metaclass=QtAbstractMeta):
             self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
             self.workspace.currentTimeframeChanged.connect(self.onCurrentTimeframeChanged)
             self.currentTimeframeChanged.connect(self.workspace.setCurrentTimeframe)
-      
-            qgsDebug(f"{self.__class__.__name__}.onWorkspaceConnectionChanged: adding map layer")
-            QgsProject.instance().addMapLayer(self, False)
-            
-      
-    

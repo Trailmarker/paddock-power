@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from ...utils import qgsDebug
 from ..calculator import Calculator
 from ..features.watered_area import WateredArea
 from ..fields.grazing_radius_type import GrazingRadiusType
 from ..fields.names import FID, PADDOCK, STATUS, GRAZING_RADIUS_TYPE, TIMEFRAME, WATERED_TYPE
+from ..fields.schemas import WateredAreaSchema
 from ..fields.timeframe import Timeframe
 from ..fields.watered_type import WateredType
 from .derived_feature_layer import DerivedFeatureLayer
@@ -14,7 +16,7 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
     NAME = "Derived Watered Areas"
     STYLE = "watered_area"
 
-    def prepareQuery(self, query=None, *dependentLayers):
+    def prepareQuery(self, query, *dependentLayers):
         [paddockLayer, waterpointBufferLayer] = self.names(*dependentLayers)
         
         _NEAR_WATERED_AREA = "NearWateredArea"
@@ -104,10 +106,21 @@ where not exists (
     def __init__(self,
                  paddockLayer: PaddockLayer,
                  waterpointBufferLayer: WaterpointBufferLayer):
+        qgsDebug(f"DerivedwateredArea.__init__({paddockLayer}, {waterpointBufferLayer})")
+
+        super().__init__(
+            WateredArea,
+			DerivedWateredAreaLayer.NAME,
+			DerivedWateredAreaLayer.STYLE,
+			paddockLayer,
+			waterpointBufferLayer)
+
+
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        return WateredAreaSchema
         
-        super().__init__(WateredArea,
-                         DerivedWateredAreaLayer.NAME,
-                         DerivedWateredAreaLayer.STYLE,
-                         paddockLayer,
-                         waterpointBufferLayer)
-        
+    
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        return WateredAreaSchema.wkbType

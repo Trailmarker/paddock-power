@@ -3,6 +3,7 @@ import inspect
 import os
 import random
 import string
+import traceback
 from os import path
 
 
@@ -19,6 +20,7 @@ PLUGIN_FOLDER = "mlapp"
 
 # 16777215
 MAX_QT_DIMENSION = (2 * 24 - 1)
+
 
 def formatMessage(message):
     if isinstance(message, str):
@@ -48,9 +50,14 @@ def qgsError(message):
     """Print a debug message."""
     qgsDebug(message, PLUGIN_NAME, Qgis.Critical)
 
+
 def qgsInfo(message):
     """Print a debug message."""
     qgsDebug(message, PLUGIN_NAME, Qgis.Info)
+
+
+def qgsException():
+    qgsError(traceback.format_exc())
 
 
 def guiInformation(message):

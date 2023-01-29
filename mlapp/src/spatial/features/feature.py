@@ -31,17 +31,17 @@ class Feature(ABC, QgsFeature, metaclass=QtAbstractMeta):
             super().__init__(existingFeature)
             
             # Incoming QgsFeature must have the correct schema
-            missingFields, _ = self.schema.checkFields(self.fields())
+            missingFields, _ = self.getSchema().checkFields(self.fields())
             if missingFields:
-                raise Glitch(f"{self._typeName}.__init__({existingFeature}) newly created with missing fields: {missingFields}")
+                raise Glitch(f"{self.typeName}.__init__({existingFeature}) newly created with missing fields: {missingFields}")
 
         elif existingFeature is not None:
             # What?
             raise Glitch(
-                f"{self._typeName}.__init__: unexpected type {type(existingFeature).__name__} for provided existing feature data (should be a QgsFeature instance)")
+                f"{self.typeName}.__init__: unexpected type {type(existingFeature).__name__} for provided existing feature data (should be a QgsFeature instance)")
 
     @cached_property
-    def _typeName(self):
+    def typeName(self):
         """Return the Feature's type name."""
         return type(self).__name__
 
@@ -55,7 +55,7 @@ class Feature(ABC, QgsFeature, metaclass=QtAbstractMeta):
 
     def depend(self, layerType):
         """Get a layer we depend on to work with by type."""
-        return next((l for l in QgsProject.instance().mapLayers.values() if type(l) == layerType), None)
+        return self.featureLayer.depend(layerType)
 
     #TODO cache?
     @property
@@ -89,7 +89,7 @@ class Feature(ABC, QgsFeature, metaclass=QtAbstractMeta):
     @cached_property
     def hasField(self, fieldName):
         """Return True if the Feature's Schema has a Field with the supplied name."""
-        return fieldName in [field.name() for field in self.schema]
+        return fieldName in [field.name() for field in self.getSchema()]
 
     @cached_property
     def hasArea(self):

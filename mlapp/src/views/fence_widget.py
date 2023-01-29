@@ -15,16 +15,16 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 
 class FenceWidget(QWidget, FORM_CLASS):
 
-    def __init__(self, wprkspace, parent=None):
+    def __init__(self, workspace, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        self.wprkspace = wprkspace
+        self.workspace = workspace
 
         self.setupUi(self)
 
-        self.fenceList.featureLayer = self.wprkspace.fenceLayer
-        self.fencePaddockChanges.setWorkspace(self.wprkspace)
+        self.fenceList.featureLayer = self.workspace.fenceLayer
+        self.fencePaddockChanges.setWorkspace(self.workspace)
 
         self.splitter.setSizes([self.fenceListGroupBox.sizeHint().width(),
                                self.fencePaddockChanges.sizeHint().width()])
@@ -34,12 +34,12 @@ class FenceWidget(QWidget, FORM_CLASS):
 
     def sketchFence(self):
         """Sketch and analyse a new Fence."""
-        tool = SketchLineTool(self.wprkspace)
+        tool = SketchLineTool(self.workspace)
         tool.sketchFinished.connect(self.onSketchFenceFinished)
-        self.wprkspace.setTool(tool)
+        self.workspace.setTool(tool)
 
     @pyqtSlot(QgsGeometry)
     def onSketchFenceFinished(self, sketchLine):
-        fence = self.wprkspace.fenceLayer.makeFeature()
+        fence = self.workspace.fenceLayer.makeFeature()
         fence.draftFeature(sketchLine)
-        self.wprkspace.selectFeature(fence)
+        self.workspace.selectFeature(fence)

@@ -1,17 +1,17 @@
 
 import sqlite3
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 
 from ...utils import qgsInfo, PLUGIN_NAME
 from ..fields.condition_type import ConditionType
 from ..fields.names import LAND_TYPE, PADDOCK, CONDITION_TYPE
 
 
-class ConditionTable(QObject):
-    
+class ConditionTable:
+
     NAME = "ConditionTable"
-    
+
     featuresPersisted = pyqtSignal(list)
 
     def makeExistsQuery(self, tableName):
@@ -93,9 +93,12 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             self.createInGeoPackage(workspaceFile, self.tableName)
 
         self.workspaceFile = workspaceFile
-        self._gpkgUrl = f"{workspaceFile}|layername={self.tableName}"
+        self.gpkgUrl = f"{workspaceFile}|layername={self.tableName}"
 
     def name(self):
+        return self.tableName
+
+    def id(self):
         return self.tableName
 
     def getAllRecords(self):

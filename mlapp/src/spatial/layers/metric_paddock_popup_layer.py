@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..features.paddock_land_type import PaddockLandType
-from ..fields.schemas import LAND_TYPE_NAME, PADDOCK, TIMEFRAME
+from ..fields.schemas import LAND_TYPE_NAME, PADDOCK, TIMEFRAME, PaddockLandTypeSchema
 from .derived_feature_layer import DerivedFeatureLayer
 from .paddock_land_types_layer import PaddockLandTypesLayer
 
@@ -8,7 +8,7 @@ class MetricPaddockPopupLayer(DerivedFeatureLayer):
 
     STYLE = "paddock_land_types_popup"
 
-    def prepareQuery(self, query=None):
+    def prepareQuery(self, query, *dependentLayers):
         [paddockId, timeframe] = [self.metricPaddock.paddockId, self.timeframe]
         
         query = f"""
@@ -31,3 +31,11 @@ order by "{LAND_TYPE_NAME}"
             MetricPaddockPopupLayer.STYLE,
             [PaddockLandTypesLayer])
 
+    def getSchema(self):
+        """Return the Schema for this layer."""
+        return PaddockLandTypeSchema
+        
+    
+    def getWkbType(self):
+        """Return the WKB type for this layer."""
+        return PaddockLandTypeSchema.wkbType
