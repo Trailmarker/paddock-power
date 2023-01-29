@@ -161,7 +161,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     paddockId=paddockId,
                     landTypeId=landTypeId,
                     condition=conditionType.name))
-        self.featuresChanged.emit([paddockId])
 
     def upsertSplit(self, splitPaddockId, crossedPaddockId):
         """Upsert the condition data for a paddock to the new paddocks into which it will be split."""
@@ -199,4 +198,4 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landTypeId=landTypeId))
-        self.featuresChanged.emit([paddockId])
+        # self.featuresChanged.emit([self])

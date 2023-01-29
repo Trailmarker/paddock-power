@@ -237,7 +237,7 @@ class Fence(StatusFeature):
 
         edits = Edits()
 
-        with Edits.editAndRollBack(self.paddockLayer):
+        with Edits.editAndRollBack([self.paddockLayer]):
 
             _, lowestDraftBuildOrder, _ = self.featureLayer.getBuildOrder()
 

@@ -3,6 +3,7 @@ from qgis.PyQt.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsProject
 
+from ..spatial.features.edits import Edits
 from ..spatial.layers.condition_table import ConditionTable
 from ..spatial.layers.derived_boundary_layer import DerivedBoundaryLayer
 from ..spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
@@ -15,13 +16,14 @@ from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.land_type_layer import LandTypeLayer
 from ..spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
+from ..spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
 from ..spatial.fields.timeframe import Timeframe
 from ..tools.map_tool import MapTool
-from ..utils import PLUGIN_NAME
+from ..utils import PLUGIN_NAME, qgsInfo
 from ..views.feature_view.feature_view import FeatureView
 from ..widgets.import_dialog.import_dialog import ImportDialog
 from .glitch import Glitch
@@ -37,6 +39,8 @@ class Workspace(QObject):
     selectedFeaturesChanged = pyqtSignal(list)
     currentTimeframeChanged = pyqtSignal(Timeframe)
     workspaceUnloading = pyqtSignal()
+    
+    featuresChanged = pyqtSignal(list)
 
     def __init__(self,
                  iface,
@@ -58,6 +62,7 @@ class Workspace(QObject):
         self.selectedFeature = None
 
         self.currentTimeframeChanged.connect(self.deselectFeature)
+        self.featuresChanged.connect(self.analyseLayers)
 
         # For convenient reference
         self.landTypeLayer = self.workspaceLayers.layer(LandTypeLayer)
@@ -78,6 +83,8 @@ class Workspace(QObject):
 
         for layer in self.workspaceLayers.layers():
             layer.connectWorkspace(self)
+
+        self.analyseLayers(self.workspaceLayers.featureLayers())
 
         self.addToMap()
 
@@ -192,3 +199,19 @@ class Workspace(QObject):
         self.view.setAttribute(Qt.WA_DeleteOnClose)
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.view)
         self.view.show()
+    
+    
+    def updateOrder(self, updatedLayers):
+        """Return the order in which layers should be updated."""
+        updateOrder = self.layerDependencyGraph.updateOrder(updatedLayers)
+        return [self.workspaceLayer(layerType) for layerType in updateOrder]
+        
+    @pyqtSlot(list)
+    def analyseLayers(self, updatedLayers):
+        """Winnow and re-analyse a batch of updated layers."""        
+        updateOrder = self.updateOrder(updatedLayers)
+        
+        layerNames = ", ".join([layer.name() for layer in updateOrder])   
+        qgsInfo(f"Analysing layers: {layerNames} …")        
+        Edits.analyseLayers(updateOrder)
+        qgsInfo(f"Analysis complete.")

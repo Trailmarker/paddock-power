@@ -21,7 +21,7 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
         targetFeature = self.makeFeature()
         mappedFeature = fieldMap.mapFeature(importFeature, targetFeature)
         feature = self.wrapFeature(mappedFeature)
-        feature.clearId()
+        feature.clearFid()
 
         # Default imported data to 'Built' status - TODO might need other things here?
         if isinstance(feature, StatusFeature):
@@ -37,7 +37,7 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
         wasReadOnly = self.readOnly()
         self.setReadOnly(False)
         try:
-            with Edits.editAndCommit(self):
+            with Edits.editAndCommit([self], emitFeaturesChanged=True):
                 self.dataProvider().truncate()
                 features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
                 qgsDebug(f"Features to import: {[format(f) for f in features]}")
@@ -46,5 +46,4 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
                 return features
         finally:
             self.setReadOnly(wasReadOnly)
-            self.featuresChanged.emit([])
             self.triggerRepaint()

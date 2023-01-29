@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSlot
 
+from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME, qgsInfo
 from .persisted_feature_layer import PersistedFeatureLayer
-from ..features.edits import Edits
 
 
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
@@ -18,35 +17,23 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         self.derivedLayer = derivedLayer
 
         super().__init__(featureType, workspaceFile, layerName, styleName)
-        self.setReadOnly(True)  # TODO?
+        self.setReadOnly(True)
 
-        # Initial persistence
-        # self.repersistDerivedFeatures(None, [])
 
-    @pyqtSlot()
-    def repersistDerivedFeatures(self, layer, idList):
-        """Derive all Features to be persisted from the source DerivedFeatureLayer."""
-
+    def analyseFeatures(self):
+        """Analyse the features in the derived layer and copy them to this layer."""
+        
+        if not self.isEditable():
+            raise Glitch(f"{self}.analyseFeatures(): analysis can only be run during an edit session …")
+        
         derivedLayer = self.derivedLayer
         if derivedLayer is None:
-            return
+            raise Glitch(f"{self}.analyseFeatures(): no derived layer to analyse …")
+            
+        qgsInfo(f"Analysing {self.name()} …")
+        self.dataProvider().truncate()
 
-        qgsInfo(f"Repersisting derived features for layer {self.name()} …")
-        self.setReadOnly(False)
-
-        try:
-            with Edits.editAndCommit(self):
-                self.dataProvider().truncate()
-
-                derivedFeatures = list(derivedLayer.getFeatures())
-                for derivedFeature in derivedFeatures:
-                    feature = self.copyFeature(derivedFeature)
-                    feature.upsert()
-        finally:
-            self.setReadOnly(True)
-            self.featuresChanged.emit([])
-            self.triggerRepaint()
-
-    @pyqtSlot()
-    def onWorkspaceConnectionChanged(self):
-        return super().onWorkspaceConnectionChanged()
+        derivedFeatures = list(derivedLayer.getFeatures())
+        for derivedFeature in derivedFeatures:
+            feature = self.copyFeature(derivedFeature)
+            feature.upsert()

@@ -15,8 +15,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceConnectionMixin, LayerMixin):
     selectedFeaturesChanged = pyqtSignal(list)
     currentTimeframeChanged = pyqtSignal(Timeframe)
 
-    featuresChanged = pyqtSignal(list)
-
     def __init__(self,
                  featureType,
                  path,
