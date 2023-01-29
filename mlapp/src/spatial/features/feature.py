@@ -27,11 +27,13 @@ class Feature(QgsFeature):
 
         if isinstance(existingFeature, QgsFeature):
             QgsFeature.__init__(self, existingFeature)
-            
+        
             # Incoming QgsFeature must have the correct schema
             missingFields, _ = self.getSchema().checkFields(self.fields())
             if missingFields:
                 raise Glitch(f"{self.typeName}.__init__({existingFeature}) newly created with missing fields: {missingFields}")
+            
+            self.FID = existingFeature.id()
 
         elif existingFeature is not None:
             # What?
@@ -63,8 +65,17 @@ class Feature(QgsFeature):
 
     @property
     def FID(self):
-        """Return the Feature's fid."""
+        """Return the PersistedFeature's fid."""
+        if self.hasFid:
+            return self.attribute(FID)
         return self.id()
+
+    @FID.setter
+    def FID(self, fid):
+        """Set or the PersistedFeature's id."""
+        if self.hasFid:
+            self.setAttribute(FID, fid)
+        self.setId(fid)
 
     @property
     def GEOMETRY(self):
@@ -138,7 +149,7 @@ class Feature(QgsFeature):
         if self.hasTimeframe:
             return Timeframe[self.TIMEFRAME.name] == Timeframe[timeframe.name]
         elif self.hasStatus:
-            return timeframe.matchFeatureStatus(self.status)
+            return timeframe.matchFeatureStatus(self.STATUS)
         else:
             return False
 

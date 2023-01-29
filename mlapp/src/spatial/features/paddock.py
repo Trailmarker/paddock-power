@@ -20,7 +20,7 @@ class Paddock(StatusFeature):
 
     @property
     def TITLE(self):
-        return f"{self.NAME} ({self.FEATURE_AREA:.2f} km²)"
+        return f"{self.NAME} ({self.AREA:.2f} km²)"
 
     @property
     def conditionTable(self):

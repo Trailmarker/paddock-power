@@ -19,11 +19,11 @@ class MetricPaddockDetails(QWidget, FORM_CLASS):
         self.metricPaddock = metricPaddock
 
         if self.metricPaddock is not None:
-            self.areaText.setValue(self.metricPaddock.FEATURE_AREA, "{0:.2f}")
-            self.wateredAreaText.setValue(self.metricPaddock.wateredArea, "{0:.2f}")
+            self.areaText.setValue(self.metricPaddock.AREA, "{0:.2f}")
+            self.wateredAreaText.setValue(self.metricPaddock.WATERED_AREA, "{0:.2f}")
             self.perimeterText.setValue(self.metricPaddock.PERIMETER, "{0:.1f}")
-            self.estimatedCapacityText.setValue(self.metricPaddock.ESTIMATED_CAPCITY, "{0:.0f}")
-            self.potentialCapacityText.setValue(self.metricPaddock.POTENTIAL_CAPCITY, "{0:.0f}")
+            self.estimatedCapacityText.setValue(self.metricPaddock.ESTIMATED_CAPACITY, "{0:.0f}")
+            self.potentialCapacityText.setValue(self.metricPaddock.POTENTIAL_CAPACITY, "{0:.0f}")
             self.estimatedCapacityPerAreaText.setValue(self.metricPaddock.ESTIMATED_CAPACITY_PER_AREA, "{0:.1f}")
-            self.wateredAreaText.setValue(self.metricPaddock.wateredArea, "{0:.2f}")
+            self.wateredAreaText.setValue(self.metricPaddock.WATERED_AREA, "{0:.2f}")
             # self.potentialCapacityPerAreaText.setValue(self.metricPaddock.potentialCapacityPerArea, "{0:.1f}")

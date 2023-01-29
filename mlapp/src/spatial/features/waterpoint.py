@@ -40,8 +40,8 @@ class Waterpoint(StatusFeature):
     @property
     def TITLE(self):
         if self.NAME and self.NAME != "NULL":
-            return f"{self.NAME} ({self.waterpointType})"
-        return f"Waterpoint ({self.FID}) ({self.waterpointType})"
+            return f"{self.NAME} ({self.WATERPOINT_TYPE})"
+        return f"Waterpoint ({self.FID}) ({self.WATERPOINT_TYPE})"
 
     def addPopupLayer(self):
         """Add a Waterpoint popup layer."""
@@ -55,7 +55,7 @@ class Waterpoint(StatusFeature):
 
             self.popupLayer = WaterpointPopupLayer(
                 self.featureLayer.getPaddockPowerProject(),
-                f"{self.waterpointType.value} {self.FID} Watered Area",
+                f"{self.WATERPOINT_TYPE.value} {self.FID} Watered Area",
                 self,
                 self.waterpointBufferLayer)
             group = item.parent()

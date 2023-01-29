@@ -16,7 +16,7 @@ class PaddockLandType(PersistedFeature):
 
     @property
     def TITLE(self):
-        return f"{self.landTypeName} ({self.FEATURE_AREA:.2f} km², {self.estimatedCapacity:.1f} AE)"
+        return f"{self.landTypeName} ({self.AREA:.2f} km², {self.estimatedCapacity:.1f} AE)"
 
     @property
     def conditionTable(self):

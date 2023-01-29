@@ -8,7 +8,7 @@ from ...spatial.features.feature_action import FeatureAction
 from ...spatial.features.persisted_feature import PersistedFeature
 from ...spatial.features.status_feature import StatusFeature
 from ...spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
-from ...utils import PLUGIN_FOLDER
+from ...utils import PLUGIN_FOLDER, qgsDebug
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -20,8 +20,13 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
-        super().__init__(parent)
+        qgsDebug(f"{self.__class__.__name__}.__init__()")
 
+        QWidget.__init__(self, parent)
+        EditStateMachine.__init__(self)
+        
+        qgsDebug(f"{self.__class__.__name__}.__inited__()!")
+        
         self.feature = feature
 
         # Swap between view and edit layouts in the Collapse widget content area
@@ -118,7 +123,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
         # Respond to changes in editing status
-        self.statusChanged.connect(self.refreshUi)
+        self.statusChanged = self.refreshUi
 
         if self.hasStatus:
             self.feature.statusChanged = self.refreshUi
@@ -181,7 +186,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
         """Refresh the UI based on the current state of the fence."""
 
         # Set title to Feature title
-        self.collapse.setTitle(self.feature.title)
+        self.collapse.setTitle(self.feature.TITLE)
 
         if self.hasStatus:
             self.statusLabel.status = self.feature.status

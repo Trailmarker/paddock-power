@@ -50,22 +50,22 @@ class FieldMap(dict):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
             
-    def mapQgsFeature(self, qgsFeature, targetQgsFeature):
+    def mapFeature(self, feature, targetFeature):
         """Map a QgsFeature to another QgsFeature via this FieldMap."""
        
         # Transform the imported geometry, if applicable
-        if qgsFeature.hasGeometry():
+        if feature.hasGeometry():
             # Copy incoming
-            destGeom = QgsGeometry(qgsFeature.geometry())        
+            destGeom = QgsGeometry(feature.geometry())        
             sourceCrs = self.importLayer.crs()
             destCrs = QgsCoordinateReferenceSystem(f"epsg:{PADDOCK_POWER_EPSG}")
             tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
             # Stateful
             destGeom.transform(tr)
-            targetQgsFeature.setGeometry(destGeom)
+            targetFeature.setGeometry(destGeom)
                 
-        for field in qgsFeature.fields():
+        for field in feature.fields():
             if field.name() in self:
-                targetQgsFeature.setAttribute(self[field.name()], qgsFeature.attribute(field.name()))
+                targetFeature.setAttribute(self[field.name()], feature.attribute(field.name()))
         
-        return targetQgsFeature
+        return targetFeature

@@ -18,7 +18,7 @@ class WaterpointDetails(QWidget, FORM_CLASS):
 
         self.waterpoint = waterpoint
         if self.waterpoint is not None:
-            # self.nameText.setValue(self.waterpoint.name, "{0}")
+            # self.nameText.setValue(self.waterpoint.NAME, "{0}")
             self.nearGrazingRadiusText.setValue(self.waterpoint.NEAR_GRAZING_RADIUS, "{0:.0f}")
             self.farGrazingRadiusText.setValue(self.waterpoint.FAR_GRAZING_RADIUS, "{0:.0f}")
             self.waterpointTypeText.setValue(self.waterpoint.WATERPOINT_TYPE.value, "{0}")

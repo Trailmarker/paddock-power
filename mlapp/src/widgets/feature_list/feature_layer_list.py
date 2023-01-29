@@ -32,6 +32,7 @@ class FeatureLayerList(FeatureListBase):
     def getFeatures(self):
         """Get the Features."""
         if self.featureLayer:
-            return [feature for feature in self.featureLayer.getFeaturesInCurrentTimeframe()]
+            return [feature for feature in self.featureLayer.getFeatures()]
+            # [feature for feature in self.featureLayer.getFeaturesInCurrentTimeframe()]
         else:
             return []

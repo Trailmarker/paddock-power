@@ -28,7 +28,7 @@ class FeatureListBase(QListWidget):
         for item in [self.item(i) for i in range(self.count())]:
             widget = self.itemWidget(item)
             item.setHidden(not filter.lower()
-                           in widget.feature.name.lower())
+                           in widget.feature.NAME.lower())
 
     def getFeatures():
         """Get the Features."""
@@ -58,7 +58,7 @@ class FeatureListBase(QListWidget):
             return
 
         # Sort Features alphabetically
-        features.sort(key=lambda x: x.name)
+        features.sort(key=lambda x: x.NAME)
 
         # Repopulate list since we have Features
         for feature in features:

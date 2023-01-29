@@ -23,10 +23,6 @@ class PaddockWidget(QWidget, FORM_CLASS):
 
         self.setupUi(self)
 
-        qgsDebug(f"PaddockWidget.__init__(), self.workspace = {self.workspace}")
-        qgsDebug(f"PaddockWidget.__init__(), self.workspace.paddockLayer = {self.workspace.paddockLayer}")
-        qgsDebug(f"PaddockWidget.__init__(), self.workspace.paddockLayer.countFeatures() = {self.workspace.paddockLayer.countFeatures()}")
-
         self.paddockList.paddockLayer = self.workspace.paddockLayer
         self.paddockList.featureLayer = self.workspace.derivedMetricPaddockLayer
 
@@ -43,6 +39,7 @@ class PaddockWidget(QWidget, FORM_CLASS):
             self.onPaddockFilterChanged)
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
+        
 
     @pyqtSlot(MetricPaddockPopupLayer)
     def setPaddockLandTypesLayer(self, layer=None):

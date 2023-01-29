@@ -22,7 +22,7 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
 
         self.waterpoint = waterpoint
 
-        self.nameLineEdit.setText(self.waterpoint.name)
+        self.nameLineEdit.setText(self.waterpoint.NAME)
 
         self.nearGrazingRadiusSpinBox.setMinimum(Waterpoint.NEAREST_GRAZING_RADIUS)
         self.nearGrazingRadiusSpinBox.setMaximum(Waterpoint.FARTHEST_GRAZING_RADIUS)
@@ -38,7 +38,7 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
         self.adjustMinimumFarGrazingRadius()
         self.adjustMaximumNearGrazingRadius()
 
-        self._waterpointType = waterpoint.waterpointType
+        self._waterpointType = waterpoint.WATERPOINT_TYPE
 
         for waterpointType in WaterpointType:
             self.waterpointTypeComboBox.addItem(waterpointType.value, waterpointType)

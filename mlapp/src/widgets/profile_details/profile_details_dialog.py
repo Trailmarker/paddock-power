@@ -16,7 +16,7 @@ class ProfileDetailsDialog(QDialog, FORM_CLASS):
         self.feature = feature
         self.setupUi(self)
 
-        self.setWindowTitle(f"Elevation Profile - {self.feature.title}")
+        self.setWindowTitle(f"Elevation Profile - {self.feature.TITLE}")
         self.profileDetails.setFeature(self.feature)
 
     def showEvent(self, event):

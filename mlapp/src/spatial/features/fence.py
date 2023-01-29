@@ -43,7 +43,7 @@ class Fence(StatusFeature):
             FeatureStatus.Built, FeatureStatus.Planned)
 
         # Get the whole current Paddock area - note the buffering here to reduce glitches
-        return QgsGeometry.unaryUnion(p.geometry.buffer(glitchBuffer, 10) for p in builtAndPlannedPaddocks)
+        return QgsGeometry.unaryUnion(p.GEOMETRY.buffer(glitchBuffer, 10) for p in builtAndPlannedPaddocks)
         # return property.buffer(-glitchBuffer, 10)
 
     def getPropertyNeighbourhood(self):
@@ -130,7 +130,7 @@ class Fence(StatusFeature):
         builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
             FeatureStatus.Built, FeatureStatus.Planned)
 
-        intersects = [p for p in builtAndPlannedPaddocks if fenceLine.intersects(p.geometry)]
+        intersects = [p for p in builtAndPlannedPaddocks if fenceLine.intersects(p.GEOMETRY)]
 
         # Crop the fence line to the property
         propertyBoundary = self.getPropertyGeometry(glitchBuffer=1.0)
@@ -147,13 +147,13 @@ class Fence(StatusFeature):
         # Find the Built paddocks crossed by the fence line that will be superseded
         crossedPaddocks = []
         for paddock in intersects:
-            polygon = paddock.geometry.asMultiPolygon()
+            polygon = paddock.GEOMETRY.asMultiPolygon()
             boundaryLine = QgsGeometry.fromMultiPolylineXY(polygon[0])
             intersection = boundaryLine.intersection(fenceLine)
             if intersection.isMultipart():
                 crossedPaddocks.append(paddock)
 
-        allCrossed = QgsGeometry.unaryUnion(p.geometry for p in crossedPaddocks)
+        allCrossed = QgsGeometry.unaryUnion(p.GEOMETRY for p in crossedPaddocks)
         allCrossedBuffered = allCrossed.buffer(1.0, 10)
         fenceLine = fenceLine.intersection(allCrossedBuffered)
 
@@ -196,14 +196,14 @@ class Fence(StatusFeature):
 
         # qgsDebug(
         # f"Fence.draftFeature getNewPaddocks {len(enclosingLines)},
-        # {len(newPaddocks)}, {[p.name for p in newPaddocks]}")
+        # {len(newPaddocks)}, {[p.NAME for p in newPaddocks]}")
 
         # Split Paddocks
         splitLines, supersededPaddocks = self.getCrossedPaddocks()
 
         # qgsDebug(
         # f"Fence.draftFeature getCrossedPaddocks {len(splitLines)},
-        # {len(supersededPaddocks)}, {[p.name for p in supersededPaddocks]}")
+        # {len(supersededPaddocks)}, {[p.NAME for p in supersededPaddocks]}")
 
         fenceLines = enclosingLines + splitLines
 
@@ -258,16 +258,16 @@ class Fence(StatusFeature):
                 FeatureStatus.Built, FeatureStatus.Planned)
 
             for crossedPaddock in supersededPaddocks:
-                crossedPaddockName = crossedPaddock.name
+                crossedPaddockName = crossedPaddock.NAME
 
                 # Deep copy all split paddocks
                 splitPaddocks = [self.paddockLayer.copyFeature(f)
                                  for f in builtAndPlannedPaddocks
-                                 if f.name == crossedPaddockName]
+                                 if f.NAME == crossedPaddockName]
 
                 for i, splitPaddock in enumerate(splitPaddocks):
                     defaultName = crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
-                    splitPaddock.name = defaultName
+                    splitPaddock.NAME = defaultName
                     # Note this is set explicitly to Drafted because
                     # the Paddock is derived in a dodgy way using splitFeatures
                     splitPaddock.status = FeatureStatus.Drafted
@@ -276,14 +276,14 @@ class Fence(StatusFeature):
 
         _, newPaddocks = self.getNewPaddocks()
 
-        # qgsDebug(f"Fence.planFeature: getNewPaddocks {len(newPaddocks)}, {[p.name for p in newPaddocks]}")
+        # qgsDebug(f"Fence.planFeature: getNewPaddocks {len(newPaddocks)}, {[p.NAME for p in newPaddocks]}")
 
         for paddock in newPaddocks:
             edits.editBefore(paddock.planFeature(self))
 
         _, supersededPaddocks = self.getCrossedPaddocks()
 
-        # qgsDebug(f"Fence.planFeature: getCrossedPaddocks {len(supersededPaddocks)}, {[p.name for p in supersededPaddocks]}")
+        # qgsDebug(f"Fence.planFeature: getCrossedPaddocks {len(supersededPaddocks)}, {[p.NAME for p in supersededPaddocks]}")
 
         for paddock in supersededPaddocks:
             edits.editBefore(paddock.supersedeFeature(self))
