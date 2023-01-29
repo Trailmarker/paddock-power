@@ -19,15 +19,13 @@ class WaterpointLayer(ImportedFeatureLayer):
                          workspaceFile,
                          layerName=WaterpointLayer.NAME,
                          styleName=WaterpointLayer.STYLE)
-        
+
         self.elevationLayer = elevationLayer
 
     def getSchema(self):
         """Return the Schema for this layer."""
         return WaterpointSchema
-    
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return WaterpointSchema.wkbType

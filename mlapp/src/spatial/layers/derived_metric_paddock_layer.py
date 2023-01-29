@@ -17,7 +17,7 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer):
 
     def prepareQuery(self, query, *dependentLayers):
         [paddockLayer, paddockLandTypesLayer] = self.names(*dependentLayers)
-        
+
         query = f"""
 select
 	"{paddockLayer}".geometry as geometry,
@@ -55,19 +55,17 @@ group by "{paddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
     def __init__(self,
                  paddockLayer: PaddockLayer,
                  paddockLandTypesLayer: PaddockLandTypesLayer):
-        
+
         super().__init__(MetricPaddock,
                          DerivedMetricPaddockLayer.NAME,
                          DerivedMetricPaddockLayer.STYLE,
                          paddockLayer,
                          paddockLandTypesLayer)
 
-
     def getSchema(self):
         """Return the Schema for this layer."""
         return MetricPaddockSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return MetricPaddockSchema.wkbType

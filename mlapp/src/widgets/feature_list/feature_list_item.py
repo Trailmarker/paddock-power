@@ -24,9 +24,9 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
         QWidget.__init__(self, parent)
         EditStateMachine.__init__(self)
-        
+
         qgsDebug(f"{self.__class__.__name__}.__inited__()!")
-        
+
         self.feature = feature
 
         # Swap between view and edit layouts in the Collapse widget content area

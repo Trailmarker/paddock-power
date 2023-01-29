@@ -115,7 +115,6 @@ def resolveWorkspaceFile(projectFilePath=None):
     f"""Get where the current {PLUGIN_NAME} GeoPackage should be."""
     projectFilePath = projectFilePath or resolveProjectFile()
     return f"{path.splitext(projectFilePath)[0]}.gpkg" if projectFilePath else None
-             
 
 
 def resolveStylePath(styleName):

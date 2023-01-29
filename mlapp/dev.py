@@ -36,6 +36,7 @@ def container():
     f"""Get the {PLUGIN_NAME} container."""
     return plugin().container
 
+
 def workspace():
     f"""Get the current {PLUGIN_NAME} Workspace."""
     return plugin().workspace
@@ -45,9 +46,11 @@ def workspaceLayers():
     f"""Get all layers in the current workspace."""
     return workspace().workspaceLayers
 
+
 def byType(layerType):
     f"""Get the layer with the given type in the current workspace."""
     return workspace().workspaceLayers.layer(layerType)
+
 
 def show(layer):
     f"""Show the given layer."""
@@ -126,7 +129,7 @@ def checkLayers():
 # def testImportKidmanLandTypes():
 #     kidmanLandTypeFieldMap["LAND_UNIT"] = "Land Type Name"
 #     landTypes.importFeatures(kidmanLandTypes, kidmanLandTypeFieldMap)
-    
+
 # def testImportKidmanWaterpoints():
 #     kidmanWaterpointFieldMap["NAME"] = "Name"
 #     kidmanWaterpointFieldMap["LAYER"] = "Waterpoint Type"

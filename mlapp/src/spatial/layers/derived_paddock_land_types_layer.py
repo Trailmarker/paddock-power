@@ -11,6 +11,7 @@ from .land_type_layer import LandTypeLayer
 from .paddock_layer import PaddockLayer
 from .watered_area_layer import WateredAreaLayer
 
+
 class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 
     NAME = "Derived Paddock Land Types"
@@ -19,7 +20,7 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
     def prepareQuery(self, query, *dependentLayers):
 
         [conditionTable, paddockLayer, landTypeLayer, wateredAreaLayer] = self.names(*dependentLayers)
-        
+
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
         _WATERED_FACTOR = "WateredFactor"
@@ -113,7 +114,7 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
                  paddockLayer: PaddockLayer,
                  landTypeLayer: LandTypeLayer,
                  wateredAraLayer: WateredAreaLayer):
-  
+
         super().__init__(PaddockLandType,
                          DerivedPaddockLandTypesLayer.NAME,
                          DerivedPaddockLandTypesLayer.STYLE,
@@ -122,12 +123,10 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
                          landTypeLayer,
                          wateredAraLayer)
 
-
     def getSchema(self):
         """Return the Schema for this layer."""
         return PaddockLandTypeSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return PaddockLandTypeSchema.wkbType

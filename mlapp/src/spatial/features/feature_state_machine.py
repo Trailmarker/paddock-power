@@ -10,7 +10,7 @@ class FeatureStateMachine(StateMachine):
     def __init__(self):
         self._status = FeatureStatus.Undefined
         self._statusChangedHandlers = []
-        
+
     # State machine interface
     __TRANSITIONS = {
         (FeatureStatus.Undefined, FeatureAction.draft): FeatureStatus.Drafted,
@@ -67,7 +67,7 @@ class FeatureStateMachine(StateMachine):
     @property
     def statusType(self):
         return FeatureStatus
-    
+
     @property
     def status(self):
         return self.STATUS
@@ -75,16 +75,15 @@ class FeatureStateMachine(StateMachine):
     @status.setter
     def status(self, s):
         self.STATUS = s
-        
+
     @property
     def statusChanged(self):
         def __callAll():
             for handler in self._statusChangedHandlers:
                 handler(self.status)
-        return __callAll    
+        return __callAll
 
     @statusChanged.setter
     def statusChanged(self, handler):
         if not handler in self._statusChangedHandlers:
             self._statusChangedHandlers.append(handler)
-

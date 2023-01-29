@@ -17,14 +17,11 @@ class PipelineLayer(ImportedFeatureLayer):
                          workspaceFile,
                          layerName=PipelineLayer.NAME,
                          styleName=PipelineLayer.STYLE)
-        
+
     def getSchema(self):
         """Return the Schema for this layer."""
         return PipelineSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return PipelineSchema.wkbType
-
-  

@@ -10,6 +10,7 @@ from .derived_feature_layer import DerivedFeatureLayer
 from .paddock_layer import PaddockLayer
 from .waterpoint_layer import WaterpointLayer
 
+
 class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 
     NAME = "Derived Waterpoint Buffers"
@@ -17,7 +18,7 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 
     def prepareQuery(self, query, *dependentLayers):
         [paddockLayer, waterpointLayer] = self.names(*dependentLayers)
-        
+
         _BUFFERS = "Buffers"
         _FAR_BUFFER = "FarBuffer"
         _NEAR_BUFFER = "NearBuffer"
@@ -94,7 +95,7 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
     def __init__(self,
                  paddockLayer: PaddockLayer,
                  waterpointLayer: WaterpointLayer):
-        
+
         super().__init__(
             WaterpointBuffer,
             DerivedWaterpointBufferLayer.NAME,
@@ -102,12 +103,10 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
             paddockLayer,
             waterpointLayer)
 
-
     def getSchema(self):
         """Return the Schema for this layer."""
         return WaterpointBufferSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return WaterpointBufferSchema.wkbType

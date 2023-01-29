@@ -27,10 +27,10 @@ class MetricPaddockListItem(FeatureListItem):
     def makeEditWidget(self, metricPaddock):
         """Create a new edit widget for the given Metric Paddock, that will save edits to the corresponding 'underlying' Paddock."""
         qgsDebug(f"{self.__class__.__name__}.makeEditWidget({metricPaddock})")
-        
+
         editWidget = MetricPaddockDetailsEdit(metricPaddock)
         editWidget.paddockLayer = self.paddockLayer
-        
+
         qgsDebug(f"{self.__class__.__name__}.makeEditWidget({metricPaddock})")
-        
+
         return editWidget

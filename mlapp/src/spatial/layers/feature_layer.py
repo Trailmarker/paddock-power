@@ -15,9 +15,9 @@ class FeatureLayer(QgsVectorLayer):
     selectedFeaturesChanged = pyqtSignal(list)
     currentTimeframeChanged = pyqtSignal(Timeframe)
     workspaceConnectionChanged = pyqtSignal()
-    
+
     featuresChanged = pyqtSignal(list)
-    
+
     popupLayerAdded = pyqtSignal(Feature, QObject)
     popupLayerRemoved = pyqtSignal(Feature)
 

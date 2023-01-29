@@ -26,8 +26,12 @@ Elevation = CalculatedField(propertyName="ELEVATION", name=ELEVATION, defaultVal
 ErosionRisk = StringField(propertyName="EROSION_RISK", name=EROSION_RISK)
 EstimatedCapacity = CalculatedField(propertyName="ESTIMATED_CAPACITY", name=ESTIMATED_CAPACITY, dps=0)
 EstimatedCapacityPerArea = CalculatedField(propertyName="ESTIMATED_CAPACITY_PER_AREA",
-                                        name=ESTIMATED_CAPACITY_PER_AREA, dps=1)
-FarGrazingRadius = MeasureField(propertyName="FAR_GRAZING_RADIUS", name=FAR_GRAZING_RADIUS, defaultValue="5000.0", dps=0)
+                                           name=ESTIMATED_CAPACITY_PER_AREA, dps=1)
+FarGrazingRadius = MeasureField(
+    propertyName="FAR_GRAZING_RADIUS",
+    name=FAR_GRAZING_RADIUS,
+    defaultValue="5000.0",
+    dps=0)
 Fid = IdField("FID", name=FID)
 LandscapeClass = StringField(propertyName="LANDSCAPE_CLASS", name=LANDSCAPE_CLASS)
 LandType = IdField(propertyName="LAND_TYPE", name=LAND_TYPE)
@@ -54,7 +58,7 @@ PaddockStatus = DomainField(
 Perimeter = CalculatedField(propertyName="PERIMETER", name=PERIMETER, dps=2)
 PotentialCapacity = CalculatedField(propertyName="POTENTIAL_CAPACITY", name=POTENTIAL_CAPACITY, dps=0)
 PotentialCapacityPerArea = CalculatedField(propertyName="POTENTIAL_CAPACITY_PER_AREA",
-                                        name=POTENTIAL_CAPACITY_PER_AREA, dps=1)
+                                           name=POTENTIAL_CAPACITY_PER_AREA, dps=1)
 Reference = StringField(propertyName="REFERENCE", name=REFERENCE)
 RequiredName = StringField(propertyName="NAME", name=NAME, required=True)
 Status = DomainField(propertyName="STATUS", name=STATUS, domainType=FeatureStatus, defaultValue=FeatureStatus.Undefined)

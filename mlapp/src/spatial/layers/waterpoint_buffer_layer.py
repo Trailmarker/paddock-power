@@ -22,15 +22,10 @@ class WaterpointBufferLayer(PersistedDerivedFeatureLayer):
                          styleName=WaterpointBufferLayer.STYLE,
                          derivedLayer=derivedWaterpointBufferLayer)
 
-
     def getSchema(self):
         """Return the Schema for this layer."""
         return WaterpointBufferSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return WaterpointBufferSchema.wkbType
-
-  
-

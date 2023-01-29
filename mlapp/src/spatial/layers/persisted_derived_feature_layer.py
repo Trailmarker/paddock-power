@@ -16,13 +16,12 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         # Applies the editor widgets (TODO need to make read only for a derived layer?)
         # Optionally applies a style
         self.derivedLayer = derivedLayer
-        
+
         super().__init__(featureType, workspaceFile, layerName, styleName)
         self.setReadOnly(True)  # TODO?
-        
+
         # Initial persistence
         # self.repersistDerivedFeatures(None, [])
-  
 
     @pyqtSlot()
     def repersistDerivedFeatures(self, layer, idList):
@@ -38,7 +37,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         try:
             with Edits.editAndCommit(self):
                 self.dataProvider().truncate()
-                
+
                 derivedFeatures = list(derivedLayer.getFeatures())
                 for derivedFeature in derivedFeatures:
                     feature = self.copyFeature(derivedFeature)
@@ -47,10 +46,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
             self.setReadOnly(True)
             self.featuresChanged.emit([])
             self.triggerRepaint()
-            
-            
+
     @pyqtSlot()
-    def onWorkspaceConnectionChanged(self):      
+    def onWorkspaceConnectionChanged(self):
         return super().onWorkspaceConnectionChanged()
-    
-    

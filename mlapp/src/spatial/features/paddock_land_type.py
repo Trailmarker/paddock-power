@@ -3,6 +3,7 @@ from .persisted_feature import PersistedFeature
 from ..fields.schemas import PaddockLandTypeSchema
 from ..layers.condition_table import ConditionTable
 
+
 @PaddockLandTypeSchema.addSchema()
 class PaddockLandType(PersistedFeature):
 

@@ -17,6 +17,7 @@ from ..spatial.layers.waterpoint_layer import WaterpointLayer
 
 from .type_dependency_graph import TypeDependencyGraph
 
+
 class LayerDependencyGraph(TypeDependencyGraph):
     """A bit like a makefile. Describe the dependencies between layers and the order in which they should be built."""
 
@@ -32,19 +33,19 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(WaterpointBufferLayer, [DerivedWaterpointBufferLayer])
         self.addDependencies(DerivedWateredAreaLayer, [PaddockLayer, WaterpointBufferLayer])
         self.addDependencies(WateredAreaLayer, [DerivedWateredAreaLayer])
-        self.addDependencies(DerivedPaddockLandTypesLayer, [ConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
-        self.addDependencies(PaddockLandTypesLayer, [DerivedPaddockLandTypesLayer])          
+        self.addDependencies(
+            DerivedPaddockLandTypesLayer, [
+                ConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
+        self.addDependencies(PaddockLandTypesLayer, [DerivedPaddockLandTypesLayer])
         self.addDependencies(DerivedMetricPaddockLayer, [PaddockLayer, PaddockLandTypesLayer])
-        self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, DerivedMetricPaddockLayer])  
+        self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, DerivedMetricPaddockLayer])
         self.addDependencies(PipelineLayer, [ElevationLayer])
         self.addDependencies(DerivedBoundaryLayer, [PaddockLayer])
-
-
 
     def loadOrder(self):
         """Return a list of layer types in the order they should be initialised."""
         return self.sort()
-    
+
     def unloadOrder(self):
         """Return a list of layer types in the order they should be unloaded."""
         return list(reversed(self.loadOrder()))

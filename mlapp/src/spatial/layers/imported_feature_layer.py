@@ -22,18 +22,18 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
         mappedFeature = fieldMap.mapFeature(importFeature, targetFeature)
         feature = self.wrapFeature(mappedFeature)
         feature.clearId()
-        
+
         # Default imported data to 'Built' status - TODO might need other things here?
         if isinstance(feature, StatusFeature):
             feature.status = FeatureStatus.Built
-        
+
         return feature
 
     @pyqtSlot()
     def importFeatures(self, importLayer, fieldMap):
         """Import all Features from the specified layer, applying the given field map."""
         qgsInfo(f"Importing features for layer {self.name()} …")
-        
+
         wasReadOnly = self.readOnly()
         self.setReadOnly(False)
         try:
@@ -48,5 +48,3 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
             self.setReadOnly(wasReadOnly)
             self.featuresChanged.emit([])
             self.triggerRepaint()
-
-

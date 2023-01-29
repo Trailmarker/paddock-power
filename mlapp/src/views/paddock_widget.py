@@ -39,7 +39,6 @@ class PaddockWidget(QWidget, FORM_CLASS):
             self.onPaddockFilterChanged)
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
-        
 
     @pyqtSlot(MetricPaddockPopupLayer)
     def setPaddockLandTypesLayer(self, layer=None):

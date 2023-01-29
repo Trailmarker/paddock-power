@@ -17,12 +17,10 @@ class LandTypeLayer(ImportedFeatureLayer):
 
         self.setReadOnly(True)
 
-    
     def getSchema(self):
         """Return the Schema for this layer."""
         return LandTypeSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return LandTypeSchema.wkbType

@@ -11,6 +11,7 @@ from .derived_feature_layer import DerivedFeatureLayer
 from .paddock_layer import PaddockLayer
 from .waterpoint_buffer_layer import WaterpointBufferLayer
 
+
 class DerivedWateredAreaLayer(DerivedFeatureLayer):
 
     NAME = "Derived Watered Areas"
@@ -18,7 +19,7 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
 
     def prepareQuery(self, query, *dependentLayers):
         [paddockLayer, waterpointBufferLayer] = self.names(*dependentLayers)
-        
+
         _NEAR_WATERED_AREA = "NearWateredArea"
         _FAR_WATERED_AREA = "FarWateredArea"
 
@@ -109,17 +110,15 @@ where not exists (
 
         super().__init__(
             WateredArea,
-			DerivedWateredAreaLayer.NAME,
-			DerivedWateredAreaLayer.STYLE,
-			paddockLayer,
-			waterpointBufferLayer)
-
+            DerivedWateredAreaLayer.NAME,
+            DerivedWateredAreaLayer.STYLE,
+            paddockLayer,
+            waterpointBufferLayer)
 
     def getSchema(self):
         """Return the Schema for this layer."""
         return WateredAreaSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return WateredAreaSchema.wkbType

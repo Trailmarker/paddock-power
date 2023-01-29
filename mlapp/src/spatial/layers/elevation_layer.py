@@ -11,6 +11,7 @@ from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME, qgsError, resolveStylePath
 from ..fields.timeframe import Timeframe
 
+
 class ElevationLayer(QgsRasterLayer):
 
     NAME = "Elevation Mapping"
@@ -28,7 +29,6 @@ class ElevationLayer(QgsRasterLayer):
         """Return a URL for a raster layer in a GeoPackage file."""
         # different from QgsVectorLayer GeoPackage URL format!
         return f"GPKG:{workspaceFile}:{layerName}"
-
 
     @classmethod
     def detectInGeoPackage(_, workspaceFile):
@@ -53,44 +53,41 @@ class ElevationLayer(QgsRasterLayer):
         except BaseException:
             return None
 
-
     def __init__(self, workspaceFile, layerName=None, *args, **kwargs):
         """Create a new elevation layer."""
 
         self._workspace = None
-        
+
         # Route changes to this layer *through* the Paddock Power
         # workspace so other objects can respond
         self._blockWorkspaceConnnection = False
 
         layerName = layerName or ElevationLayer.NAME
-        
+
         styleName = kwargs.pop("styleName", ElevationLayer.STYLE)
 
         # Note ths URL format is different from QgsVectorLayer!
         rasterUrl = ElevationLayer._rasterGpkgUrl(workspaceFile, layerName)
         super().__init__(rasterUrl, baseName=layerName)
-        
+
         self.applyNamedStyle(styleName)
-        
+
         self.addInBackground()
 
     @cached_property
     def typeName(self):
         """Return the FeatureLayer's type name."""
         return type(self).__name__
-    
-    
+
     def __repr__(self):
         """Return a string representation of the Field."""
         return f"{self.typeName}(name={self.name()})"
 
-
     def __str__(self):
         """Convert the Field to a string representation."""
         return repr(self)
-   
-    # Workspace interface 
+
+    # Workspace interface
     @property
     def connectedToWorkspace(self):
         """Are we both connected to the workspace and not temporarily blocked."""
@@ -106,12 +103,10 @@ class ElevationLayer(QgsRasterLayer):
         """Get the current timeframe for this layer (same as that of the workspace)."""
         return self.workspace.currentTimeframe if self.connectedToWorkspace else Timeframe.Undefined
 
-
     def connectWorkspace(self, workspace):
         """Hook it up to uor veins."""
         self._workspace = workspace
         self.workspaceConnectionChanged.emit()
-
 
     def workspaceLayer(self, layerType):
         """Get a layer we depend on to work with by type."""
@@ -119,32 +114,27 @@ class ElevationLayer(QgsRasterLayer):
             return self.workspace.workspaceLayers.getLayer(layerType)
         else:
             qgsError(f"{self.typeName}.depend({layerType}): no workspace connection")
-    
-    
+
     def findGroup(self, name=None):
         """Find the group for this layer in the map."""
         return QgsProject.instance().layerTreeRoot().findGroup(name) if name else None
 
-    
     def addInBackground(self):
         """Add this layer to the map in the background."""
         QgsProject.instance().addMapLayer(self, False)
-        
-        
+
     def addToMap(self, group=None):
         """Ensure the layer is in the map in the target group, adding it if necessary."""
         group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
         group.addLayer(self)
-        
-    
+
     def removeFromMap(self, group):
         """Remove the layer from the map in the target group, if it is there."""
         group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
         node = group.findLayer(self.id())
         if node:
             group.removeChildNode(node)
-    
-    
+
     def setVisible(self, group, visible):
         """Set the layer's visibility."""
         group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
@@ -152,7 +142,6 @@ class ElevationLayer(QgsRasterLayer):
         if node:
             node.setItemVisibilityChecked(visible)
 
-    
     def applyNamedStyle(self, styleName):
         """Apply a style to the layer."""
         # Optionally apply a style to the layer
@@ -160,13 +149,13 @@ class ElevationLayer(QgsRasterLayer):
             stylePath = resolveStylePath(styleName)
             self.loadNamedStyle(stylePath)
         self.triggerRepaint()
-    
-    @pyqtSlot(Timeframe)  
+
+    @pyqtSlot(Timeframe)
     def onCurrentTimeframeChanged(self, timeframe):
         """Handle the current timeframe changing."""
         pass
-        
-    @pyqtSlot()   
+
+    @pyqtSlot()
     def onWorkspaceConnectionChanged(self):
         """Handle the workspace connection changing."""
         pass

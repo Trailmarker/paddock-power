@@ -49,7 +49,7 @@ class Workspace(QObject):
         self.workspaceFile = workspaceFile
         self.workspaceLayers = workspaceLayers
         self.layerDependencyGraph = LayerDependencyGraph()
-            
+
         self.iface = iface
         self.currentTool = None
         self.currentTimeframe = Timeframe.Current
@@ -58,8 +58,6 @@ class Workspace(QObject):
         self.selectedFeature = None
 
         self.currentTimeframeChanged.connect(self.deselectFeature)
-
-
 
         # For convenient reference
         self.landTypeLayer = self.workspaceLayers.layer(LandTypeLayer)
@@ -80,11 +78,9 @@ class Workspace(QObject):
 
         self.addToMap()
 
-
     def workspaceLayer(self, layerType):
         """Retrieve a layer by type."""
         return self.workspaceLayers.layer(layerType)
-
 
     @pyqtSlot()
     def importData(self):
@@ -94,7 +90,6 @@ class Workspace(QObject):
             self.importDialog.setAttribute(Qt.WA_DeleteOnClose)
         self.importDialog.show()
 
-
     def findGroup(self):
         """Find this workspace's group in the Layers panel."""
         group = QgsProject.instance().layerTreeRoot().findGroup(self.workspaceName)
@@ -102,25 +97,30 @@ class Workspace(QObject):
             group = QgsProject.instance().layerTreeRoot().insertGroup(0, self.workspaceName)
         return group
 
-
     def addToMap(self, group=None):
         """Add the visible layers of the given type to the QGIS map."""
-  
+
         self.removeFromMap()
         group = group or self.findGroup()
-  
-        layerStackingOrder = [WaterpointLayer, PipelineLayer, FenceLayer, WateredAreaLayer, LandTypeLayer, DerivedBoundaryLayer, DerivedMetricPaddockLayer, ElevationLayer]
+
+        layerStackingOrder = [
+            WaterpointLayer,
+            PipelineLayer,
+            FenceLayer,
+            WateredAreaLayer,
+            LandTypeLayer,
+            DerivedBoundaryLayer,
+            DerivedMetricPaddockLayer,
+            ElevationLayer]
         availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in layerStackingOrder] if l]
-               
+
         for layer in availableLayers:
-            layer.addToMap(group)  
-    
-    
+            layer.addToMap(group)
+
     def removeFromMap(self):
         """Remove this workspace from the current map view."""
         group = self.findGroup()
         QgsProject.instance().layerTreeRoot().removeChildNode(group)
-    
 
     def setTool(self, tool):
         """Set the current map tool for this workspace."""
@@ -132,7 +132,6 @@ class Workspace(QObject):
         self.currentTool = tool
         self.iface.mapCanvas().setMapTool(self.currentTool)
 
-
     def unsetTool(self):
         """Unset the current map tool for this workspace."""
         if self.currentTool is not None:
@@ -140,7 +139,6 @@ class Workspace(QObject):
             self.currentTool.dispose()
             self.iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
-
 
     def setCurrentTimeframe(self, timeframe):
         """Set the current timeframe for this workspace."""
@@ -153,17 +151,14 @@ class Workspace(QObject):
             self.currentTimeframe = timeframe
             self.currentTimeframeChanged.emit(timeframe)
 
-
     def deselectFeature(self):
         """Deselect any currently selected Feature."""
         self.selectedFeaturesChanged.emit([])
-
 
     def selectFeature(self, feature):
         """Select a feature."""
         self.selectedFeature = feature
         self.selectedFeaturesChanged.emit([feature])
-
 
     @pyqtSlot()
     def unload(self):
@@ -173,13 +168,12 @@ class Workspace(QObject):
         if self.view:
             self.view.close()
             self.iface.removeDockWidget(self.view)
-            
+
         self.removeFromMap()
-        
+
         for layerType in self.layerDependencyGraph.unloadOrder():
             self.workspaceLayers.unloadLayer(layerType)
         self.workspaceUnloading.emit()
-        
 
     @pyqtSlot(FeatureLayer, list)
     def onLayerSelectionChanged(self, layer, selection):
@@ -188,7 +182,6 @@ class Workspace(QObject):
             if feature is not None:
                 self.selectFeature(feature)
 
-
     @pyqtSlot()
     def openFeatureView(self):
         """Run method that loads and opens the Feature View."""
@@ -196,5 +189,3 @@ class Workspace(QObject):
         self.view.setAttribute(Qt.WA_DeleteOnClose)
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.view)
         self.view.show()
-        
-

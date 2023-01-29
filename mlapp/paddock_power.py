@@ -198,7 +198,7 @@ class PaddockPower(QObject):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
 
         self.unloadWorkspace()
-        
+
         projectFile = resolveProjectFile()
         if projectFile is None:
             qgsInfo(f"{PLUGIN_NAME} no QGIS project file located …")

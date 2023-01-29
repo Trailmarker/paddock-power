@@ -79,4 +79,3 @@ class StatusFeature(PersistedFeature, FeatureStateMachine, metaclass=QtAbstractM
     def archiveFeature(self):
         """Archive a Feature."""
         return Edits.upsert(self)
-

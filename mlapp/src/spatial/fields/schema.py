@@ -15,7 +15,7 @@ class Schema(list):
 
     def hasField(self, field):
         return any(field == f.name() for f in self)
-    
+
     def toQgsFields(self):
         fields = QgsFields()
         for f in self:
@@ -30,7 +30,7 @@ class Schema(list):
             setattr(cls, "getSchema", classmethod(lambda _: self))
             setattr(cls, "getWkbType", classmethod(lambda _: self.wkbType))
             return cls
-        
+
         return _addSchema
 
     def checkFields(self, fields):
@@ -38,4 +38,3 @@ class Schema(list):
         missing = [field for field in self if field.name() not in [f.name() for f in fields]]
         extra = [field for field in fields if field.name() not in [f.name() for f in self]]
         return missing, extra
-        

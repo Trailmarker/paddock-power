@@ -11,7 +11,6 @@ from ..fields.names import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, ST
 from ..fields.timeframe import Timeframe
 
 
-
 class Feature(QgsFeature):
 
     @classmethod
@@ -22,17 +21,18 @@ class Feature(QgsFeature):
 
     def __init__(self, featureLayerType, existingFeature):
         """Create a new Feature."""
-        
+
         self.featureLayerType = featureLayerType
 
         if isinstance(existingFeature, QgsFeature):
             QgsFeature.__init__(self, existingFeature)
-        
+
             # Incoming QgsFeature must have the correct schema
             missingFields, _ = self.getSchema().checkFields(self.fields())
             if missingFields:
-                raise Glitch(f"{self.typeName}.__init__({existingFeature}) newly created with missing fields: {missingFields}")
-            
+                raise Glitch(
+                    f"{self.typeName}.__init__({existingFeature}) newly created with missing fields: {missingFields}")
+
             self.FID = existingFeature.id()
 
         elif existingFeature is not None:
@@ -57,7 +57,7 @@ class Feature(QgsFeature):
         """Get a layer we depend on to work with by type."""
         return self.featureLayer.depend(layerType)
 
-    #TODO cache?
+    # TODO cache?
     @property
     def featureLayer(self):
         """Return the FeatureLayer that contains this Feature."""
@@ -103,37 +103,37 @@ class Feature(QgsFeature):
     def hasArea(self):
         """Return True if the Feature has an area."""
         return self.hasField(AREA)
-    
+
     @cached_property
     def hasElevation(self):
         """Return True if the Feature has an elevation."""
         return self.hasField(ELEVATION)
-    
+
     @cached_property
     def hasFid(self):
         """Return True if the Feature has a fid."""
         return self.hasField(FID)
-    
+
     @cached_property
     def hasLength(self):
         """Return True if the Feature has a length."""
         return self.hasField(LENGTH)
-    
+
     @cached_property
     def hasLongitude(self):
         """Return True if the Feature has a longitude."""
         return self.hasField(LONGITUDE)
-    
+
     @cached_property
     def hasLatitude(self):
         """Return True if the Feature has a latitude."""
         return self.hasField(LATITUDE)
-    
+
     @cached_property
     def hasPerimeter(self):
         """Return True if the Feature has a perimeter."""
         return self.hasField(PERIMETER)
-        
+
     @cached_property
     def hasTimeframe(self):
         """Return True if this layer has a """
@@ -143,7 +143,7 @@ class Feature(QgsFeature):
     def hasStatus(self):
         """Return True if this layer has a status."""
         return self.hasField(STATUS)
-        
+
     def matchTimeframe(self, timeframe):
         """Return True if this feature's timeframe or status matches the supplied timeframe."""
         if self.hasTimeframe:

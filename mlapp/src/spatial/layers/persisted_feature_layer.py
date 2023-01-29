@@ -38,9 +38,9 @@ class PersistedFeatureLayer(FeatureLayer):
         return False
 
     def createInGeoPackage(self, workspaceFile, layerName):
-        
+
         qgsDebug(f"{self.__class__.__name__}.createInGeoPackage(workspaceFile={workspaceFile}, layerName={layerName})")
-        
+
         wkbType = self.getWkbType()
         schema = self.getSchema()
 
@@ -56,7 +56,7 @@ class PersistedFeatureLayer(FeatureLayer):
         layer.commitChanges()
 
         # layer.startEditing()
-        
+
         # for field in self.getSchema():
         #     field.setupLayer(layer)
         # layer.commitChanges()
@@ -94,10 +94,9 @@ class PersistedFeatureLayer(FeatureLayer):
             self.createInGeoPackage(workspaceFile, layerName)
         else:
             qgsInfo(f"{self.__class__.__name__} found in {PLUGIN_NAME} GeoPackage, loading …")
-            
 
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
-        
+
         super().__init__(featureType, self.gpkgUrl, layerName, "ogr", styleName=styleName)
 
         # TODO
@@ -122,13 +121,11 @@ class PersistedFeatureLayer(FeatureLayer):
         for field in self.getSchema():
             field.setupLayer(self)
 
-
     def addFeatures(self, features):
         """Add a batch of features to this layer."""
         for f in features:
             f.clearId()
             self.addFeature(f)
-
 
     def copyFeature(self, feature):
         """Copy a feature using the logic (eg dependent layers) of this layer."""
@@ -143,14 +140,12 @@ class PersistedFeatureLayer(FeatureLayer):
         copyFeature.clearId()
         return copyFeature
 
-
     def makeFeature(self):
         """Make a new PersistedFeature in this layer."""
         return self.wrapFeature(None)
 
-
     # TODO
+
     def deleteFeature(self, feature):
         """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.FID)
-

@@ -25,11 +25,7 @@ class WateredAreaLayer(PersistedDerivedFeatureLayer):
     def getSchema(self):
         """Return the Schema for this layer."""
         return WateredAreaSchema
-        
-    
+
     def getWkbType(self):
         """Return the WKB type for this layer."""
         return WateredAreaSchema.wkbType
-
-  
-

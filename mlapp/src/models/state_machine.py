@@ -68,7 +68,7 @@ class StateMachine(ABC):
     def statusChanged(self):
         if not hasattr(self, "_statusChangedHandlers"):
             setattr(self, "_statusChangedHandlers", [])
-        
+
         def __callAll():
             badHandlers = []
             for handler in self._statusChangedHandlers:
@@ -78,14 +78,14 @@ class StateMachine(ABC):
                     badHandlers.append(handler)
                 finally:
                     self._statusChangedHandlers = [h for h in self._statusChangedHandlers if h not in badHandlers]
-                    
-        return __callAll    
+
+        return __callAll
 
     @statusChanged.setter
     def statusChanged(self, handler):
         if not hasattr(self, "_statusChangedHandlers"):
             setattr(self, "_statusChangedHandlers", [])
-        
+
         if not handler in self._statusChangedHandlers:
             self._statusChangedHandlers.append(handler)
 
