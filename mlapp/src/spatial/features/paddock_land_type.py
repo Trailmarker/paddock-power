@@ -21,7 +21,7 @@ class PaddockLandType(PersistedFeature):
 
     @property
     def conditionTable(self):
-        return self.workspaceLayer(ConditionTable)
+        return self.featureLayer.workspace.conditionTable
 
     @classmethod
     def focusOnSelect(cls):

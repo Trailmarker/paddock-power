@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import QObject, pyqtSignal
+
+from ...models.qt_abstract_meta import QtAbstractMeta
 from ...models.state_machine import StateMachine
 from ..fields.feature_status import FeatureStatus
 from ..fields.timeframe import Timeframe
 from .feature_action import FeatureAction
 
 
-class FeatureStateMachine(StateMachine):
-
-    def __init__(self):
-        self._status = FeatureStatus.Undefined
-        self._statusChangedHandlers = []
+class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
+    
+    _stateChanged = pyqtSignal()
+    
+    def __init__(self, feature):
+        QObject.__init__(self)
+        super().__init__()
+        self.feature = feature
 
     # State machine interface
     __TRANSITIONS = {
@@ -38,7 +44,7 @@ class FeatureStateMachine(StateMachine):
 
     def doAction(self, action):
         """Perform an action on the Feature state machine and update the current timeframe if necessary."""
-        newTimeframe = self.featureLayer.currentTimeframe
+        newTimeframe = self.feature.featureLayer.timeframe
         actionPermitted = self.isPermitted(action)
 
         if actionPermitted:
@@ -54,7 +60,7 @@ class FeatureStateMachine(StateMachine):
         super().doAction(action)
 
         if actionPermitted:
-            self.featureLayer.setCurrentTimeframe(newTimeframe)
+            self.feature.featureLayer.workspace.setTimeframe(newTimeframe)
 
     @property
     def transitions(self):
@@ -70,20 +76,26 @@ class FeatureStateMachine(StateMachine):
 
     @property
     def status(self):
-        return self.STATUS
+        return self.feature.STATUS
 
     @status.setter
-    def status(self, s):
-        self.STATUS = s
+    def status(self, stat):
+        self.feature.STATUS = stat
 
     @property
-    def statusChanged(self):
-        def __callAll():
-            for handler in self._statusChangedHandlers:
-                handler(self.status)
-        return __callAll
+    def STATUS(self):
+        return self.feature.STATUS
 
-    @statusChanged.setter
-    def statusChanged(self, handler):
-        if not handler in self._statusChangedHandlers:
-            self._statusChangedHandlers.append(handler)
+    @STATUS.setter
+    def status(self, s):
+        self.feature.STATUS = s
+        
+    def displayName(self):
+        return self.feature.displayName()
+
+    @property
+    def stateChanged(self):
+        return self._stateChanged
+    
+    def emitStateChanged(self):
+        self.stateChanged.emit()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSlot
 
-from ...utils import PLUGIN_NAME, qgsDebug, qgsInfo
+from ...utils import PLUGIN_NAME, qgsInfo
 from ..features.edits import Edits
 from ..features.status_feature import StatusFeature
 from ..fields.feature_status import FeatureStatus
@@ -10,10 +10,10 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class ImportedFeatureLayer(PersistedFeatureLayer):
 
-    def __init__(self, featureType, workspaceFile, layerName, styleName=None):
+    def __init__(self, workspaceFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""
 
-        super().__init__(featureType, workspaceFile, layerName, styleName)
+        super().__init__(workspaceFile, layerName, styleName)
 
     def mapFeature(self, importFeature, fieldMap):
         f"""Map a QgsFeature to a {PLUGIN_NAME} Feature."""
@@ -25,7 +25,7 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
 
         # Default imported data to 'Built' status - TODO might need other things here?
         if isinstance(feature, StatusFeature):
-            feature.status = FeatureStatus.Built
+            feature.STATUS = FeatureStatus.Built
 
         return feature
 
@@ -40,7 +40,6 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
             with Edits.editAndCommit([self], emitFeaturesChanged=True):
                 self.dataProvider().truncate()
                 features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
-                qgsDebug(f"Features to import: {[format(f) for f in features]}")
                 for feature in features:
                     feature.upsert()
                 return features

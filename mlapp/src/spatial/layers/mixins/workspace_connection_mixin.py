@@ -6,7 +6,6 @@ from ....utils import qgsError, qgsDebug
 
 
 class WorkspaceConnectionMixin:
-    workspaceConnectionChanged = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -27,20 +26,16 @@ class WorkspaceConnectionMixin:
     def connectWorkspace(self, workspace):
         """Hook it up to uor veins."""
         self._workspace = workspace
-        self.workspaceConnectionChanged.emit()
+        self.onWorkspaceConnectionChanged()
 
     def workspaceLayer(self, layerType):
         """Get a layer we depend on to work with by type."""
         if self.connectedToWorkspace:
             return self.workspace.workspaceLayers.layer(layerType)
         else:
-            qgsError(f"{self.typeName}.workspaceLayer({layerType}): no workspace connection")
+            qgsError(f"{type(self).__name__}.workspaceLayer({layerType}): no workspace connection")
+            return None
 
-    @pyqtSlot()
     def onWorkspaceConnectionChanged(self):
         """Handle the workspace changing."""
-        qgsDebug(f"{self.typeName}.onWorkspaceConnectionChanged(): {self.workspace}")
-        if self.workspace:
-            self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
-            self.workspace.currentTimeframeChanged.connect(self.onCurrentTimeframeChanged)
-            self.currentTimeframeChanged.connect(self.workspace.setCurrentTimeframe)
+        pass

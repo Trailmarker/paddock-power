@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>699</width>
+    <width>826</width>
     <height>307</height>
    </rect>
   </property>
@@ -43,8 +43,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="MetricPaddockLayerList" name="paddockList">
-        </widget>
+        <widget class="MetricPaddockLayerList" name="paddockList"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -82,7 +81,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="paddockLandTypeListGroupBox">
+     <widget class="QGroupBox" name="currentPaddockLandTypeListGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
@@ -90,9 +89,9 @@
        </sizepolicy>
       </property>
       <property name="title">
-       <string>Paddock Land Types</string>
+       <string>Current Land Types</string>
       </property>
-      <layout class="QVBoxLayout" name="paddockLandTypesVerticalLayout">
+      <layout class="QVBoxLayout" name="currentPaddockLandTypesVerticalLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -106,7 +105,35 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockLandTypesLayerList" name="paddockLandTypeList"/>
+        <widget class="PaddockLandTypesLayerList" name="currentPaddockLandTypeList"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="futurePaddockLandTypeListGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Future Land Types</string>
+      </property>
+      <layout class="QVBoxLayout" name="futurePaddockLandTypesVerticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>1</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="PaddockLandTypesLayerList" name="futurePaddockLandTypeList"/>
        </item>
       </layout>
      </widget>

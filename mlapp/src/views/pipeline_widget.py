@@ -8,24 +8,21 @@ from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsGeometry
 
 from ..tools.sketch_line_tool import SketchLineTool
-
+from ..models.workspace_mixin import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'pipeline_widget_base.ui')))
 
 
-class PipelineWidget(QWidget, FORM_CLASS):
+class PipelineWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
-    def __init__(self, workspace, parent=None):
+    def __init__(self, parent=None):
         """Constructor."""
-        super().__init__(parent)
-
-        self.workspace = workspace
+        QWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.setupUi(self)
-
-        self.pipelineList.setFeatureLayer(self.workspace.pipelineLayer)
-
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)
 

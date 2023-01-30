@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+
 from ..models.state_machine import StateMachine, StateMachineAction, StateMachineStatus
 
 
@@ -14,7 +16,9 @@ class EditAction(StateMachineAction):
 
 
 class EditStateMachine(StateMachine):
+    
     def __init__(self):
+        super().__init__()
         self._status = EditStatus.Viewing
 
     # State machine interface
@@ -43,3 +47,5 @@ class EditStateMachine(StateMachine):
     @status.setter
     def status(self, status):
         self._status = status
+     
+  

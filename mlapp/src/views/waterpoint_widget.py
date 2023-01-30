@@ -8,23 +8,21 @@ from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsGeometry
 
 from ..tools.sketch_point_tool import SketchPointTool
+from ..models.workspace_mixin import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'waterpoint_widget_base.ui')))
 
 
-class WaterpointWidget(QWidget, FORM_CLASS):
+class WaterpointWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
-    def __init__(self, workspace, parent=None):
+    def __init__(self, parent=None):
         """Constructor."""
-        super().__init__(parent)
-
-        self.workspace = workspace
+        QWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.setupUi(self)
-
-        self.waterpointList.setFeatureLayer(self.workspace.waterpointLayer)
-
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, True)
 

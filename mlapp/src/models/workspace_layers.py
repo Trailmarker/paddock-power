@@ -49,6 +49,11 @@ class WorkspaceLayers(dict):
         if isinstance(layer, QgsMapLayer):
             QgsProject.instance().removeMapLayer(layer.id())
 
+    def unloadByName(self, name):
+        """Unload all layers in the registry."""
+        for layerType in list(self.keys()):
+            self.unloadLayer(layerType)
+
     def __layerKey(self, layerType):
         if isinstance(layerType, type):
             return layerType.__name__

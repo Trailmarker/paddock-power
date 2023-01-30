@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from functools import cached_property
 
-from qgis.PyQt.QtCore import pyqtSlot
 from re import finditer
 
 from qgis.core import QgsFeature, QgsRectangle, QgsVectorLayer
 
 from ...models.glitch import Glitch
-from ...utils import qgsDebug
 from ..fields.names import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, STATUS, PERIMETER, TIMEFRAME
 from ..fields.timeframe import Timeframe
 
@@ -24,7 +22,7 @@ class Feature(QgsFeature):
         """Create a new Feature."""
 
         self.featureLayer = featureLayer
-        
+
         # This will be unused unless this is a LineFeature
         self._profile = None
 
@@ -43,7 +41,7 @@ class Feature(QgsFeature):
             # Incoming Feature must have compatible schema
             missingFields, _ = self.getSchema().checkFields(existingFeature.fields())
             if missingFields:
-                raise Glitch(f"{self.typeName}.__init__: incoming Feature has missing fields: {missingFields}")
+                raise Glitch(f"{type(self).__name__}.__init__: incoming Feature has missing fields: {missingFields}")
 
             QgsFeature.__init__(self, existingFeature)
             self.setAttributes(existingFeature.attributes())
@@ -52,47 +50,20 @@ class Feature(QgsFeature):
         elif existingFeature is not None:
             # What?
             raise Glitch(
-                f"{self.typeName}.__init__: unexpected type {type(existingFeature).__name__} (should be a QgsFeature)")
-
-    @cached_property
-    def typeName(self):
-        """Return the Feature's type name."""
-        return type(self).__name__
+                f"{type(self).__name__}.__init__: unexpected type {type(existingFeature).__name__} (should be a QgsFeature)")
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        return f"{self.__class__.__name__}(id={self.FID})"
+        return f"{self.__class__.__name__}(id()={self.id()},FID={self.FID})"
 
     def __str__(self):
         """Convert the Feature to a string representation."""
         return repr(self)
 
-    def workspaceLayer(self, layerType):
-        """Get a layer we depend on to work with by type."""
-        return self.featureLayer.workspaceLayer(layerType)
-
-    @property
-    def FID(self):
-        # Always keep ID consisted with FID attribute unless we are inserting
-        if self.hasFID:
-            fid, id = self.attribute(FID), self.id()
-            if id <= 0 and fid > 0:
-                self.setId(fid)
-                return fid
-            elif id > 0 and fid <= 0:
-                self.setAttribute(FID, id)
-                return id
-        return self.id()
-
-    @FID.setter
-    def FID(self, fid):
-        if self.hasFid:
-            self.setAttribute(FID, fid)
-        self.setId(fid)
-
     def clearFid(self):
-        """Set or the PersistedFeature's id."""
+        """Nullify the PersistedFeature's id as a prelude to saving it."""
         self.FID = -1
+        self.setId(-1)
 
     @property
     def GEOMETRY(self):
@@ -129,7 +100,7 @@ class Feature(QgsFeature):
     @cached_property
     def hasFid(self):
         """Return True if the Feature has a fid."""
-        return self.hasField(FID)
+        return self.hasField(FID) and self.attribute(FID) > 0
 
     @cached_property
     def hasLength(self):
@@ -175,27 +146,16 @@ class Feature(QgsFeature):
         """Return True if the app should focus on this type of Feature when selected."""
         return True
 
-    @pyqtSlot()
     def selectFeature(self):
         """Select the Feature."""
-        qgsDebug(f"{self}.selectFeature(FID={self.FID})")
+        # qgsDebug(f"{self.__class__.__name__}.selectFeature({self}), self.FID={self.FID}, self.id()={self.id()}")
         self.featureLayer.selectByIds([self.id()], QgsVectorLayer.SetSelection)
 
     def zoomFeature(self):
         """Zoom to the Feature."""
-        if self.featureLayer.connectedToWorkspace:
-            iface = self.featureLayer.workspace.iface
-            if self.GEOMETRY and iface:
-                featureExtent = QgsRectangle(self.GEOMETRY.boundingBox())
-                featureExtent.scale(1.5)  # Expand by 50%
-                iface.mapCanvas().setExtent(featureExtent)
-                iface.mapCanvas().refresh()
-
-    def onSelectFeature(self):
-        """Called when the Feature is selected."""
-        qgsDebug(f"{self}.onSelectFeature(FID={self.FID})")
-        self.zoomFeature()
-
-    def onDeselectFeature(self):
-        """Called when the Feature is selected."""
-        qgsDebug(f"{self}.onDeselectFeature(FID={self.FID})")
+        iface = self.featureLayer and self.featureLayer.workspace and self.featureLayer.workspace.iface
+        if self.GEOMETRY and iface:
+            featureExtent = QgsRectangle(self.GEOMETRY.boundingBox())
+            featureExtent.scale(1.5)  # Expand by 50%
+            iface.mapCanvas().setExtent(featureExtent)
+            iface.mapCanvas().refresh()

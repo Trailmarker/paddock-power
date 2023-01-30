@@ -2,13 +2,13 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QButtonGroup, QToolBar
+from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
 from ...spatial.fields.timeframe import Timeframe
+from ...models.workspace_mixin import WorkspaceMixin
 from ...utils import getComponentStyleSheet, PLUGIN_FOLDER
-from ..view_base import ViewBase
 from ..fence_widget import FenceWidget
 from ..paddock_widget import PaddockWidget
 from ..pipeline_widget import PipelineWidget
@@ -17,26 +17,27 @@ from ..waterpoint_widget import WaterpointWidget
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'feature_view_base.ui')))
 
-
 STYLESHEET = getComponentStyleSheet(__file__)
 
 
-class FeatureView(ViewBase, FORM_CLASS):
+class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
-    def __init__(self, workspace, parent=None):
+    closingView = pyqtSignal(type)
+
+    def __init__(self, parent=None):
         """Constructor."""
-        super().__init__(workspace, parent)
-
-        self.workspace = workspace
+        QDockWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.setupUi(self)
 
         self.setStyleSheet(STYLESHEET)
 
-        self.paddockTab = PaddockWidget(workspace, self.tabWidget)
-        self.fenceTab = FenceWidget(workspace, self.tabWidget)
-        self.pipelineTab = PipelineWidget(workspace, self.tabWidget)
-        self.waterpointTab = WaterpointWidget(workspace, self.tabWidget)
+        self.paddockTab = PaddockWidget(self.tabWidget)
+        self.fenceTab = FenceWidget(self.tabWidget)
+        self.pipelineTab = PipelineWidget(self.tabWidget)
+        self.waterpointTab = WaterpointWidget(self.tabWidget)
 
         self.tabWidget.addTab(self.paddockTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
         self.tabWidget.addTab(self.fenceTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
@@ -49,8 +50,8 @@ class FeatureView(ViewBase, FORM_CLASS):
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png"),
             'Waterpoints')
 
-        self.currentTimeframeButton.clicked.connect(lambda: self.workspace.setCurrentTimeframe(Timeframe.Current))
-        self.futureTimeframeButton.clicked.connect(lambda: self.workspace.setCurrentTimeframe(Timeframe.Future))
+        self.currentTimeframeButton.clicked.connect(lambda: self.workspace.setTimeframe(Timeframe.Current))
+        self.futureTimeframeButton.clicked.connect(lambda: self.workspace.setTimeframe(Timeframe.Future))
 
         # Create a button group to control checking of the Timeframe buttons
         self.timeframeButtonGroup = QButtonGroup(exclusive=True)
@@ -72,17 +73,13 @@ class FeatureView(ViewBase, FORM_CLASS):
         self.toolBar.addWidget(self.sketchWaterpointButton)
 
         self.tabWidget.setCornerWidget(self.toolBar)
+        self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
 
         self.refreshUi()
 
-        self.workspace.currentTimeframeChanged.connect(lambda _: self.refreshUi())
-
-        # Experimentation with customising the tab bar
-        # self.tabWidget.setCornerWidget(QPushButton('Add Feature'), Qt.TopLeftCorner)
-
-        # tabBar = self.tabWidget.findChild(QTabBar)
-        # tabBar.hide()
+      
 
     def refreshUi(self):
-        self.currentTimeframeButton.setChecked(self.workspace.currentTimeframe == Timeframe.Current)
-        self.futureTimeframeButton.setChecked(self.workspace.currentTimeframe == Timeframe.Future)
+        if self.ready:
+            self.currentTimeframeButton.setChecked(self.workspace.timeframe == Timeframe.Current)
+            self.futureTimeframeButton.setChecked(self.workspace.timeframe == Timeframe.Future)

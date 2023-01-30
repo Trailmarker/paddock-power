@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-from ...utils import qgsDebug
 from ..fields.schemas import MetricPaddockSchema
-from ..layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
-from ..layers.paddock_layer import PaddockLayer
-from ..layers.paddock_land_types_layer import PaddockLandTypesLayer
 from .feature_action import FeatureAction
 from .status_feature import StatusFeature
 
@@ -18,28 +14,23 @@ class MetricPaddock(StatusFeature, PopupFeatureMixin):
         StatusFeature.__init__(self, featureLayer, existingFeature)
         PopupFeatureMixin.__init__(self)
 
-
     @property
     def TITLE(self):
+        # return f"#{self.FID} {self.NAME} ({self.AREA:.2f} km²)"
         return f"{self.NAME} ({self.AREA:.2f} km²)"
 
     @property
     def paddockLayer(self):
-        return self.workspaceLayer(PaddockLayer)
+        return self.featureLayer.workspace.paddockLayer
 
     @property
     def paddockLandTypesLayer(self):
-        return self.workspaceLayer(PaddockLandTypesLayer)
-
-    # Completing the required definition of PopupFeatureMixin above
-    @property
-    def popupLayerTypes(self):
-        return [MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer]
+        return self.featureLayer.workspace.paddockLandTypesLayer
 
     # All workflow functions are deferred to the underlying Paddock for this MetricPaddock
     def getPaddock(self):
         """Get the Paddock that this Metric Paddock is associated with."""
-        return self.paddockLayer.getFeature(self.paddock)
+        return self.paddockLayer.getFeature(self.PADDOCK)
 
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):
@@ -61,19 +52,3 @@ class MetricPaddock(StatusFeature, PopupFeatureMixin):
     @FeatureAction.undoSupersede.handler()
     def undoSupersedeFeature(self):
         return self.getPaddock().undoSupersedeFeature()
-
-
-    def onSelectFeature(self):
-        """Do the stuff we'd normally do, but also add the popup layers."""
-        super().onSelectFeature()
-        
-        qgsDebug(f"PopupFeatureMixin.onSelectFeature() - adding popup layers for {self}")
-        for layerType in self.popupLayerTypes:
-            self.addPopupLayer(layerType)
-
-    def onDeselectFeature(self):
-        """Do the stuff we'd normally do, but also remove the popup layers."""
-        super().onDeselectFeature()
-        qgsDebug(f"PopupFeatureMixin.onSelectFeature() - removing popup layers for {self}")
-
-        self.removeAllPopupLayers()

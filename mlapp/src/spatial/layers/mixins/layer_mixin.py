@@ -2,20 +2,31 @@
 from qgis.core import QgsMapLayer, QgsProject
 
 
-from ....utils import resolveStylePath
+from ....utils import qgsDebug, resolveStylePath
 from .abstract_layer_mixin import AbstractLayerMixin
 
+
 class LayerMixin(AbstractLayerMixin):
+
     @classmethod
     def detectAndRemoveAllOfType(cls):
         """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
-        layers = [l for l in QgsProject.instance().mapLayers().values() if type(l).__name__ == cls.__name__]
-        for layer in layers:
-            QgsProject.instance().removeMapLayer(layer.id())
+        allLayers = QgsProject.instance().mapLayers().values()
+
+        defaultName = cls.NAME if hasattr(cls, 'NAME') else None
+
+        sameTypes = set(l.id() for l in allLayers if type(l).__name__ == cls.__name__)
+        sameNames = set(l.id() for l in allLayers if defaultName == l.name())
+
+        layerIds = sameTypes.union(sameNames)
+
+        qgsDebug(f"Cleaning up {len(layerIds)} layers of type {cls.__name__} …")
+        for layerId in layerIds:
+            QgsProject.instance().removeMapLayer(layerId)
 
     def __init__(self):
         super().__init__()
-        
+
         assert isinstance(self, QgsMapLayer)
 
     def findGroup(self, name=None):
@@ -25,7 +36,7 @@ class LayerMixin(AbstractLayerMixin):
     def findItem(self):
         """Find the item for this layer in the layer stack."""
         return QgsProject.instance().layerTreeRoot().findLayer(self)
-            
+
     def addInBackground(self):
         """Add this layer to the map in the background."""
         QgsProject.instance().addMapLayer(self, False)
@@ -48,7 +59,7 @@ class LayerMixin(AbstractLayerMixin):
         node = group.findLayer(self.id())
         if node:
             node.setItemVisibilityChecked(visible)
-            
+
     def applyNamedStyle(self, styleName):
         """Apply a style to the layer."""
         # Optionally apply a style to the layer
@@ -57,3 +68,9 @@ class LayerMixin(AbstractLayerMixin):
             self.loadNamedStyle(stylePath)
         self.triggerRepaint()
 
+    def zoomLayer(self):
+        """Zoom to this layer."""
+        iface = self.workspace.iface
+        canvas = iface.mapCanvas()
+        canvas.setExtent(self.extent())
+        canvas.refresh()

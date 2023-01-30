@@ -35,16 +35,18 @@ from ...resources_rc import *
 
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
-    selectedFeatureChanged = pyqtSignal(type, int, bool)
-    currentTimeframeChanged = pyqtSignal(Timeframe)
-    workspaceUnloading = pyqtSignal()
-    
+    featureLayerSelected = pyqtSignal(type)
+    featureLayerDeselected = pyqtSignal(type)
+    timeframeChanged = pyqtSignal(Timeframe)
     featuresChanged = pyqtSignal(list)
 
     def __init__(self,
                  iface,
                  workspaceFile: str,
                  workspaceLayers: WorkspaceLayers):
+
+        self.ready = False
+
         super().__init__(iface.mainWindow())
 
         self.workspaceName = PLUGIN_NAME
@@ -55,12 +57,11 @@ class Workspace(QObject):
 
         self.iface = iface
         self.currentTool = None
-        self.currentTimeframe = Timeframe.Future
+        self.timeframe = Timeframe.Current
         self.view = None
         self.importDialog = None
-        self.selectedFeature = None
 
-        self.currentTimeframeChanged.connect(self.deselectFeatures)
+        self.timeframeChanged.connect(self.deselectLayers)
         self.featuresChanged.connect(self.analyseLayers)
 
         # For convenient reference
@@ -82,19 +83,16 @@ class Workspace(QObject):
 
         qgsInfo(f"{PLUGIN_NAME} analysis layers initialised …")
 
-        for layer in self.workspaceLayers.layers():
-            layer.connectWorkspace(self)
-
+        # Wiring some stuff for selected features …
+        self.__selectedFeatures = {}
+ 
         qgsInfo(f"{PLUGIN_NAME} workspace connected …")
 
         self.addToMap()
-        
+
         qgsInfo(f"{PLUGIN_NAME} load complete.")
 
-
-    def workspaceLayer(self, layerType):
-        """Retrieve a layer by type."""
-        return self.workspaceLayers.layer(layerType)
+        self.ready = True
 
     @pyqtSlot()
     def importData(self):
@@ -154,30 +152,35 @@ class Workspace(QObject):
             self.iface.mapCanvas().unsetMapTool(self.currentTool)
             self.currentTool = None
 
-    def setCurrentTimeframe(self, timeframe):
+    def setTimeframe(self, timeframe):
         """Set the current timeframe for this workspace."""
-        if self.currentTimeframe != timeframe:
-            # If our current feature is not in the new timeframe, deselect it
-            if self.selectedFeature and not self.selectedFeature.matchTimeframe(timeframe):
-                # qgsDebug("Deselecting feature because it is not in the new timeframe")
-                self.deselectFeatures()
+        if self.timeframe != timeframe:
+            self.timeframe = timeframe
+            self.timeframeChanged.emit(timeframe)
 
-            self.currentTimeframe = timeframe
-            self.currentTimeframeChanged.emit(timeframe)
-
-    def deselectFeatures(self):
+    def deselectLayers(self, selectedLayerType=None):
         """Deselect any currently selected Feature."""
-        if self.selectedFeature:
-            self.selectedFeature.onDeselectFeature()
-            self.selectedFeature = None
-        self.selectedFeatureChanged.emit(type(None), [], True)
+        for layerType in [l for l in self.__selectedFeatures.keys() if l != selectedLayerType]:
+            qgsInfo(f"Workspace.deselectLayers({layerType.__name__})")
+            del self.__selectedFeatures[layerType]
+            self.featureLayerDeselected.emit(layerType)
 
     def selectFeature(self, feature):
         """Select a feature."""
-        self.selectedFeature = feature
-        self.selectedFeatureChanged.emit(type(feature.featureLayer), [feature], feature.focusOnSelect())
-        feature.onSelectFeature() 
-            
+        qgsInfo(f"Workspace.selectFeature({feature})")
+        selectedLayerType = type(feature.featureLayer)
+        self.__selectedFeatures[selectedLayerType] = feature
+
+        # If we are going to focus on the new feature, deselect the old layers
+        if selectedLayerType.focusOnSelect():
+            self.deselectLayers(selectedLayerType)
+
+        # Select on the new layer either way
+        self.featureLayerSelected.emit(selectedLayerType)
+
+    def selectedFeature(self, layerType):
+        """Return the selected feature for the given layer type."""
+        return self.__selectedFeatures[layerType] if layerType in self.__selectedFeatures else None
 
     @pyqtSlot()
     def unload(self):
@@ -189,42 +192,42 @@ class Workspace(QObject):
             self.iface.removeDockWidget(self.view)
 
         self.removeFromMap()
+        
+        def cleanupByName(name):
+            f"""Remove all layers from the current project with the given names."""
+            for layer in QgsProject.instance().mapLayers().values():
+                if layer.name() == name:
+                    QgsProject.instance().removeMapLayers([layer.id()])
+        
+        for cls in self.layerDependencyGraph.unloadOrder():
+            cleanupByName(cls.NAME)
 
         for layerType in self.layerDependencyGraph.unloadOrder():
             self.workspaceLayers.unloadLayer(layerType)
-        self.workspaceUnloading.emit()
-
-    @pyqtSlot(FeatureLayer, list)
-    def onLayerSelectionChanged(self, layer, selection):
-        qgsInfo(f"Workspace.onLayerSelectionChanged({layer.name()}, {selection})")
-        
-        if len(selection) == 1:
-            feature = layer.getFeature(selection[0])
-            if feature:
-                self.selectFeature(feature)
 
     @pyqtSlot()
     def openFeatureView(self):
         """Run method that loads and opens the Feature View."""
-        self.view = FeatureView(self)
-        self.view.setAttribute(Qt.WA_DeleteOnClose)
-        self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.view)
-        self.view.show()
-    
-    
+        if self.view is None:
+            self.view = FeatureView()
+            self.view.setAttribute(Qt.WA_DeleteOnClose)
+            self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.view)
+            self.view.show()
+
+    def analysisOrder(self):
+        """Return the order in which layers should be analsed."""
+        order = self.layerDependencyGraph.analysisOrder()
+        return [self.workspaceLayers.layer(layerType) for layerType in order]
+        
     def updateOrder(self, updatedLayers):
         """Return the order in which layers should be updated."""
         updateOrder = self.layerDependencyGraph.updateOrder(updatedLayers)
-        return [self.workspaceLayer(layerType) for layerType in updateOrder]
-        
+        return [self.workspaceLayers.layer(layerType) for layerType in updateOrder]
+
     @pyqtSlot(list)
-    def analyseLayers(self, updatedLayers=None):
+    def analyseLayers(self):
         """Winnow and re-analyse a batch of updated layers."""        
-        updatedLayers = updatedLayers or self.workspaceLayers.featureLayers()
-        updateOrder = self.updateOrder(updatedLayers)
-        
-        layerNames = ", ".join([layer.name() for layer in updateOrder])   
-        
-        qgsInfo(f"{PLUGIN_NAME} analysing layers …")        
-        Edits.analyseLayers(updateOrder)
+        analysisOrder = self.analysisOrder()
+        qgsInfo(f"{PLUGIN_NAME} analysing layers …")
+        Edits.analyseLayers(analysisOrder)
         qgsInfo(f"{PLUGIN_NAME} load complete.")

@@ -10,10 +10,10 @@ from .feature import Feature
 
 class PersistedFeature(Feature):
 
-    def __init__(self, featureLayerType, existingFeature=None):
+    def __init__(self, featureLayer, existingFeature=None):
         """Create a new Feature."""
 
-        super().__init__(featureLayerType, existingFeature)
+        super().__init__(featureLayer, existingFeature)
 
 
     @property
@@ -41,7 +41,7 @@ class PersistedFeature(Feature):
                 if self.hasLatitude:
                     self.LATITUDE = latitude
             if self.hasElevation or self.hasLength:
-                elevationLayer = self.workspaceLayer(ElevationLayer)
+                elevationLayer = self.featureLayer.workspace.elevationLayer
                 if self.hasElevation:
                     self.ELEVATION = Calculator.calculateElevationAtPoint(self.GEOMETRY, elevationLayer)
                 if self.hasLength:

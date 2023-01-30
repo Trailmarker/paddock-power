@@ -1,71 +1,77 @@
 # -*- coding: utf-8 -*-
-from collections import namedtuple
-from functools import cached_property
 
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsFeature, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
+from ...spatial.features.feature import Feature
 from ...utils import qgsDebug, resolveStylePath, PLUGIN_NAME
-from ..fields.timeframe import Timeframe
 from .mixins.layer_mixin import LayerMixin
-from .mixins.interaction_mixin import InteractionMixin
+from ...models.workspace_mixin import WorkspaceMixin
 
 
-class FeatureLayer(QgsVectorLayer, InteractionMixin, LayerMixin):
+class FeatureLayer(QgsVectorLayer, WorkspaceMixin, LayerMixin):
 
-    # Emit this signal when a selected Feature is updated
-    selectedFeatureChanged = pyqtSignal(type, int, bool)
-    currentTimeframeChanged = pyqtSignal(Timeframe)
+    featureSelected = pyqtSignal(type)
+    featureDeselected = pyqtSignal(type)
+
+    @classmethod
+    def getFeatureType(cls):
+        """Return the Feature type for this layer."""
+        raise NotImplementedError
+
+    @classmethod
+    def getSchema(cls):
+        """Return the Schema for this layer."""
+        return cls.getFeatureType().getSchema()
+
+    @classmethod
+    def getWkbType(cls):
+        """Return the WKB type for this layer."""
+        return cls.getSchema().wkbType
+
+    @classmethod
+    def focusOnSelect(self):
+        """Return True if this layer should be focused when a feature is selected."""
+        return self.getFeatureType().focusOnSelect()
 
     def __init__(self,
-                 featureType,
                  path,
                  layerName,
                  providerLib,
                  styleName=None,
                  *args, **kwargs):
         f"""Create a new {PLUGIN_NAME} vector layer."""
-
-        self._featureType = featureType
-
-        self._workspace = None
-        # Route changes to this layer *through* the Paddock Power
-        # workspace so other objects can respond
-        self._blockWorkspaceConnnection = False
-
-        self._selectedFeature = None
+        # Clear out any unwanted friends from the map … (classmethod defined in LayerMixin)
+        # TODO - does not work
+        # self.detectAndRemoveAllOfType()        
 
         super().__init__(path, layerName, providerLib, *args, **kwargs)
+        LayerMixin.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.applyNamedStyle(styleName)
         self.addInBackground()
-        self.selectionChanged.connect(lambda selection, *_: self.onLayerSelectionChanged(selection))
+
+        qgsDebug(f"{type(self).__name__} initialised …")
+
+        self.plugin.workspaceReady.connect(self.onWorkspaceReady)
+        
+
+    def onWorkspaceReady(self):
+        self.selectionChanged.connect(self.onSelectionChanged)
+
+        self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
+        self.workspace.featureLayerDeselected.connect(self.onFeatureLayerDeselected)
+        self.workspace.timeframeChanged.connect(self.onTimeframeChanged)
 
     @property
-    def featureType(self):
-        return self._featureType
-
-    def focusOnSelect(self):
-        """Return True if this layer should be focused when a feature is selected."""
-        return self.featureType.focusOnSelect()
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        raise NotImplementedError
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        raise NotImplementedError
-
-    @cached_property
-    def typeName(self):
-        """Return the FeatureLayer's type name."""
-        return type(self).__name__
+    def hasPopups(self):
+        return False
 
     def __repr__(self):
         """Return a string representation of the Field."""
-        return f"{self.typeName}(name={self.name()})"
+        return f"{type(self).__name__}(name={self.name()})"
 
     def __str__(self):
         """Convert the Field to a string representation."""
@@ -82,8 +88,7 @@ class FeatureLayer(QgsVectorLayer, InteractionMixin, LayerMixin):
     # Feature interface
     def wrapFeature(self, feature):
         """Wrap a QgsFeature using the Feature type of this FeatureLayer."""
-        assert (not feature) or isinstance(feature, QgsFeature)
-        return self.featureType(self, feature)
+        return self.getFeatureType()(self, feature)
 
     def _wrapFeatures(self, features):
         """Adapt the features in this layer."""
@@ -91,16 +96,24 @@ class FeatureLayer(QgsVectorLayer, InteractionMixin, LayerMixin):
             feature = self.wrapFeature(feature)
             yield feature
 
+    def getFeaturesByTimeframe(self, timeframe, request=None):
+        """Get the features in this layer that are in the current timeframe."""
+        features = self.getFeatures(request)
+        return [f for f in features if f.matchTimeframe(timeframe)]
+
     def getFeaturesInCurrentTimeframe(self, request=None):
         """Get the features in this layer that are in the current timeframe."""
         features = self.getFeatures(request)
-        # qgsDebug(f"{self.typeName}.getFeaturesInCurrentTimeframe({self.currentTimeframe})")
-        return [f for f in features if f.matchTimeframe(self.currentTimeframe)]
+        return [f for f in features if f.matchTimeframe(self.timeframe)]
 
-    def getFeature(self, fid):
-        """Get a feature by its ID."""
-        feature = super().getFeature(fid)
+    def getFeature(self, id):
+        """Get a feature by its id, assumed to be the same as its FID."""
+        feature = super().getFeature(id)
         return self.wrapFeature(feature) if feature else None
+
+    def getFeatureFromSelection(self, selectionId):
+        """Convenience function as in rare cases this has to behave differently."""
+        return self.getFeature(selectionId)
 
     def getFeatures(self, request=None):
         """Get the features in this layer."""
@@ -113,11 +126,29 @@ class FeatureLayer(QgsVectorLayer, InteractionMixin, LayerMixin):
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
 
-    @pyqtSlot(list)
-    def onLayerSelectionChanged(self, selection):
-        """Handle the QGIS layer selection changing."""
-        qgsDebug(f"{self.typeName}.onLayerSelectionChanged({selection})")
-        if self.connectedToWorkspace:
-            self.workspace.onLayerSelectionChanged(self, selection)
+    def onFeatureLayerSelected(self, layerType):
+        if isinstance(self, layerType):
+            feature = self.workspace.selectedFeature(layerType)
+            self.onSelectFeature(feature)
+            self.featureSelected.emit(layerType)
 
-   
+    def onFeatureLayerDeselected(self, layerType):
+        if isinstance(self, layerType):
+            self.onDeselectFeature()
+            self.featureDeselected.emit(layerType)
+
+    def onTimeframeChanged(self, timeframe):
+        self.triggerRepaint()
+
+    def onSelectFeature(self, feature):
+        feature.zoomFeature()
+        pass
+
+    def onDeselectFeature(self):
+        pass
+
+    def onSelectionChanged(self, selection, *_):
+        if len(selection) == 1:
+            feature = next(self.getFeatures(QgsFeatureRequest().setFilterFids(selection)), None)
+            if feature:
+                self.workspace.selectFeature(feature)

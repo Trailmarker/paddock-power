@@ -37,8 +37,6 @@ class PersistedFeatureLayer(FeatureLayer):
 
     def createInGeoPackage(self, workspaceFile, layerName):
 
-        qgsDebug(f"{self.__class__.__name__}.createInGeoPackage(workspaceFile={workspaceFile}, layerName={layerName})")
-
         wkbType = self.getWkbType()
         schema = self.getSchema()
 
@@ -79,10 +77,9 @@ class PersistedFeatureLayer(FeatureLayer):
             'SQL': 'drop table {0}'.format(layerName)
         })
 
-    def __init__(self, featureType, workspaceFile, layerName, styleName=None):
+    def __init__(self, workspaceFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} vector layer."""
 
-        assert featureType
         assert workspaceFile
         assert layerName
 
@@ -93,7 +90,7 @@ class PersistedFeatureLayer(FeatureLayer):
        
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
 
-        super().__init__(featureType, self.gpkgUrl, layerName, "ogr", styleName=styleName)
+        super().__init__(self.gpkgUrl, layerName, "ogr", styleName=styleName)
 
         # TODO
         missingFields, extraFields = self.getSchema().checkFields(self.dataProvider().fields())
@@ -101,14 +98,14 @@ class PersistedFeatureLayer(FeatureLayer):
         if missingFields:
             # Start editing to to expand the schema
             qgsInfo(
-                f"Expanding schema for {self.typeName} to include {str([f.name() for f in missingFields])} …")
+                f"Expanding schema for {type(self).__name__} to include {str([f.name() for f in missingFields])} …")
             self.startEditing()
             self.dataProvider().addAttributes(missingFields)
             self.commitChanges()
 
         if extraFields:
             # Start editing to to cut down the schema
-            qgsInfo(f"Reducing schema for {self.typeName} to remove {str([f.name() for f in extraFields])} …")
+            qgsInfo(f"Reducing schema for {type(self).__name__} to remove {str([f.name() for f in extraFields])} …")
             self.startEditing()
             self.dataProvider().deleteAttributes([self.fields().indexFromName(f.name()) for f in extraFields])
             self.commitChanges()
@@ -116,6 +113,7 @@ class PersistedFeatureLayer(FeatureLayer):
         # Apply editor widgets and other Field-specific layer setup
         for field in self.getSchema():
             field.setupLayer(self)
+              
 
     def addFeatures(self, features):
         """Add a batch of features to this layer."""
@@ -125,9 +123,9 @@ class PersistedFeatureLayer(FeatureLayer):
 
     def copyFeature(self, feature):
         """Copy a feature using the logic (eg dependent layers) of this layer."""
-        if not isinstance(feature, self.featureType):
+        if not isinstance(feature, self.getFeatureType()):
             raise Glitch(
-                f"You can't use a {self.typeName} to copy an object that isn't a {self.featureType.__name__}")
+                f"You can't use a {type(self).__name__} to copy an object that isn't a {self.getFeatureType().__name__}")
 
         copyFeature = self.wrapFeature(feature)
         
@@ -145,3 +143,17 @@ class PersistedFeatureLayer(FeatureLayer):
     def deleteFeature(self, feature):
         """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.FID)
+                
+    def analyseFeatures(self):
+        """Recalculate features in this layer."""
+            
+        if not self.isEditable():
+            raise Glitch(f"{self}.recalculateFeatures(): analysis can only be run during an edit session …")
+            
+        qgsInfo(f"Recalculating {self.name()} …")
+
+        for feature in self.getFeatures():
+            feature.recalculate()
+            feature.upsert()
+        
+        

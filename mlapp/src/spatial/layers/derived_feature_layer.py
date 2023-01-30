@@ -3,8 +3,6 @@ from urllib.parse import quote
 
 from qgis.PyQt.QtCore import pyqtSlot
 
-from ...utils import qgsDebug
-from ..fields.names import FID
 from .condition_table import ConditionTable
 from .feature_layer import FeatureLayer
 from .persisted_feature_layer import PersistedFeatureLayer
@@ -12,14 +10,12 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class DerivedFeatureLayer(FeatureLayer):
 
-    def __init__(self, featureType, layerName, styleName, *dependentLayers):
-        # qgsDebug(f"DerivedFeatureLayer.__init__({featureType}, {layerName}, {styleName}, {dependentLayers})")
+    def __init__(self, layerName, styleName, *dependentLayers):
 
-        # This ends up getting initialised again in onWorkspaceConnectionChanged at the moment
-        self.workspaceLayerentLayers = dependentLayers
+        self.dependentLayers = dependentLayers
         virtualSource = self._makeDerivedFeatureLayerSource(*dependentLayers)
 
-        super().__init__(featureType, virtualSource, layerName, "virtual", styleName)
+        super().__init__(virtualSource, layerName, "virtual", styleName)
 
         # Apply editor widgets and other Field-specific layer setup
         for field in self.getSchema():
@@ -28,7 +24,7 @@ class DerivedFeatureLayer(FeatureLayer):
     @property
     def persistedDependentLayers(self):
         """Return the instances of Paddock Power PersistedFeatureLayers used to derive this layer."""
-        return [f for f in self.workspaceLayerentLayers if isinstance(
+        return [f for f in self.dependentLayers if isinstance(
             f, PersistedFeatureLayer) or isinstance(f, ConditionTable)]
 
     def names(self, *dependentLayers):

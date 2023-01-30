@@ -7,7 +7,7 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
 
-    def __init__(self, featureType, workspaceFile, layerName, styleName, derivedLayer):
+    def __init__(self, workspaceFile, layerName, styleName, derivedLayer):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""
 
         # Ensures that the layer is created in the GeoPackage
@@ -16,7 +16,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         # Optionally applies a style
         self.derivedLayer = derivedLayer
 
-        super().__init__(featureType, workspaceFile, layerName, styleName)
+        super().__init__(workspaceFile, layerName, styleName)
         self.setReadOnly(True)
 
 

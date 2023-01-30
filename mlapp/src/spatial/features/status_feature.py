@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from ...models.qt_abstract_meta import QtAbstractMeta
 from ..fields.names import TIMEFRAME
 from ..fields.schemas import StatusFeatureSchema
 from ..fields.timeframe import Timeframe
@@ -10,26 +9,39 @@ from .persisted_feature import PersistedFeature
 
 
 @StatusFeatureSchema.addSchema()
-class StatusFeature(PersistedFeature, FeatureStateMachine, metaclass=QtAbstractMeta):
+class StatusFeature(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new AreaFeature."""
-        FeatureStateMachine.__init__(self)
         PersistedFeature.__init__(self, featureLayer, existingFeature)
+
+        self.machine = FeatureStateMachine(self)
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        return f"{self.__class__.__name__}(id={self.FID},name='{self.NAME}',status={self.status})"
+        return f"{self.__class__.__name__}(id()={self.id()},FID={self.FID},name='{self.NAME}',status={self.STATUS})"
 
     def __str__(self):
         """Convert the Feature to a string representation."""
         return repr(self)
 
     @property
+    def stateChanged(self):
+        return self.machine.stateChanged
+
+    @property
+    def status(self):
+        return self.STATUS
+    
+    @status.setter
+    def status(self, stat):
+        self.STATUS = stat
+
+    @property
     def TIMEFRAME(self):
         """Return the timeframe for the Feature."""
         if not self.hasTimeframe:
-            return Timeframe.fromFeatureStatus(self.status)
+            return Timeframe.fromFeatureStatus(self.STATUS)
         else:
             return self.attribute(TIMEFRAME)
 

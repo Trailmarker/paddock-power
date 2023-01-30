@@ -6,10 +6,12 @@ from ..spatial.layers.derived_paddock_land_types_layer import DerivedPaddockLand
 from ..spatial.layers.derived_watered_area_layer import DerivedWateredAreaLayer
 from ..spatial.layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
 from ..spatial.layers.elevation_layer import ElevationLayer
+from ..spatial.layers.feature_layer import FeatureLayer
 from ..spatial.layers.fence_layer import FenceLayer
 from ..spatial.layers.land_type_layer import LandTypeLayer
 from ..spatial.layers.paddock_layer import PaddockLayer
 from ..spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
+from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ..spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
@@ -51,7 +53,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
         """Return a list of layer types in the order they should be unloaded."""
         return list(reversed(self.loadOrder()))
     
-    def updateOrder(self, updatedLayers):
+    def updateOrderByType(self, layerType, updatedLayers):
         """Return a list of layers that must be 'repersisted' in response to feature updates."""
         updatedLayerTypeNames = [type(layer).__name__ for layer in updatedLayers]
         
@@ -62,7 +64,12 @@ class LayerDependencyGraph(TypeDependencyGraph):
         for i in range(0, len(loadOrder)):
             layerType = loadOrder[i]
             if layerType.__name__ in updatedLayerTypeNames:
-                return [t for t in loadOrder[i:] if issubclass(t, PersistedDerivedFeatureLayer)] 
+                return [t for t in loadOrder[i:] if issubclass(t, layerType)] 
                 
         return []
         
+    def updateOrder(self, updatedLayers):
+        return self.updateOrderByType(PersistedDerivedFeatureLayer, updatedLayers)
+    
+    def analysisOrder(self):
+        return [l for l in self.loadOrder() if issubclass(l, PersistedFeatureLayer)]

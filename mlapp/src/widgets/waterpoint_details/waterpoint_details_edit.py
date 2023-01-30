@@ -5,6 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
+from ...spatial.features.edits import Edits
 from ...spatial.features.waterpoint import Waterpoint
 from ...spatial.fields.waterpoint_type import WaterpointType
 
@@ -62,7 +63,6 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
     def setWaterpointType(self, index):
         self._waterpointType = self.waterpointTypeComboBox.itemData(index)
 
-    @pyqtSlot()
     def saveFeature(self):
         """Save the Waterpoint, updating the Waterpoint Type."""
 
@@ -70,3 +70,5 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
         self.waterpoint.WATERPOINT_TYPE = self._waterpointType
         self.waterpoint.NEAR_GRAZING_RADIUS = float(self.nearGrazingRadiusSpinBox.value())
         self.waterpoint.FAR_GRAZING_RADIUS = float(self.farGrazingRadiusSpinBox.value())
+        
+        return Edits.upsert(self.waterpoint)

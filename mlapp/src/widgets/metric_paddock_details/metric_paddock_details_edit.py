@@ -2,43 +2,40 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from qgis.core import QgsProject
-
+from ...spatial.features.edits import Edits
+from ...models.workspace_mixin import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'metric_paddock_details_edit_base.ui')))
 
 
-class MetricPaddockDetailsEdit(QWidget, FORM_CLASS):
+class MetricPaddockDetailsEdit(QWidget, FORM_CLASS, WorkspaceMixin):
 
     def __init__(self, metricPaddock, parent=None):
         """Constructor."""
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.setupUi(self)
 
         self.metricPaddock = metricPaddock
-        self._paddockLayerId = None
         self.paddock = None
+        self.getPaddock()
 
     @property
     def paddockLayer(self):
         """Get the FeatureLayer."""
-        return QgsProject.instance().mapLayer(self._paddockLayerId) if self._paddockLayerId else None
+        return self.workspace.paddockLayer
 
-    @paddockLayer.setter
-    def paddockLayer(self, paddockLayer):
-        """Set the FeatureLayer and update the display."""
-        self._paddockLayerId = paddockLayer.id() if paddockLayer else None
+    def getPaddock(self):
+        self.paddock = self.paddockLayer.getFeature(self.metricPaddock.FID)
+        self.nameLineEdit.setText(self.paddock.NAME)
 
-        if paddockLayer and self.paddock:
-            self.paddock = paddockLayer.getFeature(self.metricPaddock.FID)
-            self.nameLineEdit.setText(self.paddock.NAME)
-
-    @pyqtSlot()
     def saveFeature(self):
         """Save the Paddock Details."""
+        self.metricPaddock.NAME = self.nameLineEdit.text()
         self.paddock.NAME = self.nameLineEdit.text()
+        return Edits.upsert(self.paddock)

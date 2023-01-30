@@ -3,10 +3,10 @@ from qgis.core import QgsFeatureRequest
 
 from ..features.metric_paddock import MetricPaddock
 from ..fields.names import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_AREA
-from ..fields.schemas import MetricPaddockSchema
 from ..fields.timeframe import Timeframe
 from .mixins.popup_feature_layer_mixin import PopupFeatureLayerMixin
 from .derived_feature_layer import DerivedFeatureLayer
+from .metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
 from .paddock_layer import PaddockLayer
 from .paddock_land_types_layer import PaddockLandTypesLayer
 
@@ -15,6 +15,19 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer, PopupFeatureLayerMixin):
 
     NAME = "Paddocks"
     STYLE = "paddock"
+
+    @property
+    def popupLayerTypes(self):
+        return [MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer]
+
+    @property
+    def relativeLayerPosition(self):
+        """Makes the Paddock Land Types popups appear *over* the Paddock layer."""
+        return -1
+
+    @classmethod
+    def getFeatureType(cls):
+        return MetricPaddock
 
     def prepareQuery(self, query, *dependentLayers):
         [paddockLayer, paddockLandTypesLayer] = self.names(*dependentLayers)
@@ -50,23 +63,14 @@ group by "{paddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
             return None
         else:
             for f in features:
-                if Timeframe[f.timeframe.name] == Timeframe[self.currentTimeframe.name]:
+                if Timeframe[f.timeframe.name] == Timeframe[self.timeframe.name]:
                     return f
 
     def __init__(self,
                  paddockLayer: PaddockLayer,
                  paddockLandTypesLayer: PaddockLandTypesLayer):
 
-        super().__init__(MetricPaddock,
-                         DerivedMetricPaddockLayer.NAME,
+        super().__init__(DerivedMetricPaddockLayer.NAME,
                          DerivedMetricPaddockLayer.STYLE,
                          paddockLayer,
                          paddockLandTypesLayer)
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return MetricPaddockSchema
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return MetricPaddockSchema.wkbType

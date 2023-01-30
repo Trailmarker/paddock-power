@@ -19,12 +19,8 @@ class Waterpoint(StatusFeature, PopupFeatureMixin):
         PopupFeatureMixin.__init__(self)
 
     @property
-    def popupLayerTypes(self): 
-        return [WaterpointPopupLayer]
-
-    @property
     def waterpointBufferLayer(self):
-        return self.workspaceLayer("WaterpointBufferLayer")
+        return self.featureLayer.workspace.waterpointBufferLayer
 
     @property
     def TITLE(self):
@@ -39,3 +35,16 @@ class Waterpoint(StatusFeature, PopupFeatureMixin):
         self.GEOMETRY = point
 
         return Edits.upsert(self)
+
+    def onSelectFeature(self):
+        """Do the stuff we'd normally do, but also add the popup layer."""
+        super().onSelectFeature()
+        
+        for layerType in self.popupLayerTypes:
+            self.addPopupLayer(layerType)
+
+    def onDeselectFeature(self):
+        """Do the stuff we'd normally do, but also remove the popup layer."""
+        super().onDeselectFeature()
+
+        self.removeAllPopupLayers()

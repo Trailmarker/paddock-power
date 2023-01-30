@@ -46,6 +46,11 @@ def workspace():
     return plugin().workspace
 
 
+def allLayers():
+    f"""Get all layers in the current project."""
+    return QgsProject.instance().mapLayers().values()
+
+
 def workspaceLayers():
     f"""Get all layers in the current workspace."""
     return workspace().workspaceLayers
@@ -79,7 +84,7 @@ def exportStyles(relativeOutDir, overwrite=False):
     if not path.exists(outputDir):
         mkdir(outputDir)
 
-    for layer in [l for l in layers() if isinstance(l, FeatureLayer)]:
+    for layer in [l for l in allLayers() if isinstance(l, FeatureLayer)]:
         if layer.styleName is not None:
             outFile = path.join(outputDir, f"{layer.styleName}.qml")
 
@@ -111,10 +116,11 @@ def checkLayers():
     return [byType(layerType) for layerType in layerTypes]
 
 
-[conditionTable, derivedBoundaryLayer, derivedMetricPaddockLayer, derivedPaddockLandTypeLayer,
- derivedWateredAreaLayer, derivedWaterpointBufferLayer, elevationLayer,
- fenceLayer, landTypeLayer, paddockLayer, paddockLandTypeLayer, pipelineLayer,
- wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
+if workspace():
+    [conditionTable, derivedBoundaryLayer, derivedMetricPaddockLayer, derivedPaddockLandTypeLayer,
+     derivedWateredAreaLayer, derivedWaterpointBufferLayer, elevationLayer,
+     fenceLayer, landTypeLayer, paddockLayer, paddockLandTypeLayer, pipelineLayer,
+     wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
 
 
 # kidmanPaddocks = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "b_Kidman_Paddocks"), None)

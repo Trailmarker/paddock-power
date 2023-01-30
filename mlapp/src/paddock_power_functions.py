@@ -18,7 +18,7 @@ def currentTimeframe(vals, *_):
     f"""Return the current {PLUGIN_NAME} Timeframe."""
     try:
         workspace = getWorkspace()
-        return workspace.currentTimeframe.name
+        return workspace.timeframe.name
     except BaseException:
         return None
 
@@ -28,7 +28,7 @@ def matchCurrentFeatureStatus(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
     try:
         workspace = getWorkspace()
-        return workspace and vals[0] and workspace.currentTimeframe.matchFeatureStatus(FeatureStatus[vals[0]])
+        return workspace and vals[0] and workspace.timeframe.matchFeatureStatus(FeatureStatus[vals[0]])
     except BaseException:
         return False
 
@@ -38,7 +38,7 @@ def matchCurrentTimeframe(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe."""
     try:
         workspace = getWorkspace()
-        return workspace and vals[0] and workspace.currentTimeframe == Timeframe[vals[0]]
+        return workspace and vals[0] and workspace.timeframe == Timeframe[vals[0]]
     except BaseException:
         return False
 
@@ -48,7 +48,7 @@ def ifCurrentFeatureStatus(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
     try:
         workspace = getWorkspace()
-        if workspace and vals[0] and workspace.currentTimeframe.matchFeatureStatus(FeatureStatus[vals[0]]):
+        if workspace and vals[0] and workspace.timeframe.matchFeatureStatus(FeatureStatus[vals[0]]):
             return vals[1]
         else:
             return vals[2]
@@ -61,7 +61,7 @@ def ifCurrentTimeframe(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe."""
     try:
         workspace = getWorkspace()
-        if workspace and vals[0] and workspace.currentTimeframe == Timeframe[vals[0]]:
+        if workspace and vals[0] and workspace.timeframe == Timeframe[vals[0]]:
             return vals[1]
         else:
             return vals[2]
@@ -73,7 +73,7 @@ def ifCurrentTimeframe(vals, *_):
 def timeframeWaterpointColour(vals, *_):
     """Convert a Timeframe to a colour for a Waterpoint."""
     try:
-        timeframe = getWorkspace().currentTimeframe
+        timeframe = getWorkspace().timeframe
 
         if timeframe == Timeframe.Current:
             return "#026b7f"
@@ -93,7 +93,7 @@ def timeframeWaterpointColour(vals, *_):
 def timeframeWaterpointForegroundColour(vals, *_):
     """Convert a Timeframe to a foreground colour for a Waterpoint."""
     try:
-        timeframe = getWorkspace().currentTimeframe
+        timeframe = getWorkspace().timeframe
 
         if timeframe == Timeframe.Current:
             return "#ffffff"

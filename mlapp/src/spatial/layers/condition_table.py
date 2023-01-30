@@ -1,20 +1,18 @@
 
 import sqlite3
 
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import QObject
 
 from ...utils import qgsInfo, PLUGIN_NAME
 from ..fields.condition_type import ConditionType
 from ..fields.names import LAND_TYPE, PADDOCK, CONDITION_TYPE
 from ..fields.timeframe import Timeframe
-from ..layers.mixins.workspace_connection_mixin import WorkspaceConnectionMixin
+from ...models.workspace_mixin import WorkspaceMixin
 
 
-class ConditionTable(WorkspaceConnectionMixin):
+class ConditionTable(QObject, WorkspaceMixin):
 
     NAME = "ConditionTable"
-
-    featuresChanged = pyqtSignal(list)
 
     def makeExistsQuery(self, tableName):
         return f"""
@@ -85,7 +83,8 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             conn.execute(self.makeDropQuery(tableName=tableName))
 
     def __init__(self, workspaceFile):
-        super().__init__()
+        QObject.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.tableName = ConditionTable.NAME
 
@@ -115,9 +114,9 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
         return self._workspace
 
     @property
-    def currentTimeframe(self):
+    def timeframe(self):
         """Get the current timeframe for this layer (same as that of the workspace)."""
-        return self.workspace.currentTimeframe if self.connectedToWorkspace else Timeframe.Undefined
+        return self.workspace.timeframe if self.connectedToWorkspace else Timeframe.Undefined
 
     def connectWorkspace(self, workspace):
         """Hook it up to uor veins."""
@@ -193,7 +192,8 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             except BaseException:
                 cursor.execute("rollback")
                 raise Exception("Error upserting split paddock condition data")
-
+        self.workspace.featuresChanged.emit([self])
+            
     def delete(self, paddockId, landTypeId):
         with sqlite3.connect(self.workspaceFile) as conn:
             conn.execute(
@@ -201,4 +201,4 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landTypeId=landTypeId))
-        # self.featuresChanged.emit([self])
+        self.workspace.featuresChanged.emit([self])

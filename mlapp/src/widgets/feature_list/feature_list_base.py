@@ -1,21 +1,18 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QFrame, QListWidget, QListWidgetItem, QSizePolicy
+from qgis.PyQt.QtWidgets import QAbstractItemView, QFrame, QListWidget, QListWidgetItem, QSizePolicy
 
-from ...spatial.layers.mixins.interaction_mixin import InteractionMixin
+
+from ...models.workspace_mixin import WorkspaceMixin
 from ...utils import qgsDebug
 
 
-class FeatureListBase(QListWidget, InteractionMixin):
-
-    @classmethod
-    def getFeatureType(cls):
-        raise NotImplementedError
+class FeatureListBase(QListWidget, WorkspaceMixin):
 
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
         QListWidget.__init__(self, parent)
-        InteractionMixin.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.listItemFactory = listItemFactory
 
@@ -38,7 +35,6 @@ class FeatureListBase(QListWidget, InteractionMixin):
     def getFeatures():
         """Get the Features."""
         raise NotImplementedError("getFeatures() must be implemented in a subclass")
-
 
     def refreshUi(self):
         """Show the Feature List."""
@@ -81,21 +77,19 @@ class FeatureListBase(QListWidget, InteractionMixin):
 
         return hint
 
-
-    # Overriding default WorkspaceMixin behaviour
     def removeSelection(self):
         """Clear the selected Feature."""
-        qgsDebug(f"Clearing selection in {self.__class__.__name__}")
+        qgsDebug(f"{self.__class__.__name__}.removeSelection()")
         self.clearSelection()
-    
-    # Overriding default WorkspaceMixin behaviour
+
     def changeSelection(self, feature):
         """Select the Feature."""
         self.removeSelection()
+        qgsDebug(f"{self.__class__.__name__}.changeSelection({feature})")
         if feature:
-            qgsDebug(f"Selecting Feature {feature.id} in {self.__class__.__name__}")
             for item in [self.item(i) for i in range(self.count())]:
                 widget = self.itemWidget(item)
-                if widget.feature.FID == feature.id():  # TODO might this lead to "old" copies of the Feature "aliasing"?
+                if widget.feature.FID == feature.FID:  # TODO might this lead to "old" copies of the Feature "aliasing"?
                     self.setCurrentItem(item)
+                    self.scrollToItem(item, QAbstractItemView.PositionAtTop)
                     return

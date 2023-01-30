@@ -13,7 +13,7 @@ from .resources_rc import *
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.models.glitch import Glitch
 from .src.models.container import Container
-from .src.utils import guiWarning, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
+from .src.utils import guiInformation, guiWarning, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 
 
 class PaddockPower(QObject):
@@ -22,6 +22,8 @@ class PaddockPower(QObject):
 
     __GLITCH_HOOK_WRAPPER = "__glitchHookWrapper"
 
+    workspaceReady = pyqtSignal()
+    workspaceUnloading = pyqtSignal()
     caughtGlitch = pyqtSignal(Glitch)
 
     def __init__(self, iface):
@@ -52,8 +54,8 @@ class PaddockPower(QObject):
 
         self.container = None
 
-        QgsProject.instance().cleared.connect(self.unloadWorkspace)
-        QgsProject.instance().readProject.connect(self.detectWorkspace)
+        # QgsProject.instance().cleared.connect(self.unloadWorkspace)
+        # QgsProject.instance().readProject.connect(self.detectWorkspace)
 
     def initContainer(self):
         """Initialise the IoC container."""
@@ -229,8 +231,10 @@ class PaddockPower(QObject):
             workspaceFile = resolveWorkspaceFile()
             if workspaceFile and os.path.exists(workspaceFile):
                 self.workspace = self.container.workspace()
+                self.workspaceReady.emit()
+                guiInformation(f"{PLUGIN_NAME} loaded workspace (.gpkg) from {os.path.split(os.path.basename(workspaceFile))[1]} …")
             else:
-                qgsInfo(f"{PLUGIN_NAME} no workspace (.gpkg) file was located …")
+                guiWarning(f"{PLUGIN_NAME} no workspace (.gpkg) file was located …")
 
     # @Glitch.glitchy(f"An error occurred while creating a {PLUGIN_NAME} workspace.")
     def createWorkspace(self):
@@ -247,8 +251,9 @@ class PaddockPower(QObject):
                     qgsInfo(f"A {PLUGIN_NAME} workspace (.gpkg) file already exists. Stopping creation …")
                 else:
                     self.workspace = self.container.workspace()
+                    self.workspaceReady.emit()
                     qgsInfo(f"{PLUGIN_NAME} created workspace …")
-                    # guiInformation(f"A new {PLUGIN_NAME} workspace file, {os.path.basename(workspaceFile)} has been created alongside your QGIS project file.")
+                    guiInformation(f"A new {PLUGIN_NAME} workspace file, {os.path.split(os.path.basename(workspaceFile))[1]} has been created alongside your QGIS project file.")
             else:
                 qgsInfo(f"{PLUGIN_NAME} no workspace (.gpkg) file was located …")
         # except BaseException as e:
@@ -264,6 +269,7 @@ class PaddockPower(QObject):
     def unloadWorkspace(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         if self.workspace is not None:
+            self.workspaceUnloading.emit()
             qgsInfo(f"{PLUGIN_NAME} unloading workspace …")
             self.workspace.unload()
             self.workspace = None

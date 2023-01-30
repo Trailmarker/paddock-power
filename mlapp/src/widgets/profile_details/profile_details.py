@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from ...models.workspace_mixin import WorkspaceMixin
 import os
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QSizePolicy, QWidget
+
+from qgis.core import QgsFeature
 
 from ...spatial.features.persisted_feature import Feature
 from .profile_canvas import ProfileCanvas
@@ -12,11 +15,13 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'profile_details_base.ui')))
 
 
-class ProfileDetails(QWidget, FORM_CLASS):
+class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
 
     def __init__(self, parent=None):
         """Constructor."""
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.setupUi(self)
 
@@ -26,10 +31,20 @@ class ProfileDetails(QWidget, FORM_CLASS):
         self.infrastructureLengthText.setProperty("class", "form-right")
 
         self.feature = None
-        self.workspace = None
         self.profileCanvas = None
 
+        self.fenceLayer.featureSelected.connect(self.onSelectedFeatureChanged)
+        self.pipelineLayer.featureSelected.connect(self.onSelectedFeatureChanged)
+
         self.refreshUi()
+
+    @property
+    def fenceLayer(self):
+        return self.workspace.fenceLayer
+
+    @property
+    def pipelineLayer(self):
+        return self.workspace.pipelineLayer
 
     def setFeature(self, feature):
         """Set the Feature."""
@@ -38,12 +53,6 @@ class ProfileDetails(QWidget, FORM_CLASS):
         else:
             self.feature = None
 
-        self.refreshUi()
-
-    def setWorkspace(self, workspace):
-        """Set the Workspace."""
-        self.workspace = workspace
-        self.workspace.selectedFeatureChanged.connect(self.onSelectedFeatureChanged)
         self.refreshUi()
 
     def refreshUi(self):
@@ -82,7 +91,7 @@ class ProfileDetails(QWidget, FORM_CLASS):
                     f"{maximumDistance:,.2f}")
 
             self.refreshProfileCanvas()
-            self.update()
+            self.triggerRepaint()
 
     def cleanupProfileCanvas(self):
         if self.profileCanvas is not None:
@@ -101,8 +110,7 @@ class ProfileDetails(QWidget, FORM_CLASS):
 
         self.refreshUi()
 
-    @pyqtSlot(type, list)
-    def onSelectedFeatureChanged(self, featureLayerType, features):
+    @pyqtSlot(type, QgsFeature, bool)
+    def onSelectedFeatureChanged(self, feature):
         """Handle a change to the selected Fence."""
-        feature = features[0] if features else None
         self.setFeature(feature)

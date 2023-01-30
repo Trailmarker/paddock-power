@@ -5,8 +5,6 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 from ...models.qt_abstract_meta import QtAbstractMeta
 from ...spatial.features.edits import Edits
 from ...spatial.features.feature_action import FeatureAction
-from ...spatial.features.persisted_feature import PersistedFeature
-from ...spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 from ...utils import PLUGIN_FOLDER
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
@@ -16,6 +14,7 @@ from .status_feature_tool_bar import StatusFeatureToolBar
 
 
 class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
+    _stateChanged = pyqtSignal()
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
@@ -118,12 +117,19 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             self.collapse.expanded.connect(self.layoutRefreshNeeded.emit)
 
         # Respond to changes in editing status
-        self.statusChanged = lambda _: self.refreshUi()
+        self.stateChanged.connect(self.refreshUi)
 
         if self.hasStatus:
-            self.feature.statusChanged = lambda _: self.refreshUi()
+            self.feature.stateChanged.connect(self.refreshUi)
 
         self.refreshUi()
+
+    @property
+    def stateChanged(self):
+        return self._stateChanged
+
+    def emitStateChanged(self):
+        self._stateChanged.emit()
 
     @property
     def hasDetails(self):
@@ -161,13 +167,8 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     @Edits.persistFeatures
     @EditAction.save.handler()
     def saveItem(self):
-        self.featureEdit.saveFeature()
-
-        if isinstance(self.feature, PersistedFeature) and not isinstance(
-                self.feature.featureLayer, PersistedDerivedFeatureLayer):
-            return Edits.upsert(self.feature)
-        else:
-            return Edits()
+        # saveFeature returns an Edits …
+        return self.featureEdit.saveFeature()
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
@@ -184,7 +185,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
         self.collapse.setTitle(self.feature.TITLE)
 
         if self.hasStatus:
-            self.statusLabel.status = self.feature.status
+            self.statusLabel.status = self.feature.STATUS
             self.statusToolBar.refreshUi()
 
         if self.isEditable:

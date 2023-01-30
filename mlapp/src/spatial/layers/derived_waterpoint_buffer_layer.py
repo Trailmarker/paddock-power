@@ -3,7 +3,6 @@ from ..calculator import Calculator
 from ..features.waterpoint_buffer import WaterpointBuffer
 from ..fields.names import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE
 from ..fields.grazing_radius_type import GrazingRadiusType
-from ..fields.schemas import WaterpointBufferSchema
 from ..fields.timeframe import Timeframe
 from ..fields.waterpoint_type import WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
@@ -15,6 +14,10 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 
     NAME = "Derived Waterpoint Buffers"
     STYLE = "waterpoint_buffer"
+
+    @classmethod
+    def getFeatureType(cls):
+        return WaterpointBuffer
 
     def prepareQuery(self, query, *dependentLayers):
         [paddockLayer, waterpointLayer] = self.names(*dependentLayers)
@@ -97,16 +100,7 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
                  waterpointLayer: WaterpointLayer):
 
         super().__init__(
-            WaterpointBuffer,
             DerivedWaterpointBufferLayer.NAME,
             DerivedWaterpointBufferLayer.STYLE,
             paddockLayer,
             waterpointLayer)
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return WaterpointBufferSchema
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return WaterpointBufferSchema.wkbType

@@ -5,7 +5,6 @@ from ...models.glitch import Glitch
 from ..features.fence import Fence
 from ..fields.feature_status import FeatureStatus
 from ..fields.names import BUILD_ORDER
-from ..fields.schemas import FenceSchema
 from .persisted_feature_layer import PersistedFeatureLayer
 
 
@@ -14,21 +13,16 @@ class FenceLayer(PersistedFeatureLayer):
     NAME = "Fences"
     STYLE = "fence"
 
+    @classmethod
+    def getFeatureType(cls):
+        return Fence
+
     def __init__(self,
                  workspaceFile):
-        super().__init__(Fence,
-                         workspaceFile,
+        super().__init__(workspaceFile,
                          layerName=FenceLayer.NAME,
                          styleName=FenceLayer.STYLE)
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return FenceSchema
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return FenceSchema.wkbType
-
+    
     def getBuildOrder(self):
         """The lowest Build Order of any Fence in Draft status."""
         fences = list(self.getFeatures())
@@ -40,9 +34,9 @@ class FenceLayer(PersistedFeatureLayer):
 
         currentBuildOrder = max([bo for (bo, _) in pairs], default=0)
         lowestDraftBuildOrder = min(
-            [bo for(bo, f) in pairs if f.status == FeatureStatus.Drafted],
+            [bo for(bo, f) in pairs if f.STATUS == FeatureStatus.Drafted],
             default=currentBuildOrder + 1)
-        highestPlannedBuildOrder = max([bo for (bo, f) in pairs if f.status == FeatureStatus.Planned], default=0)
+        highestPlannedBuildOrder = max([bo for (bo, f) in pairs if f.STATUS == FeatureStatus.Planned], default=0)
 
         return (currentBuildOrder, lowestDraftBuildOrder, highestPlannedBuildOrder)
 

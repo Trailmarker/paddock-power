@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from abc import ABC, abstractmethod, abstractproperty
 from enum import Enum
 from functools import partial
 
@@ -42,21 +41,24 @@ class StateMachineAction(StateMachineEnum):
         return partial(actionHandler, self)
 
 
-class StateMachine(ABC):
+class StateMachine:
 
-    @abstractproperty
+    def __init__(self):
+        super().__init__()
+
+    @property
     def transitions(self):
         pass
 
-    @abstractproperty
+    @property
     def actionType(self):
         pass
 
-    @abstractproperty
+    @property
     def statusType(self):
         pass
 
-    @abstractproperty
+    @property
     def status(self):
         pass
 
@@ -65,29 +67,11 @@ class StateMachine(ABC):
         pass
 
     @property
-    def statusChanged(self):
-        if not hasattr(self, "_statusChangedHandlers"):
-            setattr(self, "_statusChangedHandlers", [])
+    def stateChanged(self):
+        raise NotImplementedError
 
-        def __callAll():
-            badHandlers = []
-            for handler in self._statusChangedHandlers:
-                try:
-                    handler()
-                except BaseException as e:
-                    badHandlers.append(handler)
-                finally:
-                    self._statusChangedHandlers = [h for h in self._statusChangedHandlers if h not in badHandlers]
-
-        return __callAll
-
-    @statusChanged.setter
-    def statusChanged(self, handler):
-        if not hasattr(self, "_statusChangedHandlers"):
-            setattr(self, "_statusChangedHandlers", [])
-
-        if not handler in self._statusChangedHandlers:
-            self._statusChangedHandlers.append(handler)
+    def emitStateChanged(self):
+        raise NotImplementedError
 
     def isPermitted(self, action):
         """Return True if the action is enabled for the current status."""
@@ -104,7 +88,7 @@ class StateMachine(ABC):
             newStatus = self.transitions[(self.status, action)]
             qgsInfo(f"{self}: {self.status} → {action} → {newStatus}")
             self.status = newStatus
-            self.statusChanged()
+            self.emitStateChanged()
         else:
             qgsInfo(f"{self}: {self.status} → {action} → {newStatus} not permitted")
             # raise Glitch(f"An error happened trying to {action} a {self}")
@@ -114,5 +98,5 @@ class StateMachine(ABC):
         return f"{self.__class__.__name__}(status={self.status})"
 
     def __str__(self):
-        """Convert the EditStateMachine to a string representation."""
+        """Convert the state machine to a string representation."""
         return repr(self)

@@ -11,3 +11,8 @@ class FenceLayerList(FeatureLayerList):
         def listItemFactory(fence): return InfrastructureListItem(fence, parent=parent)
 
         super().__init__(listItemFactory, parent)
+
+    @property
+    def featureLayer(self):
+        """Get the FeatureLayer - override this."""
+        return self.workspace.fenceLayer

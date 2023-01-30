@@ -5,8 +5,9 @@ from qgis.core import QgsVectorLayer
 
 from ...models.glitch import Glitch
 from ...spatial.features.persisted_feature import PersistedFeature
+from ...models.workspace_mixin import WorkspaceMixin
+from ...spatial.layers.persisted_feature_layer import PersistedFeatureLayer
 from ...spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
-from ...spatial.layers.mixins.workspace_connection_mixin import WorkspaceConnectionMixin
 from ...utils import qgsInfo
 
 
@@ -42,8 +43,6 @@ class Edits:
     @contextmanager
     def editAndCommit(layers, emitFeaturesChanged=True):
         
-        if not all(isinstance(layer, WorkspaceConnectionMixin) for layer in layers):
-            raise Glitch("When editing layers, all layers must have a workspace connection")
         for layer in layers:
             if layer.isEditable():
                 raise Glitch(f"Please end your edit session on {layer.name()} before you run this operation")
@@ -55,7 +54,7 @@ class Edits:
                 layer.commitChanges()
             
             if emitFeaturesChanged:
-                workspace = next([l.workspace for l in layers if isinstance(l, WorkspaceConnectionMixin) and l.connectedToWorkspace])
+                workspace = next(l.workspace for l in layers if isinstance(l, WorkspaceMixin) and l.ready)
                 workspace.featuresChanged.emit(list(layers))
                 
         except Exception as e:
@@ -110,15 +109,15 @@ class Edits:
     @staticmethod
     def analyseLayers(layers):
         """Input is a correctly ordered batch of PersistedDerivedFeatureLayers."""        
-        assert all(isinstance(layer, PersistedDerivedFeatureLayer) for layer in layers)
+        assert all(isinstance(layer, PersistedFeatureLayer) for layer in layers)
 
         readOnlies = [(layer, layer.readOnly()) for layer in layers]        
         try:
             for layer in layers:
                 layer.setReadOnly(False)
             
-            with Edits.editAndCommit(layers, emitFeaturesChanged=False):
-                for layer in layers:
+            for layer in layers:
+                with Edits.editAndCommit([layer], emitFeaturesChanged=False):
                     layer.analyseFeatures()
         finally:
             for (layer, readOnly) in readOnlies:

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from functools import cached_property
 from os import path
 import sqlite3
 
@@ -8,10 +7,10 @@ from qgis.core import QgsRasterLayer
 from ...models.glitch import Glitch
 from ...utils import PLUGIN_NAME
 from .mixins.layer_mixin import LayerMixin
-from .mixins.interaction_mixin import InteractionMixin
+from ...models.workspace_mixin import WorkspaceMixin
 
 
-class ElevationLayer(QgsRasterLayer, InteractionMixin, LayerMixin):
+class ElevationLayer(QgsRasterLayer, WorkspaceMixin, LayerMixin):
 
     NAME = "Elevation Mapping"
     STYLE = "elevation"
@@ -60,20 +59,17 @@ class ElevationLayer(QgsRasterLayer, InteractionMixin, LayerMixin):
 
         # Note ths URL format is different from QgsVectorLayer!
         rasterUrl = ElevationLayer._rasterGpkgUrl(workspaceFile, layerName)
-        super().__init__(rasterUrl, baseName=layerName)
+        QgsRasterLayer.__init__(self, rasterUrl, baseName=layerName)
+        WorkspaceMixin.__init__(self)
+        LayerMixin.__init__(self)
 
         self.applyNamedStyle(styleName)
 
         self.addInBackground()
 
-    @cached_property
-    def typeName(self):
-        """Return the FeatureLayer's type name."""
-        return type(self).__name__
-
     def __repr__(self):
         """Return a string representation of the Field."""
-        return f"{self.typeName}(name={self.name()})"
+        return f"{type(self).__name__}(name={self.name()})"
 
     def __str__(self):
         """Convert the Field to a string representation."""

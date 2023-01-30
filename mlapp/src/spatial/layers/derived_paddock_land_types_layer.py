@@ -3,7 +3,6 @@ from ...utils import randomString
 from ..calculator import Calculator
 from ..features.paddock_land_type import PaddockLandType
 from ..fields.names import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDITION_TYPE, ESTIMATED_CAPACITY, FID, LAND_TYPE, LAND_TYPE_NAME, NAME, OPTIMAL_CAPACITY_PER_AREA, PADDOCK, PADDOCK_NAME, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_DISCOUNT, WATERED_TYPE, WATERED_AREA
-from ..fields.schemas import PaddockLandTypeSchema
 from ..fields.timeframe import Timeframe
 from .condition_table import ConditionTable
 from .derived_feature_layer import DerivedFeatureLayer
@@ -16,6 +15,10 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 
     NAME = "Derived Paddock Land Types"
     STYLE = "paddock_land_types_popup"
+
+    @classmethod
+    def getFeatureType(cls):
+        return PaddockLandType
 
     def prepareQuery(self, query, *dependentLayers):
 
@@ -115,18 +118,10 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
                  landTypeLayer: LandTypeLayer,
                  wateredAraLayer: WateredAreaLayer):
 
-        super().__init__(PaddockLandType,
-                         DerivedPaddockLandTypesLayer.NAME,
+        super().__init__(DerivedPaddockLandTypesLayer.NAME,
                          DerivedPaddockLandTypesLayer.STYLE,
                          conditionTable,
                          paddockLayer,
                          landTypeLayer,
                          wateredAraLayer)
 
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return PaddockLandTypeSchema
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return PaddockLandTypeSchema.wkbType

@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 from ..features.paddock_land_type import PaddockLandType
-from ..fields.schemas import LAND_TYPE_NAME, PADDOCK, TIMEFRAME, PaddockLandTypeSchema
+from ..fields.schemas import LAND_TYPE_NAME, PADDOCK, TIMEFRAME
 from ..fields.timeframe import Timeframe
-from .derived_feature_layer import DerivedFeatureLayer
+from .popup_feature_layer import PopupFeatureLayer
 
 
-class MetricPaddockLandTypesPopupLayer(DerivedFeatureLayer):
+class MetricPaddockLandTypesPopupLayer(PopupFeatureLayer):
 
     STYLE = "metric_paddock_land_types_popup"
 
+    @classmethod
+    def getFeatureType(cls):
+        return PaddockLandType
+
     def prepareQuery(self, query, *dependentLayers):
         [paddockLandTypesLayer] = self.names(*dependentLayers)
-        [paddockId, timeframe] = [self.metricPaddock.PADDOCK, self.timeframe]
+        [paddockId, timeframe] = [self.metricPaddock.PADDOCK, self.layerTimeframe]
 
         query = f"""
 select *
@@ -27,23 +31,13 @@ order by "{LAND_TYPE_NAME}"
                  timeframe):
 
         self.metricPaddock = metricPaddock
-        self.timeframe = timeframe
-
-        layerName = f"{metricPaddock.NAME} {timeframe.name} Paddock Land Types"
+        self.layerTimeframe = timeframe
 
         super().__init__(
-            PaddockLandType,
-            layerName,
+            metricPaddock,
+            f"{metricPaddock.NAME} {timeframe.name} Land Types",
             MetricPaddockLandTypesPopupLayer.STYLE,
             self.metricPaddock.paddockLandTypesLayer)
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return PaddockLandTypeSchema
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return PaddockLandTypeSchema.wkbType
 
 
 class MetricPaddockCurrentLandTypesPopupLayer(MetricPaddockLandTypesPopupLayer):

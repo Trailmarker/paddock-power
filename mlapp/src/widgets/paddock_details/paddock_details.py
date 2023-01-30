@@ -6,36 +6,37 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from qgis.core import QgsProject
 
-from ...utils import qgsDebug
+from ...models.workspace_mixin import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_details_base.ui')))
 
 
-class PaddockDetails(QWidget, FORM_CLASS):
+class PaddockDetails(QWidget, FORM_CLASS, WorkspaceMixin):
 
     def __init__(self, paddock, parent=None):
         """Constructor."""
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.setupUi(self)
 
         self.paddock = paddock
-        self._derivedMetricPaddockLayerId = None
         self.metricPaddock = None
 
+        self.refreshUi()
+
     @property
-    def derivedMetricPaddockLayer(self):
+    def featureLayer(self):
         """Get the FeatureLayer."""
-        return QgsProject.instance().mapLayer(self._derivedMetricPaddockLayerId) if self._derivedMetricPaddockLayerId else None
+        return self.workspace.derivedMetricPaddockLayer
 
-    @derivedMetricPaddockLayer.setter
-    def derivedMetricPaddockLayer(self, derivedMetricPaddockLayer):
+    def refreshUi(self):
         """Set the FeatureLayer and update the display."""
-        self._derivedMetricPaddockLayerId = derivedMetricPaddockLayer.id() if derivedMetricPaddockLayer else None
 
-        if derivedMetricPaddockLayer and self.paddock:
-            self.metricPaddock = derivedMetricPaddockLayer.getFeatureByPaddockId(self.paddock.FID)
+        if self.featureLayer and self.paddock:
+            self.metricPaddock = self.featureLayer.getFeatureByPaddockId(self.paddock.FID)
 
             if self.metricPaddock is not None:
                 self.areaText.setValue(self.metricPaddock.AREA, "{0:.2f}")

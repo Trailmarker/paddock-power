@@ -2,7 +2,6 @@
 
 from ...utils import PLUGIN_NAME
 from ..features.paddock_land_type import PaddockLandType
-from ..fields.schemas import PaddockLandTypeSchema
 from .derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
 from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
@@ -12,21 +11,17 @@ class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
     NAME = "Paddock Land Types"
     STYLE = "paddock_land_types_popup"
 
+
+    @classmethod
+    def getFeatureType(cls):
+        return PaddockLandType
+
     def __init__(self,
                  workspaceFile,
                  derivedPaddockLandTypesLayer: DerivedPaddockLandTypesLayer):
         f"""Create a new {PLUGIN_NAME} Paddock Land Types layer."""
 
-        super().__init__(PaddockLandType,
-                         workspaceFile,
+        super().__init__(workspaceFile,
                          layerName=PaddockLandTypesLayer.NAME,
                          styleName=PaddockLandTypesLayer.STYLE,
                          derivedLayer=derivedPaddockLandTypesLayer)
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return PaddockLandTypeSchema
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return PaddockLandTypeSchema.wkbType

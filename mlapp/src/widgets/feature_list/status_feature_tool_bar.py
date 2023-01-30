@@ -5,8 +5,9 @@ from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 
 class StatusFeatureToolBar(StateMachineToolBar):
     def __init__(self, feature, parent=None):
-        super().__init__(feature, parent)
+        super().__init__(feature.machine, parent)
 
+        self.feature = feature
         self.refreshUi()
 
     def addSelectAction(self):
@@ -17,4 +18,4 @@ class StatusFeatureToolBar(StateMachineToolBar):
 
     def selectFeature(self):
         """Select this Fence and zoom to it."""
-        self.machine.selectFeature()
+        self.feature.selectFeature()

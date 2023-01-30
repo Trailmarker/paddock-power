@@ -5,15 +5,15 @@ from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 
+from ..models.workspace_mixin import WorkspaceMixin
 from .map_tool import MapTool
 
 
-class SketchLineTool(MapTool):
+class SketchLineTool(MapTool, WorkspaceMixin):
     sketchFinished = pyqtSignal(QgsGeometry)
 
-    def __init__(self, workspace):
+    def __init__(self):
 
-        self.workspace = workspace
         super().__init__(self.workspace.iface.mapCanvas())
 
         self.points = []

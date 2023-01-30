@@ -24,11 +24,11 @@ class Fence(StatusFeature):
 
     @property
     def paddockLayer(self):
-        return self.workspaceLayer(PaddockLayer)
+        return self.featureLayer.workspace.paddockLayer
 
     @property
     def derivedMetricPaddockLayer(self):
-        return self.workspaceLayer(DerivedMetricPaddockLayer)
+        return self.featureLayer.workspace.derivedMetricPaddockLayer
 
     @property
     def isInfrastructure(self):
@@ -172,7 +172,7 @@ class Fence(StatusFeature):
     def getCurrentAndFuturePaddocks(self):
         """Get the MetricPaddocks with the specified Build Order."""
 
-        if self.status == FeatureStatus.Drafted:
+        if self.STATUS == FeatureStatus.Drafted:
             return [], []
             # _, crossedPaddocks = self.getCrossedPaddocks()
             # return crossedPaddocks, []
@@ -276,7 +276,7 @@ class Fence(StatusFeature):
                     splitPaddock.NAME = defaultName
                     # Note this is set explicitly to Drafted because
                     # the Paddock is derived in a dodgy way using splitFeatures
-                    splitPaddock.status = FeatureStatus.Drafted
+                    splitPaddock.STATUS = FeatureStatus.Drafted
                     splitPaddock.recalculate()
                     edits.editBefore(splitPaddock.planFeature(self, crossedPaddock))
 

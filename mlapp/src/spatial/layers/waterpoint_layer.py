@@ -1,32 +1,40 @@
 # -*- coding: utf-8 -*-
 from ..features.waterpoint import Waterpoint
-from ..fields.schemas import WaterpointSchema
 from ..layers.mixins.popup_feature_layer_mixin import PopupFeatureLayerMixin
 from .elevation_layer import ElevationLayer
 from .imported_feature_layer import ImportedFeatureLayer
-
+from .waterpoint_popup_layer import WaterpointPopupLayer
 
 class WaterpointLayer(ImportedFeatureLayer, PopupFeatureLayerMixin):
 
     NAME = "Waterpoints"
     STYLE = "waterpoint"
 
+    @property
+    def popupLayerTypes(self): 
+        return [WaterpointPopupLayer]
+    
+    @property
+    def relativeLayerPosition(self):
+        """Makes the Paddock Land Types popups appear *over* the Paddock layer."""
+        return 1
+
+    @property
+    def zoomPopupLayerOnLoad(self):
+        """True for this becaus Waterpoints don't zoom nicely."""
+        return True
+
+    @classmethod
+    def getFeatureType(cls):
+        return Waterpoint
+
     def __init__(self,
                  workspaceFile,
                  elevationLayer: ElevationLayer):
         """Create or open a Waterpoint layer."""
 
-        super().__init__(Waterpoint,
-                         workspaceFile,
+        super().__init__(workspaceFile,
                          layerName=WaterpointLayer.NAME,
                          styleName=WaterpointLayer.STYLE)
 
         self.elevationLayer = elevationLayer
-
-    def getSchema(self):
-        """Return the Schema for this layer."""
-        return WaterpointSchema
-
-    def getWkbType(self):
-        """Return the WKB type for this layer."""
-        return WaterpointSchema.wkbType
