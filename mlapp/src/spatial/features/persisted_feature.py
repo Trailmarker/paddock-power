@@ -76,7 +76,7 @@ class PersistedFeature(Feature):
     def upsert(self):
         """Add or update the PersistedFeature in the PersistedFeatureLayer."""
 
-        self.recalculate()
+        # self.recalculate()
 
         if (self.FID >= 0):
             self.featureLayer.updateFeature(self)

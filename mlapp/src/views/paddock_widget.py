@@ -30,29 +30,15 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, True)
 
-        self.currentPaddockLandTypeList.timeframe = Timeframe.Current
-        self.futurePaddockLandTypeList.timeframe = Timeframe.Future
 
-        self.workspace.derivedMetricPaddockLayer.popupLayerAdded.connect(self.setPaddockLandTypesLayer)
-        self.workspace.derivedMetricPaddockLayer.popupLayerRemoved.connect(self.clearPaddockLandTypesLayers)
+        self.currentPaddockLandTypesList.popupLayerSource = self.workspace.derivedMetricPaddockLayer
+        self.futurePaddockLandTypesList.popupLayerSource = self.workspace.derivedMetricPaddockLayer
 
         self.paddockFilterLineEdit.textChanged.connect(
             self.onPaddockFilterChanged)
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
 
-    def setPaddockLandTypesLayer(self, popupLayer):
-        if type(popupLayer) == MetricPaddockCurrentLandTypesPopupLayer:
-           self.currentPaddockLandTypeList.featureLayer = popupLayer
-        elif type(popupLayer) == MetricPaddockFutureLandTypesPopupLayer:
-           self.futurePaddockLandTypeList.featureLayer = popupLayer
-        # pass
-
-    @pyqtSlot()
-    def clearPaddockLandTypesLayers(self):
-        self.currentPaddockLandTypeLsist.featureLayer = None
-        self.futurePaddockLandTypeList.featureLayer = None
-        pass
 
     def onPaddockFilterChanged(self, text):
         self.paddockList.filterByName(text)

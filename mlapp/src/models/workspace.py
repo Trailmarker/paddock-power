@@ -62,7 +62,7 @@ class Workspace(QObject):
         self.importDialog = None
 
         self.timeframeChanged.connect(self.deselectLayers)
-        self.featuresChanged.connect(self.analyseLayers)
+        # self.featuresChanged.connect(self.updateLayers)
 
         # For convenient reference
         self.landTypeLayer = self.workspaceLayers.layer(LandTypeLayer)
@@ -218,13 +218,21 @@ class Workspace(QObject):
         """Return the order in which layers should be analsed."""
         order = self.layerDependencyGraph.analysisOrder()
         return [self.workspaceLayers.layer(layerType) for layerType in order]
-        
+    
     def updateOrder(self, updatedLayers):
         """Return the order in which layers should be updated."""
         updateOrder = self.layerDependencyGraph.updateOrder(updatedLayers)
         return [self.workspaceLayers.layer(layerType) for layerType in updateOrder]
 
-    @pyqtSlot(list)
+    
+    def updateLayers(self, updatedLayers):
+        """Winnow and re-analyse a batch of updated layers."""
+        updateOrder = self.updateOrder(updatedLayers)
+        qgsInfo(f"{PLUGIN_NAME} deriving layers … {updateOrder}")
+        Edits.analyseLayers(updateOrder)
+        qgsInfo(f"{PLUGIN_NAME} load complete.")
+   
+   
     def analyseLayers(self):
         """Winnow and re-analyse a batch of updated layers."""        
         analysisOrder = self.analysisOrder()

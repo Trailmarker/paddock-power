@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from .persisted_feature import PersistedFeature
+from ...utils import qgsDebug
+from ..features.condition_record import ConditionRecord
+from ..features.edits import Edits
 from ..fields.schemas import PaddockLandTypeSchema
-from ..layers.condition_table import ConditionTable
-
+from .persisted_feature import PersistedFeature
 
 @PaddockLandTypeSchema.addSchema()
 class PaddockLandType(PersistedFeature):
@@ -30,5 +31,6 @@ class PaddockLandType(PersistedFeature):
 
     def upsertCondition(self, conditionType):
         """Update the Condition table."""
-        self.conditionTable.upsert(self.paddock, self.landType, conditionType)
+        condition = (self.PADDOCK, self.LAND_TYPE, conditionType)
+        self.conditionTable.upsert(*condition)
         self.conditionType = conditionType

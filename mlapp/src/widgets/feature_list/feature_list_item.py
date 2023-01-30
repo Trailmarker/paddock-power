@@ -18,9 +18,11 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     _stateChanged = pyqtSignal()
     layoutRefreshNeeded = pyqtSignal()
 
-    def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
+    def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, noEdits=False, parent=None):
         QWidget.__init__(self, parent)
         EditStateMachine.__init__(self)
+
+        self.noEdits = noEdits
 
         self.feature = feature
 
@@ -87,10 +89,17 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             EditAction.cancelEdit,
             f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
             lambda *_: self.cancelEditItem())
-        self.editToolBar.addStateAction(
-            EditAction.save,
-            f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
-            lambda *_: self.saveItem())
+        
+        if self.noEdits:
+            self.editToolBar.addStateAction(
+                EditAction.save,
+                f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
+                lambda *_: self.saveItemNoEdits())
+        else:
+            self.editToolBar.addStateAction(
+                EditAction.save,
+                f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
+                lambda *_: self.saveItem())
 
         self.editToolBar.addGenericAction(
             f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
@@ -124,6 +133,8 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             machine(self.feature).stateChanged.connect(self.refreshUi)
 
         self.refreshUi()
+
+
 
     @property
     def stateChanged(self):
@@ -171,6 +182,13 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
         # saveFeature returns an Edits …
         return self.featureEdit.saveFeature()
 
+
+    @EditAction.save.handler()
+    def saveItemNoEdits(self):
+        # saveFeature returns an Edits …
+        return self.featureEdit.saveFeature()
+    
+        
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
         pass

@@ -9,7 +9,7 @@ from ...features.feature import Feature
 from ..popup_feature_layer import PopupFeatureLayer
 
 
-class PopupFeatureLayerMixin:
+class PopupLayerSourceMixin:
 
     popupLayerAdded = pyqtSignal(PopupFeatureLayer)
     popupLayerRemoved = pyqtSignal()
@@ -76,8 +76,8 @@ class PopupFeatureLayerMixin:
         # The "relativeLayerPosition determines whether a layer is below or above"
         group.insertLayer(max(0, layerIndex + self.relativeLayerPosition), popupLayer)
         
-        if self.zoomPopupLayerOnLoad:
-            popupLayer.zoomLayer()
+        # if self.zoomPopupLayerOnLoad:
+        #     popupLayer.zoomLayer()
         self.popupLayerAdded.emit(popupLayer)
 
     def addAllPopupLayers(self, feature):

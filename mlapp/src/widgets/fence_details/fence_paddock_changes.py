@@ -37,7 +37,6 @@ class FencePaddockChanges(QWidget, FORM_CLASS, WorkspaceMixin):
 
     def changeSelection(self, feature):
         self.fence = feature
-        self.fence.connectStateChanged(self.refreshUi)
 
     def removeSelection(self):
         self.fence = None

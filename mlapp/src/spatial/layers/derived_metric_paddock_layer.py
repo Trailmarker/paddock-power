@@ -4,14 +4,14 @@ from qgis.core import QgsFeatureRequest
 from ..features.metric_paddock import MetricPaddock
 from ..fields.names import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_AREA
 from ..fields.timeframe import Timeframe
-from .mixins.popup_feature_layer_mixin import PopupFeatureLayerMixin
 from .derived_feature_layer import DerivedFeatureLayer
 from .metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
-from .paddock_layer import PaddockLayer
+from .mixins.popup_layer_source_mixin import PopupLayerSourceMixin
 from .paddock_land_types_layer import PaddockLandTypesLayer
+from .paddock_layer import PaddockLayer
 
 
-class DerivedMetricPaddockLayer(DerivedFeatureLayer, PopupFeatureLayerMixin):
+class DerivedMetricPaddockLayer(DerivedFeatureLayer, PopupLayerSourceMixin):
 
     NAME = "Paddocks"
     STYLE = "paddock"

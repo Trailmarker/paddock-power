@@ -38,4 +38,5 @@ class PaddockLandTypeDetailsEdit(QWidget, FORM_CLASS):
     def saveFeature(self):
         """Save the Paddock Land Type details, updating the Condition Type."""
         self.paddockLandType.upsertCondition(self._conditionType)
-        return Edits()
+        
+        

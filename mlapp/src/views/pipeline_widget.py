@@ -36,4 +36,4 @@ class PipelineWidget(QWidget, FORM_CLASS, WorkspaceMixin):
     def onSketchPipelineFinished(self, sketchLine):
         pipeline = self.workspace.pipelineLayer.makeFeature()
         pipeline.planFeature(sketchLine)
-        self.workspace.selectFeature(pipeline)
+        # self.workspace.selectFeature(pipeline)

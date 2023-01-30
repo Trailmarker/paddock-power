@@ -11,8 +11,7 @@ class FeatureLayerList(FeatureListBase):
         self._timeframeOverride = False
         self.workspace.timeframeChanged.connect(self.refreshUi)
         
-        if self.featureLayer:
-            self.rewireFeatureLayer(None, self.featureLayer)
+        self._featureLayer = None
         
         self.refreshUi()
 

@@ -105,7 +105,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockLandTypesLayerList" name="currentPaddockLandTypeList"/>
+        <widget class="CurrentPaddockLandTypesLayerList" name="currentPaddockLandTypesList"/>
        </item>
       </layout>
      </widget>
@@ -133,7 +133,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockLandTypesLayerList" name="futurePaddockLandTypeList"/>
+        <widget class="FuturePaddockLandTypesLayerList" name="futurePaddockLandTypesList"/>
        </item>
       </layout>
      </widget>
@@ -156,7 +156,12 @@
    <header>mlapp/src/widgets/feature_list/metric_paddock_layer_list</header>
   </customwidget>
   <customwidget>
-   <class>PaddockLandTypesLayerList</class>
+   <class>CurrentPaddockLandTypesLayerList</class>
+   <extends>QListWidget</extends>
+   <header>mlapp/src/widgets/feature_list/paddock_land_types_layer_list</header>
+  </customwidget>
+  <customwidget>
+   <class>FuturePaddockLandTypesLayerList</class>
    <extends>QListWidget</extends>
    <header>mlapp/src/widgets/feature_list/paddock_land_types_layer_list</header>
   </customwidget>
