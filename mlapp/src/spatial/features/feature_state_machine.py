@@ -15,7 +15,7 @@ class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
     def __init__(self, feature):
         QObject.__init__(self)
         super().__init__()
-        self.feature = feature
+        self._feature = feature
 
     # State machine interface
     __TRANSITIONS = {
@@ -44,7 +44,7 @@ class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
 
     def doAction(self, action):
         """Perform an action on the Feature state machine and update the current timeframe if necessary."""
-        newTimeframe = self.feature.featureLayer.timeframe
+        newTimeframe = self._feature.featureLayer.timeframe
         actionPermitted = self.isPermitted(action)
 
         if actionPermitted:
@@ -60,7 +60,7 @@ class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
         super().doAction(action)
 
         if actionPermitted:
-            self.feature.featureLayer.workspace.setTimeframe(newTimeframe)
+            self._feature.featureLayer.workspace.setTimeframe(newTimeframe)
 
     @property
     def transitions(self):
@@ -76,22 +76,22 @@ class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
 
     @property
     def status(self):
-        return self.feature.STATUS
+        return self._feature.STATUS
 
     @status.setter
     def status(self, stat):
-        self.feature.STATUS = stat
+        self._feature.STATUS = stat
 
     @property
     def STATUS(self):
-        return self.feature.STATUS
+        return self._feature.STATUS
 
     @STATUS.setter
     def status(self, s):
-        self.feature.STATUS = s
+        self._feature.STATUS = s
         
     def displayName(self):
-        return self.feature.displayName()
+        return self._feature.displayName()
 
     @property
     def stateChanged(self):

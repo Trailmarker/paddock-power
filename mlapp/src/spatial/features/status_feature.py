@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ...models.state_machine import StateMachineMixin
 from ..fields.names import TIMEFRAME
 from ..fields.schemas import StatusFeatureSchema
 from ..fields.timeframe import Timeframe
@@ -9,13 +10,13 @@ from .persisted_feature import PersistedFeature
 
 
 @StatusFeatureSchema.addSchema()
-class StatusFeature(PersistedFeature):
+class StatusFeature(PersistedFeature, StateMachineMixin):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new AreaFeature."""
         PersistedFeature.__init__(self, featureLayer, existingFeature)
 
-        self.machine = FeatureStateMachine(self)
+        self._machine = FeatureStateMachine(self)
 
     def __repr__(self):
         """Return a string representation of the Feature."""
@@ -26,16 +27,8 @@ class StatusFeature(PersistedFeature):
         return repr(self)
 
     @property
-    def stateChanged(self):
-        return self.machine.stateChanged
-
-    @property
-    def status(self):
-        return self.STATUS
-    
-    @status.setter
-    def status(self, stat):
-        self.STATUS = stat
+    def machine(self):
+        return self._machine
 
     @property
     def TIMEFRAME(self):

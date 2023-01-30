@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from abc import abstractproperty
 from enum import Enum
 from functools import partial
 
@@ -23,16 +24,35 @@ class StateMachineStatus(StateMachineEnum):
     pass
 
 
+class StateMachineMixin:
+    """Given an object a degree of control in terms of how it works as a machine."""
+    
+    # In the case of getting from the machine to the object, we have the latitude
+    # to implement the StateMachine interface the way we choose (eg FeatureStateMachine
+    # is done as a facade).This is for the other way round, getting from the object 
+    # to the machine …
+    @abstractproperty
+    def machine(self):
+        pass
+
+def machine(obj):
+    """Retrieve the machine from the object."""
+    if isinstance(obj, StateMachineMixin):
+        return obj.machine
+    elif isinstance(obj, StateMachine):
+        return obj
+
+
 def actionHandler(action, method):
-    def wrapper(machine, *args, **kwargs):
-        if machine.isPermitted(action):
+    def wrapper(obj, *args, **kwargs):
+        if machine(obj).isPermitted(action):
             # message = f"An error happened trying to {action} a {machine}"
-            result = ((Glitch.glitchy())(method))(machine, *args, **kwargs)
-            machine.doAction(action)
+            result = ((Glitch.glitchy())(method))(obj, *args, **kwargs)
+            machine(obj).doAction(action)
             return result
         else:
             raise Glitch(
-                f"This {machine} can't handle the action {action} using the handler {method.__name__}, because it's in {machine.status} state")
+                f"This {obj} can't handle the action {action} using the handler {method.__name__}, because it's in {obj.status} state")
     return wrapper
 
 

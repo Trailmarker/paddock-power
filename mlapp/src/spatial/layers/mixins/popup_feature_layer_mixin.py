@@ -45,7 +45,7 @@ class PopupFeatureLayerMixin:
 
     @classmethod
     def __key(self, layerType):
-        return layerType.__name__
+        return layerType.__name__ if isinstance(layerType, type) else layerType
 
     def getPopupLayer(self, layerType):
         """Get the popup layer with the given name."""
@@ -101,7 +101,7 @@ class PopupFeatureLayerMixin:
             except BaseException:
                 pass
             finally:
-                self.popupLayerRemoved.emit(self)
+                self.popupLayerRemoved.emit()
                 self.popupLayer = None
 
     def removeAllPopupLayers(self):

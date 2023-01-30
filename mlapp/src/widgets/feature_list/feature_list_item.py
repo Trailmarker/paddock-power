@@ -3,6 +3,7 @@ from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ...models.qt_abstract_meta import QtAbstractMeta
+from ...models.state_machine import machine
 from ...spatial.features.edits import Edits
 from ...spatial.features.feature_action import FeatureAction
 from ...utils import PLUGIN_FOLDER
@@ -120,7 +121,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
         self.stateChanged.connect(self.refreshUi)
 
         if self.hasStatus:
-            self.feature.stateChanged.connect(self.refreshUi)
+            machine(self.feature).stateChanged.connect(self.refreshUi)
 
         self.refreshUi()
 

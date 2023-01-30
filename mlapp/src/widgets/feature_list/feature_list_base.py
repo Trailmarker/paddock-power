@@ -82,14 +82,17 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
         qgsDebug(f"{self.__class__.__name__}.removeSelection()")
         self.clearSelection()
 
-    def changeSelection(self, feature):
+    def changeSelection(self, layerType):
         """Select the Feature."""
         self.removeSelection()
+
+        feature = self.workspace.selectedFeature(layerType)
+
         qgsDebug(f"{self.__class__.__name__}.changeSelection({feature})")
         if feature:
             for item in [self.item(i) for i in range(self.count())]:
                 widget = self.itemWidget(item)
-                if widget.feature.FID == feature.FID:  # TODO might this lead to "old" copies of the Feature "aliasing"?
+                if widget.feature.FID == feature.FID:
                     self.setCurrentItem(item)
                     self.scrollToItem(item, QAbstractItemView.PositionAtTop)
                     return
