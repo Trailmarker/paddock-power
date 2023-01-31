@@ -1,5 +1,3 @@
-from dependency_injector import containers, providers
-
 from qgis.utils import iface
 
 from ..models.glitch import Glitch
@@ -20,99 +18,107 @@ from ..spatial.layers.pipeline_layer import PipelineLayer
 from ..spatial.layers.watered_area_layer import WateredAreaLayer
 from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from ..spatial.layers.waterpoint_layer import WaterpointLayer
-from ..utils import PLUGIN_NAME, resolveProjectFile, resolveWorkspaceFile
+from ..utils import PLUGIN_NAME
 
 
-def resolveWorkspaceFileOrFail(projectFile: str):
-    workspaceFile = resolveWorkspaceFile(projectFilePath=projectFile)
-    if workspaceFile is None:
-        raise Glitch(f"Could not resolve {PLUGIN_NAME} workspace file.")
-    return workspaceFile
+class Container:
 
+    def __init__(self):
+        self.workspaceFile = None
+        self.qgisInterface = None
+        self.landTypeLayer = None
+        self.conditionTable = None
+        self.elevationLayer = None
+        self.paddockLayer = None
+        self.waterpointLayer = None
+        self.derivedWaterpointBufferLayer = None
+        self.waterpointBufferLayer = None
+        self.derivedWateredAreaLayer = None
+        self.wateredAreaLayer = None
+        self.derivedPaddockLandTypesLayer = None
+        self.paddockLandTypesLayer = None
+        self.derivedMetricPaddockLayer = None
+        self.fenceLayer = None
+        self.pipelineLayer = None
+        self.derivedBoundaryLayer = None
+        self.workspaceLayers = None
+        self.workspace = None
 
-class Container(containers.DeclarativeContainer):
+    
+    def initServices(self, workspaceFile):
+        self.workspaceFile = workspaceFile
+        self.qgisInterface = iface
+        self.landTypeLayer = LandTypeLayer(self.workspaceFile)
+        self.conditionTable = ConditionTable(self.workspaceFile)
 
-    projectFile = providers.Factory(resolveProjectFile)
+        self.elevationLayer = ElevationLayer(
+            self.workspaceFile)
 
-    workspaceFile = providers.Factory(resolveWorkspaceFileOrFail,
-                                      projectFile)
+        self.paddockLayer = PaddockLayer(
+            self.workspaceFile,
+            self.conditionTable)
 
-    qgisInterface = providers.Singleton(lambda: iface)
+        self.waterpointLayer = WaterpointLayer(
+            self.workspaceFile,
+            self.elevationLayer)
 
-    landTypeLayer = providers.Singleton(LandTypeLayer,
-                                        workspaceFile)
+        self.derivedWaterpointBufferLayer = DerivedWaterpointBufferLayer(
+            self.paddockLayer,
+            self.waterpointLayer)
 
-    conditionTable = providers.Singleton(ConditionTable,
-                                         workspaceFile)
+        self.waterpointBufferLayer = WaterpointBufferLayer(
+            self.workspaceFile,
+            self.derivedWaterpointBufferLayer)
 
-    elevationLayer = providers.Singleton(ElevationLayer,
-                                         workspaceFile)
+        self.derivedWateredAreaLayer = DerivedWateredAreaLayer(
+            self.paddockLayer,
+            self.waterpointBufferLayer)
 
-    paddockLayer = providers.Singleton(PaddockLayer,
-                                       workspaceFile,
-                                       conditionTable)
+        self.wateredAreaLayer = WateredAreaLayer(
+            self.workspaceFile,
+            self.derivedWateredAreaLayer)
 
-    waterpointLayer = providers.Singleton(WaterpointLayer,
-                                          workspaceFile,
-                                          elevationLayer)
+        self.derivedPaddockLandTypesLayer = DerivedPaddockLandTypesLayer(
+            self.conditionTable,
+            self.paddockLayer,
+            self.landTypeLayer,
+            self.wateredAreaLayer)
 
-    derivedWaterpointBufferLayer = providers.Singleton(DerivedWaterpointBufferLayer,
-                                                       paddockLayer,
-                                                       waterpointLayer)
+        self.paddockLandTypesLayer = PaddockLandTypesLayer(
+            self.workspaceFile,
+            self.derivedPaddockLandTypesLayer)
 
-    waterpointBufferLayer = providers.Singleton(WaterpointBufferLayer,
-                                                workspaceFile,
-                                                derivedWaterpointBufferLayer)
+        self.derivedMetricPaddockLayer = DerivedMetricPaddockLayer(
+            self.paddockLayer,
+            self.paddockLandTypesLayer)
 
-    derivedWateredAreaLayer = providers.Singleton(DerivedWateredAreaLayer,
-                                                  paddockLayer,
-                                                  waterpointBufferLayer)
+        self.fenceLayer = FenceLayer(
+            self.workspaceFile)
 
-    wateredAreaLayer = providers.Singleton(WateredAreaLayer,
-                                           workspaceFile,
-                                           derivedWateredAreaLayer)
+        self.pipelineLayer = PipelineLayer(
+            self.workspaceFile)
 
-    derivedPaddockLandTypesLayer = providers.Singleton(DerivedPaddockLandTypesLayer,
-                                                       conditionTable,
-                                                       paddockLayer,
-                                                       landTypeLayer,
-                                                       wateredAreaLayer)
+        self.derivedBoundaryLayer = DerivedBoundaryLayer(
+            self.paddockLayer)
 
-    paddockLandTypesLayer = providers.Singleton(PaddockLandTypesLayer,
-                                                workspaceFile,
-                                                derivedPaddockLandTypesLayer)
+        self.workspaceLayers = WorkspaceLayers(
+            *[self.landTypeLayer,
+              self.conditionTable,
+              self.paddockLayer,
+              self.elevationLayer,
+              self.waterpointLayer,
+              self.derivedWaterpointBufferLayer,
+              self.waterpointBufferLayer,
+              self.derivedWateredAreaLayer,
+              self.wateredAreaLayer,
+              self.derivedPaddockLandTypesLayer,
+              self.paddockLandTypesLayer,
+              self.derivedMetricPaddockLayer,
+              self.fenceLayer,
+              self.pipelineLayer,
+              self.derivedBoundaryLayer])
 
-    derivedMetricPaddockLayer = providers.Singleton(DerivedMetricPaddockLayer,
-                                                    paddockLayer,
-                                                    paddockLandTypesLayer)
-
-    fenceLayer = providers.Singleton(FenceLayer,
-                                     workspaceFile)
-
-    pipelineLayer = providers.Singleton(PipelineLayer,
-                                        workspaceFile)
-
-    derivedBoundaryLayer = providers.Singleton(DerivedBoundaryLayer,
-                                               paddockLayer)
-
-    workspaceLayers = providers.Singleton(WorkspaceLayers,
-                                          *[landTypeLayer,
-                                            conditionTable,
-                                            paddockLayer,
-                                            elevationLayer,
-                                            waterpointLayer,
-                                            derivedWaterpointBufferLayer,
-                                            waterpointBufferLayer,
-                                            derivedWateredAreaLayer,
-                                            wateredAreaLayer,
-                                            derivedPaddockLandTypesLayer,
-                                            paddockLandTypesLayer,
-                                            derivedMetricPaddockLayer,
-                                            fenceLayer,
-                                            pipelineLayer,
-                                            derivedBoundaryLayer])
-
-    workspace = providers.Singleton(Workspace,
-                                    qgisInterface,
-                                    workspaceFile,
-                                    workspaceLayers)
+        self.workspace = Workspace(
+            self.qgisInterface,
+            self.workspaceFile,
+            self.workspaceLayers)

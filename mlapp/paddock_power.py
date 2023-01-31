@@ -3,20 +3,6 @@ import os.path
 import sys
 
 
-import platform
-import subprocess 
-import sys
-
-try:
-    from dependency_injector import containers, providers
-except ModuleNotFoundError:
-    if platform.system() == 'Windows':
-        subprocess.call([sys.exec_prefix + '/python', "-m", 'pip', 'install', 'dependency_injector'])
-    else:
-        subprocess.call(['python3', '-m', 'pip', 'install', 'dependency_injector']) 
-    from dependency_injector import containers, providers
-
-
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, QTranslator, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -76,8 +62,6 @@ class PaddockPower(QObject):
         """Initialise the IoC container."""
         qgsInfo(f"{PLUGIN_NAME} initialising resources …")
         self.container = Container()
-        self.container.init_resources()
-        self.container.wire(modules=[__name__])
 
     def addAction(self,
                   icon,
@@ -245,7 +229,8 @@ class PaddockPower(QObject):
         else:
             workspaceFile = resolveWorkspaceFile()
             if workspaceFile and os.path.exists(workspaceFile):
-                self.workspace = self.container.workspace()
+                self.container.initServices(workspaceFile)
+                self.workspace = self.container.workspace
                 self.workspaceReady.emit()
                 guiInformation(f"{PLUGIN_NAME} loaded workspace (.gpkg) from {os.path.split(os.path.basename(workspaceFile))[1]} …")
             else:
@@ -265,7 +250,8 @@ class PaddockPower(QObject):
                 if os.path.exists(workspaceFile):
                     qgsInfo(f"A {PLUGIN_NAME} workspace (.gpkg) file already exists. Stopping creation …")
                 else:
-                    self.workspace = self.container.workspace()
+                    self.container.initServices(workspaceFile)
+                    self.workspace = self.container.workspace
                     self.workspaceReady.emit()
                     qgsInfo(f"{PLUGIN_NAME} created workspace …")
                     guiInformation(f"A new {PLUGIN_NAME} workspace file, {os.path.split(os.path.basename(workspaceFile))[1]} has been created alongside your QGIS project file.")
