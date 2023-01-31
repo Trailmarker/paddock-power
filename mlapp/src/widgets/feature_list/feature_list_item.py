@@ -6,7 +6,7 @@ from ...models.qt_abstract_meta import QtAbstractMeta
 from ...models.state_machine import machine
 from ...spatial.features.edits import Edits
 from ...spatial.features.feature_action import FeatureAction
-from ...utils import PLUGIN_FOLDER
+from ...utils import PLUGIN_FOLDER, qgsDebug
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -131,7 +131,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
         if self.hasStatus:
             machine(self.feature).stateChanged.connect(self.refreshUi)
-
+            machine(self.feature).stateChanged.connect(lambda: qgsDebug(f"State of {self} updated!"))
         self.refreshUi()
 
 

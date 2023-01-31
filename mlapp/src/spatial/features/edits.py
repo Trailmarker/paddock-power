@@ -43,21 +43,12 @@ class Edits:
     @staticmethod
     @contextmanager
     def editAndCommit(layers, emitFeaturesChanged=True):
-
-        for layer in layers:
-            if layer.isEditable():
-                raise Glitch(f"Please end your edit session on {layer.name()} before you run this operation")
         try:
             for layer in layers:
                 layer.startEditing()
             yield
             for layer in layers:
                 layer.commitChanges()
-
-            # if emitFeaturesChanged:
-            #     workspace = next(l.workspace for l in layers if isinstance(l, WorkspaceMixin) and l.ready)
-            #     workspace.featuresChanged.emit(list(layers))
-
         except Exception as e:
             qgsInfo("Edits.editAndCommit: Exception raised, rolling back edits")
             for layer in layers:

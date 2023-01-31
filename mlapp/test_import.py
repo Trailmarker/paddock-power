@@ -1,7 +1,6 @@
 
-from mlapp.dev import *
-from mlapp.src.spatial.fields.field_map import FieldMap
-from mlapp.src.spatial.layers.imported_feature_layer import ImportedFeatureLayer
+from .dev import *
+from .src.spatial.fields.field_map import FieldMap
 
 # From QGIS having created a new project and loaded it empty
 
