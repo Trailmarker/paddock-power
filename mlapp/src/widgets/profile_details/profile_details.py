@@ -110,7 +110,11 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
 
         self.refreshUi()
 
-    @pyqtSlot(type, QgsFeature, bool)
-    def onSelectedFeatureChanged(self, feature):
+    def onSelectedFeatureChanged(self, layerType):
         """Handle a change to the selected Fence."""
-        self.setFeature(feature)
+        feature = self.workspace.selectedFeature(layerType)
+        
+        if feature and feature.isInfrastructure:
+            self.setFeature(feature)
+
+
