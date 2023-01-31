@@ -2,6 +2,21 @@
 import os.path
 import sys
 
+
+import platform
+import subprocess 
+import sys
+
+try:
+    from dependency_injector import containers, providers
+except ModuleNotFoundError:
+    if platform.system() == 'Windows':
+        subprocess.call([sys.exec_prefix + '/python', "-m", 'pip', 'install', 'dependency_injector'])
+    else:
+        subprocess.call(['python3', '-m', 'pip', 'install', 'dependency_injector']) 
+    from dependency_injector import containers, providers
+
+
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, QTranslator, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
