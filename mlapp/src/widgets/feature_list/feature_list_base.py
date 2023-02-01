@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QFrame, QListWidget, QListWidgetItem, QSizePolicy
 
 
-from ...models.workspace_mixin import WorkspaceMixin
+from ...models import WorkspaceMixin
 from ...utils import qgsDebug
 
 

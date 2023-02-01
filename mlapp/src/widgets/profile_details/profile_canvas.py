@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.utils import iface
 
-from ...models.glitch import Glitch
-from ...spatial.elevation_profile import ElevationProfile
+from ...models import Glitch
+from ...layers.elevation_profile import ElevationProfile
 from ...utils import qgsDebug
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg

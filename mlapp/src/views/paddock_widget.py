@@ -2,12 +2,9 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ..spatial.fields.timeframe import Timeframe
-from ..spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
-from ..models.workspace_mixin import WorkspaceMixin
+from ..models import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_widget_base.ui')))

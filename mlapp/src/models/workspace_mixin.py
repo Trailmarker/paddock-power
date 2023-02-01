@@ -2,14 +2,12 @@
 from functools import cached_property
 from qgis.utils import plugins
 
-from ..spatial.fields.timeframe import Timeframe
-
 
 class WorkspaceMixin:
 
     def __init__(self):
         super().__init__()
-
+        
     @cached_property
     def plugin(self):
         return plugins['mlapp']
@@ -25,4 +23,5 @@ class WorkspaceMixin:
 
     @property
     def timeframe(self):
-        return self.workspace.timeframe if self.ready else Timeframe.Undefined
+        # TODO could be null …
+        return self.workspace.timeframe

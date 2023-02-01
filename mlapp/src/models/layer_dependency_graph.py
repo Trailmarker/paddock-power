@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
-from ..spatial.layers.condition_table import ConditionTable
-from ..spatial.layers.derived_boundary_layer import DerivedBoundaryLayer
-from ..spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
-from ..spatial.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
-from ..spatial.layers.derived_watered_area_layer import DerivedWateredAreaLayer
-from ..spatial.layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
-from ..spatial.layers.elevation_layer import ElevationLayer
-from ..spatial.layers.feature_layer import FeatureLayer
-from ..spatial.layers.fence_layer import FenceLayer
-from ..spatial.layers.land_type_layer import LandTypeLayer
-from ..spatial.layers.paddock_layer import PaddockLayer
-from ..spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
-from ..spatial.layers.persisted_feature_layer import PersistedFeatureLayer
-from ..spatial.layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
-from ..spatial.layers.pipeline_layer import PipelineLayer
-from ..spatial.layers.watered_area_layer import WateredAreaLayer
-from ..spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from ..spatial.layers.waterpoint_layer import WaterpointLayer
+from ..layers.land_type_condition_table import LandTypeConditionTable
+from ..layers.derived_boundary_layer import DerivedBoundaryLayer
+from ..layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
+from ..layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
+from ..layers.derived_watered_area_layer import DerivedWateredAreaLayer
+from ..layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
+from ..layers.elevation_layer import ElevationLayer
+from ..layers.feature_layer import FeatureLayer
+from ..layers.fence_layer import FenceLayer
+from ..layers.land_type_layer import LandTypeLayer
+from ..layers.paddock_layer import PaddockLayer
+from ..layers.paddock_land_types_layer import PaddockLandTypesLayer
+from ..layers.persisted_feature_layer import PersistedFeatureLayer
+from ..layers.persisted_derived_feature_layer import PersistedDerivedFeatureLayer
+from ..layers.pipeline_layer import PipelineLayer
+from ..layers.watered_area_layer import WateredAreaLayer
+from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from ..layers.waterpoint_layer import WaterpointLayer
 
 from .type_dependency_graph import TypeDependencyGraph
 
@@ -28,9 +28,9 @@ class LayerDependencyGraph(TypeDependencyGraph):
         super().__init__()
 
         self.addDependencies(LandTypeLayer, [])
-        self.addDependencies(ConditionTable, [])
+        self.addDependencies(LandTypeConditionTable, [])
         self.addDependencies(ElevationLayer, [])
-        self.addDependencies(PaddockLayer, [ConditionTable])
+        self.addDependencies(PaddockLayer, [LandTypeConditionTable])
         self.addDependencies(WaterpointLayer, [ElevationLayer])
         self.addDependencies(DerivedWaterpointBufferLayer, [PaddockLayer, WaterpointLayer])
         self.addDependencies(WaterpointBufferLayer, [DerivedWaterpointBufferLayer])
@@ -38,7 +38,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(WateredAreaLayer, [DerivedWateredAreaLayer])
         self.addDependencies(
             DerivedPaddockLandTypesLayer, [
-                ConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
+                LandTypeConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
         self.addDependencies(PaddockLandTypesLayer, [DerivedPaddockLandTypesLayer])
         self.addDependencies(DerivedMetricPaddockLayer, [PaddockLayer, PaddockLandTypesLayer])
         self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, DerivedMetricPaddockLayer])

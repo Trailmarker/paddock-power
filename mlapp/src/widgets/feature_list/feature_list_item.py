@@ -2,10 +2,9 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
-from ...models.qt_abstract_meta import QtAbstractMeta
-from ...models.state_machine import machine
-from ...spatial.features.edits import Edits
-from ...spatial.features.feature_action import FeatureAction
+from ...models import QtAbstractMeta, toStateMachine
+from ...layers import Edits
+from ...layers.features import FeatureAction
 from ...utils import PLUGIN_FOLDER, qgsDebug
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
@@ -130,8 +129,8 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
         self.stateChanged.connect(self.refreshUi)
 
         if self.hasStatus:
-            machine(self.feature).stateChanged.connect(self.refreshUi)
-            machine(self.feature).stateChanged.connect(lambda: qgsDebug(f"State of {self} updated!"))
+            toStateMachine(self.feature).stateChanged.connect(self.refreshUi)
+            toStateMachine(self.feature).stateChanged.connect(lambda: qgsDebug(f"State of {self} updated!"))
         self.refreshUi()
 
 

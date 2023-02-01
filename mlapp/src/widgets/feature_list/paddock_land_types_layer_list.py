@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ...utils import qgsDebug
-from ...spatial.fields.timeframe import Timeframe
-from ...spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
+from ...layers.fields import Timeframe
+from ...layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
 from ..paddock_land_type_details.paddock_land_type_details import PaddockLandTypeDetails
 from ..paddock_land_type_details.paddock_land_type_details_edit import PaddockLandTypeDetailsEdit
 from .popup_layer_list import PopupLayerList

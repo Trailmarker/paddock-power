@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
-
-from ..models.state_machine import StateMachine, StateMachineAction, StateMachineStatus
+from ..models import StateMachine, StateMachineAction, StateMachineStatus
 
 
 class EditStatus(StateMachineStatus):

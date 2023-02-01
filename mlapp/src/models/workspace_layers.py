@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayer, QgsProject
 
-from ..spatial.layers.condition_table import ConditionTable
-from ..spatial.layers.elevation_layer import ElevationLayer
-from ..spatial.layers.feature_layer import FeatureLayer
+from ..layers.land_type_condition_table import LandTypeConditionTable
+from ..layers.elevation_layer import ElevationLayer
+from ..layers.feature_layer import FeatureLayer
 from ..utils import PLUGIN_NAME
 from .glitch import Glitch
 
@@ -22,7 +22,7 @@ class WorkspaceLayers(dict):
         if not isinstance(layerType, type):
             raise Glitch(f"Invalid WorkspaceLayers key: must be a type")
 
-        if not any(map(lambda cls: isinstance(layer, cls), [FeatureLayer, ElevationLayer, ConditionTable])):
+        if not any(map(lambda cls: isinstance(layer, cls), [FeatureLayer, ElevationLayer, LandTypeConditionTable])):
             raise Glitch(f"Invalid WorkspaceLayers value: must be a ConditionTable, ElevationLayer or FeatureLayer")
 
         self[self.__layerKey(layerType)] = self.__setValue(layer)

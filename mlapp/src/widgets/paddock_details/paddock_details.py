@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from qgis.core import QgsProject
 
-from ...models.workspace_mixin import WorkspaceMixin
+from ...models import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_details_base.ui')))

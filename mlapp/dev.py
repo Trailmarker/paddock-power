@@ -6,27 +6,27 @@ from os import mkdir
 from qgis.core import QgsProject
 from qgis.utils import plugins
 
-from .src.spatial.features.metric_paddock import MetricPaddock
-from .src.spatial.features.waterpoint import Waterpoint
-from .src.spatial.fields.field_map import FieldMap
-from .src.spatial.layers.condition_table import ConditionTable
-from .src.spatial.layers.derived_boundary_layer import DerivedBoundaryLayer
-from .src.spatial.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
-from .src.spatial.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
-from .src.spatial.layers.derived_watered_area_layer import DerivedWateredAreaLayer
-from .src.spatial.layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
-from .src.spatial.layers.elevation_layer import ElevationLayer
-from .src.spatial.layers.feature_layer import FeatureLayer
-from .src.spatial.layers.fence_layer import FenceLayer
-from .src.spatial.layers.land_type_layer import LandTypeLayer
-from .src.spatial.layers.paddock_layer import PaddockLayer
-from .src.spatial.layers.paddock_land_types_layer import PaddockLandTypesLayer
-from .src.spatial.layers.pipeline_layer import PipelineLayer
-from .src.spatial.layers.watered_area_layer import WateredAreaLayer
-from .src.spatial.layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from .src.spatial.layers.waterpoint_layer import WaterpointLayer
-from .src.spatial.layers.waterpoint_popup_layer import WaterpointPopupLayer
-from .src.spatial.layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
+from .src.layers.features import MetricPaddock
+from .src.layers.features import Waterpoint
+from .src.layers.fields.field_map import FieldMap
+from .src.layers.land_type_condition_table import LandTypeConditionTable
+from .src.layers.derived_boundary_layer import DerivedBoundaryLayer
+from .src.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
+from .src.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
+from .src.layers.derived_watered_area_layer import DerivedWateredAreaLayer
+from .src.layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
+from .src.layers.elevation_layer import ElevationLayer
+from .src.layers.feature_layer import FeatureLayer
+from .src.layers.fence_layer import FenceLayer
+from .src.layers.land_type_layer import LandTypeLayer
+from .src.layers.paddock_layer import PaddockLayer
+from .src.layers.paddock_land_types_layer import PaddockLandTypesLayer
+from .src.layers.pipeline_layer import PipelineLayer
+from .src.layers.watered_area_layer import WateredAreaLayer
+from .src.layers.waterpoint_buffer_layer import WaterpointBufferLayer
+from .src.layers.waterpoint_layer import WaterpointLayer
+from .src.layers.waterpoint_popup_layer import WaterpointPopupLayer
+from .src.layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
 
 from .src.utils import resolvePluginPath, qgsDebug, PLUGIN_NAME
 
@@ -95,7 +95,7 @@ def exportStyles(relativeOutDir, overwrite=False):
 
 
 layerTypes = [
-    ConditionTable,
+    LandTypeConditionTable,
     DerivedBoundaryLayer,
     DerivedMetricPaddockLayer,
     DerivedPaddockLandTypesLayer,

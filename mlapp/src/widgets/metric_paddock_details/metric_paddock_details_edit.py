@@ -4,8 +4,8 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.features.edits import Edits
-from ...models.workspace_mixin import WorkspaceMixin
+from ...layers.edits import Edits
+from ...models import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'metric_paddock_details_edit_base.ui')))

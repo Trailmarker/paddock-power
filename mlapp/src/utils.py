@@ -6,11 +6,11 @@ import string
 import traceback
 from os import path
 
-
 from qgis.PyQt.QtCore import QFile, pyqtSignal, pyqtBoundSignal
 from qgis.PyQt.QtWidgets import QMessageBox
 
 from qgis.core import Qgis, QgsMessageLog, QgsProject
+from qgis.utils import iface
 
 # MLA Paddock Power data is held in the GDA2020 coordinate system
 PADDOCK_POWER_EPSG = 7845
@@ -85,6 +85,10 @@ def guiConfirm(question="Are you sure?", title=None):
     return QMessageBox.question(None, title, question, QMessageBox.Yes |
                                 QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
 
+
+def guiStatusBar(message):
+    """Show a status bar message."""
+    iface.mainWindow().statusBar().showMessage(message)
 
 def guiHelpNotYetImplemented():
     """Show a message saying this help section has not yet been implemented."""

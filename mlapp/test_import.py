@@ -1,6 +1,6 @@
 
 from .dev import *
-from .src.spatial.fields.field_map import FieldMap
+from .src.layers.fields.field_map import FieldMap
 
 # From QGIS having created a new project and loaded it empty
 

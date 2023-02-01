@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...spatial.features.edits import Edits
+from ...layers.edits import Edits
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_details_edit_base.ui')))

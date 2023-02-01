@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-from ...models.workspace_mixin import WorkspaceMixin
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QSizePolicy, QWidget
 
-from qgis.core import QgsFeature
-
-from ...spatial.features.persisted_feature import Feature
+from ...models import WorkspaceMixin
 from .profile_canvas import ProfileCanvas
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -91,7 +87,9 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
                     f"{maximumDistance:,.2f}")
 
             self.refreshProfileCanvas()
-            self.triggerRepaint()
+            
+            # Repaint the whole widget
+            self.update()
 
     def cleanupProfileCanvas(self):
         if self.profileCanvas is not None:

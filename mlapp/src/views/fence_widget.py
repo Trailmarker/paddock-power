@@ -7,8 +7,8 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from qgis.core import QgsGeometry
 
+from ..models import WorkspaceMixin
 from ..tools.sketch_line_tool import SketchLineTool
-from ..models.workspace_mixin import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_widget_base.ui')))

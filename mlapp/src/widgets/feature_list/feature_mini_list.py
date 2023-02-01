@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from ...models.glitch import Glitch
-from ...spatial.features.persisted_feature import Feature
+from ...models import Glitch
+from ...layers.features import IFeature
 from .feature_list_base import FeatureListBase
 
 
@@ -18,7 +18,7 @@ class FeatureMiniList(FeatureListBase):
         """Set the paddocks."""
         if not features:
             self.features = []
-        elif not isinstance(features, list) or not all(isinstance(feature, Feature) for feature in features):
+        elif not isinstance(features, list) or not all(isinstance(feature, IFeature) for feature in features):
             raise Glitch(
                 "The content passed to a Feature mini-list should be a list of Features")
         else:
