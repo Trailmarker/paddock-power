@@ -61,7 +61,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
         self.workspace.featureLayerDeselected.connect(self.onFeatureLayerDeselected)
         self.workspace.timeframeChanged.connect(self.onTimeframeChanged)
-        qgsDebug(f"{type(self).__name__} connected to workspace …")
 
     @property
     def hasPopups(self):

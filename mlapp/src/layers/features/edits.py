@@ -82,13 +82,12 @@ class Edits:
 
             layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
 
-            with Edits.editAndCommit(layers, emitFeaturesChanged=True):
+            with Edits.editAndCommit(layers):
                 for feature in edits.upserts:
                     # feature.recalculate()
                     feature.upsert()
                 for feature in edits.deletes:
                     feature.delete()
-            return None
 
         return callableWithPersistFeatures
 
@@ -101,7 +100,7 @@ class Edits:
                 layer.setReadOnly(False)
 
             for layer in layers:
-                with Edits.editAndCommit([layer], emitFeaturesChanged=False):
+                with Edits.editAndCommit([layer]):
                     layer.analyseFeatures()
         finally:
             for (layer, readOnly) in readOnlies:
