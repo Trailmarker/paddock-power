@@ -6,7 +6,8 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
-from ...utils import getComponentStyleSheet, PLUGIN_FOLDER
+from ...models import WorkspaceMixin
+from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from ..fence_widget import FenceWidget
 from ..paddock_widget import PaddockWidget
 from ..pipeline_widget import PipelineWidget
@@ -18,16 +19,19 @@ FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
 STYLESHEET = getComponentStyleSheet(__file__)
 
 
-class FeatureView(QDockWidget, FORM_CLASS):
+class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
     closingView = pyqtSignal(type)
 
     def __init__(self, parent=None):
         """Constructor."""
-        super().__init__(parent)
+        QDockWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
+
+        self.pluginInitGui = False
 
         self.setupUi(self)
-
         self.setStyleSheet(STYLESHEET)
 
         self.toolBar = QToolBar()
@@ -47,39 +51,44 @@ class FeatureView(QDockWidget, FORM_CLASS):
         self.timeframeButtonGroup.addButton(self.currentTimeframeButton)
         self.timeframeButtonGroup.addButton(self.futureTimeframeButton)
 
-        self.workspace = None
+    def initGui(self):
+        f"""Called when the {PLUGIN_NAME} plugin calls initGui()."""
+        if not self.pluginInitGui:
+            self.plugin.workspaceReady.connect(self.rebuildUi)
+            self.plugin.workspaceUnloading.connect(self.clearUi)
+            self.pluginInitGui = True
 
     def refreshUi(self):
+        self.paddockTab.refreshUi()
+
         if self.workspace:
             self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
             self.futureTimeframeButton.setChecked(self.workspace.timeframe.name == 'Future')
 
-    def clearWorkspace(self):
-        if self.workspace:
-            self.tabWidget.removeTab(self.tabWidget.indexOf(self.paddockTab))
-            self.tabWidget.removeTab(self.tabWidget.indexOf(self.fenceTab))
-            self.tabWidget.removeTab(self.tabWidget.indexOf(self.pipelineTab))
-            self.tabWidget.removeTab(self.tabWidget.indexOf(self.waterpointTab))
+    def clearUi(self):
+        qgsInfo(f"{PLUGIN_NAME} tearing down old feature view …")
 
-            self.paddockTab = None
-            self.fenceTab = None
-            self.pipelineTab = None
-            self.waterpointTab = None
+        self.tabWidget.removeTab(self.tabWidget.indexOf(self.paddockTab))
+        self.tabWidget.removeTab(self.tabWidget.indexOf(self.fenceTab))
+        self.tabWidget.removeTab(self.tabWidget.indexOf(self.pipelineTab))
+        self.tabWidget.removeTab(self.tabWidget.indexOf(self.waterpointTab))
 
-            for item in [self.currentTimeframeButton, self.futureTimeframeButton,
-                         self.sketchFenceButton, self.sketchPipelineButton, self.sketchWaterpointButton]:
-                try:
-                    item.clicked.disconnect()
-                except BaseException:
-                    pass
-            self.timeframeButtonGroup = None
-            self.workspace = None
+        self.paddockTab = None
+        self.fenceTab = None
+        self.pipelineTab = None
+        self.waterpointTab = None
 
-    def setWorkspace(self, workspace):
-        if self.workspace:
-            self.clearWorkspace()
+        for item in [self.currentTimeframeButton, self.futureTimeframeButton,
+                     self.sketchFenceButton, self.sketchPipelineButton, self.sketchWaterpointButton]:
+            try:
+                item.clicked.disconnect()
+            except BaseException:
+                pass
+        self.timeframeButtonGroup = None
+        self.update()
 
-        self.workspace = workspace
+    def rebuildUi(self):
+        qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
 
         self.paddockTab = PaddockWidget(self.tabWidget)
         self.fenceTab = FenceWidget(self.tabWidget)
@@ -105,4 +114,5 @@ class FeatureView(QDockWidget, FORM_CLASS):
         self.sketchWaterpointButton.clicked.connect(self.waterpointTab.sketchWaterpoint)
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
+        self.update()
         self.refreshUi()

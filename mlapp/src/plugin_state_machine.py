@@ -3,7 +3,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
-from .models import QtAbstractMeta, StateMachineAction, StateMachine, StateMachineStatus, actionHandler
+from .models import QtAbstractMeta, StateMachineAction, StateMachine, StateMachineStatus, actionHandlerWithException
 
 
 class PluginActionFailure(Exception):
@@ -11,6 +11,8 @@ class PluginActionFailure(Exception):
 
 
 class PluginAction(StateMachineAction):
+    def handler(self):
+        return partial(actionHandlerWithException, self, PluginActionFailure)
 
     """Allowed transitions for a StatusFeature."""
     detectWorkspace = "Detect Workspace"
@@ -23,8 +25,6 @@ class PluginAction(StateMachineAction):
     projectClosed = "Project Closed"
 
 
-def pluginActionHandler(pluginAction):
-    return partial(actionHandler, pluginAction, PluginActionFailure)
 
 
 class PluginStatus(StateMachineStatus):

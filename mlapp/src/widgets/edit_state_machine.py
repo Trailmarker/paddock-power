@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from ..models import StateMachine, StateMachineAction, StateMachineStatus
+from functools import partial
+from ..models import StateMachine, StateMachineAction, StateMachineStatus, actionHandler
 
 
 class EditStatus(StateMachineStatus):
@@ -8,6 +9,9 @@ class EditStatus(StateMachineStatus):
 
 
 class EditAction(StateMachineAction):
+    def handler(self):
+        return partial(actionHandler, self)
+    
     edit = "Edit"
     save = "Save"
     cancelEdit = "Cancel"

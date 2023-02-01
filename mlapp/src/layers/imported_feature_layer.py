@@ -37,7 +37,7 @@ class ImportedFeatureLayer(PersistedFeatureLayer):
         wasReadOnly = self.readOnly()
         self.setReadOnly(False)
         try:
-            with Edits.editAndCommit([self], emitFeaturesChanged=True):
+            with Edits.editAndCommit([self]):
                 self.dataProvider().truncate()
                 features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
                 for feature in features:

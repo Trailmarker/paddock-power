@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
-from ...models import StateMachineAction
+from functools import partial
+from ...models import StateMachineAction, actionHandler
 
 
 class FeatureAction(StateMachineAction):
+    def handler(self):
+        return partial(actionHandler, self)
+    
     """Allowed transitions for a StatusFeature."""
     draft = "Draft"
     trash = "Trash"

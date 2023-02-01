@@ -2,14 +2,9 @@
 import os.path
 import sys
 
-
 from qgis.PyQt.QtCore import Qt, QCoreApplication, QSettings, QTranslator, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-
-from .src.widgets.import_dialog.import_dialog import ImportDialog
-from .src.views.feature_view.feature_view import FeatureView
-
 
 from qgis.core import QgsExpression, QgsProject
 
@@ -17,8 +12,10 @@ from .resources_rc import *
 
 from .src.models import Glitch, Workspace
 from .src.paddock_power_functions import PaddockPowerFunctions
-from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus, pluginActionHandler
+from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus
 from .src.utils import guiStatusBar, guiWarning, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
+from .src.views.feature_view.feature_view import FeatureView
+from .src.widgets.import_dialog.import_dialog import ImportDialog
 
 
 class PaddockPower(PluginStateMachine):
@@ -141,6 +138,7 @@ class PaddockPower(PluginStateMachine):
             callback=lambda *_: self.openImportDialog(),
             parent=self.iface.mainWindow())
 
+        self.featureView.initGui()
         self.refreshUi()
 
         if self.status == PluginStatus.NoWorkspaceLoaded:
@@ -182,9 +180,9 @@ class PaddockPower(PluginStateMachine):
 
         try:
             if self.featureView:
-                self.view.clearWorkspace()
-                self.view.close()
-            self.iface.removeDockWidget(self.view)
+                self.featureView.clearUi()
+                self.featureView.setVisible(False)
+            self.iface.removeDockWidget(self.featureView)
         except BaseException:
             pass
 
@@ -223,30 +221,30 @@ class PaddockPower(PluginStateMachine):
             QgsExpression.unregisterFunction(paddockPowerFunction)
 
     def initWorkspace(self, workspaceFile):
+        self.workspaceUnloading.emit()
         self.workspace = Workspace(self.iface, workspaceFile)
         self.workspaceReady.emit()
-        self.featureView.setWorkspace(self.workspace)
 
-    @pluginActionHandler(PluginAction.detectWorkspace)
+    @PluginAction.detectWorkspace.handler()
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
 
         try:
             projectFile = resolveProjectFile()
             if projectFile is None:
-                self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
+                if warning:
+                    self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
                 raise PluginActionFailure()
             else:
                 workspaceFile = resolveWorkspaceFile(projectFilePath=projectFile)
                 if workspaceFile and os.path.exists(workspaceFile):
                     self.initWorkspace(workspaceFile)
-                    qgsInfo(f"{PLUGIN_NAME} load workspace …")
                     self.__successMessage(
                         f"{PLUGIN_NAME} loaded workspace (.gpkg) from {os.path.split(os.path.basename(workspaceFile))[1]}.")
                 else:
                     if warning:
                         self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
-                        raise PluginActionFailure()
+                    raise PluginActionFailure()
         except BaseException as e:
             if isinstance(e, PluginActionFailure):
                 raise e
@@ -256,7 +254,7 @@ class PaddockPower(PluginStateMachine):
             self.__failureMessage(
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
-    @pluginActionHandler(PluginAction.createWorkspace)
+    @PluginAction.createWorkspace.handler()
     def createWorkspace(self):
         f"""Create a new {PLUGIN_NAME} workspace in the current QGIS project."""
 
@@ -288,36 +286,35 @@ class PaddockPower(PluginStateMachine):
             self.__failureMessage(
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
-    @pluginActionHandler(PluginAction.analyseWorkspace)
+    @PluginAction.analyseWorkspace.handler()
     def analyseWorkspace(self):
         self.workspace.analyseLayers()
 
-    @pluginActionHandler(PluginAction.projectClosed)
+    @PluginAction.projectClosed.handler()
     def projectClosed(self):
         projectFile = resolveProjectFile()
 
         if not projectFile:
             self.featureView.setVisible(False)
-            self.featureView.clearWorkspace()
             self.unloadWorkspace()
 
     def unloadWorkspace(self):
-        """Removes the plugin menu item and icon from QGIS interface."""
+        f"""Unloads the {PLUGIN_NAME} workspace."""
         if self.workspace is not None:
             self.workspaceUnloading.emit()
             qgsInfo(f"{PLUGIN_NAME} unloading workspace …")
             self.workspace.unload()
             self.workspace = None
 
-    @pluginActionHandler(PluginAction.openFeatureView)
+    @PluginAction.openFeatureView.handler()
     def openFeatureView(self):
         self.featureView.setVisible(True)
 
-    @pluginActionHandler(PluginAction.closeFeatureView)
+    @PluginAction.closeFeatureView.handler()
     def closeFeatureView(self):
         self.featureView.setVisible(False)
 
-    @pluginActionHandler(PluginAction.openImportDialog)
+    @PluginAction.openImportDialog.handler()
     def openImportDialog(self):
         if self.workspace:
             self.importDialog = ImportDialog(self, self.iface.mainWindow())

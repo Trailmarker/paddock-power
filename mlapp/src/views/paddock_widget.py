@@ -37,3 +37,8 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
     def onPaddockFilterChanged(self, text):
         self.paddockList.filterByName(text)
+        
+    def refreshUi(self):
+        self.paddockList.refreshUi()
+        self.currentPaddockLandTypesList.refreshUi()
+        self.futurePaddockLandTypesList.refreshUi()

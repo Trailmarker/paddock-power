@@ -16,7 +16,7 @@ class Edits(Edits):
 
     @staticmethod
     @contextmanager
-    def editAndCommit(layers, emitFeaturesChanged=True):
+    def editAndCommit(layers):
         try:
             for layer in layers:
                 layer.startEditing()
@@ -60,7 +60,7 @@ class Edits(Edits):
 
             layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
 
-            with Edits.editAndCommit(layers, emitFeaturesChanged=True):
+            with Edits.editAndCommit(layers):
                 for feature in edits.upserts:
                     # feature.recalculate()
                     feature.upsert()
@@ -82,7 +82,7 @@ class Edits(Edits):
                 layer.setReadOnly(False)
 
             for layer in layers:
-                with Edits.editAndCommit([layer], emitFeaturesChanged=False):
+                with Edits.editAndCommit([layer]):
                     layer.analyseFeatures()
         finally:
             for (layer, readOnly) in readOnlies:
