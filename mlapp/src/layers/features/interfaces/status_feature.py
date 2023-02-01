@@ -2,6 +2,7 @@
 from abc import abstractmethod
 from .feature import Feature
 
+
 class StatusFeature(Feature):
 
     @abstractmethod
@@ -43,6 +44,3 @@ class StatusFeature(Feature):
     def archiveFeature(self):
         """Archive a Feature."""
         pass
-
-
-  

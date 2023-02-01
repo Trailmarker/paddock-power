@@ -14,7 +14,7 @@ class EditAction(StateMachineAction):
 
 
 class EditStateMachine(StateMachine):
-    
+
     def __init__(self):
         super().__init__()
         self._status = EditStatus.Viewing
@@ -45,5 +45,3 @@ class EditStateMachine(StateMachine):
     @status.setter
     def status(self, status):
         self._status = status
-     
-  

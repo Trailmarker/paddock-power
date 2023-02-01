@@ -22,10 +22,11 @@ wkt = "LineString (-363652.75268516730284318 -1888203.19256767281331122, -365386
 testGeom = QgsGeometry.fromWkt(wkt)
 
 # p1.planFeature1(testGeom)
+
+
 def testCrash():
     p1.GEOM = testGeom
     p1.featureLayer.startEditing()
     p1.upsert()
 
 #testPipeline.GEOMETRY = testGeom
-

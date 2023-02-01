@@ -4,15 +4,16 @@ from .popup_layer_source_mixin import PopupLayerSourceMixin
 from .imported_feature_layer import ImportedFeatureLayer
 from .waterpoint_popup_layer import WaterpointPopupLayer
 
+
 class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
 
     NAME = "Waterpoints"
     STYLE = "waterpoint"
 
     @property
-    def popupLayerTypes(self): 
+    def popupLayerTypes(self):
         return [WaterpointPopupLayer]
-    
+
     @property
     def relativeLayerPosition(self):
         """Makes the Paddock Land Types popups appear *over* the Paddock layer."""

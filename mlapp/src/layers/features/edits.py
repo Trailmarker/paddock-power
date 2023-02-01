@@ -7,6 +7,7 @@ from ...models import Glitch
 from ...utils import qgsInfo
 from . import IPersistedFeature
 
+
 class Edits:
 
     def __init__(self, upserts=[], deletes=[]):
@@ -34,7 +35,7 @@ class Edits:
     @staticmethod
     def delete(*features):
         return Edits(deletes=list(features))
-    
+
     @staticmethod
     @contextmanager
     def editAndCommit(layers):
@@ -83,7 +84,7 @@ class Edits:
 
             with Edits.editAndCommit(layers, emitFeaturesChanged=True):
                 for feature in edits.upserts:
-                    #feature.recalculate()
+                    # feature.recalculate()
                     feature.upsert()
                 for feature in edits.deletes:
                     feature.delete()
@@ -106,5 +107,3 @@ class Edits:
             for (layer, readOnly) in readOnlies:
                 layer.setReadOnly(readOnly)
                 layer.triggerRepaint()
-
-  

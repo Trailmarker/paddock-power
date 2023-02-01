@@ -88,7 +88,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             EditAction.cancelEdit,
             f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
             lambda *_: self.cancelEditItem())
-        
+
         if self.noEdits:
             self.editToolBar.addStateAction(
                 EditAction.save,
@@ -132,8 +132,6 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             toStateMachine(self.feature).stateChanged.connect(self.refreshUi)
             toStateMachine(self.feature).stateChanged.connect(lambda: qgsDebug(f"State of {self} updated!"))
         self.refreshUi()
-
-
 
     @property
     def stateChanged(self):
@@ -181,13 +179,11 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
         # saveFeature returns an Edits …
         return self.featureEdit.saveFeature()
 
-
     @EditAction.save.handler()
     def saveItemNoEdits(self):
         # saveFeature returns an Edits …
         return self.featureEdit.saveFeature()
-    
-        
+
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
         pass

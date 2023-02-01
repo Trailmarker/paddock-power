@@ -7,9 +7,9 @@ from .feature_action import FeatureAction
 
 
 class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
-    
+
     _stateChanged = pyqtSignal()
-    
+
     def __init__(self, feature):
         QObject.__init__(self)
         super().__init__()
@@ -87,13 +87,13 @@ class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
     @STATUS.setter
     def status(self, s):
         self._feature.STATUS = s
-        
+
     def displayName(self):
         return self._feature.displayName()
 
     @property
     def stateChanged(self):
         return self._stateChanged
-    
+
     def emitStateChanged(self):
         self.stateChanged.emit()

@@ -36,4 +36,3 @@ class PopupLayerConsumerMixin:
         if newVal:
             newVal.popupLayerAdded.connect(self.onPopupLayerAdded)
             newVal.popupLayerRemoved.connect(self.onPopupLayerRemoved)
-

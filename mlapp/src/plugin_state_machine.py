@@ -9,8 +9,9 @@ from .models import QtAbstractMeta, StateMachineAction, StateMachine, StateMachi
 class PluginActionFailure(Exception):
     pass
 
+
 class PluginAction(StateMachineAction):
-    
+
     """Allowed transitions for a StatusFeature."""
     detectWorkspace = "Detect Workspace"
     createWorkspace = "Create Workspace"
@@ -24,6 +25,7 @@ class PluginAction(StateMachineAction):
 
 def pluginActionHandler(pluginAction):
     return partial(actionHandler, pluginAction, PluginActionFailure)
+
 
 class PluginStatus(StateMachineStatus):
     """Allowed statuses for a StatusFeature."""

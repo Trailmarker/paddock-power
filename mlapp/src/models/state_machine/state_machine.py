@@ -4,6 +4,7 @@ from ...utils import qgsInfo
 
 from .interfaces.state_machine import StateMachine as IStateMachine
 
+
 class StateMachine(IStateMachine):
 
     def __init__(self):

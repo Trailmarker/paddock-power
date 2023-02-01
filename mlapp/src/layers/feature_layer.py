@@ -44,7 +44,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         f"""Create a new {PLUGIN_NAME} vector layer."""
         # Clear out any unwanted friends from the map … (classmethod defined in LayerMixin)
         # TODO - does not work
-        # self.detectAndRemoveAllOfType()        
+        # self.detectAndRemoveAllOfType()
 
         super().__init__(path, layerName, providerLib, *args, **kwargs)
         MapLayerMixin.__init__(self)
@@ -54,7 +54,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.addInBackground()
 
         self.plugin.workspaceReady.connect(self.onWorkspaceReady)
-        
 
     def onWorkspaceReady(self):
         self.selectionChanged.connect(self.onSelectionChanged)

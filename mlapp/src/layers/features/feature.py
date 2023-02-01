@@ -8,6 +8,7 @@ from ...models import Glitch, QtAbstractMeta
 from ..fields import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, STATUS, PERIMETER, TIMEFRAME, Timeframe
 from .interfaces import IFeature
 
+
 class Feature(IFeature, QgsFeature, metaclass=QtAbstractMeta):
 
     @classmethod

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 
+
 class StateMachineEnum(Enum):
     def match(self, *statuses):
         """Return True if a provided StateMachineStatus or string matches this status.
@@ -12,4 +13,3 @@ class StateMachineEnum(Enum):
 
     def __str__(self):
         return self.value
-

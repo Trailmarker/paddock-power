@@ -87,7 +87,7 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
                     f"{maximumDistance:,.2f}")
 
             self.refreshProfileCanvas()
-            
+
             # Repaint the whole widget
             self.update()
 
@@ -111,8 +111,6 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
     def onSelectedFeatureChanged(self, layerType):
         """Handle a change to the selected Fence."""
         feature = self.workspace.selectedFeature(layerType)
-        
+
         if feature and feature.isInfrastructure:
             self.setFeature(feature)
-
-

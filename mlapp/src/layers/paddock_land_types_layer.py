@@ -11,7 +11,6 @@ class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
     NAME = "Paddock Land Types"
     STYLE = "paddock_land_types_popup"
 
-
     @classmethod
     def getFeatureType(cls):
         return PaddockLandType

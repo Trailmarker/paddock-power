@@ -7,5 +7,5 @@ from .watered_type import WateredType
 from .waterpoint_type import WaterpointType
 
 from .names import *
-from .fields import * 
+from .fields import *
 from .schemas import *

@@ -2,17 +2,18 @@
 
 from .feature_list_base import FeatureListBase
 
+
 class FeatureLayerList(FeatureListBase):
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
         super().__init__(listItemFactory, parent)
-        
+
         self._timeframe = self.workspace.timeframe
         self._timeframeOverride = False
         self.workspace.timeframeChanged.connect(self.refreshUi)
-        
+
         self._featureLayer = None
-        
+
         self.refreshUi()
 
     @property
@@ -26,12 +27,12 @@ class FeatureLayerList(FeatureListBase):
     def timeframe(self, timeframe):
         self._timeframe = timeframe
         self._timeframeOverride = True
-        
+
     @property
     def featureLayer(self):
         """Get the FeatureLayer."""
         return self._featureLayer
-    
+
     @featureLayer.setter
     def featureLayer(self, newVal):
         """Set the FeatureLayer."""
@@ -47,7 +48,6 @@ class FeatureLayerList(FeatureListBase):
             newVal.featureSelected.connect(self.changeSelection)
             newVal.featureDeselected.connect(self.removeSelection)
 
-
     def getFeatures(self):
         """Get the Features."""
         if self.featureLayer:
@@ -55,7 +55,3 @@ class FeatureLayerList(FeatureListBase):
             return [feature for feature in self.featureLayer.getFeaturesByTimeframe(self.timeframe)]
         else:
             return []
-
-
-
-     

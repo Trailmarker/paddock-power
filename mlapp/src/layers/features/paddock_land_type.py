@@ -23,7 +23,7 @@ class PaddockLandType(PersistedFeature):
 
     @property
     def conditionType(self):
-        return self._conditionType if self._conditionType else self.CONDITION_TYPE  
+        return self._conditionType if self._conditionType else self.CONDITION_TYPE
 
     @conditionType.setter
     def conditionType(self, ct):

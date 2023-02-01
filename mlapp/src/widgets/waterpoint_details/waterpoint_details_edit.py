@@ -70,5 +70,5 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
         self.waterpoint.WATERPOINT_TYPE = self._waterpointType
         self.waterpoint.NEAR_GRAZING_RADIUS = float(self.nearGrazingRadiusSpinBox.value())
         self.waterpoint.FAR_GRAZING_RADIUS = float(self.farGrazingRadiusSpinBox.value())
-        
+
         return Edits.upsert(self.waterpoint)

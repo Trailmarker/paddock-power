@@ -21,7 +21,7 @@ class FenceLayer(PersistedFeatureLayer):
         super().__init__(workspaceFile,
                          layerName=FenceLayer.NAME,
                          styleName=FenceLayer.STYLE)
-    
+
     def getBuildOrder(self):
         """The lowest Build Order of any Fence in Draft status."""
         fences = list(self.getFeatures())

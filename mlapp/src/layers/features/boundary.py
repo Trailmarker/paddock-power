@@ -2,6 +2,7 @@
 from ..fields import BoundarySchema
 from .feature import Feature
 
+
 @BoundarySchema.addSchema()
 class Boundary(Feature):
 

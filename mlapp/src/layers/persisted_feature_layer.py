@@ -87,7 +87,7 @@ class PersistedFeatureLayer(FeatureLayer):
         if not self.detectInGeoPackage(workspaceFile, layerName):
             qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage, creating new …")
             self.createInGeoPackage(workspaceFile, layerName)
-       
+
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
 
         super().__init__(self.gpkgUrl, layerName, "ogr", styleName=styleName)
@@ -113,7 +113,6 @@ class PersistedFeatureLayer(FeatureLayer):
         # Apply editor widgets and other Field-specific layer setup
         for field in self.getSchema():
             field.setupLayer(self)
-              
 
     def addFeatures(self, features):
         """Add a batch of features to this layer."""
@@ -128,8 +127,7 @@ class PersistedFeatureLayer(FeatureLayer):
                 f"You can't use a {type(self).__name__} to copy an object that isn't a {self.getFeatureType().__name__}")
 
         copyFeature = self.wrapFeature(feature)
-        
-        
+
         for f in feature.getSchema():
             copyFeature.setAttribute(f.name(), feature.attribute(f.name()))
         copyFeature.setGeometry(copyFeature.geometry())
@@ -143,17 +141,15 @@ class PersistedFeatureLayer(FeatureLayer):
     def deleteFeature(self, feature):
         """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.FID)
-                
+
     def analyseFeatures(self):
         """Recalculate features in this layer."""
-            
+
         if not self.isEditable():
             raise Glitch(f"{self}.recalculateFeatures(): analysis can only be run during an edit session …")
-            
+
         qgsInfo(f"Recalculating {self.name()} …")
 
         for feature in self.getFeatures():
             feature.recalculate()
             feature.upsert()
-        
-        

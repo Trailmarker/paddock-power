@@ -14,14 +14,13 @@ class PopupLayerList(FeatureLayerList, PopupLayerConsumerMixin):
     def popupLayerType(self):
         pass
 
-
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
         FeatureLayerList.__init__(self, listItemFactory, parent)
         PopupLayerConsumerMixin.__init__(self)
 
         self.refreshUi()
-    
+
     @property
     def popupLayerTypes(self):
         """Popup layer types that this layer can consume."""

@@ -9,6 +9,7 @@ from .features import IFeature
 from .popup_feature_layer import PopupFeatureLayer
 from .interfaces import IMapLayer
 
+
 class PopupLayerSourceMixin(IMapLayer):
 
     popupLayerAdded = pyqtSignal(PopupFeatureLayer)
@@ -58,7 +59,6 @@ class PopupLayerSourceMixin(IMapLayer):
         assert issubclass(layerType, PopupFeatureLayer)
         assert isinstance(feature, IFeature)
 
-
         item = self.findItem()
         if not item:
             # This layer isn't in the map, don't create the popup
@@ -75,7 +75,7 @@ class PopupLayerSourceMixin(IMapLayer):
 
         # The "relativeLayerPosition determines whether a layer is below or above"
         group.insertLayer(max(0, layerIndex + self.relativeLayerPosition), popupLayer)
-        
+
         # if self.zoomPopupLayerOnLoad:
         #     popupLayer.zoomLayer()
         self.popupLayerAdded.emit(popupLayer)

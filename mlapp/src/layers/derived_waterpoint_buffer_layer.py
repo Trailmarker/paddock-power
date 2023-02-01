@@ -2,7 +2,7 @@
 from .calculator import Calculator
 from .features import WaterpointBuffer
 from .fields import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
-from . import DerivedFeatureLayer
+from .derived_feature_layer import DerivedFeatureLayer
 
 
 class DerivedWaterpointBufferLayer(DerivedFeatureLayer):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from ...models import WorkspaceMixin
 from .interfaces import IPersistedFeature
+
 
 class LandTypeCondition(IPersistedFeature, WorkspaceMixin):
     """This is a sort of mock Feature for the ConditionTable."""

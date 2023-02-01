@@ -110,4 +110,3 @@ where not exists (
             DerivedWateredAreaLayer.STYLE,
             paddockLayer,
             waterpointBufferLayer)
-

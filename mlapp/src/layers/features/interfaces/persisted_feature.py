@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from .feature import Feature
 
+
 class PersistedFeature(Feature):
 
     @abstractmethod
@@ -19,5 +20,3 @@ class PersistedFeature(Feature):
     def upsert(self):
         """Add or update this Persisted item."""
         pass
-
-  

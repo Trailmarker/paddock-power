@@ -40,5 +40,3 @@ class PaddockLandTypeDetailsEdit(QWidget, FORM_CLASS):
         # TODO!
         raise NotImplementedError
         # self.paddockLandType.upsertCondition(self._conditionType)
-        
-        

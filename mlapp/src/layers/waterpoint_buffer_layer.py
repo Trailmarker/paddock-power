@@ -22,4 +22,3 @@ class WaterpointBufferLayer(PersistedDerivedFeatureLayer):
                          layerName=WaterpointBufferLayer.NAME,
                          styleName=WaterpointBufferLayer.STYLE,
                          derivedLayer=derivedWaterpointBufferLayer)
-

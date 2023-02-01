@@ -20,6 +20,7 @@ from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus, pluginActionHandler
 from .src.utils import guiStatusBar, guiWarning, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 
+
 class PaddockPower(PluginStateMachine):
 
     MENU_NAME = f"&{PLUGIN_NAME}"
@@ -64,7 +65,7 @@ class PaddockPower(PluginStateMachine):
         self.featureView = FeatureView(self.iface.mainWindow())
         self.featureView.setVisible(False)
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.featureView)
-        
+
         self._stateChanged.connect(self.refreshUi)
         self.triggerDetectWorkspace.connect(lambda: self.detectWorkspace(warning=False))
 
@@ -99,7 +100,7 @@ class PaddockPower(PluginStateMachine):
     def initGui(self):
         """The real Paddock Power GUI is initialised when a QGIS project is opened,
            but QGIS utilities call this when the plug-in is loaded anyway."""
-        
+
         # Initialise plug-in menu and toolbar
         self.menu = PaddockPower.MENU_NAME
 
@@ -107,13 +108,13 @@ class PaddockPower(PluginStateMachine):
         self.toolbar.setObjectName(u"PaddockPower")
 
         self.openFeatureViewAction = self.addAction(PluginAction.openFeatureView,
-            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock-power.png"),
-            text=f"Open {PLUGIN_NAME} …",
-            callback=lambda *_: self.openFeatureView(),
-            parent=self.iface.mainWindow())
+                                                    QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock-power.png"),
+                                                    text=f"Open {PLUGIN_NAME} …",
+                                                    callback=lambda *_: self.openFeatureView(),
+                                                    parent=self.iface.mainWindow())
 
         self.detectWorkspaceAction = self.addAction(
-            PluginAction.detectWorkspace, 
+            PluginAction.detectWorkspace,
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
             text=f"Refresh {PLUGIN_NAME} workspace …",
             callback=lambda *_: self.detectWorkspace(),
@@ -141,11 +142,10 @@ class PaddockPower(PluginStateMachine):
             parent=self.iface.mainWindow())
 
         self.refreshUi()
-        
+
         if self.status == PluginStatus.NoWorkspaceLoaded:
             self.triggerDetectWorkspace.emit()
-        
-        
+
     # Override Glitch type exceptions application-wide
 
     def setupGlitchHook(self):
@@ -222,7 +222,6 @@ class PaddockPower(PluginStateMachine):
         for paddockPowerFunction in PaddockPowerFunctions:
             QgsExpression.unregisterFunction(paddockPowerFunction)
 
-
     def initWorkspace(self, workspaceFile):
         self.workspace = Workspace(self.iface, workspaceFile)
         self.workspaceReady.emit()
@@ -251,7 +250,7 @@ class PaddockPower(PluginStateMachine):
         except BaseException as e:
             if isinstance(e, PluginActionFailure):
                 raise e
-            
+
             qgsInfo(f"{PLUGIN_NAME} exception occurred detecting workspace …")
             qgsException()
             self.__failureMessage(
@@ -283,7 +282,7 @@ class PaddockPower(PluginStateMachine):
         except BaseException as e:
             if isinstance(e, PluginActionFailure):
                 raise e
-            
+
             qgsInfo(f"{PLUGIN_NAME} exception occurred creating workspace …")
             qgsException()
             self.__failureMessage(
@@ -296,12 +295,11 @@ class PaddockPower(PluginStateMachine):
     @pluginActionHandler(PluginAction.projectClosed)
     def projectClosed(self):
         projectFile = resolveProjectFile()
-        
+
         if not projectFile:
             self.featureView.setVisible(False)
             self.featureView.clearWorkspace()
             self.unloadWorkspace()
-
 
     def unloadWorkspace(self):
         """Removes the plugin menu item and icon from QGIS interface."""
@@ -310,7 +308,6 @@ class PaddockPower(PluginStateMachine):
             qgsInfo(f"{PLUGIN_NAME} unloading workspace …")
             self.workspace.unload()
             self.workspace = None
-            
 
     @pluginActionHandler(PluginAction.openFeatureView)
     def openFeatureView(self):
@@ -334,8 +331,6 @@ class PaddockPower(PluginStateMachine):
 
     def __failureMessage(self, message):
         guiWarning(message)
-
-
 
     def refreshUi(self):
         for pluginAction in self.actions:

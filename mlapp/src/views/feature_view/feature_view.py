@@ -67,7 +67,7 @@ class FeatureView(QDockWidget, FORM_CLASS):
             self.waterpointTab = None
 
             for item in [self.currentTimeframeButton, self.futureTimeframeButton,
-                        self.sketchFenceButton, self.sketchPipelineButton, self.sketchWaterpointButton]:
+                         self.sketchFenceButton, self.sketchPipelineButton, self.sketchWaterpointButton]:
                 try:
                     item.clicked.disconnect()
                 except BaseException:

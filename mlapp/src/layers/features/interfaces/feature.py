@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
 
+
 class Feature(ABC):
 
     @abstractmethod
@@ -17,5 +18,3 @@ class Feature(ABC):
     def upsert(self):
         """Add or update this Persisted item."""
         pass
-
-  

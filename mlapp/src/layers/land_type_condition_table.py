@@ -8,6 +8,7 @@ from ..utils import PLUGIN_NAME, qgsInfo
 from .fields import LAND_TYPE, PADDOCK, CONDITION_TYPE, ConditionType
 from .interfaces import IPersistedLayer
 
+
 class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass=QtAbstractMeta):
 
     NAME = "Land Type Condition Table"
@@ -177,7 +178,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                 cursor.execute("rollback")
                 raise Exception("Error upserting split paddock condition data")
         self.workspace.featuresChanged.emit([self])
-            
+
     def delete(self, paddockId, landTypeId):
         with sqlite3.connect(self.workspaceFile) as conn:
             conn.execute(
@@ -186,26 +187,24 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     paddockId=paddockId,
                     landTypeId=landTypeId))
         self.workspace.featuresChanged.emit([self])
-    
+
     def analyseFeatures(self):
-        pass    
-    
+        pass
+
     def isEditable(self):
         return self._editable
-    
+
     def startEditing(self):
         if not self._editable:
             self._editable = True
         return True
-    
+
     def commitChanges(self):
         if self._editable:
             self._editable = False
         return True
-    
+
     def rollBack(self):
         if self._editable:
             self._editable = False
         return True
-    
-    

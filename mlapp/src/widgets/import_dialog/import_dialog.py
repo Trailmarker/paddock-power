@@ -13,12 +13,11 @@ class ImportDialog(QDialog, FORM_CLASS):
         """Constructor."""
         QDialog.__init__(self, parent)
         FORM_CLASS.__init__(self)
-     
+
         self.setupUi(self)
 
         self.plugin = plugin
-        
-        
+
     # def closeEvent(self, event):
     #     self.
     #     event.accept()

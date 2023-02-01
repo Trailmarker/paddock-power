@@ -14,7 +14,6 @@ class PersistedFeature(IPersistedFeature, Feature, metaclass=QtAbstractMeta):
 
         super().__init__(featureLayer, existingFeature)
 
-
     @property
     def GEOMETRY(self):
         """Return the PersistedFeature's geometry."""

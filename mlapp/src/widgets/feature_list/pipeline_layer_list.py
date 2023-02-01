@@ -11,7 +11,7 @@ class PipelineLayerList(FeatureLayerList):
         def listItemFactory(pipeline): return InfrastructureListItem(pipeline, parent=parent)
 
         super().__init__(listItemFactory, parent)
-  
+
     @property
     def featureLayer(self):
         return self.workspace.pipelineLayer

@@ -5,4 +5,3 @@ from .state_machine_action import StateMachineAction, StateMachineActionFailure,
 from .state_machine_mixin import StateMachineMixin, toStateMachine
 from .state_machine_status import StateMachineStatus
 from .state_machine import StateMachine
-

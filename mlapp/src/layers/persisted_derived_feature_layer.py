@@ -19,17 +19,16 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
         super().__init__(workspaceFile, layerName, styleName)
         self.setReadOnly(True)
 
-
     def analyseFeatures(self):
         """Analyse the features in the derived layer and copy them to this layer."""
-        
+
         if not self.isEditable():
             raise Glitch(f"{self}.analyseFeatures(): analysis can only be run during an edit session …")
-        
+
         derivedLayer = self.derivedLayer
         if derivedLayer is None:
             raise Glitch(f"{self}.analyseFeatures(): no derived layer to analyse …")
-            
+
         qgsInfo(f"Analysing {self.name()} …")
         self.dataProvider().truncate()
 

@@ -5,9 +5,9 @@ from qgis.core import QgsProject
 
 from ..layers.edits import Edits
 from ..layers import (LandTypeConditionTable, DerivedBoundaryLayer, DerivedMetricPaddockLayer,
-                              DerivedPaddockLandTypesLayer, DerivedWateredAreaLayer, DerivedWaterpointBufferLayer,
-                              ElevationLayer, FenceLayer, LandTypeLayer, PaddockLandTypesLayer, PaddockLayer,
-                              PipelineLayer, WateredAreaLayer, WaterpointBufferLayer, WaterpointLayer)
+                      DerivedPaddockLandTypesLayer, DerivedWateredAreaLayer, DerivedWaterpointBufferLayer,
+                      ElevationLayer, FenceLayer, LandTypeLayer, PaddockLandTypesLayer, PaddockLayer,
+                      PipelineLayer, WateredAreaLayer, WaterpointBufferLayer, WaterpointLayer)
 from ..layers.fields import Timeframe
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, guiStatusBar, qgsInfo, qgsDebug
@@ -36,7 +36,7 @@ class Workspace(QObject):
 
         self.iface = iface
         self.workspaceFile = workspaceFile
-        
+
         qgsDebug(f"{PLUGIN_NAME} initialising layers …")
         self.landTypeLayer = LandTypeLayer(self.workspaceFile)
         guiStatusBar(f"{PLUGIN_NAME} {self.landTypeLayer.name()} loaded …")
@@ -115,13 +115,12 @@ class Workspace(QObject):
         self.timeframe = Timeframe.Current
 
         self.timeframeChanged.connect(self.deselectLayers)
-      
-      
+
         qgsInfo(f"{PLUGIN_NAME} analysis layers initialised …")
 
         # Wiring some stuff for selected features …
         self.__selectedFeatures = {}
- 
+
         self.addToMap()
 
         qgsInfo(f"{PLUGIN_NAME} workspace load complete")
@@ -182,7 +181,7 @@ class Workspace(QObject):
         """Set the current timeframe for this workspace."""
         if isinstance(timeframe, str):
             timeframe = Timeframe[timeframe]
-        
+
         if self.timeframe != timeframe:
             self.timeframe = timeframe
             self.timeframeChanged.emit(timeframe)
@@ -217,41 +216,38 @@ class Workspace(QObject):
         self.unsetTool()
 
         self.removeFromMap()
-        
+
         def cleanupByName(name):
             f"""Remove all layers from the current project with the given names."""
             for layer in QgsProject.instance().mapLayers().values():
                 if layer.name() == name:
                     QgsProject.instance().removeMapLayers([layer.id()])
-        
+
         for cls in self.layerDependencyGraph.unloadOrder():
             cleanupByName(cls.NAME)
 
         for layerType in self.layerDependencyGraph.unloadOrder():
             self.workspaceLayers.unloadLayer(layerType)
-  
 
     def analysisOrder(self):
         """Return the order in which layers should be analsed."""
         order = self.layerDependencyGraph.analysisOrder()
         return [self.workspaceLayers.layer(layerType) for layerType in order]
-    
+
     def updateOrder(self, updatedLayers):
         """Return the order in which layers should be updated."""
         updateOrder = self.layerDependencyGraph.updateOrder(updatedLayers)
         return [self.workspaceLayers.layer(layerType) for layerType in updateOrder]
 
-    
     def updateLayers(self, updatedLayers):
         """Winnow and re-analyse a batch of updated layers."""
         updateOrder = self.updateOrder(updatedLayers)
         qgsInfo(f"{PLUGIN_NAME} deriving layers … {updateOrder}")
         Edits.analyseLayers(updateOrder)
         qgsInfo(f"{PLUGIN_NAME} load complete.")
-   
-   
+
     def analyseLayers(self):
-        """Winnow and re-analyse a batch of updated layers."""        
+        """Winnow and re-analyse a batch of updated layers."""
         analysisOrder = self.analysisOrder()
         qgsInfo(f"{PLUGIN_NAME} analysing layers …")
         Edits.analyseLayers(analysisOrder)

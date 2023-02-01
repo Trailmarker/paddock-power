@@ -90,6 +90,7 @@ def guiStatusBar(message):
     """Show a status bar message."""
     iface.mainWindow().statusBar().showMessage(message)
 
+
 def guiHelpNotYetImplemented():
     """Show a message saying this help section has not yet been implemented."""
     QMessageBox.information(None, f"{PLUGIN_NAME} | Help", "This help section has not yet been implemented.")

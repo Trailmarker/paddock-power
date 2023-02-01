@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
-
 from .derived_feature_layer import DerivedFeatureLayer as IDerivedFeatureLayer
 from .feature_layer import FeatureLayer as IFeatureLayer
 from .layer import Layer as ILayer

@@ -16,4 +16,3 @@ from .waterpoint_buffer import WaterpointBuffer
 from .waterpoint import Waterpoint
 
 from .feature_action import FeatureAction
-

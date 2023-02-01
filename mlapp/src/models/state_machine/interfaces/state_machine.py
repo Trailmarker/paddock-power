@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import abstractmethod, abstractproperty
 
+
 class StateMachine:
 
     @abstractproperty
@@ -45,7 +46,7 @@ class StateMachine:
     @abstractmethod
     def doAction(self, action):
         pass
-    
+
     def __repr__(self):
         """Return a string representation of the EditStateMachine."""
         return f"{self.__class__.__name__}(status={self.status})"
