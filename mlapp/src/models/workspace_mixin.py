@@ -8,7 +8,7 @@ class WorkspaceMixin:
     def __init__(self):
         super().__init__()
 
-    @cached_property
+    @property
     def plugin(self):
         return plugins['mlapp']
 

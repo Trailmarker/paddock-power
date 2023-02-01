@@ -26,7 +26,7 @@ class Workspace(QObject):
     timeframeChanged = pyqtSignal(Timeframe)
     featuresChanged = pyqtSignal(list)
 
-    def __init__(self, iface, workspaceFile):
+    def __init__(self, plugin, iface, workspaceFile):
 
         self.ready = False
 

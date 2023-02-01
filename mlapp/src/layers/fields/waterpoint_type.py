@@ -10,7 +10,10 @@ class WaterpointType(FieldDomain):
     WaterTank = "Water Tank"
     Waterhole = "Waterhole"
 
+    def givesWater(self):
+        return self.name in [t.name for t in [WaterpointType.Dam, WaterpointType.Trough, WaterpointType.Waterhole]]
+
     @classmethod
-    def givesWater(cls, term):
+    def givesWaterSql(cls, term):
         """Return a SQL expression that will return True if the Waterpoint Type gives water."""
         return f"{term} in ('{WaterpointType.Dam.name}', '{WaterpointType.Trough.name}', '{WaterpointType.Waterhole.name}')"

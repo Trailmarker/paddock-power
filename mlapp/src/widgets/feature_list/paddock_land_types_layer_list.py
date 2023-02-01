@@ -33,8 +33,7 @@ class PaddockLandTypesLayerList(PopupLayerList):
     def onPopupLayerAdded(self, layer):
         if type(layer) not in self.popupLayerTypes:
             return
-        self._featureLayer = layer
-        self.refreshUi()
+        self.featureLayer = layer
 
     def onPopupLayerRemoved(self):
         self.featureLayer = None

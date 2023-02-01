@@ -7,7 +7,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
 from ...models import WorkspaceMixin
-from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
+from ...utils import getComponentStyleSheet, qgsDebug, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from ..fence_widget import FenceWidget
 from ..paddock_widget import PaddockWidget
 from ..pipeline_widget import PipelineWidget
@@ -54,7 +54,7 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
     def initGui(self):
         f"""Called when the {PLUGIN_NAME} plugin calls initGui()."""
         if not self.pluginInitGui:
-            self.plugin.workspaceReady.connect(self.rebuildUi)
+            self.plugin.workspaceReady.connect(self.buildUi)
             self.plugin.workspaceUnloading.connect(self.clearUi)
             self.pluginInitGui = True
 
@@ -68,10 +68,8 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
     def clearUi(self):
         qgsInfo(f"{PLUGIN_NAME} tearing down old feature view …")
 
-        self.tabWidget.removeTab(self.tabWidget.indexOf(self.paddockTab))
-        self.tabWidget.removeTab(self.tabWidget.indexOf(self.fenceTab))
-        self.tabWidget.removeTab(self.tabWidget.indexOf(self.pipelineTab))
-        self.tabWidget.removeTab(self.tabWidget.indexOf(self.waterpointTab))
+        while (self.tabWidget.count() > 0):
+            self.tabWidget.removeTab(0)
 
         self.paddockTab = None
         self.fenceTab = None
@@ -87,7 +85,23 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.timeframeButtonGroup = None
         self.update()
 
-    def rebuildUi(self):
+
+    def onFeatureLayerSelected(self, featureLayerType):
+        name = featureLayerType.__name__
+
+        qgsDebug(f"{type(self).__name__}.onFeatureLayerSelected(featureLayerType={name})")
+
+        if name == 'FenceLayer':
+            self.tabWidget.setCurrentWidget(self.fenceTab)
+        elif name == 'PaddockLayer':
+            self.tabWidget.setCurrentWidget(self.paddockTab)
+        elif name == 'PipelineLayer':
+            self.tabWidget.setCurrentWidget(self.pipelineTab)
+        elif name == 'WaterpointLayer':
+            self.tabWidget.setCurrentWidget(self.waterpointTab)
+            
+
+    def buildUi(self):
         qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
 
         self.paddockTab = PaddockWidget(self.tabWidget)
@@ -114,5 +128,6 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchWaterpointButton.clicked.connect(self.waterpointTab.sketchWaterpoint)
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
+        self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
         self.update()
         self.refreshUi()

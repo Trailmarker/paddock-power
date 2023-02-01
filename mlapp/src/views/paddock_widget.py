@@ -34,6 +34,7 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
             self.onPaddockFilterChanged)
         self.clearPaddockFilterButton.clicked.connect(
             self.paddockFilterLineEdit.clear)
+        
 
     def onPaddockFilterChanged(self, text):
         self.paddockList.filterByName(text)

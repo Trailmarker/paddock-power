@@ -84,4 +84,4 @@ WaterpointTypeField = DomainField(
     propertyName="WATERPOINT_TYPE",
     name=WATERPOINT_TYPE,
     domainType=WaterpointType,
-    defaultValue=WaterpointType.Bore)
+    defaultValue=WaterpointType.Trough)

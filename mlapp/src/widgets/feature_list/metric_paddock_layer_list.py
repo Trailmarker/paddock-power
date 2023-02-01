@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from ...utils import qgsDebug
 from .feature_layer_list import FeatureLayerList
 from .metric_paddock_list_item import MetricPaddockListItem
 
@@ -14,7 +15,7 @@ class MetricPaddockLayerList(FeatureLayerList):
 
         super().__init__(listItemFactory, parent)
 
-    @property
-    def featureLayer(self):
-        """Get the FeatureLayer - override this."""
-        return self.workspace.derivedMetricPaddockLayer
+        self.featureLayer = self.workspace.derivedMetricPaddockLayer
+
+ 
+

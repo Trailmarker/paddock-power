@@ -138,10 +138,12 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.triggerRepaint()
 
     def onSelectFeature(self, feature):
+        qgsDebug(f"{type(self).__name__}.selectFeature({feature})")
         feature.zoomFeature()
         pass
 
     def onDeselectFeature(self):
+        qgsDebug(f"{type(self).__name__}.onDeselectFeature()")
         pass
 
     def onSelectionChanged(self, selection, *_):

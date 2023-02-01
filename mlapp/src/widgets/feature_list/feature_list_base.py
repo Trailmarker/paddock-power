@@ -14,7 +14,9 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
         QListWidget.__init__(self, parent)
         WorkspaceMixin.__init__(self)
 
-        self.listItemFactory = listItemFactory
+        self._selectedFeature = None
+        self._selectedItem = None
+        self._listItemFactory = listItemFactory
 
         self.setFrameStyle(QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -40,9 +42,10 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
         """Show the Feature List."""
         # Initially clear the list
         self.clear()
+        self.removeSelection()
 
         features = self.getFeatures()
-
+        
         if not features:
             return
 
@@ -51,7 +54,7 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
         # Repopulate list since we have Features
         for feature in features:
-            widget = self.listItemFactory(feature)
+            widget = self._listItemFactory(feature)
             item = QListWidgetItem(self)
             item.setSizeHint(widget.sizeHint())
 
@@ -60,8 +63,17 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
             self.addItem(item)
             self.setItemWidget(item, widget)
-
+            
+            if self._selectedFeature and self._selectedFeature.FID == feature.FID:
+                self._selectedItem = item
+                qgsDebug(f"{type(self).__name__}.refreshUi(): selectedItem = {feature}")
             widget.layoutRefreshNeeded.connect(self.refreshLayout)
+
+        if self._selectedItem:
+            self.itemWidget(self._selectedItem).setSelected(True)
+            self.scrollToItem(self._selectedItem, QAbstractItemView.PositionAtTop)    
+
+
 
     def refreshLayout(self):
         """Refresh the layout based on the size hints of all the custom widgets."""
@@ -79,20 +91,12 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
     def removeSelection(self):
         """Clear the selected Feature."""
-        qgsDebug(f"{self.__class__.__name__}.removeSelection()")
+        # if self._selectedItem:
+        #     self.itemWidget(self._selectedItem).setSelected(False) 
+        self._selectedItem = None            
         self.clearSelection()
 
     def changeSelection(self, layerType):
         """Select the Feature."""
-        self.removeSelection()
-
-        feature = self.workspace.selectedFeature(layerType)
-
-        qgsDebug(f"{self.__class__.__name__}.changeSelection({feature})")
-        if feature:
-            for item in [self.item(i) for i in range(self.count())]:
-                widget = self.itemWidget(item)
-                if widget.feature.FID == feature.FID:
-                    self.setCurrentItem(item)
-                    self.scrollToItem(item, QAbstractItemView.PositionAtTop)
-                    return
+        self._selectedFeature = self.workspace.selectedFeature(layerType)
+        self.refreshUi()

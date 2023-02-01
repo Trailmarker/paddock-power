@@ -221,8 +221,10 @@ class PaddockPower(PluginStateMachine):
             QgsExpression.unregisterFunction(paddockPowerFunction)
 
     def initWorkspace(self, workspaceFile):
-        self.workspaceUnloading.emit()
-        self.workspace = Workspace(self.iface, workspaceFile)
+        if self.workspace:
+            self.workspaceUnloading.emit()
+        self.workspace = Workspace(self, self.iface, workspaceFile)
+        qgsInfo("Plugin emitting ready …")
         self.workspaceReady.emit()
 
     @PluginAction.detectWorkspace.handler()
@@ -245,10 +247,9 @@ class PaddockPower(PluginStateMachine):
                     if warning:
                         self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
                     raise PluginActionFailure()
-        except BaseException as e:
-            if isinstance(e, PluginActionFailure):
-                raise e
-
+        except PluginActionFailure as e:
+            raise e
+        except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred detecting workspace …")
             qgsException()
             self.__failureMessage(
@@ -277,10 +278,9 @@ class PaddockPower(PluginStateMachine):
                             f"A new {PLUGIN_NAME} workspace file, {os.path.split(os.path.basename(workspaceFile))[1]} has been created alongside your QGIS project file.")
                 else:
                     qgsInfo(f"No workspace {PLUGIN_NAME} (.gpkg) file was located …")
-        except BaseException as e:
-            if isinstance(e, PluginActionFailure):
-                raise e
-
+        except PluginActionFailure as e:
+            raise e
+        except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred creating workspace …")
             qgsException()
             self.__failureMessage(

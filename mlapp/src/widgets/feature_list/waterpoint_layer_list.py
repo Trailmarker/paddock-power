@@ -18,7 +18,5 @@ class WaterpointLayerList(FeatureLayerList):
 
         super().__init__(listItemFactory, parent)
 
-    @property
-    def featureLayer(self):
-        """Get the FeatureLayer - override this."""
-        return self.workspace.waterpointLayer
+        self.featureLayer = self.workspace.waterpointLayer
+

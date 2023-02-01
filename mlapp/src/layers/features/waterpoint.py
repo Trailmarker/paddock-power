@@ -37,8 +37,9 @@ class Waterpoint(StatusFeature):
         """Do the stuff we'd normally do, but also add the popup layer."""
         super().onSelectFeature()
 
-        for layerType in self.popupLayerTypes:
-            self.addPopupLayer(layerType)
+        if self.WATERPOINT_TYPE.givesWater():
+            for layerType in self.popupLayerTypes:
+                self.addPopupLayer(layerType)
 
     def onDeselectFeature(self):
         """Do the stuff we'd normally do, but also remove the popup layer."""

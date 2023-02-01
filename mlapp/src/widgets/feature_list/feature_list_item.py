@@ -133,6 +133,13 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             toStateMachine(self.feature).stateChanged.connect(lambda: qgsDebug(f"State of {self} updated!"))
         self.refreshUi()
 
+    def setSelected(self, selected):
+        if selected:
+            self.collapse.toggleButton.setStyleSheet("background-color: yellow")
+        else:
+            self.collapse.toggleButton.setStyleSheet("background-color: white")
+            
+
     @property
     def stateChanged(self):
         return self._stateChanged

@@ -25,7 +25,8 @@ class PopupLayerConsumerMixin:
     @popupLayerSource.setter
     def popupLayerSource(self, newVal):
         """Set the source of popups."""
-        [self._source, oldVal] = [newVal, self._source]
+        oldVal = self._source
+        self._source = newVal
         self.rewirePopupLayerSource(oldVal, newVal)
 
     def rewirePopupLayerSource(self, oldVal, newVal):

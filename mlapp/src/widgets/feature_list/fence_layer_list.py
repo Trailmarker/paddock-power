@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ...utils import qgsDebug
 from .infrastructure_list_item import InfrastructureListItem
 from .feature_layer_list import FeatureLayerList
 
@@ -12,7 +13,5 @@ class FenceLayerList(FeatureLayerList):
 
         super().__init__(listItemFactory, parent)
 
-    @property
-    def featureLayer(self):
-        """Get the FeatureLayer - override this."""
-        return self.workspace.fenceLayer
+        self.featureLayer = self.workspace.fenceLayer
+

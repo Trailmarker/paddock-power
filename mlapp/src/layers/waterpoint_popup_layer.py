@@ -10,7 +10,7 @@ class WaterpointPopupLayer(PopupFeatureLayer):
 
     @classmethod
     def getFeatureType(self):
-        return WaterpointBufferus
+        return WaterpointBuffer
 
     def prepareQuery(self, query, *dependentLayers):
         [waterpointBufferLayer] = self.names(*dependentLayers)

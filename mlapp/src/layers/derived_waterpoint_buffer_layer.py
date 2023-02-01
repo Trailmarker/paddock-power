@@ -34,7 +34,7 @@ with {_IN_PADDOCKS} as
 	 inner join "{paddockLayer}"
      on {Timeframe.Current.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{paddockLayer}"."{STATUS}"')}
 	 and st_contains("{paddockLayer}".geometry, "{waterpointLayer}".geometry)
-     where {WaterpointType.givesWater(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
+     where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
      union
      select
         "{paddockLayer}".geometry,
@@ -45,7 +45,7 @@ with {_IN_PADDOCKS} as
 	 inner join "{paddockLayer}"
      on {Timeframe.Future.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{paddockLayer}"."{STATUS}"')}
 	 and st_contains("{paddockLayer}".geometry, "{waterpointLayer}".geometry)
-     where {WaterpointType.givesWater(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
+     where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
      ),
 {_RENAMED_WATERPOINTS} as
      (select
@@ -55,7 +55,7 @@ with {_IN_PADDOCKS} as
 		 "{NEAR_GRAZING_RADIUS}" as {_NEAR_BUFFER},
 		 "{FAR_GRAZING_RADIUS}" as {_FAR_BUFFER}
 	  from "{waterpointLayer}"
-      where {WaterpointType.givesWater(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
+      where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
       ),
 {_BUFFERS} as
     (select
