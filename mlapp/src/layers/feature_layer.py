@@ -126,7 +126,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
 
     def onFeaturesChanged(self):
         """Handle our own featuresChanged signal."""
-        # Redraw the layer        
+        # Redraw the layer
         self.triggerRepaint()
 
     def onFeatureLayerSelected(self, layerType):

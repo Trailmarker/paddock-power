@@ -17,17 +17,15 @@ def testSelectChange():
     for p in paddocks:
         metricPaddockLayer.onSelectedFeatureChanged(type(p.featureLayer), p, True)
 
+
 waterpointList = plugin().featureView.waterpointTab.waterpointList
+
 
 def testListSelection():
     f = first(waterpointLayer)
 
     workspace().selectFeature(f)
-    
+
     assert waterpointList.itemWidget(waterpointList._selectedItem).feature.FID == f.FID
     assert waterpointList._selectedFeature.FID == f.FID
     waterpointList.changeSelection(WaterpointLayer)
-    
-    
-    
-    

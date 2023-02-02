@@ -6,6 +6,7 @@ from .feature_list_base import FeatureListBase
 
 class FeatureMiniList(FeatureListBase):
     """A flexible mini list of features (doesn't load from a changing source or anything)."""
+
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
         super().__init__(listItemFactory, parent)

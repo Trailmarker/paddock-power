@@ -5,17 +5,17 @@ from .layer import Layer
 
 
 class MapLayer(Layer):
-    
+
     @abstractclassmethod
     def defaultName(cls):
         """Return the default name for this layer."""
         pass
-        
+
     @abstractclassmethod
     def defaultStyle(cls):
         """Return the default style for this layer."""
         pass
-    
+
     @abstractclassmethod
     def detectAndRemoveAllOfType(cls):
         """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""

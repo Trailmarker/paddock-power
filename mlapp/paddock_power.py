@@ -216,7 +216,6 @@ class PaddockPower(PluginStateMachine):
         PaddockPower.restoreSystemExceptionHook()
         qgsInfo(f"{PLUGIN_NAME} unloaded.")
 
-
     def registerFunctions(self):
         f"""Register the extension functions used by {PLUGIN_NAME}."""
         for paddockPowerFunction in PaddockPowerFunctions:
@@ -295,11 +294,12 @@ class PaddockPower(PluginStateMachine):
     @PluginAction.analyseWorkspace.handler()
     def analyseWorkspace(self):
         """Recalculates then re-derives the whole workspace."""
-        
-        if guiConfirm(f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock metrics.",
-                      f"Analyse {PLUGIN_NAME} workspace?"):
+
+        if guiConfirm(
+            f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock metrics.",
+                f"Analyse {PLUGIN_NAME} workspace?"):
             self.workspace.recalculateLayers()
-        
+
     @PluginAction.projectClosed.handler()
     def projectClosed(self):
         projectFile = resolveProjectFile()

@@ -6,6 +6,7 @@ from ..utils import PLUGIN_NAME
 from .glitch import Glitch
 from .type_dict import TypeDict
 
+
 class WorkspaceLayers(TypeDict):
     def __init__(self, *layers):
         f"""Create a type registry for {PLUGIN_NAME}'s Layer like objects."""

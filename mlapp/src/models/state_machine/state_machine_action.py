@@ -28,6 +28,7 @@ def actionHandlerWithException(action, exceptionType=None, method=lambda x: x):
                 f"This {obj} can't handle the action {action} using the handler {method.__name__}, because it's in {obj.status} state")
     return wrapper
 
+
 def actionHandler(action, method=lambda x: x):
     def wrapper(obj, *args, **kwargs):
         if toStateMachine(obj).isPermitted(action):

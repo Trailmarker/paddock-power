@@ -20,7 +20,7 @@ class PersistedLayer(Layer):
     def commitChanges(self):
         """Commit changes to this layer."""
         pass
-    
+
     @abstractmethod
     def rollBack(self):
         """Roll back changes to this layer."""
@@ -40,7 +40,7 @@ class PersistedLayer(Layer):
     def addFeature(self, feature):
         """Add a feature to this layer."""
         pass
-    
+
     @abstractmethod
     def updateFeature(self, feature):
         """Update a feature in this layer."""

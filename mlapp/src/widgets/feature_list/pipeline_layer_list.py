@@ -13,4 +13,3 @@ class PipelineLayerList(FeatureLayerList):
         super().__init__(listItemFactory, parent)
 
         self.featureLayer = self.workspace.pipelineLayer
-

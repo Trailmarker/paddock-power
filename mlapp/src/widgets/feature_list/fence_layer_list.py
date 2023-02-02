@@ -14,4 +14,3 @@ class FenceLayerList(FeatureLayerList):
         super().__init__(listItemFactory, parent)
 
         self.featureLayer = self.workspace.fenceLayer
-

@@ -6,7 +6,7 @@ from ...models import StateMachineAction, actionHandler
 class FeatureAction(StateMachineAction):
     def handler(self):
         return partial(actionHandler, self)
-    
+
     """Allowed transitions for a StatusFeature."""
     draft = "Draft"
     trash = "Trash"

@@ -66,7 +66,6 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
             self.futureTimeframeButton.setChecked(self.workspace.timeframe.name == 'Future')
 
-  
     def buildUi(self):
         if self.uiBuilt:
             return
@@ -100,10 +99,9 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
         self.update()
         self.refreshUi()
-        
-        self.uiBuilt = True        
-        qgsInfo(f"{PLUGIN_NAME} rebuilt.")
 
+        self.uiBuilt = True
+        qgsInfo(f"{PLUGIN_NAME} rebuilt.")
 
     def clearUi(self):
         if not self.uiBuilt:
@@ -126,11 +124,11 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             except BaseException:
                 pass
         self.timeframeButtonGroup = None
-        self.uiBuilt = False        
+        self.uiBuilt = False
         qgsInfo(f"{PLUGIN_NAME} torn down.")
 
         # self.update()
-    
+
     def onFeatureLayerSelected(self, featureLayerType):
         name = featureLayerType.__name__
         if name == 'FenceLayer':
@@ -141,4 +139,3 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             self.tabWidget.setCurrentWidget(self.pipelineTab)
         elif name == 'WaterpointLayer':
             self.tabWidget.setCurrentWidget(self.waterpointTab)
-            

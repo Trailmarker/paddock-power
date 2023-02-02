@@ -14,7 +14,6 @@ class Pipeline(PersistedFeature, StatusFeatureMixin):
         PersistedFeature.__init__(self, featureLayer, existingFeature)
         StatusFeatureMixin.__init__(self)
 
-
     @property
     def TITLE(self):
         return f"Pipeline ({self.FID})  ({self.LENGTH} km)"

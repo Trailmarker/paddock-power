@@ -43,4 +43,4 @@ class MetricPaddockDetailsEdit(QWidget, FORM_CLASS, WorkspaceMixin):
         """Save the Paddock Details."""
         self.paddock.NAME = self.nameLineEdit.text()
         self.metricPaddock.Name = self.nameLineEdit.text()
-        return Edits.upsert(self.paddock, self.metricPaddock) # Cheeky?
+        return Edits.upsert(self.paddock, self.metricPaddock)  # Cheeky?

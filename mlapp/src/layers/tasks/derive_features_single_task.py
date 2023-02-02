@@ -21,7 +21,7 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
         self.count = 0
         self.total = 0
         self.obsolete = False
-        
+
         if onTaskCompleted is not None:
             self.taskCompleted.connect(lambda: onTaskCompleted(type(layer), True))
 
@@ -33,7 +33,7 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
 
         # TODO bit of a hack, just trying to reduce contention between these guys
         sleep(0.5)
-        
+
         assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
         readOnly = self.layer.readOnly()
 
@@ -55,7 +55,7 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
     def updateCount(self, featureCount, total):
         self.count = featureCount
         self.total = total
-        self.setProgress((featureCount * 100.0 / total) if total > 0 else 100.0) # Watch for divzero …
+        self.setProgress((featureCount * 100.0 / total) if total > 0 else 100.0)  # Watch for divzero …
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""

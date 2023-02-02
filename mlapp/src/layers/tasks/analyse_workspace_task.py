@@ -17,7 +17,7 @@ class AnalyseWorkspaceTask(QgsTask, WorkspaceMixin):
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.obsolete = False
-        workspace = self.workspace # WorkspaceMixin
+        workspace = self.workspace  # WorkspaceMixin
 
         order = workspace.layerDependencyGraph.recalculateOrder()
         recalculateLayers = [workspace.workspaceLayers.layer(layerType) for layerType in order]
@@ -27,7 +27,7 @@ class AnalyseWorkspaceTask(QgsTask, WorkspaceMixin):
             recalculateTask,
             dependencies=[],
             subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
-        
+
         order = workspace.layerDependencyGraph.deriveOrder()
         deriveLayers = [workspace.workspaceLayers.layer(layerType) for layerType in order]
         deriveTask = DeriveFeaturesTask(deriveLayers, workspace.onLayerAnalysisComplete)

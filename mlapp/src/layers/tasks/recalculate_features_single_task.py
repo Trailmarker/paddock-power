@@ -48,11 +48,11 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
             self.layer.setReadOnly(readOnly)
         self.setProgress(100.0)
         return True
-    
+
     def updateCount(self, featureCount, total):
         self.count = featureCount
         self.total = total
-        self.setProgress((featureCount * 100.0 / total) if total > 0 else 100.0) # Watch for divzero …
+        self.setProgress((featureCount * 100.0 / total) if total > 0 else 100.0)  # Watch for divzero …
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""

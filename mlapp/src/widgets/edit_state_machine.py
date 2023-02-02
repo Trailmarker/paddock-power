@@ -11,7 +11,7 @@ class EditStatus(StateMachineStatus):
 class EditAction(StateMachineAction):
     def handler(self):
         return partial(actionHandler, self)
-    
+
     edit = "Edit"
     save = "Save"
     cancelEdit = "Cancel"

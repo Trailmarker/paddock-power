@@ -15,6 +15,7 @@ from .src.layers import *
 
 from .src.utils import resolvePluginPath, qgsDebug, PLUGIN_NAME
 
+
 def plugin():
     f"""Get the instance of the {PLUGIN_NAME} plug-in"""
     return plugins['mlapp']
@@ -99,7 +100,6 @@ def checkLayers():
 
 if workspace():
     [landTypeConditionTable, boundaryLayer, metricPaddockLayer,
-     elevationLayer, fenceLayer, landTypeLayer, 
+     elevationLayer, fenceLayer, landTypeLayer,
      paddockLayer, paddockLandTypeLayer, pipelineLayer,
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
-

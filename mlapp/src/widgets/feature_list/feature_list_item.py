@@ -90,7 +90,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             EditAction.save,
             f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
             lambda *_: self.saveItem())
-    
+
         self.editToolBar.addGenericAction(
             f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
             f"Zoom to {self.feature.displayName()}",
@@ -128,7 +128,6 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             self.collapse.toggleButton.setStyleSheet("background-color: yellow")
         else:
             self.collapse.toggleButton.setStyleSheet("background-color: white")
-            
 
     @property
     def stateChanged(self):

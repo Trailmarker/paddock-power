@@ -12,7 +12,7 @@ class MapLayerMixin(IMapLayer):
     def defaultName(cls):
         """Return the default name for this layer."""
         return cls.LAYER_NAME
-    
+
     @classmethod
     def defaultStyle(cls):
         """Return the default style for this layer."""

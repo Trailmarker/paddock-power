@@ -24,7 +24,8 @@ class DeriveFeaturesMultipleTask(QgsTask, WorkspaceMixin):
     def run(self):
         """Derive features for a layer."""
         [*head, last] = self.layers
-        guiStatusBar(f"{PLUGIN_NAME} deriving features for {', '.join([layer.name() for layer in head])} and {last.name()} …")
+        guiStatusBar(
+            f"{PLUGIN_NAME} deriving features for {', '.join([layer.name() for layer in head])} and {last.name()} …")
         readOnlies = [layer.readOnly() for layer in self.layers]
 
         try:
@@ -37,9 +38,11 @@ class DeriveFeaturesMultipleTask(QgsTask, WorkspaceMixin):
             with Edits.editAndCommit(self.layers):
                 for layer in self.layers:
                     layer.deriveFeatures(
-                        featureProgressCallback=lambda featureCount, total: self.setProgress(featureCount * 100.0 / total),
+                        featureProgressCallback=lambda featureCount,
+                        total: self.setProgress(
+                            featureCount * 100.0 / total),
                         cancelledCallback=self.isCanceled)
-                    layer.commitChanges() # Commit early if we can …
+                    layer.commitChanges()  # Commit early if we can …
         finally:
             for layer, readOnly in zip(self.layers, readOnlies):
                 layer.setReadOnly(readOnly)

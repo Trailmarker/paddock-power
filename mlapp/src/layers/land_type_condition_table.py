@@ -213,10 +213,10 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
         if self._editable:
             self._editable = False
         return True
-    
+
     def copyFeature(self, feature):
         """Copy a feature using the logic (eg dependent layers) of this layer."""
-        return LandTypeCondition(feature)        
+        return LandTypeCondition(feature)
 
     def makeFeature(self):
         """Make a new, empty and default-valued feature in this layer."""
@@ -225,7 +225,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
     def addFeature(self, feature):
         """Add a feature to this layer."""
         self.upsertRecord(feature.PADDOCK, feature.LAND_TYPE, feature.CONDITION_TYPE)
-    
+
     def updateFeature(self, feature):
         """Update a feature in this layer."""
         self.upsertRecord(feature.PADDOCK, feature.LAND_TYPE, feature.CONDITION_TYPE)

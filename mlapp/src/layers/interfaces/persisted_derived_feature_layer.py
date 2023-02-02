@@ -20,7 +20,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
     def deriveFeatures(self):
         """Re-derive the upstream features in this layer."""
         pass
-    
+
     def recalculateFeatures(self):
         """We don't do this for derived data, as all values are (or should be) calculated upstream."""
         raise NotImplementedError

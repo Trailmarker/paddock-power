@@ -40,15 +40,15 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
     def refreshUi(self):
         """Show the Feature List."""
-        
+
         # qgsDebug(f"{type(self).__name__}.refreshUi()")
-        
+
         # Initially clear the list
         self.clear()
         self.removeSelection()
 
         features = self.getFeatures()
-        
+
         if not features:
             return
 
@@ -66,7 +66,7 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
             self.addItem(item)
             self.setItemWidget(item, widget)
-            
+
             if self._selectedFeature and self._selectedFeature.FID == feature.FID:
                 self._selectedItem = item
                 # qgsDebug(f"{type(self).__name__}.refreshUi(): selectedItem = {feature}")
@@ -74,9 +74,7 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
         if self._selectedItem:
             self.itemWidget(self._selectedItem).setSelected(True)
-            self.scrollToItem(self._selectedItem, QAbstractItemView.PositionAtTop)    
-
-
+            self.scrollToItem(self._selectedItem, QAbstractItemView.PositionAtTop)
 
     def refreshLayout(self):
         """Refresh the layout based on the size hints of all the custom widgets."""
@@ -95,8 +93,8 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
     def removeSelection(self):
         """Clear the selected Feature."""
         # if self._selectedItem:
-        #     self.itemWidget(self._selectedItem).setSelected(False) 
-        self._selectedItem = None            
+        #     self.itemWidget(self._selectedItem).setSelected(False)
+        self._selectedItem = None
         self.clearSelection()
 
     def changeSelection(self, layerType):

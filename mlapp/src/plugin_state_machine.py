@@ -25,8 +25,6 @@ class PluginAction(StateMachineAction):
     projectClosed = "Project Closed"
 
 
-
-
 class PluginStatus(StateMachineStatus):
     """Allowed statuses for a StatusFeature."""
     NoProjectOpen = "No Project Open"

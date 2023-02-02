@@ -26,7 +26,7 @@ order by "{GRAZING_RADIUS_TYPE}"
 
     def __init__(self,
                  waterpoint):
-        
+
         self.waterpoint = waterpoint
 
         super().__init__(waterpoint,

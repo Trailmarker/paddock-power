@@ -6,6 +6,7 @@ from ...utils import PLUGIN_NAME, qgsInfo
 from ...models import WorkspaceMixin
 from .recalculate_features_single_task import RecalculateFeaturesSingleTask
 
+
 class RecalculateFeaturesTask(QgsTask, WorkspaceMixin):
 
     def __init__(self, layers, onTaskCompleted=None):

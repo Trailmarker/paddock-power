@@ -18,7 +18,8 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(WaterpointLayer, [ElevationLayer])
         self.addDependencies(WaterpointBufferLayer, [PaddockLayer, WaterpointLayer])
         self.addDependencies(WateredAreaLayer, [PaddockLayer, WaterpointBufferLayer])
-        self.addDependencies(PaddockLandTypesLayer, [LandTypeConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
+        self.addDependencies(PaddockLandTypesLayer, [LandTypeConditionTable,
+                             PaddockLayer, LandTypeLayer, WateredAreaLayer])
         self.addDependencies(MetricPaddockLayer, [PaddockLayer, PaddockLandTypesLayer])
         self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, MetricPaddockLayer])
         self.addDependencies(PipelineLayer, [ElevationLayer])
@@ -34,7 +35,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
 
     def operationOrder(self, typePredicate, layerTypes=None):
         """Return an order list of layers that must be operated on based on a predicate."""
-       
+
         # We don't update anything that isn't affected by a change
         # We 'repersist' all the downstream derived layers that are affected
         loadOrder = self.loadOrder()
@@ -53,4 +54,5 @@ class LayerDependencyGraph(TypeDependencyGraph):
         return self.operationOrder(lambda t: issubclass(t, IPersistedDerivedFeatureLayer), updatedLayerTypes)
 
     def recalculateOrder(self):
-        return self.operationOrder(lambda t: issubclass(t, IPersistedFeatureLayer) and not issubclass(t, IPersistedDerivedFeatureLayer), self.loadOrder())
+        return self.operationOrder(lambda t: issubclass(t, IPersistedFeatureLayer)
+                                   and not issubclass(t, IPersistedDerivedFeatureLayer), self.loadOrder())

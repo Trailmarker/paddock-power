@@ -19,4 +19,3 @@ class WaterpointLayerList(FeatureLayerList):
         super().__init__(listItemFactory, parent)
 
         self.featureLayer = self.workspace.waterpointLayer
-

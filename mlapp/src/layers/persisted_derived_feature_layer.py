@@ -19,7 +19,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
     def getDerivedLayerInstance(self):
         """Return the derived layer for this layer."""
         return self._derivedLayerFactory()
-    
+
     def showDerivedLayerInstance(self):
         """Add an instance of the derived layer for this layer to the map."""
         self.getDerivedLayerInstance().addToMap()
@@ -49,10 +49,10 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
             feature.upsert()
             if featureProgressCallback:
                 featureProgressCallback(count, featureCount)
-        
+
         # Check again …
         if cancelledCallback():
             return
-        
+
         # Clean up any instances of the virtual source …
         type(derivedLayer).detectAndRemoveAllOfType()

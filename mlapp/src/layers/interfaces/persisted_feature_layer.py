@@ -19,10 +19,8 @@ class PersistedFeatureLayer(FeatureLayer, PersistedLayer):
     def deleteFromStore(self, workspaceFile, layerName):
         """Delete this layer from the GeoPackage file."""
         pass
-    
+
     @abstractmethod
     def recalculateFeatures(self):
         """Re-derive the upstream features in this layer."""
         pass
-    
-
