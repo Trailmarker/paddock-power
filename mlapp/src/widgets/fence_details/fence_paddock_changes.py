@@ -4,7 +4,9 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QWidget
 
+from ...layers.features import Fence
 from ...models import WorkspaceMixin
+from ...utils import qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_paddock_changes_base.ui')))
@@ -35,11 +37,18 @@ class FencePaddockChanges(QWidget, FORM_CLASS, WorkspaceMixin):
     def paddockLayer(self):
         return self.workspace.paddockLayer
 
-    def changeSelection(self, feature):
-        self.fence = feature
+    def changeSelection(self, layerType):
+        qgsDebug("FencePaddockChanges.changeSelection")
+        feature = self.workspace.selectedFeature(layerType)
+        qgsDebug(f"FencePaddockChanges.changeSelection: feature = {feature}")
+
+        if isinstance(feature, Fence):
+            self.fence = feature
+            self.refreshUi()
 
     def removeSelection(self):
         self.fence = None
+        self.refreshUi()
 
     def refreshUi(self):
         """Show the Paddock View."""

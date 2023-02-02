@@ -133,10 +133,11 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
 
     def matchTimeframe(self, timeframe):
         """Return True if this feature's timeframe or status matches the supplied timeframe."""
-        if self.hasTimeframe:
-            return Timeframe[self.TIMEFRAME.name] == Timeframe[timeframe.name]
-        elif self.hasStatus:
+        if self.hasStatus:
+            # STATUS gets precedence because the results are more interesting
             return timeframe.matchFeatureStatus(self.STATUS)
+        elif self.hasTimeframe:
+            return timeframe.matchTimeframe(self.TIMEFRAME)
         else:
             return False
 

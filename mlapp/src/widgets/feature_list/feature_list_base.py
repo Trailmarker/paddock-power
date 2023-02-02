@@ -41,7 +41,7 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
     def refreshUi(self):
         """Show the Feature List."""
         
-        qgsDebug(f"{type(self).__name__}.refreshUi()")
+        # qgsDebug(f"{type(self).__name__}.refreshUi()")
         
         # Initially clear the list
         self.clear()

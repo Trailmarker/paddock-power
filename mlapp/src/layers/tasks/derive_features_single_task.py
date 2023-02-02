@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 
 from qgis.core import QgsTask
 
@@ -30,6 +31,9 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
         """Derive features for a layer."""
         guiStatusBar(f"{PLUGIN_NAME} deriving {self.layer.name()} …")
 
+        # TODO bit of a hack, just trying to reduce contention between these guys
+        sleep(0.5)
+        
         assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
         readOnly = self.layer.readOnly()
 

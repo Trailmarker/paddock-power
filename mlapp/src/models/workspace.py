@@ -48,14 +48,13 @@ class Workspace(QObject):
 
         self.landTypeLayer = LandTypeLayer(self.workspaceFile)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.landTypeLayer.name()} loaded …")
-        self.conditionTable = LandTypeConditionTable(self.workspaceFile)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.conditionTable.name()} loaded …")
+        self.landTypeConditionTable = LandTypeConditionTable(self.workspaceFile)
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.landTypeConditionTable.name()} loaded …")
         self.elevationLayer = ElevationLayer(
             self.workspaceFile)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.elevationLayer.name()} loaded …")
         self.paddockLayer = PaddockLayer(
-            self.workspaceFile,
-            self.conditionTable)
+            self.workspaceFile)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.paddockLayer.name()} loaded …")
         self.waterpointLayer = WaterpointLayer(
             self.workspaceFile,
@@ -73,7 +72,7 @@ class Workspace(QObject):
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.wateredAreaLayer.name()} loaded …")
         self.paddockLandTypesLayer = PaddockLandTypesLayer(
             self.workspaceFile,
-            self.conditionTable,
+            self.landTypeConditionTable,
             self.paddockLayer,
             self.landTypeLayer,
             self.wateredAreaLayer)
@@ -95,7 +94,7 @@ class Workspace(QObject):
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.boundaryLayer.name()} loaded …")
         self.workspaceLayers = WorkspaceLayers(
             *[self.landTypeLayer,
-              self.conditionTable,
+              self.landTypeConditionTable,
               self.paddockLayer,
               self.elevationLayer,
               self.waterpointLayer,
@@ -249,7 +248,7 @@ class Workspace(QObject):
         """Handle a completed recalculation of a layer."""
         if result:
             layer = self.workspaceLayers.layer(layerType)
-            qgsDebug(f"{type(self).__name__}.onLayerAnalysisComplete: {type(layer).__name__}.featuresChanged.emit()")
+            # qgsDebug(f"{type(self).__name__}.onLayerAnalysisComplete: {type(layer).__name__}.featuresChanged.emit()")
             layer.featuresChanged.emit()
 
     def onFeaturesPersisted(self, layerTypes):
@@ -258,7 +257,7 @@ class Workspace(QObject):
 
         # Emit a signal to any layer subscribers that these features have changedinstance
         for layerType in featureLayerTypes:
-            qgsDebug(f"{type(self).__name__}.onFeaturesPersisted: {layerType.__name__}.featuresChanged.emit()")
+            # qgsDebug(f"{type(self).__name__}.onFeaturesPersisted: {layerType.__name__}.featuresChanged.emit()")
             self.workspaceLayers.layer(layerType).featuresChanged.emit()
 
         # Re-derive other features that depend on these features

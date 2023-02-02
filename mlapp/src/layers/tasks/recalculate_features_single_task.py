@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 
 from qgis.core import QgsTask
 
@@ -24,6 +25,9 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
     def run(self):
         """Recalculate features for a layer."""
         guiStatusBar(f"{PLUGIN_NAME} recalculating {self.layer.name()} features …")
+
+        # TODO bit of a hack, just trying to reduce contention between these guys
+        sleep(0.5)
 
         assert isinstance(self.layer, IPersistedFeatureLayer)
         assert not isinstance(self.layer, IPersistedDerivedFeatureLayer)

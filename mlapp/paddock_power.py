@@ -13,7 +13,7 @@ from .resources_rc import *
 from .src.models import Glitch, Workspace
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus
-from .src.utils import guiStatusBar, guiWarning, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
+from .src.utils import guiConfirm, guiStatusBar, guiWarning, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 from .src.views.feature_view.feature_view import FeatureView
 from .src.widgets.import_dialog.import_dialog import ImportDialog
 
@@ -117,11 +117,11 @@ class PaddockPower(PluginStateMachine):
             callback=lambda *_: self.detectWorkspace(),
             parent=self.iface.mainWindow())
 
-        self.recalculateWorkspaceAction = self.addAction(
+        self.analyseWorkspaceAction = self.addAction(
             PluginAction.analyseWorkspace,
-            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/analyse-paddock-power.png"),
             text=f"Analyse {PLUGIN_NAME} workspace …",
-            callback=lambda *_: self.recalculateWorkspace(),
+            callback=lambda *_: self.analyseWorkspace(),
             parent=self.iface.mainWindow())
 
         self.createWorkspaceAction = self.addAction(
@@ -231,7 +231,6 @@ class PaddockPower(PluginStateMachine):
         if self.workspace:
             self.workspaceUnloading.emit()
         self.workspace = Workspace(self.iface, workspaceFile)
-        qgsInfo("Emitting workspaceReady …")
         self.workspaceReady.emit()
 
     @PluginAction.detectWorkspace.handler()
@@ -294,9 +293,13 @@ class PaddockPower(PluginStateMachine):
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
     @PluginAction.analyseWorkspace.handler()
-    def recalculateWorkspace(self):
-        self.workspace.recalculateLayers()
-
+    def analyseWorkspace(self):
+        """Recalculates then re-derives the whole workspace."""
+        
+        if guiConfirm(f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock metrics.",
+                      f"Analyse {PLUGIN_NAME} workspace?"):
+            self.workspace.recalculateLayers()
+        
     @PluginAction.projectClosed.handler()
     def projectClosed(self):
         projectFile = resolveProjectFile()

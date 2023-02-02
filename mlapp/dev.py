@@ -6,6 +6,7 @@ from os import mkdir
 from qgis.core import QgsProject
 from qgis.utils import plugins
 
+from .src.layers.fields import Timeframe, FeatureStatus
 from .src.layers.features import *
 from .src.layers.interfaces import *
 from .src.layers.tasks import *

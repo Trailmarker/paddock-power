@@ -43,11 +43,10 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         """Get the property geometry for this Fence."""
         # Get the whole area around the property
         # We are only interested in Paddocks that are current
-        builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
-            FeatureStatus.Built, FeatureStatus.Planned)
+        currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
 
         # Get the whole current Paddock area - note the buffering here to reduce glitches
-        return QgsGeometry.unaryUnion(p.GEOMETRY.buffer(glitchBuffer, 10) for p in builtAndPlannedPaddocks)
+        return QgsGeometry.unaryUnion(p.GEOMETRY.buffer(glitchBuffer, 10) for p in currentPaddocks)
         # return property.buffer(-glitchBuffer, 10)
 
     def getPropertyNeighbourhood(self):
@@ -131,10 +130,9 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             return [], []
 
         # We are only interested in Paddocks that are current
-        builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
-            FeatureStatus.Built, FeatureStatus.Planned)
+        currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
 
-        intersects = [p for p in builtAndPlannedPaddocks if fenceLine.intersects(p.GEOMETRY)]
+        intersects = [p for p in currentPaddocks if fenceLine.intersects(p.GEOMETRY)]
 
         # Crop the fence line to the property
         propertyBoundary = self.getPropertyGeometry(glitchBuffer=1.0)
@@ -183,8 +181,8 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         metricPaddocks = list(self.metricPaddockLayer.getFeatures(request=buildFenceRequest))
 
-        return ([f for f in metricPaddocks if f.timeframe.matchTimeframe(Timeframe.Current)],
-                [f for f in metricPaddocks if f.timeframe.matchTimeframe(Timeframe.Future)])
+        return ([feature for feature in metricPaddocks if feature.TIMEFRAME.matchTimeframe(Timeframe.Current)],
+                [feature for feature in metricPaddocks if feature.TIMEFRAME.matchTimeframe(Timeframe.Future)])
 
     @Edits.persistFeatures
     @FeatureAction.draft.handler()
@@ -253,20 +251,16 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             points = [QgsPoint(p.x(), p.y()) for p in polyline]
             splitLine = QgsLineString(points)
 
-            builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
-                FeatureStatus.Built, FeatureStatus.Planned)
-
             self.paddockLayer.splitFeatures(splitLine, False, False)
 
-            builtAndPlannedPaddocks = self.paddockLayer.getFeaturesByStatus(
-                FeatureStatus.Built, FeatureStatus.Planned)
+            currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
 
             for crossedPaddock in supersededPaddocks:
                 crossedPaddockName = crossedPaddock.NAME
 
                 # Deep copy all split paddocks
                 splitPaddocks = [self.paddockLayer.copyFeature(f)
-                                 for f in builtAndPlannedPaddocks
+                                 for f in currentPaddocks
                                  if f.NAME == crossedPaddockName]
 
                 for i, splitPaddock in enumerate(splitPaddocks):

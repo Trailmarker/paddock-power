@@ -17,7 +17,7 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 
     def prepareQuery(self, query, *dependentLayers):
 
-        [conditionTable, paddockLayer, landTypeLayer, wateredAreaLayer] = self.names(*dependentLayers)
+        [landTypeConditionTable, paddockLayer, landTypeLayer, wateredAreaLayer] = self.names(*dependentLayers)
 
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
@@ -82,8 +82,8 @@ from
 			when 'Unwatered' then 0.0
 			else 0.0
 		end as {_WATERED_FACTOR},
-        ifnull("{conditionTable}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
-		case ifnull("{conditionTable}"."{CONDITION_TYPE}", 'A')
+        ifnull("{landTypeConditionTable}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
+		case ifnull("{landTypeConditionTable}"."{CONDITION_TYPE}", 'A')
 			when 'A' then 1.0
 			when 'B' then 0.75
 			when 'C' then 0.45
@@ -99,23 +99,23 @@ from
 		end as "{WATERED_DISCOUNT}",
 		{TIMEFRAME}
 	 from {_PADDOCK_LAND_TYPES}
-	 left outer join "{conditionTable}"
-	 	on {_PADDOCK_LAND_TYPES}.{PADDOCK} = "{conditionTable}"."{PADDOCK}"
-	 	and {_PADDOCK_LAND_TYPES}."{LAND_TYPE}" = "{conditionTable}"."{LAND_TYPE}")
+	 left outer join "{landTypeConditionTable}"
+	 	on {_PADDOCK_LAND_TYPES}.{PADDOCK} = "{landTypeConditionTable}"."{PADDOCK}"
+	 	and {_PADDOCK_LAND_TYPES}."{LAND_TYPE}" = "{landTypeConditionTable}"."{LAND_TYPE}")
 where geometry is not null
 group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 """
         return super().prepareQuery(query)
 
     def __init__(self,
-                 conditionTable,
+                 landTypeConditionTable,
                  paddockLayer,
                  landTypeLayer,
                  wateredAraLayer):
 
         super().__init__(DerivedPaddockLandTypesLayer.defaultName(),
                          DerivedPaddockLandTypesLayer.defaultStyle(),
-                         conditionTable,
+                         landTypeConditionTable,
                          paddockLayer,
                          landTypeLayer,
                          wateredAraLayer)

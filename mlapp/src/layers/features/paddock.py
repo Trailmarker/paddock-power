@@ -23,16 +23,16 @@ class Paddock(PersistedFeature, StatusFeatureMixin):
         return f"{self.NAME} ({self.AREA:.2f} km²)"
 
     @property
-    def conditionTable(self):
+    def landTypeConditionTable(self):
         """Return the LandTypeConditionTable for this Paddock."""
-        return self.featureLayer.workspace.conditionTable
+        return self.featureLayer.workspace.landTypeConditionTable
 
     def upsert(self):
         """Upsert the Paddock and also upsert a Condition record if the Paddock has been split."""
         super().upsert()
 
         if self.crossedPaddockId:
-            self.conditionTable.upsertSplit(self.FID, self.crossedPaddockId)
+            self.landTypeConditionTable.upsertSplitPaddockRecord(self.FID, self.crossedPaddockId)
 
         return self.FID
 
