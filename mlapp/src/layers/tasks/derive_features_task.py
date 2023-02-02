@@ -2,17 +2,17 @@
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
-from ...models import WorkspaceMixin
+from ...utils import PLUGIN_NAME, qgsInfo
+from ...models import WorkspaceMixin, TypeDict
 from .derive_features_single_task import DeriveFeaturesSingleTask
 
 
 class DeriveFeaturesTask(QgsTask, WorkspaceMixin):
 
-    def __init__(self, layers):
+    def __init__(self, layers, onTaskCompleted=None):
         """Input is a correctly ordered batch of layers."""
         super().__init__(
-            f"{PLUGIN_NAME} Derive Features(layers={', '.join([layer.name() for layer in layers])})",
+            f"deriving features for {len(layers)} layers",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.layers = layers
@@ -21,7 +21,7 @@ class DeriveFeaturesTask(QgsTask, WorkspaceMixin):
 
         predecessor = None
         for layer in self.layers:
-            task = DeriveFeaturesSingleTask(layer)
+            task = DeriveFeaturesSingleTask(layer, onTaskCompleted=onTaskCompleted)
             if predecessor:
                 self.addSubTask(
                     task, dependencies=[predecessor],
@@ -34,18 +34,25 @@ class DeriveFeaturesTask(QgsTask, WorkspaceMixin):
 
     def run(self):
         """Derive features for all layers as specified in subtasks."""
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} deriving features complete.")
         return True
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
         self.workspace.onTaskCompleted(self, result)
 
+    def makesObsolete(self, otherTask):
+        """Return true if this task makes the other task obsolete."""
+        if isinstance(otherTask, DeriveFeaturesTask):
+            layers = set([layer.id() for layer in self.layers])
+            otherLayers = set([layer.id() for layer in otherTask.layers])
+            return len(layers.intersection(otherLayers)) > 0
+        return False
+
     def cancelObsolete(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} because a newer task has been queued.")
+        qgsInfo(f"{PLUGIN_NAME} cancelling task: '{self.description()}' because a newer task has been queued.")
         self.obsolete = True
         super().cancel()
 
     def cancel(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} for an unknown reason.")
+        qgsInfo(f"QGIS cancelling task: '{self.description()}' eg due to quitting or user intervention.")
         super().cancel()

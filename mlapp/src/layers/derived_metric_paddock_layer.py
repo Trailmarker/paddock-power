@@ -4,23 +4,12 @@ from qgis.core import QgsFeatureRequest
 from .features import MetricPaddock
 from .fields import AREA, BUILD_FENCE, ESTIMATED_CAPACITY_PER_AREA, ESTIMATED_CAPACITY, FID, NAME, PADDOCK, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_AREA, Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
-from .metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
-from .popup_layer_source_mixin import PopupLayerSourceMixin
 
 
-class DerivedMetricPaddockLayer(DerivedFeatureLayer, PopupLayerSourceMixin):
+class DerivedMetricPaddockLayer(DerivedFeatureLayer):
 
-    NAME = "Paddocks"
+    LAYER_NAME = "Derived Metric Paddocks"
     STYLE = "paddock"
-
-    @property
-    def popupLayerTypes(self):
-        return [MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer]
-
-    @property
-    def relativeLayerPosition(self):
-        """Makes the Paddock Land Types popups appear *over* the Paddock layer."""
-        return -1
 
     @classmethod
     def getFeatureType(cls):
@@ -67,7 +56,7 @@ group by "{paddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
                  paddockLayer,
                  paddockLandTypesLayer):
 
-        super().__init__(DerivedMetricPaddockLayer.NAME,
-                         DerivedMetricPaddockLayer.STYLE,
+        super().__init__(DerivedMetricPaddockLayer.defaultName(),
+                         DerivedMetricPaddockLayer.defaultStyle(),
                          paddockLayer,
                          paddockLandTypesLayer)

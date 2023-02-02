@@ -5,27 +5,30 @@ from qgis.core import QgsVectorLayer
 
 from ...models import Glitch
 from ...utils import qgsInfo
-from ..interfaces import IPersistedFeature, IPersistedLayer, IPersistedDerivedFeatureLayer
+from ..interfaces import IPersistedFeature, IFeatureLayer
 
 
 class Edits:
 
-    def __init__(self, upserts=[], deletes=[]):
+    def __init__(self, upserts=[], deletes=[], layers=[]):
         def _filter(features=[]):
             return [f for f in (features or []) if isinstance(f, IPersistedFeature)]
         self.upserts = _filter(upserts)
         self.deletes = _filter(deletes)
+        self.layers = [d for d in (layers or []) if isinstance(d, IFeatureLayer)]
 
     def editAfter(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
         self.upserts = otherEdits.upserts + self.upserts
         self.deletes = otherEdits.deletes + self.deletes
+        self.layers = otherEdits.layers + self.layers
         return self
 
     def editBefore(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
         self.upserts = self.upserts + otherEdits.upserts
         self.deletes = self.deletes + otherEdits.deletes
+        self.layers = self.layers + otherEdits.layers
         return self
 
     @staticmethod
@@ -35,6 +38,10 @@ class Edits:
     @staticmethod
     def delete(*features):
         return Edits(deletes=list(features))
+
+    @staticmethod
+    def notifyLayers(*layers):
+        return Edits(layers=list(layers))
 
     @staticmethod
     @contextmanager
@@ -81,12 +88,7 @@ class Edits:
             qgsInfo(f"Edits.persistFeatures: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
 
             layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
-
-            qgsInfo(f"Edits.persistFeatures: layers={repr(layers)}")
-
             workspace = next(l.workspace for l in layers)
-
-            qgsInfo(f"Edits.persistFeatures: workspace is None={workspace is None}")
 
             with Edits.editAndCommit(layers):
                 for feature in edits.upserts:
@@ -95,6 +97,7 @@ class Edits:
                 for feature in edits.deletes:
                     feature.delete()
 
-            workspace.onFeaturesChanged([type(l) for l in layers])
+            allLayers = set(list(layers) + edits.layers)
+            workspace.onFeaturesPersisted([type(l) for l in allLayers])
 
         return callableWithPersistFeatures

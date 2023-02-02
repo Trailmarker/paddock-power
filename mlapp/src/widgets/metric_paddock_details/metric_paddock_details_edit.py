@@ -26,8 +26,13 @@ class MetricPaddockDetailsEdit(QWidget, FORM_CLASS, WorkspaceMixin):
         self.getPaddock()
 
     @property
+    def metricPaddockLayer(self):
+        """Get the Metric Paddock layer."""
+        return self.workspace.metricPaddockLayer
+
+    @property
     def paddockLayer(self):
-        """Get the FeatureLayer."""
+        """Get the Paddock layer."""
         return self.workspace.paddockLayer
 
     def getPaddock(self):
@@ -37,4 +42,5 @@ class MetricPaddockDetailsEdit(QWidget, FORM_CLASS, WorkspaceMixin):
     def saveFeature(self):
         """Save the Paddock Details."""
         self.paddock.NAME = self.nameLineEdit.text()
-        return Edits.upsert(self.paddock)
+        self.metricPaddock.Name = self.nameLineEdit.text()
+        return Edits.upsert(self.paddock, self.metricPaddock) # Cheeky?

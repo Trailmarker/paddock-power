@@ -1,7 +1,7 @@
 
 import sqlite3
 
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import PLUGIN_NAME, qgsInfo
@@ -12,14 +12,21 @@ from .interfaces import IPersistedLayer
 
 class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass=QtAbstractMeta):
 
-    NAME = "Land Type Condition Table"
+    willBeDeleted = pyqtSignal()
+
+    LAYER_NAME = "Land Type Condition Table"
+
+    @classmethod
+    def defaultName(cls):
+        """Return the default name for this layer."""
+        return cls.LAYER_NAME
 
     def __init__(self, workspaceFile):
         QObject.__init__(self)
         WorkspaceMixin.__init__(self)
 
         self._editable = False
-        self.tableName = LandTypeConditionTable.NAME
+        self.tableName = self.defaultName()
 
         # If not found, create
         if not self.detectInGeoPackage(workspaceFile, self.tableName):
@@ -98,7 +105,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             conn.execute(self.makeDropQuery(tableName=tableName))
 
     def name(self):
-        return self.NAME
+        return self.defaultName()
 
     def id(self):
         return self.tableName

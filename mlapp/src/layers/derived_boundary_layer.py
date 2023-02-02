@@ -6,7 +6,7 @@ from .derived_feature_layer import DerivedFeatureLayer
 
 class DerivedBoundaryLayer(DerivedFeatureLayer):
 
-    NAME = "Boundary"
+    LAYER_NAME = "Derived Boundary"
     STYLE = "boundary"
 
     @classmethod
@@ -28,6 +28,6 @@ from "{paddockLayer}" where {Timeframe.Future.includesStatuses(f'"{paddockLayer}
     def __init__(self,
                  paddockLayer):
 
-        super().__init__(DerivedBoundaryLayer.NAME,
-                         DerivedBoundaryLayer.STYLE,
+        super().__init__(DerivedBoundaryLayer.defaultName(),
+                         DerivedBoundaryLayer.defaultStyle(),
                          paddockLayer)

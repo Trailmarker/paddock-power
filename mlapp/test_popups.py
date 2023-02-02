@@ -3,13 +3,13 @@ from .dev import *
 
 
 def testMetricPaddocks():
-    p = first(derivedMetricPaddockLayer)
+    p = first(metricPaddockLayer)
 
     assert isinstance(p, MetricPaddock)
 
-    q = first(derivedMetricPaddockLayer.getFeaturesInCurrentTimeframe())
+    q = first(metricPaddockLayer.getFeaturesInCurrentTimeframe())
 
-    derivedMetricPaddockLayer.selectFeature(q)
+    metricPaddockLayer.selectFeature(q)
 
     # p.addPopupLayer(MetricPaddockCurrentLandTypesPopupLayer)
     # p.addPopupLayer(MetricPaddockFutureLandTypesPopupLayer)

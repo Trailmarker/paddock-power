@@ -8,54 +8,47 @@ from ..features import Edits
 from ..interfaces import IPersistedDerivedFeatureLayer
 
 
-class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
+class DeriveFeaturesMultipleTask(QgsTask, WorkspaceMixin):
 
-    def __init__(self, layer, onTaskCompleted=None):
+    def __init__(self, layers):
         """Input is a correctly ordered batch of layers."""
         super().__init__(
-            f"deriving {layer.name()}",
+            f"{PLUGIN_NAME} Derive Features Multiple(layers={', '.join([layer.name() for layer in layers])})",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
-        self.layer = layer
-        self.count = 0
-        self.total = 0
+        self.layers = layers
         self.obsolete = False
-        
-        if onTaskCompleted is not None:
-            self.taskCompleted.connect(lambda: onTaskCompleted(type(layer), True))
 
         # self.setDependentLayers([self.layer])
 
     def run(self):
         """Derive features for a layer."""
-        guiStatusBar(f"{PLUGIN_NAME} deriving {self.layer.name()} …")
-
-        assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
-        readOnly = self.layer.readOnly()
+        [*head, last] = self.layers
+        guiStatusBar(f"{PLUGIN_NAME} deriving features for {', '.join([layer.name() for layer in head])} and {last.name()} …")
+        readOnlies = [layer.readOnly() for layer in self.layers]
 
         try:
-            self.layer.setReadOnly(False)
+            for layer in self.layers:
+                layer.setReadOnly(False)
 
             if self.isCanceled():
                 return False
 
-            with Edits.editAndCommit([self.layer]):
-                self.layer.deriveFeatures(
-                    featureProgressCallback=self.updateCount,
-                    cancelledCallback=self.isCanceled)
+            with Edits.editAndCommit(self.layers):
+                for layer in self.layers:
+                    layer.deriveFeatures(
+                        featureProgressCallback=lambda featureCount, total: self.setProgress(featureCount * 100.0 / total),
+                        cancelledCallback=self.isCanceled)
+                    layer.commitChanges() # Commit early if we can …
         finally:
-            self.layer.setReadOnly(readOnly)
+            for layer, readOnly in zip(self.layers, readOnlies):
+                layer.setReadOnly(readOnly)
         self.setProgress(100.0)
         return True
 
-    def updateCount(self, featureCount, total):
-        self.count = featureCount
-        self.total = total
-        self.setProgress((featureCount * 100.0 / total) if total > 0 else 100.0) # Watch for divzero …
-
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
-        self.workspace.onTaskCompleted(self, result, showMessage=False)
+        self.workspace.onTaskCompleted(self, result)
 
     def cancelObsolete(self):
         qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} because a newer task has been queued …")

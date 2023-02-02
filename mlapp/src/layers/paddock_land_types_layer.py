@@ -8,7 +8,7 @@ from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
 class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
 
-    NAME = "Paddock Land Types"
+    LAYER_NAME = "Paddock Land Types"
     STYLE = "paddock_land_types_popup"
 
     @classmethod
@@ -17,10 +17,11 @@ class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
 
     def __init__(self,
                  workspaceFile,
-                 derivedPaddockLandTypesLayer: DerivedPaddockLandTypesLayer):
+                 *dependentLayers):
         f"""Create a new {PLUGIN_NAME} Paddock Land Types layer."""
 
         super().__init__(workspaceFile,
-                         layerName=PaddockLandTypesLayer.NAME,
-                         styleName=PaddockLandTypesLayer.STYLE,
-                         derivedLayer=derivedPaddockLandTypesLayer)
+                         PaddockLandTypesLayer.defaultName(),
+                         PaddockLandTypesLayer.defaultStyle(),
+                         DerivedPaddockLandTypesLayer,
+                         *dependentLayers)

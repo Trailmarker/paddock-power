@@ -11,7 +11,7 @@ from .map_layer_mixin import MapLayerMixin
 
 class ElevationLayer(QgsRasterLayer, WorkspaceMixin, MapLayerMixin, metaclass=QtAbstractMeta):
 
-    NAME = "Elevation Mapping"
+    LAYER_NAME = "Elevation Mapping"
     STYLE = "elevation"
 
     @staticmethod
@@ -52,9 +52,9 @@ class ElevationLayer(QgsRasterLayer, WorkspaceMixin, MapLayerMixin, metaclass=Qt
         # workspace so other objects can respond
         self._blockWorkspaceConnnection = False
 
-        layerName = layerName or ElevationLayer.NAME
+        layerName = layerName or ElevationLayer.defaultName()
 
-        styleName = kwargs.pop("styleName", ElevationLayer.STYLE)
+        styleName = kwargs.pop("styleName", ElevationLayer.defaultStyle())
 
         # Note ths URL format is different from QgsVectorLayer!
         rasterUrl = ElevationLayer._rasterGpkgUrl(workspaceFile, layerName)

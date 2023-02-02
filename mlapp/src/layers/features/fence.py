@@ -25,8 +25,8 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         return self.featureLayer.workspace.paddockLayer
 
     @property
-    def derivedMetricPaddockLayer(self):
-        return self.featureLayer.workspace.derivedMetricPaddockLayer
+    def metricPaddockLayer(self):
+        return self.featureLayer.workspace.metricPaddockLayer
 
     @property
     def isInfrastructure(self):
@@ -181,7 +181,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {self.BUILD_ORDER}')
 
-        metricPaddocks = list(self.derivedMetricPaddockLayer.getFeatures(request=buildFenceRequest))
+        metricPaddocks = list(self.metricPaddockLayer.getFeatures(request=buildFenceRequest))
 
         return ([f for f in metricPaddocks if f.timeframe.matchTimeframe(Timeframe.Current)],
                 [f for f in metricPaddocks if f.timeframe.matchTimeframe(Timeframe.Future)])

@@ -7,7 +7,7 @@ from .derived_feature_layer import DerivedFeatureLayer
 
 class DerivedWateredAreaLayer(DerivedFeatureLayer):
 
-    NAME = "Derived Watered Areas"
+    LAYER_NAME = "Derived Watered Areas"
     STYLE = "watered_area"
 
     @classmethod
@@ -106,7 +106,7 @@ where not exists (
                  waterpointBufferLayer):
 
         super().__init__(
-            DerivedWateredAreaLayer.NAME,
-            DerivedWateredAreaLayer.STYLE,
+            DerivedWateredAreaLayer.defaultName(),
+            DerivedWateredAreaLayer.defaultStyle(),
             paddockLayer,
             waterpointBufferLayer)

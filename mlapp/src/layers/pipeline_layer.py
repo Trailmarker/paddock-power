@@ -5,7 +5,7 @@ from .imported_feature_layer import ImportedFeatureLayer
 
 class PipelineLayer(ImportedFeatureLayer):
 
-    NAME = "Pipelines"
+    LAYER_NAME = "Pipelines"
     STYLE = "pipeline"
 
     @classmethod
@@ -17,5 +17,5 @@ class PipelineLayer(ImportedFeatureLayer):
         """Create or open a Pipeline layer."""
 
         super().__init__(workspaceFile,
-                         layerName=PipelineLayer.NAME,
-                         styleName=PipelineLayer.STYLE)
+                         layerName=PipelineLayer.defaultName(),
+                         styleName=PipelineLayer.defaultStyle())

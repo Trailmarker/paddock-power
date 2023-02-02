@@ -43,7 +43,7 @@ MetricPaddockSchema = Schema([Fid,
                               EstimatedCapacity,
                               PotentialCapacityPerArea,
                               PotentialCapacity],
-                             wkbType=QgsWkbTypes.NoGeometry)
+                             wkbType=QgsWkbTypes.MultiPolygon)
 PipelineSchema = Schema([Fid, Name, Status, Length], wkbType=QgsWkbTypes.LineString)
 StatusFeatureSchema = Schema([Fid, Name, Status])
 WaterpointBufferSchema = Schema(

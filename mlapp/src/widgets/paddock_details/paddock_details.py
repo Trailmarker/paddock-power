@@ -30,7 +30,7 @@ class PaddockDetails(QWidget, FORM_CLASS, WorkspaceMixin):
     @property
     def featureLayer(self):
         """Get the FeatureLayer."""
-        return self.workspace.derivedMetricPaddockLayer
+        return self.workspace.metricPaddockLayer
 
     def refreshUi(self):
         """Set the FeatureLayer and update the display."""

@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from qgis.core import QgsApplication, QgsProject
+from qgis.core import QgsApplication, QgsProject, QgsTask
 
-from ..layers.features.edits import Edits
 from ..layers.fields import Timeframe
-from ..layers.tasks import DeriveFeaturesTask, RecalculateFeaturesTask
-from ..layers import (LandTypeConditionTable, DerivedBoundaryLayer, DerivedMetricPaddockLayer,
-                      DerivedPaddockLandTypesLayer, DerivedWateredAreaLayer, DerivedWaterpointBufferLayer,
+from ..layers.interfaces import IFeatureLayer
+from ..layers.tasks import AnalyseWorkspaceTask, DeriveFeaturesTask, RecalculateFeaturesTask
+from ..layers import (LandTypeConditionTable, BoundaryLayer, MetricPaddockLayer,
                       ElevationLayer, FenceLayer, LandTypeLayer, PaddockLandTypesLayer, PaddockLayer,
                       PipelineLayer, WateredAreaLayer, WaterpointBufferLayer, WaterpointLayer)
 from ..tools.map_tool import MapTool
-from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
+from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo, qgsDebug
 from .glitch import Glitch
 from .layer_dependency_graph import LayerDependencyGraph
-from .type_dict import TypeDict
 from .workspace_layers import WorkspaceLayers
 
 # Initialize Qt resources from file resources.py
@@ -63,61 +61,51 @@ class Workspace(QObject):
             self.workspaceFile,
             self.elevationLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.waterpointLayer.name()} loaded …")
-        self.derivedWaterpointBufferLayer = DerivedWaterpointBufferLayer(
-            self.paddockLayer,
-            self.waterpointLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.derivedWaterpointBufferLayer.name()} loaded …")
         self.waterpointBufferLayer = WaterpointBufferLayer(
             self.workspaceFile,
-            self.derivedWaterpointBufferLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.waterpointBufferLayer.name()} loaded …")
-        self.derivedWateredAreaLayer = DerivedWateredAreaLayer(
             self.paddockLayer,
-            self.waterpointBufferLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.derivedWateredAreaLayer.name()} loaded …")
+            self.waterpointLayer)
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.waterpointBufferLayer.name()} loaded …")
         self.wateredAreaLayer = WateredAreaLayer(
             self.workspaceFile,
-            self.derivedWateredAreaLayer)
+            self.paddockLayer,
+            self.waterpointBufferLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.wateredAreaLayer.name()} loaded …")
-        self.derivedPaddockLandTypesLayer = DerivedPaddockLandTypesLayer(
+        self.paddockLandTypesLayer = PaddockLandTypesLayer(
+            self.workspaceFile,
             self.conditionTable,
             self.paddockLayer,
             self.landTypeLayer,
             self.wateredAreaLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.derivedPaddockLandTypesLayer.name()} loaded …")
-        self.paddockLandTypesLayer = PaddockLandTypesLayer(
-            self.workspaceFile,
-            self.derivedPaddockLandTypesLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.paddockLandTypesLayer.name()} loaded …")
-        self.derivedMetricPaddockLayer = DerivedMetricPaddockLayer(
+        self.metricPaddockLayer = MetricPaddockLayer(
+            self.workspaceFile,
             self.paddockLayer,
             self.paddockLandTypesLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.derivedMetricPaddockLayer.name()} loaded …")
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.metricPaddockLayer.name()} loaded …")
         self.fenceLayer = FenceLayer(
             self.workspaceFile)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.elevationLayer.name()} loaded …")
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.fenceLayer.name()} loaded …")
         self.pipelineLayer = PipelineLayer(
             self.workspaceFile)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.pipelineLayer.name()} loaded …")
-        self.derivedBoundaryLayer = DerivedBoundaryLayer(
+        self.boundaryLayer = BoundaryLayer(
+            self.workspaceFile,
             self.paddockLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.derivedBoundaryLayer.name()} loaded …")
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.boundaryLayer.name()} loaded …")
         self.workspaceLayers = WorkspaceLayers(
             *[self.landTypeLayer,
               self.conditionTable,
               self.paddockLayer,
               self.elevationLayer,
               self.waterpointLayer,
-              self.derivedWaterpointBufferLayer,
               self.waterpointBufferLayer,
-              self.derivedWateredAreaLayer,
               self.wateredAreaLayer,
-              self.derivedPaddockLandTypesLayer,
               self.paddockLandTypesLayer,
-              self.derivedMetricPaddockLayer,
+              self.metricPaddockLayer,
               self.fenceLayer,
               self.pipelineLayer,
-              self.derivedBoundaryLayer])
+              self.boundaryLayer])
 
         qgsInfo(f"{PLUGIN_NAME} feature layers initialised …")
 
@@ -149,8 +137,8 @@ class Workspace(QObject):
             FenceLayer,
             WateredAreaLayer,
             LandTypeLayer,
-            DerivedBoundaryLayer,
-            DerivedMetricPaddockLayer,
+            BoundaryLayer,
+            MetricPaddockLayer,
             ElevationLayer]
         availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in layerStackingOrder] if l]
 
@@ -227,38 +215,51 @@ class Workspace(QObject):
                     QgsProject.instance().removeMapLayers([layer.id()])
 
         for cls in self.layerDependencyGraph.unloadOrder():
-            cleanupByName(cls.NAME)
+            cleanupByName(cls.defaultName())
 
         for layerType in self.layerDependencyGraph.unloadOrder():
             self.workspaceLayers.unloadLayer(layerType)
 
-    def onTaskCompleted(self, task, result):
-        if result:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} {task.description()} completed successfully.")
-        if not result and self.obsolete:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} {task.description()} did not complete due to being marked obsolete.")
-        if not result and not self.obsolete:
-            guiStatusBarAndInfo(
-                f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
+    def onTaskCompleted(self, task, result, showMessage=True):
+        if showMessage:
+            if result:
+                guiStatusBarAndInfo(f"{PLUGIN_NAME} {task.description()} succeeded.")
+            if not result and task.obsolete:
+                guiStatusBarAndInfo(f"{PLUGIN_NAME} {task.description()} was marked obsolete.")
+            if not result and not task.obsolete:
+                guiStatusBarAndInfo(
+                    f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
 
     def deriveLayers(self, updatedLayerTypes=None):
         """Winnow and re-analyse a batch of updated layers."""
         order = self.layerDependencyGraph.deriveOrder(updatedLayerTypes)
         layers = [self.workspaceLayers.layer(layerType) for layerType in order]
 
-        self._deriveFeaturesTask = DeriveFeaturesTask(layers)
+        self._deriveFeaturesTask = DeriveFeaturesTask(layers, self.onLayerAnalysisComplete)
         QgsApplication.taskManager().addTask(self._deriveFeaturesTask)
+        return self._deriveFeaturesTask
 
     def recalculateLayers(self):
         """Winnow and re-analyse a batch of updated layers."""
-        order = self.layerDependencyGraph.recalculateOrder()
-        layers = [self.workspaceLayers.layer(layerType) for layerType in order]
-        
-        self._recalculateFeaturesTask = RecalculateFeaturesTask(layers)
+
+        self._recalculateFeaturesTask = AnalyseWorkspaceTask()
         QgsApplication.taskManager().addTask(self._recalculateFeaturesTask)
 
-    def onFeaturesChanged(self, layerTypes):
+    def onLayerAnalysisComplete(self, layerType, result):
+        """Handle a completed recalculation of a layer."""
+        if result:
+            layer = self.workspaceLayers.layer(layerType)
+            qgsDebug(f"{type(self).__name__}.onLayerAnalysisComplete: {type(layer).__name__}.featuresChanged.emit()")
+            layer.featuresChanged.emit()
+
+    def onFeaturesPersisted(self, layerTypes):
         """Handle a change to the features of one or more layer."""
-        qgsInfo(f"{PLUGIN_NAME} features changed in {[layerType.__name__ for layerType in layerTypes]} …")
-        self.deriveLayers(layerTypes)
-        
+        featureLayerTypes = [layerType for layerType in layerTypes if issubclass(layerType, IFeatureLayer)]
+
+        # Emit a signal to any layer subscribers that these features have changedinstance
+        for layerType in featureLayerTypes:
+            qgsDebug(f"{type(self).__name__}.onFeaturesPersisted: {layerType.__name__}.featuresChanged.emit()")
+            self.workspaceLayers.layer(layerType).featuresChanged.emit()
+
+        # Re-derive other features that depend on these features
+        self.deriveLayers(featureLayerTypes)

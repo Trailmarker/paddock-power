@@ -5,7 +5,7 @@ from .imported_feature_layer import ImportedFeatureLayer
 
 class PaddockLayer(ImportedFeatureLayer):
 
-    NAME = "Paddocks"
+    LAYER_NAME = "Paddocks"
     STYLE = "paddock"
 
     @classmethod
@@ -18,8 +18,8 @@ class PaddockLayer(ImportedFeatureLayer):
         """Create or open a Paddock layer."""
 
         super().__init__(workspaceFile,
-                         layerName=PaddockLayer.NAME,
-                         styleName=PaddockLayer.STYLE)
+                         layerName=PaddockLayer.defaultName(),
+                         styleName=PaddockLayer.defaultStyle())
 
     def getFeaturesByStatus(self, *statuses, request=None):
         """Get the features in this layer filtered by one or more FeatureStatus values."""

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from .analyse_workspace_task import AnalyseWorkspaceTask
+from .derive_features_multiple_task import DeriveFeaturesMultipleTask
 from .derive_features_single_task import DeriveFeaturesSingleTask
 from .derive_features_task import DeriveFeaturesTask
 from .load_workspace_task import LoadWorkspaceTask

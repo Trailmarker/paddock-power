@@ -5,7 +5,7 @@ from .imported_feature_layer import ImportedFeatureLayer
 
 class LandTypeLayer(ImportedFeatureLayer):
 
-    NAME = "Land Types"
+    LAYER_NAME = "Land Types"
     STYLE = "land_type"
 
     @classmethod
@@ -14,7 +14,7 @@ class LandTypeLayer(ImportedFeatureLayer):
 
     def __init__(self, workspaceFile):
         super().__init__(workspaceFile,
-                         layerName=LandTypeLayer.NAME,
-                         styleName=LandTypeLayer.STYLE)
+                         layerName=LandTypeLayer.defaultName(),
+                         styleName=LandTypeLayer.defaultStyle())
 
         self.setReadOnly(True)

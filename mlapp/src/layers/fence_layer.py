@@ -9,7 +9,7 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class FenceLayer(PersistedFeatureLayer):
 
-    NAME = "Fences"
+    LAYER_NAME = "Fences"
     STYLE = "fence"
 
     @classmethod
@@ -19,8 +19,8 @@ class FenceLayer(PersistedFeatureLayer):
     def __init__(self,
                  workspaceFile):
         super().__init__(workspaceFile,
-                         layerName=FenceLayer.NAME,
-                         styleName=FenceLayer.STYLE)
+                         layerName=FenceLayer.defaultName(),
+                         styleName=FenceLayer.defaultStyle())
 
     def getBuildOrder(self):
         """The lowest Build Order of any Fence in Draft status."""

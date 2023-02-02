@@ -8,23 +8,21 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatureLayer):
 
-    def __init__(self, workspaceFile, layerName, styleName, derivedLayer):
+    def __init__(self, workspaceFile, layerName, styleName, derivedLayerType, *dependentLayers):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""
-        self._derivedLayer = derivedLayer
-
         super().__init__(workspaceFile, layerName, styleName)
+
+        self._derivedLayerFactory = lambda: derivedLayerType(*dependentLayers)
 
         self.setReadOnly(True)
 
-    @property
-    def derivedLayer(self):
-        """Get the DerivedFeatureLayer from which this layer's features are derived."""
-        return self._derivedLayer
-
-    @derivedLayer.setter
-    def derivedLayer(self, derivedLayer):
-        """Set the DerivedFeatureLayer from which this layer's features are derived."""
-        self._derivedLayer = derivedLayer
+    def getDerivedLayerInstance(self):
+        """Return the derived layer for this layer."""
+        return self._derivedLayerFactory()
+    
+    def showDerivedLayerInstance(self):
+        """Add an instance of the derived layer for this layer to the map."""
+        self.getDerivedLayerInstance().addToMap()
 
     def deriveFeatures(self, featureProgressCallback=None, cancelledCallback=None):
         """Retrieve the features in the derived layer and copy them to this layer."""
@@ -32,7 +30,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         if not self.isEditable():
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): this can only be run during an edit session …")
 
-        derivedLayer = self.derivedLayer
+        derivedLayer = self.getDerivedLayerInstance()
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
@@ -40,8 +38,10 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         self.dataProvider().truncate()
 
         derivedFeatures = list(derivedLayer.getFeatures())
+
         featureCount = len(derivedFeatures)
         count = 0
+
         for derivedFeature in derivedFeatures:
             if cancelledCallback and cancelledCallback():
                 return
@@ -49,3 +49,10 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
             feature.upsert()
             if featureProgressCallback:
                 featureProgressCallback(count, featureCount)
+        
+        # Check again …
+        if cancelledCallback():
+            return
+        
+        # Clean up any instances of the virtual source …
+        type(derivedLayer).detectAndRemoveAllOfType()

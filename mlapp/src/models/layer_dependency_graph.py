@@ -1,22 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..layers.interfaces import IPersistedDerivedFeatureLayer, IPersistedFeatureLayer
 
-from ..layers.land_type_condition_table import LandTypeConditionTable
-from ..layers.derived_boundary_layer import DerivedBoundaryLayer
-from ..layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
-from ..layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
-from ..layers.derived_watered_area_layer import DerivedWateredAreaLayer
-from ..layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
-from ..layers.elevation_layer import ElevationLayer
-from ..layers.fence_layer import FenceLayer
-from ..layers.land_type_layer import LandTypeLayer
-from ..layers.paddock_layer import PaddockLayer
-from ..layers.paddock_land_types_layer import PaddockLandTypesLayer
-from ..layers.pipeline_layer import PipelineLayer
-from ..layers.watered_area_layer import WateredAreaLayer
-from ..layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from ..layers.waterpoint_layer import WaterpointLayer
-
+from ..layers import *
 from .type_dependency_graph import TypeDependencyGraph
 
 
@@ -31,18 +16,13 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(ElevationLayer, [])
         self.addDependencies(PaddockLayer, [LandTypeConditionTable])
         self.addDependencies(WaterpointLayer, [ElevationLayer])
-        self.addDependencies(DerivedWaterpointBufferLayer, [PaddockLayer, WaterpointLayer])
-        self.addDependencies(WaterpointBufferLayer, [DerivedWaterpointBufferLayer])
-        self.addDependencies(DerivedWateredAreaLayer, [PaddockLayer, WaterpointBufferLayer])
-        self.addDependencies(WateredAreaLayer, [DerivedWateredAreaLayer])
-        self.addDependencies(
-            DerivedPaddockLandTypesLayer, [
-                LandTypeConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
-        self.addDependencies(PaddockLandTypesLayer, [DerivedPaddockLandTypesLayer])
-        self.addDependencies(DerivedMetricPaddockLayer, [PaddockLayer, PaddockLandTypesLayer])
-        self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, DerivedMetricPaddockLayer])
+        self.addDependencies(WaterpointBufferLayer, [PaddockLayer, WaterpointLayer])
+        self.addDependencies(WateredAreaLayer, [PaddockLayer, WaterpointBufferLayer])
+        self.addDependencies(PaddockLandTypesLayer, [LandTypeConditionTable, PaddockLayer, LandTypeLayer, WateredAreaLayer])
+        self.addDependencies(MetricPaddockLayer, [PaddockLayer, PaddockLandTypesLayer])
+        self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, MetricPaddockLayer])
         self.addDependencies(PipelineLayer, [ElevationLayer])
-        self.addDependencies(DerivedBoundaryLayer, [PaddockLayer])
+        self.addDependencies(BoundaryLayer, [PaddockLayer])
 
     def loadOrder(self):
         """Return a list of layer types in the order they should be initialised."""
@@ -68,7 +48,8 @@ class LayerDependencyGraph(TypeDependencyGraph):
 
         return []
 
-    def deriveOrder(self, updatedLayerTypes):
+    def deriveOrder(self, updatedLayerTypes=None):
+        updatedLayerTypes = updatedLayerTypes or self.loadOrder()
         return self.operationOrder(lambda t: issubclass(t, IPersistedDerivedFeatureLayer), updatedLayerTypes)
 
     def recalculateOrder(self):

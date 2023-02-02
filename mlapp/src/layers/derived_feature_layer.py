@@ -15,8 +15,8 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
         super().__init__(virtualSource, layerName, "virtual", styleName)
 
         # Apply editor widgets and other Field-specific layer setup
-        for field in self.getSchema():
-            field.setupLayer(self)
+        # for field in self.getSchema():
+        #     field.setupLayer(self)
 
     @property
     def persistedLayers(self):

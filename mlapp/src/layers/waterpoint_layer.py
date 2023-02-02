@@ -7,7 +7,7 @@ from .waterpoint_popup_layer import WaterpointPopupLayer
 
 class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
 
-    NAME = "Waterpoints"
+    LAYER_NAME = "Waterpoints"
     STYLE = "waterpoint"
 
     @property
@@ -34,7 +34,7 @@ class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
         """Create or open a Waterpoint layer."""
 
         super().__init__(workspaceFile,
-                         layerName=WaterpointLayer.NAME,
-                         styleName=WaterpointLayer.STYLE)
+                         layerName=WaterpointLayer.defaultName(),
+                         styleName=WaterpointLayer.defaultStyle())
 
         self.elevationLayer = elevationLayer

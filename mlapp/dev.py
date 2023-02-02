@@ -6,25 +6,11 @@ from os import mkdir
 from qgis.core import QgsProject
 from qgis.utils import plugins
 
-from .src.layers.features import MetricPaddock
-from .src.layers.features import Waterpoint
-from .src.layers.fields.field_map import FieldMap
-from .src.layers.land_type_condition_table import LandTypeConditionTable
-from .src.layers.derived_boundary_layer import DerivedBoundaryLayer
-from .src.layers.derived_metric_paddock_layer import DerivedMetricPaddockLayer
-from .src.layers.derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
-from .src.layers.derived_watered_area_layer import DerivedWateredAreaLayer
-from .src.layers.derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
-from .src.layers.elevation_layer import ElevationLayer
-from .src.layers.feature_layer import FeatureLayer
-from .src.layers.fence_layer import FenceLayer
-from .src.layers.land_type_layer import LandTypeLayer
-from .src.layers.paddock_layer import PaddockLayer
-from .src.layers.paddock_land_types_layer import PaddockLandTypesLayer
-from .src.layers.pipeline_layer import PipelineLayer
-from .src.layers.watered_area_layer import WateredAreaLayer
-from .src.layers.waterpoint_buffer_layer import WaterpointBufferLayer
-from .src.layers.waterpoint_layer import WaterpointLayer
+from .src.layers.features import *
+from .src.layers.interfaces import *
+from .src.layers.tasks import *
+from .src.layers import *
+
 
 from .src.utils import resolvePluginPath, qgsDebug, PLUGIN_NAME
 
@@ -81,7 +67,7 @@ def exportStyles(relativeOutDir, overwrite=False):
     if not path.exists(outputDir):
         mkdir(outputDir)
 
-    for layer in [l for l in allLayers() if isinstance(l, FeatureLayer)]:
+    for layer in [l for l in allLayers() if isinstance(l, IFeatureLayer)]:
         if layer.styleName is not None:
             outFile = path.join(outputDir, f"{layer.styleName}.qml")
 
@@ -93,11 +79,8 @@ def exportStyles(relativeOutDir, overwrite=False):
 
 layerTypes = [
     LandTypeConditionTable,
-    DerivedBoundaryLayer,
-    DerivedMetricPaddockLayer,
-    DerivedPaddockLandTypesLayer,
-    DerivedWateredAreaLayer,
-    DerivedWaterpointBufferLayer,
+    BoundaryLayer,
+    MetricPaddockLayer,
     ElevationLayer,
     FenceLayer,
     LandTypeLayer,
@@ -114,16 +97,8 @@ def checkLayers():
 
 
 if workspace():
-    [conditionTable, derivedBoundaryLayer, derivedMetricPaddockLayer, derivedPaddockLandTypeLayer,
-     derivedWateredAreaLayer, derivedWaterpointBufferLayer, elevationLayer,
-     fenceLayer, landTypeLayer, paddockLayer, paddockLandTypeLayer, pipelineLayer,
+    [landTypeConditionTable, boundaryLayer, metricPaddockLayer,
+     elevationLayer, fenceLayer, landTypeLayer, 
+     paddockLayer, paddockLandTypeLayer, pipelineLayer,
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
-
-
-# from .test_background import *
-# from .test_dependency import *
-# from .test_import import *
-# from .test_popups import *
-# from .test_select import * 
-# from .test_sketch_line import *
 

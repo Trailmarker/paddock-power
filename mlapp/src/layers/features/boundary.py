@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from ..fields import BoundarySchema
-from .feature import Feature
+from .persisted_feature import PersistedFeature
 
 
 @BoundarySchema.addSchema()
-class Boundary(Feature):
+class Boundary(PersistedFeature):
 
     def __init__(self, featureLayer, existingFeature):
         """Create a new AreaFeature."""

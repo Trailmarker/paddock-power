@@ -104,12 +104,10 @@ class Feature(ABC):
         """Return True if this feature's timeframe or status matches the supplied timeframe."""
         pass
 
-    @abstractmethod
     def selectFeature(self):
         """Select the Feature."""
         pass
 
-    @abstractmethod
     def zoomFeature(self):
         """Zoom to the Feature."""
         pass

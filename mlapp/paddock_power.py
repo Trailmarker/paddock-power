@@ -117,7 +117,7 @@ class PaddockPower(PluginStateMachine):
             callback=lambda *_: self.detectWorkspace(),
             parent=self.iface.mainWindow())
 
-        self.analyseWorkspaceAction = self.addAction(
+        self.recalculateWorkspaceAction = self.addAction(
             PluginAction.analyseWorkspace,
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
             text=f"Analyse {PLUGIN_NAME} workspace …",
@@ -296,7 +296,6 @@ class PaddockPower(PluginStateMachine):
     @PluginAction.analyseWorkspace.handler()
     def recalculateWorkspace(self):
         self.workspace.recalculateLayers()
-        self.workspace.deriveLayers()
 
     @PluginAction.projectClosed.handler()
     def projectClosed(self):

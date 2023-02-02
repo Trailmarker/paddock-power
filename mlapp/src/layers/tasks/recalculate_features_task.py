@@ -2,39 +2,41 @@
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
+from ...utils import PLUGIN_NAME, qgsInfo
 from ...models import WorkspaceMixin
-
+from .recalculate_features_single_task import RecalculateFeaturesSingleTask
 
 class RecalculateFeaturesTask(QgsTask, WorkspaceMixin):
 
-    def __init__(self, layers):
+    def __init__(self, layers, onTaskCompleted=None):
         """Input is a batch of layers (order not important)."""
         super().__init__(
-            f"{PLUGIN_NAME} Derive Features(layers={', '.join([layer.name() for layer in layers])})",
+            f"recalculating features for {len(layers)} layers",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.layers = layers
         self.obsolete = False
 
         for layer in self.layers:
-            task = RecalculateFeaturesTask(layer)
+            task = RecalculateFeaturesSingleTask(layer)
+            if onTaskCompleted:
+                task.taskCompleted.connect(lambda: onTaskCompleted(type(layer), True))
+                task.taskTerminated.connect(lambda: onTaskCompleted(type(layer), False))
             self.addSubTask(task, dependencies=[])
 
     def run(self):
         """Recalculate features for all layers as specified in subtasks."""
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} recalculating features complete.")
         return True
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
-        self.workspace.onTaskCompleted(self, result)
+        pass
 
     def cancelObsolete(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} because a newer task has been queued.")
+        qgsInfo(f"{PLUGIN_NAME} cancelling task: '{self.description()}' because a newer task has been queued.")
         self.obsolete = True
         super().cancel()
 
     def cancel(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} for an unknown reason.")
+        qgsInfo(f"QGIS cancelling task: '{self.description()}' eg due to quitting or user intervention.")
         super().cancel()

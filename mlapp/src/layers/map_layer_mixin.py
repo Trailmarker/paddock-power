@@ -2,18 +2,28 @@
 from qgis.core import QgsMapLayer, QgsProject
 
 
-from ..utils import qgsDebug, resolveStylePath
+from ..utils import qgsDebug, qgsInfo, resolveStylePath
 from .interfaces import IMapLayer
 
 
 class MapLayerMixin(IMapLayer):
 
     @classmethod
+    def defaultName(cls):
+        """Return the default name for this layer."""
+        return cls.LAYER_NAME
+    
+    @classmethod
+    def defaultStyle(cls):
+        """Return the default style for this layer."""
+        return cls.STYLE
+
+    @classmethod
     def detectAndRemoveAllOfType(cls):
         """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
         allLayers = QgsProject.instance().mapLayers().values()
 
-        defaultName = cls.NAME if hasattr(cls, 'NAME') else None
+        defaultName = cls.defaultName()
 
         sameTypes = set(l.id() for l in allLayers if type(l).__name__ == cls.__name__)
         sameNames = set(l.id() for l in allLayers if defaultName == l.name())
@@ -39,6 +49,7 @@ class MapLayerMixin(IMapLayer):
 
     def addInBackground(self):
         """Add this layer to the map in the background."""
+        # qgsInfo(f"Adding layer {self.name()} in background …")
         QgsProject.instance().addMapLayer(self, False)
 
     def addToMap(self, group=None):

@@ -7,7 +7,7 @@ from .derived_feature_layer import DerivedFeatureLayer
 
 class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 
-    NAME = "Derived Waterpoint Buffers"
+    LAYER_NAME = "Derived Waterpoint Buffers"
     STYLE = "waterpoint_buffer"
 
     @classmethod
@@ -95,7 +95,7 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
                  waterpointLayer):
 
         super().__init__(
-            DerivedWaterpointBufferLayer.NAME,
-            DerivedWaterpointBufferLayer.STYLE,
+            DerivedWaterpointBufferLayer.defaultName(),
+            DerivedWaterpointBufferLayer.defaultStyle(),
             paddockLayer,
             waterpointLayer)

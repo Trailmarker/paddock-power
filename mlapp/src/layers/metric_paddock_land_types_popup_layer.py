@@ -35,7 +35,7 @@ order by "{LAND_TYPE_NAME}"
         super().__init__(
             metricPaddock,
             f"{metricPaddock.NAME} {timeframe.name} Land Types",
-            MetricPaddockLandTypesPopupLayer.STYLE,
+            MetricPaddockLandTypesPopupLayer.defaultStyle(),
             self.metricPaddock.paddockLandTypesLayer)
 
 

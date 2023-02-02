@@ -8,8 +8,6 @@ class MetricPaddockMiniList(FeatureMiniList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        self._derivedMetricPaddockLayerId = None
-
         def listItemFactory(paddock):
             item = FeatureListItem(paddock, detailsWidgetFactory=MetricPaddockDetails, parent=parent)
             # No editWidgetFactory so editing is turned off

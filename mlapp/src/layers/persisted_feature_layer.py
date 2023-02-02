@@ -5,7 +5,7 @@ from qgis.core import QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ..models import Glitch
-from ..utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsDebug, qgsException, qgsInfo
+from ..utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsInfo
 from .feature_layer import FeatureLayer
 from .interfaces import IPersistedFeatureLayer
 
@@ -143,18 +143,26 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.FID)
 
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, featureProgressCallback=None, cancelledCallback=None):
         """Recalculate features in this layer."""
 
         if not self.isEditable():
-            raise Glitch(f"{self}.recalculateFeatures(): recalculation can only be run during an edit session …")
+            raise Glitch(f"{type(self).__name__}.recalculateFeatures(): this can only be run during an edit session …")
 
         qgsInfo(f"Recalculating {self.name()} …")
 
-        for feature in self.getFeatures():
+        features = list(self.getFeatures())
+        featureCount = len(features)
+        count = 0
+
+        for feature in features:
+            if cancelledCallback and cancelledCallback():
+                return
             feature.recalculate()
             feature.upsert()
-            
-    def createRecalculateFeaturesTask(self):
-        """Create a task to derive the features in this layer."""
-        return DeriveFeaturesSingleTask(self)
+            if featureProgressCallback:
+                featureProgressCallback(count, featureCount)
+
+        # Check again …
+        if cancelledCallback():
+            return

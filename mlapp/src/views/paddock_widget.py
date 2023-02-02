@@ -27,8 +27,8 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, True)
 
-        self.currentPaddockLandTypesList.popupLayerSource = self.workspace.derivedMetricPaddockLayer
-        self.futurePaddockLandTypesList.popupLayerSource = self.workspace.derivedMetricPaddockLayer
+        self.currentPaddockLandTypesList.popupLayerSource = self.workspace.metricPaddockLayer
+        self.futurePaddockLandTypesList.popupLayerSource = self.workspace.metricPaddockLayer
 
         self.paddockFilterLineEdit.textChanged.connect(
             self.onPaddockFilterChanged)

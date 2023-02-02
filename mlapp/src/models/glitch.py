@@ -52,8 +52,8 @@ class Glitch(Exception):
 
         guiMessages.reverse()
         guiError(guiMessages)
-        qgsInfo(glitchMessages, level=Qgis.Critical)
-        qgsInfo(self, level=Qgis.Critical)
+        qgsInfo(glitchMessages)
+        qgsInfo(self)
 
     @staticmethod
     def popup(glitch):

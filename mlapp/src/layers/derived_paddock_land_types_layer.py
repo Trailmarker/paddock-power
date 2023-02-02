@@ -8,7 +8,7 @@ from .fields import AREA, ESTIMATED_CAPACITY_PER_AREA, CONDITION_DISCOUNT, CONDI
 
 class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 
-    NAME = "Derived Paddock Land Types"
+    LAYER_NAME = "Derived Paddock Land Types"
     STYLE = "paddock_land_types_popup"
 
     @classmethod
@@ -113,8 +113,8 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
                  landTypeLayer,
                  wateredAraLayer):
 
-        super().__init__(DerivedPaddockLandTypesLayer.NAME,
-                         DerivedPaddockLandTypesLayer.STYLE,
+        super().__init__(DerivedPaddockLandTypesLayer.defaultName(),
+                         DerivedPaddockLandTypesLayer.defaultStyle(),
                          conditionTable,
                          paddockLayer,
                          landTypeLayer,

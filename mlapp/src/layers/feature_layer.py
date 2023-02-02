@@ -5,13 +5,14 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
-from ..utils import qgsDebug, resolveStylePath, PLUGIN_NAME
+from ..utils import resolveStylePath, PLUGIN_NAME
 from .interfaces import IFeatureLayer
 from .map_layer_mixin import MapLayerMixin
 
 
 class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer, metaclass=QtAbstractMeta):
 
+    featuresChanged = pyqtSignal()
     featureSelected = pyqtSignal(type)
     featureDeselected = pyqtSignal(type)
 
@@ -123,19 +124,27 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
 
+    def onFeaturesChanged(self):
+        """Handle our own featuresChanged signal."""
+        # Redraw the layer        
+        self.triggerRepaint()
+
     def onFeatureLayerSelected(self, layerType):
+        """Handle workspace feature selection."""
         if isinstance(self, layerType):
             feature = self.workspace.selectedFeature(layerType)
             self.onSelectFeature(feature)
             self.featureSelected.emit(layerType)
 
     def onFeatureLayerDeselected(self, layerType):
+        """Handle workspace feature deselection."""
         if isinstance(self, layerType):
             # self.removeSelection()
             self.onDeselectFeature()
             self.featureDeselected.emit(layerType)
 
     def onTimeframeChanged(self, timeframe):
+        """Handle workspace timeframe changes."""
         self.triggerRepaint()
 
     def onSelectFeature(self, feature):
@@ -148,6 +157,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         pass
 
     def onSelectionChanged(self, selection, *_):
+        """Translate our own selectionChanged signal into a workspace selectFeature call."""
         if len(selection) == 1:
             feature = next(self.getFeatures(QgsFeatureRequest().setFilterFids(selection)), None)
             if feature:

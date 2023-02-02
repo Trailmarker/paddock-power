@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from ..utils import PLUGIN_NAME
 from .features import WaterpointBuffer
+from .derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
 from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
 
 class WaterpointBufferLayer(PersistedDerivedFeatureLayer):
 
-    NAME = "Waterpoint Buffers"
+    LAYER_NAME = "Waterpoint Buffers"
     STYLE = "waterpoint_buffer"
 
     @classmethod
@@ -15,10 +16,11 @@ class WaterpointBufferLayer(PersistedDerivedFeatureLayer):
 
     def __init__(self,
                  workspaceFile,
-                 derivedWaterpointBufferLayer):
+                 *dependentLayers):
         f"""Create a new {PLUGIN_NAME} waterpoint buffer layer."""
 
         super().__init__(workspaceFile,
-                         layerName=WaterpointBufferLayer.NAME,
-                         styleName=WaterpointBufferLayer.STYLE,
-                         derivedLayer=derivedWaterpointBufferLayer)
+                         WaterpointBufferLayer.defaultName(),
+                         WaterpointBufferLayer.defaultStyle(),
+                         DerivedWaterpointBufferLayer,
+                         *dependentLayers)
