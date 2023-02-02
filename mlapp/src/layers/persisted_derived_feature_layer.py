@@ -42,3 +42,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         for derivedFeature in derivedFeatures:
             feature = self.copyFeature(derivedFeature)
             feature.upsert()
+            
+    def recalculateFeatures(self):
+        """We don't do this for derived data, as all values are (or should be) calculated upstream."""
+        pass

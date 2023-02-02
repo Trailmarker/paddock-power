@@ -121,7 +121,7 @@ class PaddockPower(PluginStateMachine):
             PluginAction.analyseWorkspace,
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
             text=f"Analyse {PLUGIN_NAME} workspace …",
-            callback=lambda *_: self.analyseWorkspace(),
+            callback=lambda *_: self.recalculateWorkspace(),
             parent=self.iface.mainWindow())
 
         self.createWorkspaceAction = self.addAction(
@@ -294,8 +294,9 @@ class PaddockPower(PluginStateMachine):
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
     @PluginAction.analyseWorkspace.handler()
-    def analyseWorkspace(self):
+    def recalculateWorkspace(self):
         self.workspace.recalculateLayers()
+        self.workspace.deriveLayers()
 
     @PluginAction.projectClosed.handler()
     def projectClosed(self):

@@ -228,7 +228,7 @@ class Workspace(QObject):
         for layerType in self.layerDependencyGraph.unloadOrder():
             self.workspaceLayers.unloadLayer(layerType)
 
-    def deriveLayers(self, updatedLayerTypes):
+    def deriveLayers(self, updatedLayerTypes=None):
         """Winnow and re-analyse a batch of updated layers."""
         order = self.layerDependencyGraph.rederiveOrder(updatedLayerTypes)
         layers = [self.workspaceLayers.layer(layerType) for layerType in order]
