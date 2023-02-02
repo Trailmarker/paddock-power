@@ -98,39 +98,3 @@ class Edits:
             workspace.onFeaturesChanged([type(l) for l in layers])
 
         return callableWithPersistFeatures
-
-    @staticmethod
-    def deriveLayers(layers):
-        """Input is a correctly ordered batch of layers."""
-        assert all(isinstance(layer, IPersistedDerivedFeatureLayer) for layer in layers)
-
-        readOnlies = [(layer, layer.readOnly()) for layer in layers]
-        try:
-            for layer in layers:
-                layer.setReadOnly(False)
-
-            for layer in layers:
-                with Edits.editAndCommit([layer]):
-                    layer.deriveFeatures()
-        finally:
-            for (layer, readOnly) in readOnlies:
-                layer.setReadOnly(readOnly)
-                layer.triggerRepaint()
-
-    @staticmethod
-    def recalculateLayers(layers):
-        """Input is a correctly ordered batch of layers."""
-        assert all(isinstance(layer, IPersistedLayer) for layer in layers)
-
-        readOnlies = [(layer, layer.readOnly()) for layer in layers]
-        try:
-            for layer in layers:
-                layer.setReadOnly(False)
-
-            for layer in layers:
-                with Edits.editAndCommit([layer]):
-                    layer.recalculateFeatures()
-        finally:
-            for (layer, readOnly) in readOnlies:
-                layer.setReadOnly(readOnly)
-                layer.triggerRepaint()

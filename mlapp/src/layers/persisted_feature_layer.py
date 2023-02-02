@@ -154,3 +154,7 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         for feature in self.getFeatures():
             feature.recalculate()
             feature.upsert()
+            
+    def createRecalculateFeaturesTask(self):
+        """Create a task to derive the features in this layer."""
+        return DeriveFeaturesSingleTask(self)

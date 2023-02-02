@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from .dev import *
 from .src.layers.fields.field_map import FieldMap

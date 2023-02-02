@@ -90,6 +90,10 @@ def guiStatusBar(message):
     """Show a status bar message."""
     iface.mainWindow().statusBar().showMessage(message)
 
+def guiStatusBarAndInfo(message):
+    """Show a status bar message and an info message box."""
+    guiStatusBar(message)
+    qgsInfo(message)
 
 def guiHelpNotYetImplemented():
     """Show a message saying this help section has not yet been implemented."""

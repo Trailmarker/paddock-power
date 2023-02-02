@@ -58,17 +58,17 @@ class LayerDependencyGraph(TypeDependencyGraph):
         # We don't update anything that isn't affected by a change
         # We 'repersist' all the downstream derived layers that are affected
         loadOrder = self.loadOrder()
-        layerTypes = layerTypes or loadOrder
+        layerTypeNames = [t.__name__ for t in (layerTypes or loadOrder)]
 
         # Return the full load order of types that subclass the provided layerType
         for i in range(0, len(loadOrder)):
             lt = loadOrder[i]
-            if lt in layerTypes:
+            if lt.__name__ in layerTypeNames:
                 return [t for t in loadOrder[i:] if typePredicate(t)]
 
         return []
 
-    def rederiveOrder(self, updatedLayerTypes):
+    def deriveOrder(self, updatedLayerTypes):
         return self.operationOrder(lambda t: issubclass(t, IPersistedDerivedFeatureLayer), updatedLayerTypes)
 
     def recalculateOrder(self):

@@ -4,9 +4,9 @@ from qgis.core import QgsMapLayer, QgsProject
 from ..layers.interfaces import IFeatureLayer, ILayer
 from ..utils import PLUGIN_NAME
 from .glitch import Glitch
+from .type_dict import TypeDict
 
-
-class WorkspaceLayers(dict):
+class WorkspaceLayers(TypeDict):
     def __init__(self, *layers):
         f"""Create a type registry for {PLUGIN_NAME}'s Layer like objects."""
         super().__init__()
@@ -14,28 +14,26 @@ class WorkspaceLayers(dict):
         for layer in layers:
             self.addLayer(type(layer), layer)
 
+    def addObject(self, layerType, object):
+        raise NotImplementedError("Use addLayer instead")
+
+    def getObject(self, layerType):
+        raise NotImplementedError("Use layer instead")
+
     def addLayer(self, layerType, layer):
         """Add a layer to the registry."""
-
-        if not isinstance(layerType, type):
-            raise Glitch(f"Invalid WorkspaceLayers key: must be a type")
-
         if not isinstance(layer, ILayer):
             raise Glitch(f"Invalid WorkspaceLayers value: must be an ILayer")
 
-        self[self.__layerKey(layerType)] = self.__setValue(layer)
+        super().addObject(layerType, layer)
 
     def layer(self, layerType):
         """Get the layer for the given layer type."""
-
-        # We support the case where the layerType is a string, because
-        # it's useful when citing types causes circular imports.
-        val = self.__getValue(self.get(self.__layerKey(layerType), None))
-        return val
+        return super().getObject(layerType)
 
     def layers(self):
         """Get all layers in the registry."""
-        return list(map(self.__getValue, self.values()))
+        return list(map(self.valueToObject, self.values()))
 
     def featureLayers(self):
         """Get all layers in the registry."""
@@ -43,7 +41,7 @@ class WorkspaceLayers(dict):
 
     def unloadLayer(self, layerType):
         """Unload the layer of the given type."""
-        layer = self.__getValue(self.pop(self.__layerKey(layerType), None))
+        layer = self.valueToObject(self.pop(self.__layerKey(layerType), None))
         if isinstance(layer, QgsMapLayer):
             QgsProject.instance().removeMapLayer(layer.id())
 
@@ -59,12 +57,12 @@ class WorkspaceLayers(dict):
             return layerType
         return None
 
-    def __setValue(self, layer):
+    def objectToValue(self, layer):
         if isinstance(layer, QgsMapLayer):
             return layer.id()
         return layer
 
-    def __getValue(self, val):
+    def valueToObject(self, val):
         if isinstance(val, str):
             return QgsProject.instance().mapLayer(val)
         return val

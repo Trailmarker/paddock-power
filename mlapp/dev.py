@@ -25,11 +25,8 @@ from .src.layers.pipeline_layer import PipelineLayer
 from .src.layers.watered_area_layer import WateredAreaLayer
 from .src.layers.waterpoint_buffer_layer import WaterpointBufferLayer
 from .src.layers.waterpoint_layer import WaterpointLayer
-from .src.layers.waterpoint_popup_layer import WaterpointPopupLayer
-from .src.layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
 
 from .src.utils import resolvePluginPath, qgsDebug, PLUGIN_NAME
-
 
 def plugin():
     f"""Get the instance of the {PLUGIN_NAME} plug-in"""
@@ -123,24 +120,10 @@ if workspace():
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
 
 
-# kidmanPaddocks = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "b_Kidman_Paddocks"), None)
-# kidmanLandTypes = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "c_Kidman_30k_land_units"), None)
-# kidmanWaterpoints = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "a_Kidman_Waterpoints"), None)
+# from .test_background import *
+# from .test_dependency import *
+# from .test_import import *
+# from .test_popups import *
+# from .test_select import * 
+# from .test_sketch_line import *
 
-# kidmanPaddockFieldMap = FieldMap(kidmanPaddocks, paddocks)
-# kidmanLandTypeFieldMap = FieldMap(kidmanLandTypes, landTypes)
-# kidmanWaterpointFieldMap = FieldMap(kidmanWaterpoints, waterpoints)
-
-
-# def testImportKidmanPaddocks():
-#     kidmanPaddockFieldMap["Name"] = "Name"
-#     paddocks.importFeatures(kidmanPaddocks, kidmanPaddockFieldMap)
-
-# def testImportKidmanLandTypes():
-#     kidmanLandTypeFieldMap["LAND_UNIT"] = "Land Type Name"
-#     landTypes.importFeatures(kidmanLandTypes, kidmanLandTypeFieldMap)
-
-# def testImportKidmanWaterpoints():
-#     kidmanWaterpointFieldMap["NAME"] = "Name"
-#     kidmanWaterpointFieldMap["LAYER"] = "Waterpoint Type"
-#     waterpoints.importFeatures(kidmanWaterpoints, kidmanWaterpointFieldMap)

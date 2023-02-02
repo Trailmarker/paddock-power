@@ -5,6 +5,7 @@ from ..utils import PLUGIN_NAME, qgsInfo
 from .interfaces import IPersistedDerivedFeatureLayer
 from .persisted_feature_layer import PersistedFeatureLayer
 
+
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatureLayer):
 
     def __init__(self, workspaceFile, layerName, styleName, derivedLayer):
@@ -25,7 +26,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         """Set the DerivedFeatureLayer from which this layer's features are derived."""
         self._derivedLayer = derivedLayer
 
-    def deriveFeatures(self):
+    def deriveFeatures(self, featureProgressCallback=None, cancelledCallback=None):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
         if not self.isEditable():
@@ -39,10 +40,12 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         self.dataProvider().truncate()
 
         derivedFeatures = list(derivedLayer.getFeatures())
+        featureCount = len(derivedFeatures)
+        count = 0
         for derivedFeature in derivedFeatures:
+            if cancelledCallback and cancelledCallback():
+                return
             feature = self.copyFeature(derivedFeature)
             feature.upsert()
-            
-    def recalculateFeatures(self):
-        """We don't do this for derived data, as all values are (or should be) calculated upstream."""
-        pass
+            if featureProgressCallback:
+                featureProgressCallback(count, featureCount)
