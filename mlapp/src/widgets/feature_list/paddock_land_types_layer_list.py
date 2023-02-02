@@ -17,7 +17,7 @@ class PaddockLandTypesLayerList(PopupLayerList):
 
         def listItemFactory(paddockLandType):
             return FeatureListItem(paddockLandType, detailsWidgetFactory=PaddockLandTypeDetails,
-                                   editWidgetFactory=PaddockLandTypeDetailsEdit, noEdits=True, parent=parent)
+                                   editWidgetFactory=PaddockLandTypeDetailsEdit, parent=parent)
 
         super().__init__(listItemFactory, parent)
 

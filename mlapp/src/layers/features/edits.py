@@ -5,7 +5,7 @@ from qgis.core import QgsVectorLayer
 
 from ...models import Glitch
 from ...utils import qgsInfo
-from . import IPersistedFeature
+from ..interfaces import IPersistedFeature, IPersistedLayer, IPersistedDerivedFeatureLayer
 
 
 class Edits:
@@ -82,6 +82,12 @@ class Edits:
 
             layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
 
+            qgsInfo(f"Edits.persistFeatures: layers={repr(layers)}")
+
+            workspace = next(l.workspace for l in layers)
+
+            qgsInfo(f"Edits.persistFeatures: workspace is None={workspace is None}")
+
             with Edits.editAndCommit(layers):
                 for feature in edits.upserts:
                     # feature.recalculate()
@@ -89,11 +95,15 @@ class Edits:
                 for feature in edits.deletes:
                     feature.delete()
 
+            workspace.onFeaturesChanged([type(l) for l in layers])
+
         return callableWithPersistFeatures
 
     @staticmethod
-    def analyseLayers(layers):
+    def deriveLayers(layers):
         """Input is a correctly ordered batch of layers."""
+        assert all(isinstance(layer, IPersistedDerivedFeatureLayer) for layer in layers)
+
         readOnlies = [(layer, layer.readOnly()) for layer in layers]
         try:
             for layer in layers:
@@ -101,7 +111,25 @@ class Edits:
 
             for layer in layers:
                 with Edits.editAndCommit([layer]):
-                    layer.analyseFeatures()
+                    layer.deriveFeatures()
+        finally:
+            for (layer, readOnly) in readOnlies:
+                layer.setReadOnly(readOnly)
+                layer.triggerRepaint()
+
+    @staticmethod
+    def recalculateLayers(layers):
+        """Input is a correctly ordered batch of layers."""
+        assert all(isinstance(layer, IPersistedLayer) for layer in layers)
+
+        readOnlies = [(layer, layer.readOnly()) for layer in layers]
+        try:
+            for layer in layers:
+                layer.setReadOnly(False)
+
+            for layer in layers:
+                with Edits.editAndCommit([layer]):
+                    layer.recalculateFeatures()
         finally:
             for (layer, readOnly) in readOnlies:
                 layer.setReadOnly(readOnly)

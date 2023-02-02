@@ -7,7 +7,6 @@ from .derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from .derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer
 from .derived_watered_area_layer import DerivedWateredAreaLayer
 from .derived_waterpoint_buffer_layer import DerivedWaterpointBufferLayer
-from .edits import Edits
 from .elevation_layer import ElevationLayer
 from .fence_layer import FenceLayer
 from .land_type_layer import LandTypeLayer

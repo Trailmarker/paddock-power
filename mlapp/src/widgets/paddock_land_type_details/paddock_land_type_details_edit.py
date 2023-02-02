@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...layers import Edits
+from ...layers.features import Edits
 from ...layers.fields import ConditionType
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -37,6 +37,6 @@ class PaddockLandTypeDetailsEdit(QWidget, FORM_CLASS):
 
     def saveFeature(self):
         """Save the Paddock Land Type details, updating the Condition Type."""
-        # TODO!
-        raise NotImplementedError
-        # self.paddockLandType.upsertCondition(self._conditionType)
+        self.paddockLandType.CONDITION_TYPE = self._conditionType
+        return Edits.upsert(self.paddockLandType.landTypeCondition)
+        

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from abc import abstractproperty
+from abc import abstractmethod
 from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsProject
 
-from .features import IFeature
+from .interfaces import IFeature, IMapLayer
 from .popup_feature_layer import PopupFeatureLayer
-from .interfaces import IMapLayer
 
 
 class PopupLayerSourceMixin(IMapLayer):
@@ -28,7 +27,8 @@ class PopupLayerSourceMixin(IMapLayer):
     def hasPopups(self):
         return True
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def popupLayerTypes(self):
         pass
 

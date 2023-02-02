@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from abc import abstractproperty
+from abc import abstractmethod
 
 
 class PopupLayerConsumerMixin:
@@ -9,7 +9,8 @@ class PopupLayerConsumerMixin:
         self._source = None
         self.__popupLayers = {}
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def popupLayerTypes(self):
         """Popup layer types that this layer can consume."""
         pass

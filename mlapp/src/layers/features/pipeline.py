@@ -2,15 +2,18 @@
 from ..fields import PipelineSchema
 from .edits import Edits
 from .feature_action import FeatureAction
-from .status_feature import StatusFeature
+from .persisted_feature import PersistedFeature
+from .status_feature_mixin import StatusFeatureMixin
 
 
 @PipelineSchema.addSchema()
-class Pipeline(StatusFeature):
+class Pipeline(PersistedFeature, StatusFeatureMixin):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Pipeline."""
-        super().__init__(featureLayer, existingFeature)
+        PersistedFeature.__init__(self, featureLayer, existingFeature)
+        StatusFeatureMixin.__init__(self)
+
 
     @property
     def TITLE(self):

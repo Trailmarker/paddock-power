@@ -3,8 +3,7 @@ from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ...models import QtAbstractMeta, toStateMachine
-from ...layers import Edits
-from ...layers.features import FeatureAction
+from ...layers.features import Edits, FeatureAction
 from ...utils import PLUGIN_FOLDER, qgsDebug
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
@@ -17,11 +16,9 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     _stateChanged = pyqtSignal()
     layoutRefreshNeeded = pyqtSignal()
 
-    def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, noEdits=False, parent=None):
+    def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
         QWidget.__init__(self, parent)
         EditStateMachine.__init__(self)
-
-        self.noEdits = noEdits
 
         self.feature = feature
 
@@ -89,17 +86,11 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             f':/plugins/{PLUGIN_FOLDER}/images/cancel-edit-item.png',
             lambda *_: self.cancelEditItem())
 
-        if self.noEdits:
-            self.editToolBar.addStateAction(
-                EditAction.save,
-                f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
-                lambda *_: self.saveItemNoEdits())
-        else:
-            self.editToolBar.addStateAction(
-                EditAction.save,
-                f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
-                lambda *_: self.saveItem())
-
+        self.editToolBar.addStateAction(
+            EditAction.save,
+            f':/plugins/{PLUGIN_FOLDER}/images/save-item.png',
+            lambda *_: self.saveItem())
+    
         self.editToolBar.addGenericAction(
             f':/plugins/{PLUGIN_FOLDER}/images/zoom-item.png',
             f"Zoom to {self.feature.displayName()}",
@@ -182,11 +173,6 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     @Edits.persistFeatures
     @EditAction.save.handler()
     def saveItem(self):
-        # saveFeature returns an Edits …
-        return self.featureEdit.saveFeature()
-
-    @EditAction.save.handler()
-    def saveItemNoEdits(self):
         # saveFeature returns an Edits …
         return self.featureEdit.saveFeature()
 

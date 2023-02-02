@@ -5,6 +5,7 @@ from qgis.PyQt.QtCore import QObject
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import PLUGIN_NAME, qgsInfo
+from .features import LandTypeCondition
 from .fields import LAND_TYPE, PADDOCK, CONDITION_TYPE, ConditionType
 from .interfaces import IPersistedLayer
 
@@ -77,7 +78,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
 """
 
     def detectInGeoPackage(self, workspaceFile, tableName):
-        """Detect a matching ConditionTable in a GeoPackage."""
+        """Detect a matching LandTypeConditionTable in a GeoPackage."""
         try:
             with sqlite3.connect(workspaceFile) as conn:
                 cursor = conn.execute(self.makeExistsQuery(tableName=tableName))
@@ -87,12 +88,12 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
         return False
 
     def createInGeoPackage(self, workspaceFile, tableName):
-        """Create a new ConditionTable in the GeoPackage file."""
+        """Create a new LandTypeConditionTable in the GeoPackage file."""
         with sqlite3.connect(workspaceFile) as conn:
             conn.execute(self.makeCreateQuery(tableName=tableName))
 
     def deleteFromGeoPackage(self, workspaceFile, tableName):
-        """Delete a ConditionTable from the GeoPackage file."""
+        """Delete a LandTypeConditionTable from the GeoPackage file."""
         with sqlite3.connect(workspaceFile) as conn:
             conn.execute(self.makeDropQuery(tableName=tableName))
 
@@ -112,7 +113,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             cursor = conn.execute(self.makeGetAllRecordsQuery(tableName=self.tableName))
             return cursor.fetchall()
 
-    def getRecord(self, paddockId, landTypeId):
+    def getConditionRecord(self, paddockId, landTypeId):
         with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(
                 self.makeGetRecordQuery(
@@ -121,7 +122,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     landTypeId=landTypeId))
             return cursor.fetchone()
 
-    def getCondition(self, paddockId, landTypeId):
+    def getConditionType(self, paddockId, landTypeId):
         with sqlite3.connect(self.workspaceFile) as conn:
             cursor = conn.execute(
                 self.makeGetRecordQuery(
@@ -139,7 +140,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             cursor = conn.execute(self.makeGetByPaddockQuery(tableName=self.tableName, paddockId=paddockId))
             return cursor.fetchall()
 
-    def upsert(self, paddockId, landTypeId, conditionType):
+    def upsertRecord(self, paddockId, landTypeId, conditionType):
         with sqlite3.connect(self.workspaceFile) as conn:
             conn.execute(
                 self.makeUpsertQuery(
@@ -149,7 +150,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     condition=conditionType.name))
         self.workspace.featuresChanged.emit([self])
 
-    def upsertSplit(self, splitPaddockId, crossedPaddockId):
+    def upsertSplitPaddockRecord(self, splitPaddockId, crossedPaddockId):
         """Upsert the condition data for a paddock to the new paddocks into which it will be split."""
 
         with sqlite3.connect(self.workspaceFile) as conn:
@@ -179,7 +180,7 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                 raise Exception("Error upserting split paddock condition data")
         self.workspace.featuresChanged.emit([self])
 
-    def delete(self, paddockId, landTypeId):
+    def deleteRecord(self, paddockId, landTypeId):
         with sqlite3.connect(self.workspaceFile) as conn:
             conn.execute(
                 self.makeDeleteQuery(
@@ -187,9 +188,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     paddockId=paddockId,
                     landTypeId=landTypeId))
         self.workspace.featuresChanged.emit([self])
-
-    def analyseFeatures(self):
-        pass
 
     def isEditable(self):
         return self._editable
@@ -208,3 +206,32 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
         if self._editable:
             self._editable = False
         return True
+    
+    def copyFeature(self, feature):
+        """Copy a feature using the logic (eg dependent layers) of this layer."""
+        return LandTypeCondition(feature)        
+
+    def makeFeature(self):
+        """Make a new, empty and default-valued feature in this layer."""
+        return LandTypeCondition()
+
+    def addFeature(self, feature):
+        """Add a feature to this layer."""
+        self.upsertRecord(feature.PADDOCK, feature.LAND_TYPE, feature.CONDITION_TYPE)
+    
+    def updateFeature(self, feature):
+        """Update a feature in this layer."""
+        self.upsertRecord(feature.PADDOCK, feature.LAND_TYPE, feature.CONDITION_TYPE)
+
+    def deleteFeature(self, feature):
+        """Delete a feature from the layer."""
+        self.deleteRecord(feature.PADDOCK, feature.LAND_TYPE)
+
+    def addFeatures(self, features):
+        """Add a batch of features to this layer."""
+        for feature in features:
+            self.addFeature(feature)
+
+    def recalculateFeatures(self):
+        """Recalculate features in this layer."""
+        pass

@@ -6,14 +6,16 @@ from ...utils import PLUGIN_NAME
 from ..fields import BUILD_FENCE, FeatureStatus, Timeframe, FenceSchema
 from .edits import Edits
 from .feature_action import FeatureAction
-from .status_feature import StatusFeature
+from .persisted_feature import PersistedFeature
+from .status_feature_mixin import StatusFeatureMixin
 
 
 @FenceSchema.addSchema()
-class Fence(StatusFeature):
+class Fence(PersistedFeature, StatusFeatureMixin):
 
     def __init__(self, featureLayer, existingFeature=None):
-        super().__init__(featureLayer, existingFeature)
+        PersistedFeature.__init__(self, featureLayer, existingFeature)
+        StatusFeatureMixin.__init__(self)
 
         self._supersededPaddocks = []
         self._plannedPaddocks = []

@@ -53,23 +53,23 @@ class LayerDependencyGraph(TypeDependencyGraph):
         """Return a list of layer types in the order they should be unloaded."""
         return list(reversed(self.loadOrder()))
 
-    def updateOrderByType(self, layerType, updatedLayers):
+    def dependentOperationOrderByType(self, layerType, updatedLayerTypes):
         """Return a list of layers that must be 'repersisted' in response to feature updates."""
-        updatedLayerTypeNames = [type(layer).__name__ for layer in updatedLayers]
-
+       
         # We don't update anything that isn't affected by a change
-        # We 'repersist' all downstream derived layers that are affected
+        # We 'repersist' all the downstream derived layers that are affected
         loadOrder = self.loadOrder()
 
+        # Return the full load order of types that subclass the provided layerType
         for i in range(0, len(loadOrder)):
-            layerType = loadOrder[i]
-            if layerType.__name__ in updatedLayerTypeNames:
+            lt = loadOrder[i]
+            if lt in updatedLayerTypes:
                 return [t for t in loadOrder[i:] if issubclass(t, layerType)]
 
         return []
 
-    def updateOrder(self, updatedLayers):
-        return self.updateOrderByType(PersistedDerivedFeatureLayer, updatedLayers)
+    def rederiveOrder(self, updatedLayerTypes):
+        return self.dependentOperationOrderByType(PersistedDerivedFeatureLayer, updatedLayerTypes)
 
-    def analysisOrder(self):
-        return [l for l in self.loadOrder() if issubclass(l, PersistedFeatureLayer)]
+    def recalculateOrder(self):
+        return self.dependentOperationOrderByType(PersistedFeatureLayer, self.loadOrder())

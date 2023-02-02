@@ -2,13 +2,13 @@
 from qgis.PyQt.QtCore import pyqtSlot
 
 from ..utils import PLUGIN_NAME, qgsInfo
-from .features import IStatusFeature
+from .features import Edits
 from .fields import FeatureStatus
-from .edits import Edits
+from .interfaces import IImportedFeatureLayer, IStatusFeature
 from .persisted_feature_layer import PersistedFeatureLayer
 
 
-class ImportedFeatureLayer(PersistedFeatureLayer):
+class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
 
     def __init__(self, workspaceFile, layerName, styleName=None):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""

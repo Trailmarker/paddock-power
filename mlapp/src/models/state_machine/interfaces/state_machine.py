@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 
 
 class StateMachine:
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def transitions(self):
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def actionType(self):
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def statusType(self):
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def status(self):
         pass
 
@@ -24,7 +28,8 @@ class StateMachine:
     def status(self, _):
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def stateChanged(self):
         pass
 

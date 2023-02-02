@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-
-from .interfaces import IFeature, IPersistedFeature, IStatusFeature
-
 from .boundary import Boundary
 from .edits import Edits
 from .fence import Fence

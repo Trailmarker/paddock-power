@@ -3,12 +3,12 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsProject
 
-from ..layers.edits import Edits
+from ..layers.features.edits import Edits
+from ..layers.fields import Timeframe
 from ..layers import (LandTypeConditionTable, DerivedBoundaryLayer, DerivedMetricPaddockLayer,
                       DerivedPaddockLandTypesLayer, DerivedWateredAreaLayer, DerivedWaterpointBufferLayer,
                       ElevationLayer, FenceLayer, LandTypeLayer, PaddockLandTypesLayer, PaddockLayer,
                       PipelineLayer, WateredAreaLayer, WaterpointBufferLayer, WaterpointLayer)
-from ..layers.fields import Timeframe
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, guiStatusBar, qgsInfo, qgsDebug
 from .glitch import Glitch
@@ -228,26 +228,19 @@ class Workspace(QObject):
         for layerType in self.layerDependencyGraph.unloadOrder():
             self.workspaceLayers.unloadLayer(layerType)
 
-    def analysisOrder(self):
-        """Return the order in which layers should be analsed."""
-        order = self.layerDependencyGraph.analysisOrder()
-        return [self.workspaceLayers.layer(layerType) for layerType in order]
-
-    def updateOrder(self, updatedLayers):
-        """Return the order in which layers should be updated."""
-        updateOrder = self.layerDependencyGraph.updateOrder(updatedLayers)
-        return [self.workspaceLayers.layer(layerType) for layerType in updateOrder]
-
-    def updateLayers(self, updatedLayers):
+    def deriveLayers(self, updatedLayerTypes):
         """Winnow and re-analyse a batch of updated layers."""
-        updateOrder = self.updateOrder(updatedLayers)
-        qgsInfo(f"{PLUGIN_NAME} deriving layers … {updateOrder}")
-        Edits.analyseLayers(updateOrder)
-        qgsInfo(f"{PLUGIN_NAME} derivation complete.")
+        order = self.layerDependencyGraph.rederiveOrder(updatedLayerTypes)
+        layers = [self.workspaceLayers.layer(layerType) for layerType in order]
+        Edits.deriveLayers(layers)
 
-    def analyseLayers(self):
+    def recalculateLayers(self):
         """Winnow and re-analyse a batch of updated layers."""
-        analysisOrder = self.analysisOrder()
-        qgsInfo(f"{PLUGIN_NAME} analysing layers …")
-        Edits.analyseLayers(analysisOrder)
-        qgsInfo(f"{PLUGIN_NAME} analysis complete.")
+        order = self.layerDependencyGraph.recalculateOrder()
+        layers = [self.workspaceLayers.layer(layerType) for layerType in order]
+        Edits.recalculateLayers(layers)
+
+    def onFeaturesChanged(self, layerTypes):
+        """Handle a change to the features of one or more layer."""
+        qgsInfo(f"{PLUGIN_NAME} features changed in {[layerType.__name__ for layerType in layerTypes]} …")
+        self.deriveLayers(layerTypes)

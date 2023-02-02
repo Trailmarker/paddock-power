@@ -2,18 +2,20 @@
 from ..fields import WaterpointSchema
 from .edits import Edits
 from .feature_action import FeatureAction
-from .status_feature import StatusFeature
+from .persisted_feature import PersistedFeature
+from .status_feature_mixin import StatusFeatureMixin
 
 
 @WaterpointSchema.addSchema()
-class Waterpoint(StatusFeature):
+class Waterpoint(PersistedFeature, StatusFeatureMixin):
 
     NEAREST_GRAZING_RADIUS = 0
     FARTHEST_GRAZING_RADIUS = 20000
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Waterpoint."""
-        StatusFeature.__init__(self, featureLayer, existingFeature)
+        PersistedFeature.__init__(self, featureLayer, existingFeature)
+        StatusFeatureMixin.__init__(self)
 
     @property
     def waterpointBufferLayer(self):

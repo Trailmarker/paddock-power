@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayer, QgsProject
 
-from ..layers.land_type_condition_table import LandTypeConditionTable
-from ..layers.elevation_layer import ElevationLayer
-from ..layers.feature_layer import FeatureLayer
+from ..layers.interfaces import IFeatureLayer, ILayer
 from ..utils import PLUGIN_NAME
 from .glitch import Glitch
 
@@ -22,8 +20,8 @@ class WorkspaceLayers(dict):
         if not isinstance(layerType, type):
             raise Glitch(f"Invalid WorkspaceLayers key: must be a type")
 
-        if not any(map(lambda cls: isinstance(layer, cls), [FeatureLayer, ElevationLayer, LandTypeConditionTable])):
-            raise Glitch(f"Invalid WorkspaceLayers value: must be a ConditionTable, ElevationLayer or FeatureLayer")
+        if not isinstance(layer, ILayer):
+            raise Glitch(f"Invalid WorkspaceLayers value: must be an ILayer")
 
         self[self.__layerKey(layerType)] = self.__setValue(layer)
 
@@ -41,7 +39,7 @@ class WorkspaceLayers(dict):
 
     def featureLayers(self):
         """Get all layers in the registry."""
-        return [l for l in self.layers() if isinstance(l, FeatureLayer)]
+        return [l for l in self.layers() if isinstance(l, IFeatureLayer)]
 
     def unloadLayer(self, layerType):
         """Unload the layer of the given type."""

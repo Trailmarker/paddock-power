@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from abc import abstractproperty
+from abc import abstractmethod
 
 from .interfaces.state_machine import StateMachine as IStateMachine
 
@@ -11,7 +11,8 @@ class StateMachineMixin:
     # to implement the StateMachine interface the way we choose (eg FeatureStateMachine
     # is done as a facade).This is for the other way round, getting from the object
     # to the machine …
-    @abstractproperty
+    @property
+    @abstractmethod
     def machine(self):
         pass
 

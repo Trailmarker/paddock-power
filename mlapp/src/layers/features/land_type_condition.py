@@ -1,15 +1,28 @@
 # -*- coding: utf-8 -*-
-from ...models import WorkspaceMixin
-from .interfaces import IPersistedFeature
+from ...models import Glitch, WorkspaceMixin
+from ..fields import ConditionType
+from ..interfaces import IPersistedFeature
 
 
 class LandTypeCondition(IPersistedFeature, WorkspaceMixin):
-    """This is a sort of mock Feature for the ConditionTable."""
+    """This is a sort of mock Feature for the LandTypeConditionTable."""
 
     def __init__(self,
                  *args):
         super().__init__()
-        self._conditionRecord = args
+        
+        if not args:
+            # Blank constructor
+            self._conditionRecord = (-1, -1, ConditionType.A)
+        elif len(args) == 1:
+            # Copy constructor
+            assert isinstance(args[0], LandTypeCondition)
+            self._conditionRecord = tuple(*args)        
+        elif len(args) == 3:
+            # Constructor from values
+            self._conditionRecord = tuple(args)
+        else:
+            raise Glitch(f"LandTypeCondition.__init__: unexpected number of arguments: {len(args)}")
 
     @property
     def featureLayer(self):
@@ -40,7 +53,7 @@ class LandTypeCondition(IPersistedFeature, WorkspaceMixin):
         self._conditionRecord[2] = val
 
     def upsert(self):
-        self.featureLayer.upsertFeature(self)
+        self.featureLayer.updateFeature(self)
 
     def delete(self):
         self.featureLayer.deleteFeature(self)

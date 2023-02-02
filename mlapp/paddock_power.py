@@ -295,7 +295,7 @@ class PaddockPower(PluginStateMachine):
 
     @PluginAction.analyseWorkspace.handler()
     def analyseWorkspace(self):
-        self.workspace.analyseLayers()
+        self.workspace.recalculateLayers()
 
     @PluginAction.projectClosed.handler()
     def projectClosed(self):
@@ -339,6 +339,6 @@ class PaddockPower(PluginStateMachine):
     def refreshUi(self):
         for pluginAction in self.actions:
             if self.isPermitted(pluginAction):
-                self.actions[pluginAction].setVisible(True)
+                self.actions[pluginAction].setEnabled(True)
             else:
-                self.actions[pluginAction].setVisible(False)
+                self.actions[pluginAction].setEnabled(False)

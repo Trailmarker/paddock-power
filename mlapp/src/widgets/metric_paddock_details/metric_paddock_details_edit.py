@@ -4,7 +4,7 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QWidget
 
-from ...layers.edits import Edits
+from ...layers.features import Edits
 from ...models import WorkspaceMixin
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -31,11 +31,10 @@ class MetricPaddockDetailsEdit(QWidget, FORM_CLASS, WorkspaceMixin):
         return self.workspace.paddockLayer
 
     def getPaddock(self):
-        self.paddock = self.paddockLayer.getFeature(self.metricPaddock.FID)
+        self.paddock = self.metricPaddock.getPaddock()
         self.nameLineEdit.setText(self.paddock.NAME)
 
     def saveFeature(self):
         """Save the Paddock Details."""
-        self.metricPaddock.NAME = self.nameLineEdit.text()
         self.paddock.NAME = self.nameLineEdit.text()
         return Edits.upsert(self.paddock)

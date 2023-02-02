@@ -52,6 +52,7 @@ class PluginStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
         (PluginStatus.NoWorkspaceLoaded, PluginAction.projectClosed): PluginStatus.NoWorkspaceLoaded,
 
         (PluginStatus.WorkspaceLoaded, PluginAction.detectWorkspace): PluginStatus.WorkspaceLoaded,
+        (PluginStatus.WorkspaceLoaded, PluginAction.analyseWorkspace): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.openFeatureView): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.closeFeatureView): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.openImportDialog): PluginStatus.WorkspaceLoaded,

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeature
 
-from ...models import Glitch, QtAbstractMeta
+from ...models import Glitch
 from ..calculator import Calculator
+from ..interfaces import IPersistedFeature
 from .feature import Feature
-from .interfaces import IPersistedFeature
 
 
-class PersistedFeature(IPersistedFeature, Feature, metaclass=QtAbstractMeta):
+class PersistedFeature(Feature, IPersistedFeature):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Create a new Feature."""

@@ -6,15 +6,16 @@ import processing
 
 from ..models import Glitch
 from ..utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsDebug, qgsException, qgsInfo
-from ..layers.feature_layer import FeatureLayer
+from .feature_layer import FeatureLayer
+from .interfaces import IPersistedFeatureLayer
 
 QGSWKB_TYPES = dict([(getattr(QgsWkbTypes, v), v) for v, m in vars(
     QgsWkbTypes).items() if isinstance(getattr(QgsWkbTypes, v), QgsWkbTypes.Type)])
 
 
-class PersistedFeatureLayer(FeatureLayer):
+class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
 
-    def detectInGeoPackage(self, workspaceFile, layerName):
+    def detectInStore(self, workspaceFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""
         try:
             layers = QgsVectorLayer(path=workspaceFile, providerLib="ogr")
@@ -35,7 +36,7 @@ class PersistedFeatureLayer(FeatureLayer):
 
         return False
 
-    def createInGeoPackage(self, workspaceFile, layerName):
+    def createInStore(self, workspaceFile, layerName):
 
         wkbType = self.getWkbType()
         schema = self.getSchema()
@@ -67,7 +68,7 @@ class PersistedFeatureLayer(FeatureLayer):
         processing.run(
             'native:package', params)
 
-    def deleteFromGeoPackage(self, workspaceFile, layerName):
+    def deleteFromStore(self, workspaceFile, layerName):
         """Delete this FeatureLayer from the GeoPackage file."""
 
         #gpkgUrl = f"{workspaceFile}|layername={layerName}"
@@ -84,9 +85,9 @@ class PersistedFeatureLayer(FeatureLayer):
         assert layerName
 
         # If not found, create
-        if not self.detectInGeoPackage(workspaceFile, layerName):
+        if not self.detectInStore(workspaceFile, layerName):
             qgsInfo(f"{layerName} not found in {PLUGIN_NAME} GeoPackage, creating new …")
-            self.createInGeoPackage(workspaceFile, layerName)
+            self.createInStore(workspaceFile, layerName)
 
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
 
@@ -142,11 +143,11 @@ class PersistedFeatureLayer(FeatureLayer):
         """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.FID)
 
-    def analyseFeatures(self):
+    def recalculateFeatures(self):
         """Recalculate features in this layer."""
 
         if not self.isEditable():
-            raise Glitch(f"{self}.recalculateFeatures(): analysis can only be run during an edit session …")
+            raise Glitch(f"{self}.recalculateFeatures(): recalculation can only be run during an edit session …")
 
         qgsInfo(f"Recalculating {self.name()} …")
 

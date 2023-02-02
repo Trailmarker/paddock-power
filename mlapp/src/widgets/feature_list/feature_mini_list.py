@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from ...layers.interfaces import IFeature
 from ...models import Glitch
-from ...layers.features import IFeature
 from .feature_list_base import FeatureListBase
 
 
 class FeatureMiniList(FeatureListBase):
+    """A flexible mini list of features (doesn't load from a changing source or anything)."""
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
         super().__init__(listItemFactory, parent)

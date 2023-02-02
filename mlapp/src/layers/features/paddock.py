@@ -2,17 +2,19 @@
 from ..fields import PaddockSchema
 from .edits import Edits
 from .feature_action import FeatureAction
-from .status_feature import StatusFeature
+from .persisted_feature import PersistedFeature
+from .status_feature_mixin import StatusFeatureMixin
 
 
 @PaddockSchema.addSchema()
-class Paddock(StatusFeature):
+class Paddock(PersistedFeature, StatusFeatureMixin):
 
     def __init__(self,
                  featureLayer,
                  existingFeature=None):
         """Create a new Paddock."""
-        super().__init__(featureLayer, existingFeature)
+        PersistedFeature.__init__(self, featureLayer, existingFeature)
+        StatusFeatureMixin.__init__(self)
 
         self.crossedPaddockId = None
 
@@ -22,7 +24,7 @@ class Paddock(StatusFeature):
 
     @property
     def conditionTable(self):
-        """Return the ConditionTable for this Paddock."""
+        """Return the LandTypeConditionTable for this Paddock."""
         return self.featureLayer.workspace.conditionTable
 
     def upsert(self):

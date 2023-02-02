@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from ..fields import MetricPaddockSchema
 from .feature_action import FeatureAction
-from .status_feature import StatusFeature
+from .derived_feature import DerivedFeature
+from .status_feature_mixin import StatusFeatureMixin
 
 
 @MetricPaddockSchema.addSchema()
-class MetricPaddock(StatusFeature):
+class MetricPaddock(DerivedFeature, StatusFeatureMixin):
 
     def __init__(self, featureLayer, existingFeature=None):
         """Initialise a new Metric Paddock."""
-        super().__init__(featureLayer, existingFeature)
+        DerivedFeature.__init__(self, featureLayer, existingFeature)
+        StatusFeatureMixin.__init__(self)
 
     @property
     def TITLE(self):

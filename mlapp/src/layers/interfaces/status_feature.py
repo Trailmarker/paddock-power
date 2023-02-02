@@ -1,9 +1,21 @@
 # -*- coding: utf-8 -*-
 from abc import abstractmethod
+
 from .feature import Feature
 
 
 class StatusFeature(Feature):
+
+    @property
+    @abstractmethod
+    def machine(self):
+        pass
+
+    @property
+    @abstractmethod
+    def TIMEFRAME(self):
+        """Return the timeframe for the Feature."""
+        pass
 
     @abstractmethod
     def planFeature(self):
