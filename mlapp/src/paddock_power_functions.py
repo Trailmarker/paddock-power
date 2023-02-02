@@ -127,13 +127,13 @@ def waterpointInitials(vals, *_):
         return None
 
 
-PaddockPowerFunctions = [
-    currentTimeframe,
-    matchCurrentFeatureStatus,
-    matchCurrentTimeframe,
-    ifCurrentFeatureStatus,
-    ifCurrentTimeframe,
-    timeframeWaterpointColour,
-    timeframeWaterpointForegroundColour,
-    waterpointInitials
-]
+PaddockPowerFunctions = {
+    "currentTimeframe": currentTimeframe,
+    "matchCurrentFeatureStatus": matchCurrentFeatureStatus,
+    "matchCurrentTimeframe": matchCurrentTimeframe,
+    "ifCurrentFeatureStatus": ifCurrentFeatureStatus,
+    "ifCurrentTimeframe": ifCurrentTimeframe,
+    "timeframeWaterpointColour": timeframeWaterpointColour,
+    "timeframeWaterpointForegroundColour": timeframeWaterpointForegroundColour,
+    "waterpointInitials": waterpointInitials
+}

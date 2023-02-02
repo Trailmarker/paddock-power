@@ -164,8 +164,6 @@ class MeasureField(Field):
         matches = [c for c in columns if c.name == self.name()]
         if matches:
             column = matches[0]
-            # if not column.hidden:
-            #    qgsInfo(f"{self}.setupLayer({layer}): hiding field {self.name()}")
             column.hidden = True
             config.setColumns(columns)
             layer.setAttributeTableConfig(config)

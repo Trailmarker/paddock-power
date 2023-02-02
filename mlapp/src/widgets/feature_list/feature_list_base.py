@@ -66,7 +66,7 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
             
             if self._selectedFeature and self._selectedFeature.FID == feature.FID:
                 self._selectedItem = item
-                qgsDebug(f"{type(self).__name__}.refreshUi(): selectedItem = {feature}")
+                # qgsDebug(f"{type(self).__name__}.refreshUi(): selectedItem = {feature}")
             widget.layoutRefreshNeeded.connect(self.refreshLayout)
 
         if self._selectedItem:

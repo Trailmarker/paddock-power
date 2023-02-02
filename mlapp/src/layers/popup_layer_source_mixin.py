@@ -4,7 +4,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsProject
 
-from ..utils import qgsDebug
 from .features import IFeature
 from .popup_feature_layer import PopupFeatureLayer
 from .interfaces import IMapLayer
@@ -54,8 +53,7 @@ class PopupLayerSourceMixin(IMapLayer):
         return self.__popupLayers.get(self.__key(layerType), None)
 
     def addPopupLayer(self, layerType, feature):
-        """Add a Metrick Paddock popup layer."""
-        qgsDebug(f"{type(self).__name__}|PopupFeatureLayerMixin.addPopupLayer({layerType.__name__}, {feature})")
+        """Add a Metric Paddock popup layer."""
         assert issubclass(layerType, PopupFeatureLayer)
         assert isinstance(feature, IFeature)
 
@@ -73,20 +71,17 @@ class PopupLayerSourceMixin(IMapLayer):
         group = item.parent()
         layerIndex = group.children().index(item)
 
-        # The "relativeLayerPosition determines whether a layer is below or above"
+        # The relativeLayerPosition determines where a popup layer is inserted in the group
         group.insertLayer(max(0, layerIndex + self.relativeLayerPosition), popupLayer)
 
-        # if self.zoomPopupLayerOnLoad:
-        #     popupLayer.zoomLayer()
         self.popupLayerAdded.emit(popupLayer)
 
     def addAllPopupLayers(self, feature):
-        qgsDebug(f"{type(self).__name__}|PopupFeatureLayerMixin.addAllPopupLayers({feature}, self.popupLayerTypes={self.popupLayerTypes})")
         for layerType in self.popupLayerTypes:
             self.addPopupLayer(layerType, feature)
 
     def removePopupLayer(self, obj):
-        """Remove any Metric Paddock popup layer."""
+        """Remove any current popup layer."""
 
         popupLayer = obj if isinstance(obj, PopupFeatureLayer) else self.__popupLayers.pop(self.__key(obj), None)
 
@@ -105,6 +100,7 @@ class PopupLayerSourceMixin(IMapLayer):
                 self.popupLayer = None
 
     def removeAllPopupLayers(self):
+        """Remove all popup layers associated with this source."""
         layerIds = [self.__popupLayers[self.__key(layerType)] for layerType in self.__popupLayers]
 
         for layerId in layerIds:
@@ -112,18 +108,18 @@ class PopupLayerSourceMixin(IMapLayer):
                 self.removePopupLayer(QgsProject.instance().mapLayer(layerId))
 
     def onPopupFeatureSelected(self, layerType):
-        qgsDebug(f"{type(self).__name__}|PopupFeatureLayerMixin.onPopupFeatureSelected({layerType.__name__})")
-
+        """To be overridden and called when the popup layer source selects a popup feature."""
         feature = self.workspace.selectedFeature(layerType)
         self.addAllPopupLayers(feature)
 
     def onPopupFeatureDeselected(self, layerType):
-        qgsDebug(f"{type(self).__name__}|PopupFeatureLayerMixin.onPopupFeatureDeselected({layerType.__name__})")
-
+        """To be overridden and called when the popup layer source deselects a popup feature."""
         self.removeAllPopupLayers()
 
     def onPopupLayerAdded(self, layer):
-        qgsDebug(f"{type(self).__name__}|PopupFeatureLayerMixin.onPopupLayerAdded({layer.name()})")
+        """To be overridden and called when the popup layer source adds a popup layer."""
+        pass
 
     def onPopupLayerRemoved(self):
-        qgsDebug(f"{type(self).__name__}|PopupFeatureLayerMixin.onPopupLayerRemoved()")
+        """To be overridden and called when the popup layer source removes a popup layer."""
+        pass

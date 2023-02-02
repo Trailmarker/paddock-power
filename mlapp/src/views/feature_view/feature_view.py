@@ -30,6 +30,7 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         WorkspaceMixin.__init__(self)
 
         self.pluginInitGui = False
+        self.uiBuilt = False
 
         self.setupUi(self)
         self.setStyleSheet(STYLESHEET)
@@ -65,43 +66,11 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
             self.futureTimeframeButton.setChecked(self.workspace.timeframe.name == 'Future')
 
-    def clearUi(self):
-        qgsInfo(f"{PLUGIN_NAME} tearing down old feature view …")
-
-        while (self.tabWidget.count() > 0):
-            self.tabWidget.removeTab(0)
-
-        self.paddockTab = None
-        self.fenceTab = None
-        self.pipelineTab = None
-        self.waterpointTab = None
-
-        for item in [self.currentTimeframeButton, self.futureTimeframeButton,
-                     self.sketchFenceButton, self.sketchPipelineButton, self.sketchWaterpointButton]:
-            try:
-                item.clicked.disconnect()
-            except BaseException:
-                pass
-        self.timeframeButtonGroup = None
-        self.update()
-
-
-    def onFeatureLayerSelected(self, featureLayerType):
-        name = featureLayerType.__name__
-
-        qgsDebug(f"{type(self).__name__}.onFeatureLayerSelected(featureLayerType={name})")
-
-        if name == 'FenceLayer':
-            self.tabWidget.setCurrentWidget(self.fenceTab)
-        elif name == 'PaddockLayer':
-            self.tabWidget.setCurrentWidget(self.paddockTab)
-        elif name == 'PipelineLayer':
-            self.tabWidget.setCurrentWidget(self.pipelineTab)
-        elif name == 'WaterpointLayer':
-            self.tabWidget.setCurrentWidget(self.waterpointTab)
-            
-
+  
     def buildUi(self):
+        if self.uiBuilt:
+            return
+
         qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
 
         self.paddockTab = PaddockWidget(self.tabWidget)
@@ -131,3 +100,45 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
         self.update()
         self.refreshUi()
+        
+        self.uiBuilt = True        
+        qgsInfo(f"{PLUGIN_NAME} rebuilt.")
+
+
+    def clearUi(self):
+        if not self.uiBuilt:
+            return
+
+        qgsInfo(f"{PLUGIN_NAME} tearing down old feature view …")
+
+        while (self.tabWidget.count() > 0):
+            self.tabWidget.removeTab(0)
+
+        self.paddockTab = None
+        self.fenceTab = None
+        self.pipelineTab = None
+        self.waterpointTab = None
+
+        for item in [self.currentTimeframeButton, self.futureTimeframeButton,
+                     self.sketchFenceButton, self.sketchPipelineButton, self.sketchWaterpointButton]:
+            try:
+                item.clicked.disconnect()
+            except BaseException:
+                pass
+        self.timeframeButtonGroup = None
+        self.uiBuilt = False        
+        qgsInfo(f"{PLUGIN_NAME} torn down.")
+
+        # self.update()
+    
+    def onFeatureLayerSelected(self, featureLayerType):
+        name = featureLayerType.__name__
+        if name == 'FenceLayer':
+            self.tabWidget.setCurrentWidget(self.fenceTab)
+        elif name == 'PaddockLayer':
+            self.tabWidget.setCurrentWidget(self.paddockTab)
+        elif name == 'PipelineLayer':
+            self.tabWidget.setCurrentWidget(self.pipelineTab)
+        elif name == 'WaterpointLayer':
+            self.tabWidget.setCurrentWidget(self.waterpointTab)
+            

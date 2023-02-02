@@ -172,25 +172,29 @@ class PaddockPower(PluginStateMachine):
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
+        qgsInfo(f"Unloading {PLUGIN_NAME} plugin …")
         try:
             QgsProject.instance().cleared.disconnect(self.projectClosed)
             QgsProject.instance().readProject.disconnect(self.detectWorkspace)
-        except BaseException:
-            pass
+            qgsInfo(f"Signals disconnected …")
 
+        except BaseException:
+            qgsException()
         try:
-            if self.featureView:
-                self.featureView.clearUi()
-                self.featureView.setVisible(False)
+            self.featureView.clearUi()
+            self.featureView.setVisible(False)
+            self.featureView.setParent(None)
             self.iface.removeDockWidget(self.featureView)
+            self.featureView.deleteLater()
+            self.featureView = None
+            qgsInfo(f"Feature View destroyed …")
         except BaseException:
-            pass
-
+            qgsException()
         try:
             self.unloadWorkspace()
+            qgsInfo(f"Workspace unloaded …")
         except BaseException:
-            pass
-
+            qgsException()
         try:
             # Remove the plugin menu item and icon
             for action in self.actions:
@@ -199,21 +203,24 @@ class PaddockPower(PluginStateMachine):
 
             # Remove the toolbar
             del self.toolbar
+            qgsInfo(f"Toolbar and actions removed …")
         except BaseException:
-            pass
-
+            qgsException()
         try:
             # Unregister the extension functions
             self.unregisterFunctions()
+            qgsInfo(f"Expression functions unregistered …")
         except BaseException:
-            pass
+            qgsException()
 
         PaddockPower.restoreSystemExceptionHook()
+        qgsInfo(f"{PLUGIN_NAME} unloaded.")
+
 
     def registerFunctions(self):
         f"""Register the extension functions used by {PLUGIN_NAME}."""
         for paddockPowerFunction in PaddockPowerFunctions:
-            QgsExpression.registerFunction(paddockPowerFunction)
+            QgsExpression.registerFunction(PaddockPowerFunctions[paddockPowerFunction])
 
     def unregisterFunctions(self):
         f"""Register the extension functions used by {PLUGIN_NAME}."""
@@ -223,8 +230,8 @@ class PaddockPower(PluginStateMachine):
     def initWorkspace(self, workspaceFile):
         if self.workspace:
             self.workspaceUnloading.emit()
-        self.workspace = Workspace(self, self.iface, workspaceFile)
-        qgsInfo("Plugin emitting ready …")
+        self.workspace = Workspace(self.iface, workspaceFile)
+        qgsInfo("Emitting workspaceReady …")
         self.workspaceReady.emit()
 
     @PluginAction.detectWorkspace.handler()

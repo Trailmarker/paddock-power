@@ -44,7 +44,7 @@ class FeatureLayerList(FeatureListBase):
 
     def rewireFeatureLayer(self, oldVal, newVal):
         """Rewire the FeatureLayer."""
-        qgsDebug(f"{type(self).__name__}.rewireFeatureLayer({oldVal}, {newVal})")
+        # qgsDebug(f"{type(self).__name__}.rewireFeatureLayer({oldVal}, {newVal})")
         if oldVal:
             oldVal.featureSelected.disconnect(self.changeSelection)
             oldVal.featureDeselected.disconnect(self.removeSelection)
@@ -55,10 +55,8 @@ class FeatureLayerList(FeatureListBase):
     def getFeatures(self):
         """Get the Features."""
         if self.featureLayer:
-            # return [feature for feature in self.featureLayer.getFeatures()]
-            features = [feature for feature in self.featureLayer.getFeaturesByTimeframe(self.timeframe)]
-            qgsDebug(f"{type(self).__name__}.getFeatures(): len(features) = {len(features)}")
-            return features
+            return [feature for feature in self.featureLayer.getFeaturesByTimeframe(self.timeframe)]
+            # qgsDebug(f"{type(self).__name__}.getFeatures(): len(features) = {len(features)}")
         else:
-            qgsDebug(f"{type(self).__name__}.refreshUi(): featureLayer is None")
+            # qgsDebug(f"{type(self).__name__}.refreshUi(): featureLayer is None")
             return []

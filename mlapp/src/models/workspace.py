@@ -26,7 +26,7 @@ class Workspace(QObject):
     timeframeChanged = pyqtSignal(Timeframe)
     featuresChanged = pyqtSignal(list)
 
-    def __init__(self, plugin, iface, workspaceFile):
+    def __init__(self, iface, workspaceFile):
 
         self.ready = False
 
@@ -37,7 +37,6 @@ class Workspace(QObject):
         self.iface = iface
         self.workspaceFile = workspaceFile
 
-        qgsDebug(f"{PLUGIN_NAME} initialising layers …")
         self.landTypeLayer = LandTypeLayer(self.workspaceFile)
         guiStatusBar(f"{PLUGIN_NAME} {self.landTypeLayer.name()} loaded …")
         self.conditionTable = LandTypeConditionTable(self.workspaceFile)
@@ -116,7 +115,7 @@ class Workspace(QObject):
 
         self.timeframeChanged.connect(self.deselectLayers)
 
-        qgsInfo(f"{PLUGIN_NAME} analysis layers initialised …")
+        qgsInfo(f"{PLUGIN_NAME} feature layers initialised …")
 
         # Wiring some stuff for selected features …
         self.__selectedFeatures = {}
@@ -189,13 +188,13 @@ class Workspace(QObject):
     def deselectLayers(self, selectedLayerType=None):
         """Deselect any currently selected Feature."""
         for layerType in [l for l in self.__selectedFeatures.keys() if l != selectedLayerType]:
-            qgsInfo(f"Workspace.deselectLayers({layerType.__name__})")
+            # qgsInfo(f"Workspace.deselectLayers({layerType.__name__})")
             del self.__selectedFeatures[layerType]
             self.featureLayerDeselected.emit(layerType)
 
     def selectFeature(self, feature):
         """Select a feature."""
-        qgsInfo(f"Workspace.selectFeature({feature})")
+        # qgsInfo(f"Workspace.selectFeature({feature})")
         selectedLayerType = type(feature.featureLayer)
         self.__selectedFeatures[selectedLayerType] = feature
 
@@ -244,11 +243,11 @@ class Workspace(QObject):
         updateOrder = self.updateOrder(updatedLayers)
         qgsInfo(f"{PLUGIN_NAME} deriving layers … {updateOrder}")
         Edits.analyseLayers(updateOrder)
-        qgsInfo(f"{PLUGIN_NAME} load complete.")
+        qgsInfo(f"{PLUGIN_NAME} derivation complete.")
 
     def analyseLayers(self):
         """Winnow and re-analyse a batch of updated layers."""
         analysisOrder = self.analysisOrder()
         qgsInfo(f"{PLUGIN_NAME} analysing layers …")
         Edits.analyseLayers(analysisOrder)
-        qgsInfo(f"{PLUGIN_NAME} load complete.")
+        qgsInfo(f"{PLUGIN_NAME} analysis complete.")

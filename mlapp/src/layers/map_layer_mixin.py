@@ -20,7 +20,7 @@ class MapLayerMixin(IMapLayer):
 
         layerIds = sameTypes.union(sameNames)
 
-        qgsDebug(f"Cleaning up {len(layerIds)} layers of type {cls.__name__} …")
+        # qgsDebug(f"Cleaning up {len(layerIds)} layers of type {cls.__name__} …")
         for layerId in layerIds:
             QgsProject.instance().removeMapLayer(layerId)
 

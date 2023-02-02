@@ -43,7 +43,6 @@ class PaddockLandTypesLayerList(PopupLayerList):
         if not self._featureLayer:
             return []
         features = self._featureLayer.getFeaturesByTimeframe(self.timeframe)
-        qgsDebug(f"{self.__class__.__name__}.getFeatures: {len(features)} features in {self.timeframe.name} timeframe")
         return features
 
 

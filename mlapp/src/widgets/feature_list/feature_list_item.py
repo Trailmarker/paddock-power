@@ -130,7 +130,6 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
         if self.hasStatus:
             toStateMachine(self.feature).stateChanged.connect(self.refreshUi)
-            toStateMachine(self.feature).stateChanged.connect(lambda: qgsDebug(f"State of {self} updated!"))
         self.refreshUi()
 
     def setSelected(self, selected):

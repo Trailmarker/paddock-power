@@ -85,7 +85,7 @@ class PersistedFeatureLayer(FeatureLayer):
 
         # If not found, create
         if not self.detectInGeoPackage(workspaceFile, layerName):
-            qgsInfo(f"{self.__class__.__name__} not found in {PLUGIN_NAME} GeoPackage, creating new …")
+            qgsInfo(f"{layerName} not found in {PLUGIN_NAME} GeoPackage, creating new …")
             self.createInGeoPackage(workspaceFile, layerName)
 
         self.gpkgUrl = f"{workspaceFile}|layername={layerName}"
