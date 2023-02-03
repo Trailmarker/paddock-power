@@ -37,6 +37,10 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
             self.clearFid()
 
         if isinstance(existingFeature, QgsFeature):
+            if not existingFeature.isValid():
+                raise Glitch(
+                    f"{type(self).__name__}.__init__: existingFeature.isValid() == False: {existingFeature}, experimenting with strictnesss about validity")
+
             # Incoming Feature must have compatible schema
             missingFields, _ = self.getSchema().checkFields(existingFeature.fields())
             if missingFields:

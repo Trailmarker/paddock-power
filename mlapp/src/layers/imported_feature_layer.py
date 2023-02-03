@@ -25,7 +25,7 @@ class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
 
         # Default imported data to 'Built' status - TODO might need other things here?
         if isinstance(feature, IStatusFeature):
-            feature.STATUS = FeatureStatus.Planned
+            feature.STATUS = FeatureStatus.Built
 
         return feature
 
