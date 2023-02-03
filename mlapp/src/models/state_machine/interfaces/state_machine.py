@@ -25,6 +25,7 @@ class StateMachine:
         pass
 
     @status.setter
+    @abstractmethod
     def status(self, _):
         pass
 

@@ -167,7 +167,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def getPaddocks(self):
         """Get the MetricPaddocks with the specified Build Order."""
         if self.STATUS == FeatureStatus.Drafted:
-            return [], []
+            return []
             # _, crossedPaddocks = self.getCrossedPaddocks()
             # return crossedPaddocks, []
 
@@ -293,69 +293,6 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         return Edits.upsert(self).editAfter(edits)
 
     @Edits.persistFeatures
-    @FeatureAction.plan.handler()
-    def planFeature(self):
-        """Plan the Paddocks that would be altered after building this Fence."""
-
-        edits = Edits()
-
-        with Edits.editAndRollBack([self.paddockLayer]):
-
-            _, lowestDraftBuildOrder, _ = self.featureLayer.getBuildOrder()
-
-            if self.BUILD_ORDER > lowestDraftBuildOrder:
-                raise Glitch(
-                    "You must Plan your Drafted Fences from first to last according to Build Order.")
-
-            if self.BUILD_ORDER <= 0:
-                raise Glitch("Fence must have a positive Build Order to be Planned")
-
-            _, supersededPaddocks = self.getCrossedPaddocks()
-
-            fenceLine = self.GEOMETRY
-            polyline = fenceLine.asPolyline()
-            points = [QgsPoint(p.x(), p.y()) for p in polyline]
-            splitLine = QgsLineString(points)
-
-            self.paddockLayer.splitFeatures(splitLine, False, False)
-
-            currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
-
-            for crossedPaddock in supersededPaddocks:
-                crossedPaddockName = crossedPaddock.NAME
-
-                # Deep copy all split paddocks
-                splitPaddocks = [self.paddockLayer.copyFeature(f)
-                                 for f in currentPaddocks
-                                 if f.NAME == crossedPaddockName]
-
-                for i, splitPaddock in enumerate(splitPaddocks):
-                    defaultName = crossedPaddockName + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]
-                    splitPaddock.NAME = defaultName
-                    # Note this is set explicitly to Drafted because
-                    # the Paddock is derived in a dodgy way using splitFeatures
-                    splitPaddock.STATUS = FeatureStatus.Drafted
-                    splitPaddock.recalculate()
-                    edits.editBefore(splitPaddock.planFeature(self, crossedPaddock))
-
-        _, newPaddocks = self.getNewPaddocks()
-
-        # qgsDebug(f"Fence.planFeature: getNewPaddocks {len(newPaddocks)}, {[p.NAME for p in newPaddocks]}")
-
-        for paddock in newPaddocks:
-            edits.editBefore(paddock.planFeature(self))
-
-        _, supersededPaddocks = self.getCrossedPaddocks()
-
-        # qgsDebug(f"Fence.planFeature: getCrossedPaddocks {len(supersededPaddocks)}, {[p.NAME for p in supersededPaddocks]}")
-
-        for paddock in supersededPaddocks:
-            edits.editBefore(paddock.supersedeFeature(self))
-
-        # self.paddockLayer now rolls back
-        return Edits.upsert(self).editAfter(edits)
-
-    @Edits.persistFeatures
     @FeatureAction.undoPlan.handler()
     def undoPlanFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
@@ -394,13 +331,13 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
     @Edits.persistFeatures
     @FeatureAction.undoBuild.handler()
-    def buildFeature(self):
+    def undoBuildFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 
         edits = Edits()
 
         paddocks = self.getPaddocks()
-        
+
         builtPaddocks = [p for p in paddocks if p.STATUS.name == FeatureStatus.Built.name]
         archivedPaddocks = [p for p in paddocks if p.STATUS.name == FeatureStatus.Archived.name]
 

@@ -25,7 +25,7 @@ def actionHandlerWithException(action, exceptionType=None, method=lambda x: x):
             return result
         else:
             raise Glitch(
-                f"This {obj} can't handle the action {action} using the handler {method.__name__}, because it's in {obj.status} state")
+                f"This {obj} can't handle the action {action} using the handler {method.__name__}, because it's in {toStateMachine(obj).status} state")
     return wrapper
 
 
@@ -37,5 +37,5 @@ def actionHandler(action, method=lambda x: x):
             return result
         else:
             raise Glitch(
-                f"This {obj} can't handle the action {action} using the handler {method.__name__}, because it's in {obj.status} state")
+                f"This {obj} can't handle the action {action} using the handler {method.__name__}, because it's in {toStateMachine(obj).status} state")
     return wrapper
