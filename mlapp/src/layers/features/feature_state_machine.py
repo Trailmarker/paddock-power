@@ -38,6 +38,8 @@ class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
 
         (FeatureStatus.BuiltSuperseded, FeatureAction.undoSupersede): FeatureStatus.Built,
         (FeatureStatus.BuiltSuperseded, FeatureAction.archive): FeatureStatus.Archived,
+        
+        (FeatureStatus.Archived, FeatureAction.undoArchive): FeatureStatus.Built,
     }
 
     def doAction(self, action):

@@ -17,3 +17,4 @@ class FeatureAction(StateMachineAction):
     supersede = "Supersede"
     undoSupersede = "Undo Superseding"
     archive = "Archive"
+    undoArchive = "Undo Archiving"

@@ -54,6 +54,9 @@ class PopupLayerSourceMixin(IMapLayer):
 
     def addPopupLayer(self, layerType, feature):
         """Add a Metric Paddock popup layer."""
+        if not feature:
+            return
+
         assert issubclass(layerType, PopupFeatureLayer)
         assert isinstance(feature, IFeature)
 

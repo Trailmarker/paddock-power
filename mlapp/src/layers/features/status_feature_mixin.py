@@ -76,3 +76,9 @@ class StatusFeatureMixin(StateMachineMixin, IStatusFeature):
     def archiveFeature(self):
         """Archive a Feature."""
         return Edits.upsert(self)
+
+    @Edits.persistFeatures
+    @FeatureAction.undoArchive.handler()
+    def undoArchiveFeature(self):
+        """Archive a Feature."""
+        return Edits.upsert(self)

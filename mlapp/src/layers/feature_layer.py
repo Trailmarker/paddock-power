@@ -107,7 +107,9 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def getFeature(self, id):
         """Get a feature by its id, assumed to be the same as its FID."""
         feature = super().getFeature(id)
-        return self.wrapFeature(feature) if feature else None
+        # Note the use of QgsFeature.isValid() here, an actual object is still 
+        # returned even when the id doesn't hit …
+        return self.wrapFeature(feature) if feature.isValid() else None
 
     def getFeatureFromSelection(self, selectionId):
         """Convenience function as in rare cases this has to behave differently."""

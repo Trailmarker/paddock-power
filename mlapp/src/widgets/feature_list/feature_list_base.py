@@ -6,7 +6,6 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QFrame, QListWidget, QListWid
 from ...models import WorkspaceMixin
 from ...utils import qgsDebug
 
-
 class FeatureListBase(QListWidget, WorkspaceMixin):
 
     def __init__(self, listItemFactory, parent=None):
@@ -48,9 +47,6 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
         self.removeSelection()
 
         features = self.getFeatures()
-
-        if not features:
-            return
 
         # Sort Features alphabetically
         features.sort(key=lambda x: x.NAME)

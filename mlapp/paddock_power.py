@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os.path
 import sys
+import traceback
 
 from qgis.PyQt.QtCore import Qt, QCoreApplication, QSettings, QTranslator, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
@@ -13,7 +14,7 @@ from .resources_rc import *
 from .src.models import Glitch, Workspace
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus
-from .src.utils import guiConfirm, guiStatusBar, guiWarning, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
+from .src.utils import guiConfirm, guiStatusBar, guiWarning, qgsDebug, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 from .src.views.feature_view.feature_view import FeatureView
 from .src.widgets.import_dialog.import_dialog import ImportDialog
 
@@ -154,12 +155,14 @@ class PaddockPower(PluginStateMachine):
         exceptHook = sys.excepthook
         qgsInfo("GlitchHook: setting up Glitch hook.")
 
-        def glitchHookWrapper(exceptionType, e, traceback):
+        def glitchHookWrapper(exceptionType, e, tb):
             if isinstance(e, Glitch):
+                qgsDebug(f"Caught Glitch: {e}")
+                qgsDebug(traceback.format_exception(exceptionType, e, tb))
                 self.caughtGlitch.emit(e)
                 return
             else:
-                exceptHook(exceptionType, e, traceback)
+                exceptHook(exceptionType, e, tb)
 
         setattr(glitchHookWrapper, PaddockPower.__GLITCH_HOOK_WRAPPER, sys.excepthook)
         sys.excepthook = glitchHookWrapper

@@ -27,6 +27,10 @@ class PersistedFeature(Feature, IPersistedFeature):
     def recalculate(self):
         """Recalculate everything that can be recalculated based on the Feature schema."""
 
+        if self.hasName:
+            if not self.NAME:
+                self.NAME = f"{self.displayName()} {self.FID}"
+
         if self.GEOMETRY:
             if self.hasArea:
                 self.AREA = round(Calculator.calculateArea(self.GEOMETRY) / 1000000, 2)

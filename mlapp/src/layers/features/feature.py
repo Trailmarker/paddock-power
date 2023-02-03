@@ -5,7 +5,7 @@ from re import finditer
 from qgis.core import QgsFeature, QgsRectangle, QgsVectorLayer
 
 from ...models import Glitch, QtAbstractMeta
-from ..fields import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, STATUS, PERIMETER, TIMEFRAME, Timeframe
+from ..fields import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, NAME, STATUS, PERIMETER, TIMEFRAME, Timeframe
 from ..interfaces import IFeature
 
 
@@ -115,6 +115,11 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
     def hasLatitude(self):
         """Return True if the Feature has a latitude."""
         return self.hasField(LATITUDE)
+
+    @cached_property
+    def hasName(self):
+        """Return True if the Feature has a latitude."""
+        return self.hasField(NAME)
 
     @cached_property
     def hasPerimeter(self):

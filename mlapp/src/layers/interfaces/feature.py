@@ -26,7 +26,6 @@ class Feature(ABC):
         return self.geometry()
 
     @property
-    @abstractmethod
     def NAME(self):
         return self.TITLE
 

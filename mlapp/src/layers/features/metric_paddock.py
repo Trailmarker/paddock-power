@@ -44,6 +44,14 @@ class MetricPaddock(PersistedFeature, StatusFeatureMixin):
     def undoPlanFeature(self):
         return self.getPaddock().undoPlanFeature()
 
+    @FeatureAction.build.handler()
+    def buildFeature(self):
+        return self.getPaddock().buildFeature()
+
+    @FeatureAction.undoBuild.handler()
+    def undoBuildFeature(self):
+        return self.getPaddock().undoBuildFeature()
+
     @FeatureAction.supersede.handler()
     def supersedeFeature(self, fence):
         return self.getPaddock().supersedeFeature(fence)
@@ -51,3 +59,11 @@ class MetricPaddock(PersistedFeature, StatusFeatureMixin):
     @FeatureAction.undoSupersede.handler()
     def undoSupersedeFeature(self):
         return self.getPaddock().undoSupersedeFeature()
+
+    @FeatureAction.archive.handler()
+    def archiveFeature(self):
+        return self.getPaddock().archiveFeature()
+
+    @FeatureAction.undoArchive.handler()
+    def undoArchiveFeature(self):
+        return self.getPaddock().undoArchiveFeature()

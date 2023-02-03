@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
-from qgis.core import Qgis
-
-from ..utils import PLUGIN_NAME, guiError, qgsInfo
+from ..utils import PLUGIN_NAME, guiError, qgsException, qgsInfo
 
 
 class Glitch(Exception):
