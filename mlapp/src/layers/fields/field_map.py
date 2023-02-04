@@ -10,9 +10,11 @@ class FieldMap(dict):
 
     def __init__(self, importLayer, targetLayer, *args, **kwargs):
         """Create a FieldMap."""
-
         self.importLayer = importLayer
         self.targetLayer = targetLayer
+
+        self.populateDefaultFieldMappings()
+
         self.update(*args, **kwargs)
 
     @cached_property
@@ -24,6 +26,15 @@ class FieldMap(dict):
     def targetFieldNames(self):
         """Return the target schema's field names as a list."""
         return [f.name() for f in self.targetLayer.getSchema()]
+
+    def populateDefaultFieldMappings(self):
+        """Set up the default field mappings based on the import and target field names."""
+
+        for targetName in self.targetFieldNames:
+            importName = next((n for n in self.importFieldNames if n == targetName), None)  # TODO fix case-insensitive
+
+            if importName:
+                self[importName] = targetName
 
     def __setitem__(self, __key, __value) -> None:
         """Set the mapping for the given Field."""

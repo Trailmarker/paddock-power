@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>472</width>
-    <height>171</height>
+    <width>738</width>
+    <height>227</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,98 @@
   <property name="modal">
    <bool>false</bool>
   </property>
-  <layout class="QGridLayout" name="grid" columnstretch="0,0,0">
+  <layout class="QGridLayout" name="grid" columnstretch="0,3,0">
+   <item row="0" column="0">
+    <widget class="QLabel" name="importLayerLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string notr="true">Import features from</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="2">
+    <widget class="QgsMapLayerComboBox" name="importLayerComboBox">
+     <property name="toolTip">
+      <string>Select a layer from the current QGIS project …</string>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Select layer to import …</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <widget class="QComboBox" name="importAsComboBox"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="importButton">
+     <property name="text">
+      <string>Import features</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="targetLayerLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string notr="true">Import to</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="2" column="0">
     <widget class="QLabel" name="mapFieldsLabel">
      <property name="sizePolicy">
@@ -44,114 +135,60 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="2">
-    <widget class="QgsMapLayerComboBox" name="importLayerComboBox">
-     <property name="toolTip">
-      <string>Select a layer from the current QGIS project …</string>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <property name="placeholderText">
-      <string>Select layer to import …</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1" colspan="2">
-    <layout class="QGridLayout" name="mapFieldsGrid">
+    <layout class="QGridLayout" name="fieldMapGrid" columnstretch="1,1,0">
+     <item row="2" column="0">
+      <widget class="QPushButton" name="mapFieldButton">
+       <property name="text">
+        <string>Map another field</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="unmapFieldButton">
+       <property name="toolTip">
+        <string>Remove field mapping …</string>
+       </property>
+       <property name="text">
+        <string>Remove</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
-      <widget class="QgsFieldComboBox" name="sourceFieldComboBox">
+      <widget class="QgsFieldComboBox" name="importLayerFieldComboBox">
        <property name="placeholderText">
         <string>Select source field …</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="targetFieldText">
+      <widget class="QgsFieldComboBox" name="targetLayerFieldComboBox">
+       <property name="placeholderText">
+        <string>Select Paddock Power field …</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="importLayerFieldLabel">
        <property name="text">
-        <string>Target Field (dim)</string>
+        <string>From</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="targetLayerFieldLabel">
+       <property name="text">
+        <string>To</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="importButton">
-     <property name="text">
-      <string>Validate and import</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="importLayerLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string notr="true">Import from</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="importAsLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string notr="true">Import as</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QComboBox" name="importAsComboBox"/>
    </item>
   </layout>
  </widget>
