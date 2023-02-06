@@ -9,7 +9,7 @@ from .popup_layer_source_mixin import PopupLayerSourceMixin
 
 class MetricPaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
 
-    LAYER_NAME = "Metric Paddocks"
+    LAYER_NAME = "Paddocks"
     STYLE = "paddock"
 
     @classmethod

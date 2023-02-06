@@ -6,7 +6,7 @@ from .status_feature_layer_mixin import StatusFeatureLayerMixin
 
 class PaddockLayer(ImportedFeatureLayer, StatusFeatureLayerMixin):
 
-    LAYER_NAME = "Paddocks"
+    LAYER_NAME = "Paddock Features"
     STYLE = "paddock"
 
     @classmethod
