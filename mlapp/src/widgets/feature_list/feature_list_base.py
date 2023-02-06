@@ -37,6 +37,15 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
         """Get the Features."""
         raise NotImplementedError("getFeatures() must be implemented in a subclass")
 
+    def sortFeatures(self, features):
+        """Sort the Features."""
+        features.sort(key=lambda x: x.NAME)
+        return features
+
+    def deduplicateFeatures(self, features):
+        """De-duplicate the Features. May be necessary to provide this for some FeatureLayerList subclasses."""
+        return features
+
     def refreshUi(self):
         """Show the Feature List."""
 
@@ -48,8 +57,11 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
         features = self.getFeatures()
 
+        # De-duplicate Features
+        features = self.deduplicateFeatures(features)
+
         # Sort Features alphabetically
-        features.sort(key=lambda x: x.NAME)
+        features = self.sortFeatures(features)
 
         # Repopulate list since we have Features
         for feature in features:

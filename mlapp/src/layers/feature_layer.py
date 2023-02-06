@@ -94,6 +94,13 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
             feature = self.wrapFeature(feature)
             yield feature
 
+    def getFeatures(self, request=None):
+        """Get the features in this layer."""
+        if request is None:
+            return self._wrapFeatures(super().getFeatures())
+
+        return self._wrapFeatures(super().getFeatures(request))
+
     def getFeaturesByTimeframe(self, timeframe, request=None):
         """Get the features in this layer that are in the current timeframe."""
         features = self.getFeatures(request)
@@ -114,13 +121,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def getFeatureFromSelection(self, selectionId):
         """Convenience function as in rare cases this has to behave differently."""
         return self.getFeature(selectionId)
-
-    def getFeatures(self, request=None):
-        """Get the features in this layer."""
-        if request is None:
-            return self._wrapFeatures(super().getFeatures())
-
-        return self._wrapFeatures(super().getFeatures(request))
 
     def countFeatures(self):
         """Get the number of Features in the layer."""
