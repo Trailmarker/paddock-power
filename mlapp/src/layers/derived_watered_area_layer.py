@@ -15,7 +15,7 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
         return WateredArea
 
     def prepareQuery(self, query, *dependentLayers):
-        [paddockLayer, waterpointBufferLayer] = self.names(*dependentLayers)
+        [basePaddockLayer, waterpointBufferLayer] = self.names(*dependentLayers)
 
         _NEAR_WATERED_AREA = "NearWateredArea"
         _FAR_WATERED_AREA = "FarWateredArea"
@@ -61,52 +61,52 @@ inner join {_NEAR_WATERED_AREA}
 union
 select
 	0 as {FID},
-	st_multi(st_difference({paddockLayer}.geometry, {_FAR_WATERED_AREA}.geometry)) as geometry,
+	st_multi(st_difference("{basePaddockLayer}".geometry, {_FAR_WATERED_AREA}.geometry)) as geometry,
 	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
 	{_FAR_WATERED_AREA}.{TIMEFRAME},
 	{_FAR_WATERED_AREA}.{PADDOCK}
-from "{paddockLayer}"
+from "{basePaddockLayer}"
 inner join {_FAR_WATERED_AREA}
-	on "{paddockLayer}".{FID} = {_FAR_WATERED_AREA}.{PADDOCK}
-	and st_difference({paddockLayer}.geometry, {_FAR_WATERED_AREA}.geometry) is not null
-	and st_area(st_difference({paddockLayer}.geometry, {_FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
-	and {Timeframe.timeframesIncludeStatuses(f'"{_FAR_WATERED_AREA}"."{TIMEFRAME}"', f'"{paddockLayer}"."{STATUS}"')}
+	on "{basePaddockLayer}".{FID} = {_FAR_WATERED_AREA}.{PADDOCK}
+	and st_difference("{basePaddockLayer}".geometry, {_FAR_WATERED_AREA}.geometry) is not null
+	and st_area(st_difference("{basePaddockLayer}".geometry, {_FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+	and {Timeframe.timeframesIncludeStatuses(f'"{_FAR_WATERED_AREA}"."{TIMEFRAME}"', f'"{basePaddockLayer}"."{STATUS}"')}
 union
 select
 	0 as {FID},
-	st_multi({paddockLayer}.geometry) as geometry,
+	st_multi("{basePaddockLayer}".geometry) as geometry,
 	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
 	'{Timeframe.Current.name}' as {TIMEFRAME},
-	"{paddockLayer}".{FID} as {PADDOCK}
-from "{paddockLayer}" left join "{waterpointBufferLayer}"
+	"{basePaddockLayer}".{FID} as {PADDOCK}
+from "{basePaddockLayer}" left join "{waterpointBufferLayer}"
 where not exists (
 	select 1
 	from "{waterpointBufferLayer}"
-	where "{waterpointBufferLayer}".{PADDOCK} = "{paddockLayer}".{FID}
-	and {Timeframe.Current.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{paddockLayer}".{STATUS}')})
+	where "{waterpointBufferLayer}".{PADDOCK} = "{basePaddockLayer}".{FID}
+	and {Timeframe.Current.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')})
 union
 select
 	0 as {FID},
-	st_multi({paddockLayer}.geometry) as geometry,
+	st_multi("{basePaddockLayer}".geometry) as geometry,
 	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
 	'{Timeframe.Future.name}' as {TIMEFRAME},
-	"{paddockLayer}".{FID} as {PADDOCK}
-from "{paddockLayer}" left join "{waterpointBufferLayer}"
+	"{basePaddockLayer}".{FID} as {PADDOCK}
+from "{basePaddockLayer}" left join "{waterpointBufferLayer}"
 where not exists (
 	select 1
 	from "{waterpointBufferLayer}"
-	where "{waterpointBufferLayer}".{PADDOCK} = "{paddockLayer}".{FID}
-	and {Timeframe.Future.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{paddockLayer}".{STATUS}')})
+	where "{waterpointBufferLayer}".{PADDOCK} = "{basePaddockLayer}".{FID}
+	and {Timeframe.Future.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')})
 
 """
         return super().prepareQuery(query, *dependentLayers)
 
     def __init__(self,
-                 paddockLayer,
+                 basePaddockLayer,
                  waterpointBufferLayer):
 
         super().__init__(
             DerivedWateredAreaLayer.defaultName(),
             DerivedWateredAreaLayer.defaultStyle(),
-            paddockLayer,
+            basePaddockLayer,
             waterpointBufferLayer)

@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
+from ..utils import PLUGIN_NAME
 from .features import Paddock
-from .imported_feature_layer import ImportedFeatureLayer
-from .status_feature_layer_mixin import StatusFeatureLayerMixin
+from .derived_metric_paddock_layer import DerivedMetricPaddockLayer
+from .paddock_land_types_popup_layer import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
+from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
+from .popup_layer_source_mixin import PopupLayerSourceMixin
 
 
-class PaddockLayer(ImportedFeatureLayer, StatusFeatureLayerMixin):
+class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
 
-    LAYER_NAME = "Paddock Features"
+    LAYER_NAME = "Paddocks"
     STYLE = "paddock"
 
     @classmethod
@@ -14,9 +17,21 @@ class PaddockLayer(ImportedFeatureLayer, StatusFeatureLayerMixin):
         return Paddock
 
     def __init__(self,
-                 workspaceFile):
-        """Create or open a Paddock layer."""
+                 workspaceFile,
+                 *dependentLayers):
+        f"""Create a new {PLUGIN_NAME} Paddock Land Types layer."""
 
         super().__init__(workspaceFile,
-                         layerName=PaddockLayer.defaultName(),
-                         styleName=PaddockLayer.defaultStyle())
+                         PaddockLayer.defaultName(),
+                         PaddockLayer.defaultStyle(),
+                         DerivedMetricPaddockLayer,
+                         *dependentLayers)
+
+    @property
+    def popupLayerTypes(self):
+        return [PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer]
+
+    @property
+    def relativeLayerPosition(self):
+        """Makes the Paddock Land Types popups appear *over* the Paddock layer."""
+        return -1

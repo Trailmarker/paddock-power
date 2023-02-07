@@ -5,7 +5,7 @@ from .src.layers.fields.field_map import FieldMap
 
 # From QGIS having created a new project and loaded it empty
 
-[landTypeLayer, paddockLayer, pipelineLayer, waterpointLayer] = [workspace().landTypeLayer, workspace().paddockLayer,
+[landTypeLayer, basePaddockLayer, pipelineLayer, waterpointLayer] = [workspace().landTypeLayer, workspace().basePaddockLayer,
                                                                  workspace().pipelineLayer, workspace().waterpointLayer]
 
 kidmanPaddocks = next((l for l in QgsProject.instance().mapLayers().values() if l.name() == "b_Kidman_Paddocks"), None)
@@ -14,7 +14,7 @@ kidmanLandTypes = next((l for l in QgsProject.instance().mapLayers().values()
 kidmanWaterpoints = next((l for l in QgsProject.instance().mapLayers().values()
                          if l.name() == "a_Kidman_Waterpoints"), None)
 
-kidmanPaddockFieldMap = FieldMap(kidmanPaddocks, paddockLayer)
+kidmanPaddockFieldMap = FieldMap(kidmanPaddocks, basePaddockLayer)
 kidmanLandTypeFieldMap = FieldMap(kidmanLandTypes, landTypeLayer)
 kidmanWaterpointFieldMap = FieldMap(kidmanWaterpoints, waterpointLayer)
 
@@ -26,7 +26,7 @@ def testImportKidmanLandTypes():
 
 def testImportKidmanPaddocks():
     kidmanPaddockFieldMap["Name"] = "Name"
-    paddockLayer.importFeatures(kidmanPaddocks, kidmanPaddockFieldMap)
+    basePaddockLayer.importFeatures(kidmanPaddocks, kidmanPaddockFieldMap)
 
 
 def testImportKidmanWaterpoints():

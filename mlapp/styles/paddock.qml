@@ -272,7 +272,10 @@
                 <Option name="Superseded (was Built)" type="QString" value="BuiltSuperseded"/>
               </Option>
               <Option type="Map">
-                <Option name="Archived" type="QString" value="Archived"/>
+                <Option name="Archived (was Planned)" type="QString" value="PlannedArchived"/>
+              </Option>
+              <Option type="Map">
+                <Option name="Archived (was Built)" type="QString" value="BuiltArchived"/>
               </Option>
               <Option type="Map">
                 <Option name="Undefined" type="QString" value="Undefined"/>

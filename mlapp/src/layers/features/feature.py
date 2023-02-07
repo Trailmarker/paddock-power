@@ -57,7 +57,8 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        return f"{self.__class__.__name__}(id()={self.id()},FID={self.FID})"
+        attrs = [f"{f}={self.attribute(f)}" for f in [FID, STATUS, TIMEFRAME] if self.hasField(f)]
+        return f"{type(self).__name__}({', '.join(attrs)})"
 
     def __str__(self):
         """Convert the Feature to a string representation."""
@@ -140,12 +141,19 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
         """Return True if this layer has a status."""
         return self.hasField(STATUS)
 
+    def matchStatus(self, status):
+        """Return True if this feature's status matches the supplied status."""
+        if self.hasStatus:
+            return self.STATUS.name == status.name
+        else:
+            return False
+
     def matchTimeframe(self, timeframe):
         """Return True if this feature's timeframe or status matches the supplied timeframe."""
         if self.hasTimeframe:
+            # TIMEFRAME gets precedence if it is defined
             return timeframe.matchTimeframe(self.TIMEFRAME)
-        if self.hasStatus:
-            # STATUS gets precedence because the results are more interesting
+        elif self.hasStatus:
             return timeframe.matchFeatureStatus(self.STATUS)
         else:
             return False

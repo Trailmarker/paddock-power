@@ -5,6 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QWidget
 
 from ...layers.features import Fence
+from ...layers.fields.feature_status import FeatureStatus
 from ...models import WorkspaceMixin
 from ...utils import qgsDebug
 
@@ -23,8 +24,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS, WorkspaceMixin):
         self.fence = None
         self.setupUi(self)
 
-        self.supersededMetricPaddockMiniList.paddockLayer = self.paddockLayer
-        self.plannedMetricPaddockMiniList.paddockLayer = self.paddockLayer
+        self.affectedPaddockMiniList.basePaddockLayer = self.basePaddockLayer
+        self.resultingPaddockMiniList.basePaddockLayer = self.basePaddockLayer
 
         self.fenceLayer.featureSelected.connect(self.changeSelection)
         self.refreshUi()
@@ -34,8 +35,8 @@ class FencePaddockChanges(QWidget, FORM_CLASS, WorkspaceMixin):
         return self.workspace.fenceLayer
 
     @property
-    def paddockLayer(self):
-        return self.workspace.paddockLayer
+    def basePaddockLayer(self):
+        return self.workspace.basePaddockLayer
 
     def changeSelection(self, layerType):
         qgsDebug("FencePaddockChanges.changeSelection")
@@ -53,12 +54,25 @@ class FencePaddockChanges(QWidget, FORM_CLASS, WorkspaceMixin):
     def refreshUi(self):
         """Show the Paddock View."""
         if self.fence is None:
-            # self.setVisible(False)
-            self.supersededMetricPaddockMiniList.clear()
-            self.plannedMetricPaddockMiniList.clear()
+            self.setVisible(False)
+            self.affectedPaddockMiniList.clear()
+            self.resultingPaddockMiniList.clear()
         else:
-            # self.setVisible(True)
-            supersededPaddocks, plannedPaddocks = self.fence.getCurrentAndFuturePaddocks()
+            self.setVisible(True)
+            affectedPaddocks, resultingPaddocks = self.fence.getRelatedPaddocks()
 
-            self.supersededMetricPaddockMiniList.setFeatures(supersededPaddocks)
-            self.plannedMetricPaddockMiniList.setFeatures(plannedPaddocks)
+            if self.fence.matchStatus(FeatureStatus.Drafted):
+                self.affectedPaddockGroupBox.setTitle("Crossed Paddocks")
+                self.resultingPaddockGroupBox.setTitle("New Paddocks")
+            elif self.fence.matchStatus(FeatureStatus.Planned):
+                self.affectedPaddockGroupBox.setTitle("Superseded Paddocks")
+                self.resultingPaddockGroupBox.setTitle("Planned Paddocks")
+            elif self.fence.matchStatus(FeatureStatus.Built):
+                self.affectedPaddockGroupBox.setTitle("Archived Paddocks")
+                self.resultingPaddockGroupBox.setTitle("Built Paddocks")
+
+            # Hide these Paddock group boxes if there's no content
+            self.affectedPaddockGroupBox.setVisible(bool(affectedPaddocks))
+            self.resultingPaddockGroupBox.setVisible(bool(resultingPaddocks))
+            self.affectedPaddockMiniList.setFeatures(affectedPaddocks)
+            self.resultingPaddockMiniList.setFeatures(resultingPaddocks)

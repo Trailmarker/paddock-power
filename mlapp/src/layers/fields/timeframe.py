@@ -45,9 +45,9 @@ class Timeframe(FieldDomain):
         elif Timeframe[self.name] == Timeframe.Future:
             return [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
         elif Timeframe[self.name] == Timeframe.Historical:
-            return [FeatureStatus.Archived]
+            return [FeatureStatus.BuiltArchived]
         elif Timeframe[self.name] == Timeframe.Undefined:
-            return [FeatureStatus.PlannedSuperseded, FeatureStatus.Undefined]
+            return [FeatureStatus.PlannedSuperseded, FeatureStatus.PlannedArchived, FeatureStatus.Undefined]
         elif Timeframe[self.name] == Timeframe.Drafted:
             return [FeatureStatus.Drafted]
 

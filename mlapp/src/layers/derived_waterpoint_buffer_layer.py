@@ -15,7 +15,7 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
         return WaterpointBuffer
 
     def prepareQuery(self, query, *dependentLayers):
-        [paddockLayer, waterpointLayer] = self.names(*dependentLayers)
+        [basePaddockLayer, waterpointLayer] = self.names(*dependentLayers)
 
         _BUFFERS = "Buffers"
         _FAR_BUFFER = "FarBuffer"
@@ -26,25 +26,25 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
         query = f"""
 with {_IN_PADDOCKS} as
     (select
-        "{paddockLayer}".geometry,
-        "{paddockLayer}".{FID} as "{PADDOCK}",
+        "{basePaddockLayer}".geometry,
+        "{basePaddockLayer}".{FID} as "{PADDOCK}",
         "{waterpointLayer}".{FID} as "{WATERPOINT}",
         '{Timeframe.Current.name}' as "{TIMEFRAME}"
 	 from "{waterpointLayer}"
-	 inner join "{paddockLayer}"
-     on {Timeframe.Current.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{paddockLayer}"."{STATUS}"')}
-	 and st_contains("{paddockLayer}".geometry, "{waterpointLayer}".geometry)
+	 inner join "{basePaddockLayer}"
+     on {Timeframe.Current.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{basePaddockLayer}"."{STATUS}"')}
+	 and st_contains("{basePaddockLayer}".geometry, "{waterpointLayer}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
      union
      select
-        "{paddockLayer}".geometry,
-        "{paddockLayer}".{FID} as "{PADDOCK}",
+        "{basePaddockLayer}".geometry,
+        "{basePaddockLayer}".{FID} as "{PADDOCK}",
         "{waterpointLayer}".{FID} as "{WATERPOINT}",
         '{Timeframe.Future.name}' as "{TIMEFRAME}"
 	 from "{waterpointLayer}"
-	 inner join "{paddockLayer}"
-     on {Timeframe.Future.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{paddockLayer}"."{STATUS}"')}
-	 and st_contains("{paddockLayer}".geometry, "{waterpointLayer}".geometry)
+	 inner join "{basePaddockLayer}"
+     on {Timeframe.Future.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{basePaddockLayer}"."{STATUS}"')}
+	 and st_contains("{basePaddockLayer}".geometry, "{waterpointLayer}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
      ),
 {_RENAMED_WATERPOINTS} as
@@ -91,11 +91,11 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
         return super().prepareQuery(query, *dependentLayers)
 
     def __init__(self,
-                 paddockLayer,
+                 basePaddockLayer,
                  waterpointLayer):
 
         super().__init__(
             DerivedWaterpointBufferLayer.defaultName(),
             DerivedWaterpointBufferLayer.defaultStyle(),
-            paddockLayer,
+            basePaddockLayer,
             waterpointLayer)

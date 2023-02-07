@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from qgis.core import QgsVectorLayer
 
 from ...models import Glitch
-from ...utils import qgsInfo
+from ...utils import qgsException, qgsInfo
 from ..interfaces import IPersistedFeature, IFeatureLayer
 
 
@@ -54,6 +54,7 @@ class Edits:
                 layer.commitChanges()
         except Exception as e:
             qgsInfo("Edits.editAndCommit: Exception raised, rolling back edits")
+            qgsException()
             for layer in layers:
                 layer.rollBack()
             raise e

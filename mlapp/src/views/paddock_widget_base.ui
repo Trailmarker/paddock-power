@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>826</width>
-    <height>307</height>
+    <width>886</width>
+    <height>327</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -16,12 +22,18 @@
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1">
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QGroupBox" name="paddockListGroupBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -43,7 +55,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="MetricPaddockLayerList" name="paddockList"/>
+        <widget class="PaddockLayerList" name="paddockList"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -83,7 +95,7 @@
      </widget>
      <widget class="QGroupBox" name="currentPaddockLandTypeListGroupBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -111,7 +123,7 @@
      </widget>
      <widget class="QGroupBox" name="futurePaddockLandTypeListGroupBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -151,9 +163,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MetricPaddockLayerList</class>
+   <class>PaddockLayerList</class>
    <extends>QListView</extends>
-   <header>mlapp/src/widgets/feature_list/metric_paddock_layer_list</header>
+   <header>mlapp/src/widgets/feature_list/paddock_layer_list</header>
   </customwidget>
   <customwidget>
    <class>CurrentPaddockLandTypesLayerList</class>

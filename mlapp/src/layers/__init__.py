@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .base_paddock_layer import BasePaddockLayer
 from .boundary_layer import BoundaryLayer
 from .derived_boundary_layer import DerivedBoundaryLayer
 from .derived_feature_layer import DerivedFeatureLayer
@@ -11,8 +12,6 @@ from .elevation_layer import ElevationLayer
 from .fence_layer import FenceLayer
 from .land_type_condition_table import LandTypeConditionTable
 from .land_type_layer import LandTypeLayer
-from .metric_paddock_land_types_popup_layer import MetricPaddockLandTypesPopupLayer
-from .metric_paddock_layer import MetricPaddockLayer
 from .paddock_land_types_layer import PaddockLandTypesLayer
 from .paddock_layer import PaddockLayer
 from .pipeline_layer import PipelineLayer

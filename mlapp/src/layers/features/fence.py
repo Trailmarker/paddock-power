@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsProject, QgsPointXY, QgsRectangle
 
 from ...models import Glitch
-from ...utils import PLUGIN_NAME
+from ...utils import PLUGIN_NAME, qgsDebug
 from ..fields import BUILD_FENCE, FeatureStatus, Timeframe, FenceSchema
 from .edits import Edits
 from .feature_action import FeatureAction
@@ -21,12 +22,12 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         self._plannedPaddocks = []
 
     @property
-    def paddockLayer(self):
-        return self.featureLayer.workspace.paddockLayer
+    def basePaddockLayer(self):
+        return self.featureLayer.workspace.basePaddockLayer
 
     @property
-    def metricPaddockLayer(self):
-        return self.featureLayer.workspace.metricPaddockLayer
+    def paddockLayer(self):
+        return self.featureLayer.workspace.paddockLayer
 
     @property
     def isInfrastructure(self):
@@ -42,7 +43,8 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def getPropertyGeometry(self, glitchBuffer=1.0):
         """Get the property geometry for this Fence."""
         # Get the whole area around the property
-        # We are only interested in Paddocks that are current
+        # We are only interested in Paddocks that are going to be there if we Plan this Fence (so Future, not Current)
+        # We use the PaddockLayer because it is the reference for Paddock timeframe data
         currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
 
         # Get the whole current Paddock area - note the buffering here to reduce glitches
@@ -52,23 +54,27 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def getPropertyNeighbourhood(self):
         """Get the property neighbourhood around this Fence."""
         # Get the whole area around the property
-        propertyExtent = QgsRectangle(self.paddockLayer.extent())
+        propertyGeometry = self.getPropertyGeometry()
+
+        if not propertyGeometry or propertyGeometry.isEmpty():
+            return None
+        propertyExtent = propertyGeometry.boundingBox()
         propertyExtent.scale(1.5)  # Expand by 50%
         return QgsGeometry.fromRect(propertyExtent)
 
     def getNotPropertyGeometry(self, glitchBuffer=1.0):
         """Get the not property geometry for this Fence."""
         # Get the whole area around the property
-        propertyRegion = self.getPropertyNeighbourhood()
+        propertyNeighbourhood = self.getPropertyNeighbourhood()
         propertyGeometry = self.getPropertyGeometry(glitchBuffer=glitchBuffer)
 
         # Get a representation of everything that's not in the property
-        notPropertyGeometry = propertyRegion.difference(propertyGeometry)
+        notPropertyGeometry = propertyNeighbourhood.difference(propertyGeometry)
         return notPropertyGeometry.buffer(2 * glitchBuffer, 10)
 
     @Glitch.glitchy()
-    def getNewPaddocks(self, geometry=None):
-        """Get the paddocks that are newly enclosed by this Fence, and the normalised outer fence lines."""
+    def getNewBasePaddocks(self, geometry=None):
+        """Get the Base Paddocks that will be newly enclosed by this Fence, and the normalised outer fence lines."""
 
         fenceLine = geometry or self.GEOMETRY
 
@@ -90,7 +96,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         if fenceLine.isMultipart():
             fenceLine = fenceLine.asGeometryCollection()[0]
 
-        newPaddocks = []
+        newBasePaddocks = []
 
         for propertyBoundary in propertyBoundaries:
 
@@ -107,17 +113,17 @@ class Fence(PersistedFeature, StatusFeatureMixin):
                 # The first result is always the piece of notProperty that is carved out? TODO check this
                 if splits:
                     paddockGeometry = notPropertyGeometry.difference(splits[0])
-                    newPaddock = self.paddockLayer.makeFeature()
-                    newPaddock.draftFeature(paddockGeometry, f"Fence {self.BUILD_ORDER} New")
-                    newPaddocks.append(newPaddock)
+                    newBasePaddock = self.basePaddockLayer.makeFeature()
+                    newBasePaddock.draftFeature(paddockGeometry, f"Fence {self.BUILD_ORDER} New")
+                    newBasePaddocks.append(newBasePaddock)
 
         # notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=1.0)
         # fenceLine = fenceLine.intersection(notPropertyGeometry)
 
-        if not newPaddocks or not fenceLine:
+        if not newBasePaddocks or not fenceLine:
             return [], []
         else:
-            return [fenceLine], newPaddocks
+            return [fenceLine], newBasePaddocks
 
     @Glitch.glitchy()
     def getCrossedPaddocks(self, geometry=None):
@@ -129,10 +135,10 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         if not fenceLine or fenceLine.isEmpty():
             return [], []
 
-        # We are only interested in Paddocks that are current
-        currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
+        # We are only interested in Paddocks that are going to be there if we Plan this Fence (so Future, not Current)
+        candidatePaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
 
-        intersects = [p for p in currentPaddocks if fenceLine.intersects(p.GEOMETRY)]
+        intersects = [p for p in candidatePaddocks if fenceLine.intersects(p.GEOMETRY)]
 
         # Crop the fence line to the property
         propertyBoundary = self.getPropertyGeometry(glitchBuffer=1.0)
@@ -164,12 +170,15 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         else:
             return [fenceLine], crossedPaddocks
 
-    def getPaddocks(self):
-        """Get the MetricPaddocks with the specified Build Order."""
-        if self.STATUS == FeatureStatus.Drafted:
-            return []
-            # _, crossedPaddocks = self.getCrossedPaddocks()
-            # return crossedPaddocks, []
+    def getCrossedBasePaddocks(self, geometry=None):
+        """Same as getCrossedPaddocks but returns the crossed Base Paddock features."""
+        fenceLines, crossedPaddocks = self.getCrossedPaddocks(geometry)
+        return fenceLines, [p.getBasePaddock() for p in crossedPaddocks]
+
+    def _getRelatedPaddocks(self, *statuses):
+        """Get the Paddocks with the specified Build Order and group them by STATUS."""
+        if self.matchStatus(FeatureStatus.Drafted):
+            return self.getCrossedPaddocks(), []
 
         if self.BUILD_ORDER <= 0:
             raise Glitch(
@@ -177,15 +186,36 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {self.BUILD_ORDER}')
 
-        return list(self.metricPaddockLayer.getFeatures(request=buildFenceRequest))
+        relatedPaddocks = list(self.paddockLayer.getFeatures(request=buildFenceRequest))
 
-    def getCurrentAndFuturePaddocks(self):
-        """Get the MetricPaddocks with the specified Build Order."""
+        groupedRelatedPaddocks = defaultdict(list)
 
-        metricPaddocks = self.getPaddocks()
+        for feature in relatedPaddocks:
+            for status in statuses:
+                if feature.matchStatus(status):
+                    groupedRelatedPaddocks[status].append(feature)
 
-        return ([feature for feature in metricPaddocks if feature.TIMEFRAME.matchTimeframe(Timeframe.Current)],
-                [feature for feature in metricPaddocks if feature.TIMEFRAME.matchTimeframe(Timeframe.Future)])
+        return tuple(groupedRelatedPaddocks[status] for status in statuses)
+
+    def getRelatedPaddocks(self):
+        """Get the Paddocks for this Fence."""
+        affectedPaddocks, resultingPaddocks = [], []
+        
+        if self.matchStatus(FeatureStatus.Drafted):
+            _, crossedPaddocks = self.getCrossedPaddocks()
+            affectedPaddocks, resultingPaddocks = crossedPaddocks, []
+        elif self.matchStatus(FeatureStatus.Planned):
+            plannedSupersededPaddocks, builtSupersededPaddocks, plannedPaddocks = self._getRelatedPaddocks(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded, FeatureStatus.Planned)
+            affectedPaddocks, resultingPaddocks = (plannedSupersededPaddocks + builtSupersededPaddocks), plannedPaddocks
+        elif self.matchStatus(FeatureStatus.Built):
+            plannedArchivedPaddocks, builtArchivedPaddocks, builtPaddocks = self._getRelatedPaddocks(FeatureStatus.PlannedArchived, FeatureStatus.BuiltSuperseded, FeatureStatus.Planned)
+            affectedPaddocks, resultingPaddocks = (plannedArchivedPaddocks + builtArchivedPaddocks), builtPaddocks
+
+        qgsDebug(f"Affected paddocks = {str([format(p) for p in affectedPaddocks])}")
+        qgsDebug(f"Resulting paddocks = {str([format(p) for p in resultingPaddocks])}")
+
+        return affectedPaddocks, resultingPaddocks
+
 
     @Edits.persistFeatures
     @FeatureAction.draft.handler()
@@ -197,14 +227,14 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         edits = Edits()
 
         # New Paddocks
-        enclosingLines, newPaddocks = self.getNewPaddocks()
+        enclosingLines, newPaddocks = self.getNewBasePaddocks()
 
         # qgsDebug(
         # f"Fence.draftFeature getNewPaddocks {len(enclosingLines)},
         # {len(newPaddocks)}, {[p.NAME for p in newPaddocks]}")
 
         # Split Paddocks
-        splitLines, supersededPaddocks = self.getCrossedPaddocks()
+        splitLines, supersededPaddocks = self.getCrossedBasePaddocks()
 
         # qgsDebug(
         # f"Fence.draftFeature getCrossedPaddocks {len(splitLines)},
@@ -236,7 +266,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         edits = Edits()
 
-        with Edits.editAndRollBack([self.paddockLayer]):
+        with Edits.editAndRollBack([self.basePaddockLayer]):
 
             _, lowestDraftBuildOrder, _ = self.featureLayer.getBuildOrder()
 
@@ -247,23 +277,23 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             if self.BUILD_ORDER <= 0:
                 raise Glitch("Fence must have a positive Build Order to be Planned")
 
-            _, supersededPaddocks = self.getCrossedPaddocks()
+            _, crossedBasePaddocks = self.getCrossedBasePaddocks()
 
             fenceLine = self.GEOMETRY
             polyline = fenceLine.asPolyline()
             points = [QgsPoint(p.x(), p.y()) for p in polyline]
             splitLine = QgsLineString(points)
 
-            self.paddockLayer.splitFeatures(splitLine, False, False)
+            self.basePaddockLayer.splitFeatures(splitLine, False, False)
 
-            currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
+            futurePaddocksAfterSplit = self.basePaddockLayer.getFeaturesByTimeframe(Timeframe.Future)
 
-            for crossedPaddock in supersededPaddocks:
+            for crossedPaddock in crossedBasePaddocks:
                 crossedPaddockName = crossedPaddock.NAME
 
-                # Deep copy all split paddocks
-                splitPaddocks = [self.paddockLayer.copyFeature(f)
-                                 for f in currentPaddocks
+                # Deep copy all split paddocks based on NAME, which is preserved
+                splitPaddocks = [self.basePaddockLayer.copyFeature(f)
+                                 for f in futurePaddocksAfterSplit
                                  if f.NAME == crossedPaddockName]
 
                 for i, splitPaddock in enumerate(splitPaddocks):
@@ -275,21 +305,21 @@ class Fence(PersistedFeature, StatusFeatureMixin):
                     splitPaddock.recalculate()
                     edits.editBefore(splitPaddock.planFeature(self, crossedPaddock))
 
-        _, newPaddocks = self.getNewPaddocks()
+        _, newBasePaddocks = self.getNewBasePaddocks()
 
         # qgsDebug(f"Fence.planFeature: getNewPaddocks {len(newPaddocks)}, {[p.NAME for p in newPaddocks]}")
 
-        for paddock in newPaddocks:
+        for paddock in newBasePaddocks:
             edits.editBefore(paddock.planFeature(self))
 
-        _, supersededPaddocks = self.getCrossedPaddocks()
+        _, crossedBasePaddocks = self.getCrossedBasePaddocks()
 
         # qgsDebug(f"Fence.planFeature: getCrossedPaddocks {len(supersededPaddocks)}, {[p.NAME for p in supersededPaddocks]}")
 
-        for paddock in supersededPaddocks:
+        for paddock in crossedBasePaddocks:
             edits.editBefore(paddock.supersedeFeature(self))
 
-        # self.paddockLayer now rolls back
+        # self.basePaddockLayer now rolls back
         return Edits.upsert(self).editAfter(edits)
 
     @Edits.persistFeatures
@@ -299,16 +329,13 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         edits = Edits()
 
-        supersededPaddocks, plannedPaddocks = self.getCurrentAndFuturePaddocks()
+        supersededPaddocks, plannedPaddocks = self.getRelatedPaddocks()
 
-        # qgsDebug(f"supersededPaddocks = {str(supersededPaddocks)}")
-        # qgsDebug(f"plannedPaddocks = {str(plannedPaddocks)}")
+        for paddock in supersededPaddocks:
+            edits = edits.editBefore(paddock.undoSupersedeFeature())
 
-        for metricPaddock in supersededPaddocks:
-            edits = edits.editBefore(metricPaddock.undoSupersedeFeature())
-
-        for metricPaddock in plannedPaddocks:
-            edits = edits.editBefore(metricPaddock.undoPlanFeature())
+        for paddock in plannedPaddocks:
+            edits = edits.editBefore(paddock.undoPlanFeature())
 
         return Edits.upsert(self).editAfter(edits)
 
@@ -319,13 +346,13 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         edits = Edits()
 
-        supersededPaddocks, plannedPaddocks = self.getCurrentAndFuturePaddocks()
+        supersededPaddocks, plannedPaddocks = self.getRelatedPaddocks()
 
-        for metricPaddock in supersededPaddocks:
-            edits = edits.editBefore(metricPaddock.archiveFeature())
+        for paddock in supersededPaddocks:
+            edits = edits.editBefore(paddock.archiveFeature())
 
-        for metricPaddock in plannedPaddocks:
-            edits = edits.editBefore(metricPaddock.buildFeature())
+        for paddock in plannedPaddocks:
+            edits = edits.editBefore(paddock.buildFeature())
 
         return Edits.upsert(self).editAfter(edits)
 
@@ -336,15 +363,12 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         edits = Edits()
 
-        paddocks = self.getPaddocks()
+        archivedPaddocks, builtPaddocks = self.getRelatedPaddocks()
 
-        builtPaddocks = [p for p in paddocks if p.STATUS.name == FeatureStatus.Built.name]
-        archivedPaddocks = [p for p in paddocks if p.STATUS.name == FeatureStatus.Archived.name]
+        for paddock in archivedPaddocks:
+            edits = edits.editBefore(paddock.undoArchiveFeature())
 
-        for metricPaddock in builtPaddocks:
-            edits = edits.editBefore(metricPaddock.undoBuildFeature())
-
-        for metricPaddock in archivedPaddocks:
-            edits = edits.editBefore(metricPaddock.undoArchiveFeature())
+        for paddock in builtPaddocks:
+            edits = edits.editBefore(paddock.undoBuildFeature())
 
         return Edits.upsert(self).editAfter(edits)

@@ -27,12 +27,12 @@ def fillRendererCategory(status, colour, outline=None, enabled=True):
 def lineStatusCategoryRenderer(enabled=True):
     categories = [lineRendererCategory(status, status.toColour(),
                                        outline=(0, 0, 0), enabled=enabled)
-                  for status in FeatureStatus if not status.match(FeatureStatus.Archived, FeatureStatus.Undefined)]
+                  for status in FeatureStatus if not status.match(FeatureStatus.PlannedArchived, FeatureStatus.BuiltArchived, FeatureStatus.Undefined)]
     return QgsCategorizedSymbolRenderer(attrName='Status', categories=categories)
 
 
 def fillStatusCategoryRenderer(enabled=True):
     categories = [fillRendererCategory(status, status.toColour(),
                                        outline=(0, 0, 0), enabled=enabled)
-                  for status in FeatureStatus if not status.match(FeatureStatus.Archived, FeatureStatus.Undefined)]
+                  for status in FeatureStatus if not status.match(FeatureStatus.PlannedArchived, FeatureStatus.BuiltArchived, FeatureStatus.Undefined)]
     return QgsCategorizedSymbolRenderer(attrName='Status', categories=categories)

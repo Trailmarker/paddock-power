@@ -17,7 +17,7 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 
     def prepareQuery(self, query, *dependentLayers):
 
-        [landTypeConditionTable, paddockLayer, landTypeLayer, wateredAreaLayer] = self.names(*dependentLayers)
+        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.names(*dependentLayers)
 
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
@@ -27,14 +27,14 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 with {_PADDOCK_WATERED_AREAS} as
 	(select
 		"{wateredAreaLayer}".geometry as geometry,
-		"{paddockLayer}".{FID} as {PADDOCK},
-		"{paddockLayer}".{NAME},
+		"{basePaddockLayer}".{FID} as {PADDOCK},
+		"{basePaddockLayer}".{NAME},
 		"{wateredAreaLayer}"."{WATERED_TYPE}",
 		"{wateredAreaLayer}".{TIMEFRAME}
-	from "{paddockLayer}"
+	from "{basePaddockLayer}"
 	inner join "{wateredAreaLayer}"
-		on "{paddockLayer}".{FID} = "{wateredAreaLayer}".{PADDOCK}
-		and {Timeframe.timeframesIncludeStatuses(f'"{wateredAreaLayer}".{TIMEFRAME}', f'"{paddockLayer}".{STATUS}')}
+		on "{basePaddockLayer}".{FID} = "{wateredAreaLayer}".{PADDOCK}
+		and {Timeframe.timeframesIncludeStatuses(f'"{wateredAreaLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')}
 	),
 {_PADDOCK_LAND_TYPES} as
 	(select
@@ -109,13 +109,13 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 
     def __init__(self,
                  landTypeConditionTable,
-                 paddockLayer,
+                 basePaddockLayer,
                  landTypeLayer,
                  wateredAraLayer):
 
         super().__init__(DerivedPaddockLandTypesLayer.defaultName(),
                          DerivedPaddockLandTypesLayer.defaultStyle(),
                          landTypeConditionTable,
-                         paddockLayer,
+                         basePaddockLayer,
                          landTypeLayer,
                          wateredAraLayer)

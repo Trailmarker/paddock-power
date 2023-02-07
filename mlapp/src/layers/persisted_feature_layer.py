@@ -123,10 +123,9 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
 
     def copyFeature(self, feature):
         """Copy a feature using the logic (eg dependent layers) of this layer."""
-        if not isinstance(feature, self.getFeatureType()):
+        if not self.getSchema().containsSchema(feature.getSchema()):
             raise Glitch(
-                f"You can't use a {type(self).__name__} to copy an object that isn't a {self.getFeatureType().__name__}")
-
+                f"{type(self).__name__}.copyFeature({feature}): {type(self).__name__}.getSchema().containsSchema({type(feature).__name__}.getSchema()) is False")
         copyFeature = self.wrapFeature(feature)
 
         for f in feature.getSchema():

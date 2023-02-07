@@ -22,24 +22,24 @@ class FeatureStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
 
         (FeatureStatus.Drafted, FeatureAction.trash): FeatureStatus.Undefined,
         (FeatureStatus.Drafted, FeatureAction.plan): FeatureStatus.Planned,
-        (FeatureStatus.Drafted, FeatureAction.archive): FeatureStatus.Archived,
 
         (FeatureStatus.Planned, FeatureAction.undoPlan): FeatureStatus.Drafted,
         (FeatureStatus.Planned, FeatureAction.build): FeatureStatus.Built,
         (FeatureStatus.Planned, FeatureAction.supersede): FeatureStatus.PlannedSuperseded,
-        (FeatureStatus.Planned, FeatureAction.archive): FeatureStatus.Archived,
+        (FeatureStatus.Planned, FeatureAction.archive): FeatureStatus.PlannedArchived,
 
         (FeatureStatus.Built, FeatureAction.undoBuild): FeatureStatus.Planned,
         (FeatureStatus.Built, FeatureAction.supersede): FeatureStatus.BuiltSuperseded,
-        (FeatureStatus.Built, FeatureAction.archive): FeatureStatus.Archived,
+        (FeatureStatus.Built, FeatureAction.archive): FeatureStatus.BuiltArchived,
 
         (FeatureStatus.PlannedSuperseded, FeatureAction.undoSupersede): FeatureStatus.Planned,
-        (FeatureStatus.PlannedSuperseded, FeatureAction.archive): FeatureStatus.Archived,
+        (FeatureStatus.PlannedSuperseded, FeatureAction.archive): FeatureStatus.PlannedArchived,
 
         (FeatureStatus.BuiltSuperseded, FeatureAction.undoSupersede): FeatureStatus.Built,
-        (FeatureStatus.BuiltSuperseded, FeatureAction.archive): FeatureStatus.Archived,
+        (FeatureStatus.BuiltSuperseded, FeatureAction.archive): FeatureStatus.BuiltArchived,
         
-        (FeatureStatus.Archived, FeatureAction.undoArchive): FeatureStatus.Built,
+        (FeatureStatus.PlannedArchived, FeatureAction.undoArchive): FeatureStatus.Planned,
+        (FeatureStatus.BuiltArchived, FeatureAction.undoArchive): FeatureStatus.Built,
     }
 
     def doAction(self, action):

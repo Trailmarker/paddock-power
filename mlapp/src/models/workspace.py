@@ -6,8 +6,8 @@ from qgis.core import QgsApplication, QgsProject, QgsTask
 from ..layers.fields import Timeframe
 from ..layers.interfaces import IFeatureLayer
 from ..layers.tasks import AnalyseWorkspaceTask, DeriveFeaturesTask, RecalculateFeaturesTask
-from ..layers import (LandTypeConditionTable, BoundaryLayer, MetricPaddockLayer,
-                      ElevationLayer, FenceLayer, LandTypeLayer, PaddockLandTypesLayer, PaddockLayer,
+from ..layers import (LandTypeConditionTable, BoundaryLayer, PaddockLayer,
+                      ElevationLayer, FenceLayer, LandTypeLayer, PaddockLandTypesLayer, BasePaddockLayer,
                       PipelineLayer, WateredAreaLayer, WaterpointBufferLayer, WaterpointLayer)
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo, qgsDebug
@@ -53,35 +53,35 @@ class Workspace(QObject):
         self.elevationLayer = ElevationLayer(
             self.workspaceFile)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.elevationLayer.name()} loaded …")
-        self.paddockLayer = PaddockLayer(
+        self.basePaddockLayer = BasePaddockLayer(
             self.workspaceFile)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.paddockLayer.name()} loaded …")
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.basePaddockLayer.name()} loaded …")
         self.waterpointLayer = WaterpointLayer(
             self.workspaceFile,
             self.elevationLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.waterpointLayer.name()} loaded …")
         self.waterpointBufferLayer = WaterpointBufferLayer(
             self.workspaceFile,
-            self.paddockLayer,
+            self.basePaddockLayer,
             self.waterpointLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.waterpointBufferLayer.name()} loaded …")
         self.wateredAreaLayer = WateredAreaLayer(
             self.workspaceFile,
-            self.paddockLayer,
+            self.basePaddockLayer,
             self.waterpointBufferLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.wateredAreaLayer.name()} loaded …")
         self.paddockLandTypesLayer = PaddockLandTypesLayer(
             self.workspaceFile,
             self.landTypeConditionTable,
-            self.paddockLayer,
+            self.basePaddockLayer,
             self.landTypeLayer,
             self.wateredAreaLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.paddockLandTypesLayer.name()} loaded …")
-        self.metricPaddockLayer = MetricPaddockLayer(
+        self.paddockLayer = PaddockLayer(
             self.workspaceFile,
-            self.paddockLayer,
+            self.basePaddockLayer,
             self.paddockLandTypesLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.metricPaddockLayer.name()} loaded …")
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.paddockLayer.name()} loaded …")
         self.fenceLayer = FenceLayer(
             self.workspaceFile)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.fenceLayer.name()} loaded …")
@@ -90,18 +90,18 @@ class Workspace(QObject):
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.pipelineLayer.name()} loaded …")
         self.boundaryLayer = BoundaryLayer(
             self.workspaceFile,
-            self.paddockLayer)
+            self.basePaddockLayer)
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {self.boundaryLayer.name()} loaded …")
         self.workspaceLayers = WorkspaceLayers(
             *[self.landTypeLayer,
               self.landTypeConditionTable,
-              self.paddockLayer,
+              self.basePaddockLayer,
               self.elevationLayer,
               self.waterpointLayer,
               self.waterpointBufferLayer,
               self.wateredAreaLayer,
               self.paddockLandTypesLayer,
-              self.metricPaddockLayer,
+              self.paddockLayer,
               self.fenceLayer,
               self.pipelineLayer,
               self.boundaryLayer])
@@ -137,7 +137,7 @@ class Workspace(QObject):
             WateredAreaLayer,
             LandTypeLayer,
             BoundaryLayer,
-            MetricPaddockLayer,
+            PaddockLayer,
             ElevationLayer]
         availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in layerStackingOrder] if l]
 

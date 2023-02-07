@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from urllib.parse import quote
 
+from ..utils import qgsError
 from .feature_layer import FeatureLayer
 from .interfaces import IDerivedFeatureLayer, IPersistedLayer
 
@@ -13,6 +14,10 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
         virtualSource = self._makeDerivedFeatureLayerSource(*dependentLayers)
 
         super().__init__(virtualSource, layerName, "virtual", styleName)
+        
+        if not self.isValid():
+            # No exception raised here because it will interrupt lots of other things
+            qgsError(f"{self}.__init__(…): not self.isValid(), check the layer source: {virtualSource}")
 
         # Apply editor widgets and other Field-specific layer setup
         # for field in self.getSchema():

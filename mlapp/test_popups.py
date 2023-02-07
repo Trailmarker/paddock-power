@@ -2,20 +2,20 @@
 from .dev import *
 
 
-def testMetricPaddocks():
-    p = first(metricPaddockLayer)
+def testPaddocks():
+    p = first(paddockLayer)
 
-    assert isinstance(p, MetricPaddock)
+    assert isinstance(p, Paddock)
 
-    q = first(metricPaddockLayer.getFeaturesInCurrentTimeframe())
+    q = first(paddockLayer.getFeaturesInCurrentTimeframe())
 
-    metricPaddockLayer.selectFeature(q)
+    paddockLayer.selectFeature(q)
 
-    # p.addPopupLayer(MetricPaddockCurrentLandTypesPopupLayer)
-    # p.addPopupLayer(MetricPaddockFutureLandTypesPopupLayer)
+    # p.addPopupLayer(PaddockCurrentLandTypesPopupLayer)
+    # p.addPopupLayer(PaddockFutureLandTypesPopupLayer)
 
-    # p.removePopupLayer(MetricPaddockCurrentLandTypesPopupLayer)
-    # p.removePopupLayer(MetricPaddockFutureLandTypesPopupLayer)
+    # p.removePopupLayer(PaddockCurrentLandTypesPopupLayer)
+    # p.removePopupLayer(PaddockFutureLandTypesPopupLayer)
 
     # for layerType in p.popupLayerTypes:
     #     p.addPopupLayer(layerType)

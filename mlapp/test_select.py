@@ -4,18 +4,18 @@ from mlapp.src.layers.waterpoint_layer import WaterpointLayer
 
 
 def testSelectChange():
-    f = first(metricPaddockLayer)
+    f = first(paddockLayer)
 
     paddocks = [f]
 
     for p in paddocks:
-        assert isinstance(p, MetricPaddock)
+        assert isinstance(p, Paddock)
 
         workspace().featureLayerSelected.emit(type(p.featureLayer), p, True)
         workspace().selectFeature(p)
 
     for p in paddocks:
-        metricPaddockLayer.onSelectedFeatureChanged(type(p.featureLayer), p, True)
+        paddockLayer.onSelectedFeatureChanged(type(p.featureLayer), p, True)
 
 
 waterpointList = plugin().featureView.waterpointTab.waterpointList

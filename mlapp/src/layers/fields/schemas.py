@@ -9,7 +9,7 @@ FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid, Name, Status, Length, BuildOrder], wkbType=QgsWkbTypes.LineString)
 LandTypeSchema = Schema([Fid, LandTypeName, Area, Perimeter, OptimalCapacityPerArea, MapUnit, LandscapeClass,
                          ClassDescription, ErosionRisk], wkbType=QgsWkbTypes.MultiPolygon)
-PaddockSchema = Schema([Fid,
+BasePaddockSchema = Schema([Fid,
                         Name,
                         Status,
                         Area,
