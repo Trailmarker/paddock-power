@@ -54,7 +54,7 @@ class StateMachine(IStateMachine):
             self.status = newStatus
             self.emitStateChanged()
         else:
-            qgsInfo(f"{self}: {self.status} → {action} → {newStatus} not permitted")
+            qgsInfo(f"{self}: {self.status} → {action} → ?? not permitted")
             raise Glitch(f"An error happened trying to {action} a {self}")
 
     def __repr__(self):

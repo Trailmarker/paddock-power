@@ -7,7 +7,7 @@ from .status_feature_layer_mixin import StatusFeatureLayerMixin
 class BasePaddockLayer(ImportedFeatureLayer, StatusFeatureLayerMixin):
 
     LAYER_NAME = "Base Paddocks"
-    STYLE = "paddock"
+    STYLE = "base_paddock"
 
     @classmethod
     def getFeatureType(cls):

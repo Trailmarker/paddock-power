@@ -41,17 +41,6 @@ group by "{basePaddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
 """
         return super().prepareQuery(query, *dependentLayers)
 
-    def getFeatureByPaddockId(self, paddockId):
-        """Return a MetricPaddock based on a Paddock FID."""
-        paddockIdRequest = QgsFeatureRequest().setFilterExpression(f'"{PADDOCK}" = {paddockId}')
-        features = [f for f in self.getFeatures(paddockIdRequest)]
-        if not features:
-            return None
-        else:
-            for f in features:
-                if Timeframe[f.timeframe.name] == Timeframe[self.timeframe.name]:
-                    return f
-
     def __init__(self,
                  basePaddockLayer,
                  paddockLandTypesLayer):

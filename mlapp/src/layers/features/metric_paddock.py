@@ -6,6 +6,7 @@ from .base_paddock import BasePaddock
 
 @MetricPaddockSchema.addSchema()
 class MetricPaddock(BasePaddock):
+    """'Augmented' Base Paddock with all Paddock metrics, and a Timeframe."""
 
     def __init__(self, featureLayer, existingFeature=None):
         """Initialise a new Metric Paddock."""
@@ -30,47 +31,38 @@ class MetricPaddock(BasePaddock):
         return self.featureLayer.workspace.paddockLandTypesLayer
 
     # All workflow functions are deferred to the underlying Base Paddock for this MetricPaddock
+    # Note that this means they do not have the @FeatureAction decorators - STATUS is managed by the Base Paddock
     def getBasePaddock(self):
         """Get the Base Paddock that this Metric Paddock is associated with."""
         return self.basePaddockLayer.getFeature(self.PADDOCK)
 
-    @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):
         """Draft a Paddock."""
         return self.getBasePaddock().draftFeature(geometry, name)
 
-    @FeatureAction.trash.handler()
     def trashFeature(self):
         return self.getBasePaddock().trashFeature()
 
-    @FeatureAction.plan.handler()
     def planFeature(self, fence, crossedPaddock=None):
         return self.getBasePaddock().planFeature(fence, crossedPaddock)
 
-    @FeatureAction.undoPlan.handler()
     def undoPlanFeature(self):
         return self.getBasePaddock().undoPlanFeature()
 
-    @FeatureAction.build.handler()
     def buildFeature(self):
         return self.getBasePaddock().buildFeature()
 
-    @FeatureAction.undoBuild.handler()
     def undoBuildFeature(self):
         return self.getBasePaddock().undoBuildFeature()
 
-    @FeatureAction.supersede.handler()
     def supersedeFeature(self, fence):
         return self.getBasePaddock().supersedeFeature(fence)
 
-    @FeatureAction.undoSupersede.handler()
     def undoSupersedeFeature(self):
         return self.getBasePaddock().undoSupersedeFeature()
 
-    @FeatureAction.archive.handler()
     def archiveFeature(self):
         return self.getBasePaddock().archiveFeature()
 
-    @FeatureAction.undoArchive.handler()
     def undoArchiveFeature(self):
         return self.getBasePaddock().undoArchiveFeature()

@@ -36,6 +36,9 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
 
         return self.FID
 
+    # Note FeatureAction decorators are not accompanied by @Edits.persistFeatures(): the Base
+    # Paddock is not persisted directly, but rather through the Paddock that relies on it and 
+    # that reflects its STATUS
     @FeatureAction.draft.handler()
     def draftFeature(self, geometry, name):
         """Draft a Paddock."""
@@ -54,6 +57,14 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
         self.BUILD_FENCE = None
         return Edits.delete(self)
 
+    @FeatureAction.build.handler()
+    def buildFeature(self):
+        return Edits.upsert(self)
+
+    @FeatureAction.undoBuild.handler()
+    def undoBuildFeature(self):
+        return Edits.upsert(self)
+
     @FeatureAction.supersede.handler()
     def supersedeFeature(self, fence):
         self.BUILD_FENCE = fence.BUILD_ORDER
@@ -62,4 +73,12 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
     @FeatureAction.undoSupersede.handler()
     def undoSupersedeFeature(self):
         self.BUILD_FENCE = None
+        return Edits.upsert(self)
+    
+    @FeatureAction.archive.handler()
+    def archiveFeature(self):
+        return Edits.upsert(self)
+
+    @FeatureAction.undoArchive.handler()
+    def undoArchiveFeature(self):
         return Edits.upsert(self)

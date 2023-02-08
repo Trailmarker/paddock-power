@@ -195,7 +195,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
                 if feature.matchStatus(status):
                     groupedRelatedPaddocks[status].append(feature)
 
-        return tuple(groupedRelatedPaddocks[status] for status in statuses)
+        return tuple([groupedRelatedPaddocks[status] for status in statuses])
 
     def getRelatedPaddocks(self):
         """Get the Paddocks for this Fence."""
@@ -208,8 +208,11 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             plannedSupersededPaddocks, builtSupersededPaddocks, plannedPaddocks = self._getRelatedPaddocks(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded, FeatureStatus.Planned)
             affectedPaddocks, resultingPaddocks = (plannedSupersededPaddocks + builtSupersededPaddocks), plannedPaddocks
         elif self.matchStatus(FeatureStatus.Built):
-            plannedArchivedPaddocks, builtArchivedPaddocks, builtPaddocks = self._getRelatedPaddocks(FeatureStatus.PlannedArchived, FeatureStatus.BuiltSuperseded, FeatureStatus.Planned)
+            plannedArchivedPaddocks, builtArchivedPaddocks, builtPaddocks = self._getRelatedPaddocks(FeatureStatus.PlannedArchived, FeatureStatus.BuiltArchived, FeatureStatus.Built)
             affectedPaddocks, resultingPaddocks = (plannedArchivedPaddocks + builtArchivedPaddocks), builtPaddocks
+
+        affectedPaddocks = [p for p in affectedPaddocks if p.matchTimeframe(Timeframe.Current)]
+        resultingPaddocks = [p for p in resultingPaddocks if p.matchTimeframe(Timeframe.Future)]
 
         qgsDebug(f"Affected paddocks = {str([format(p) for p in affectedPaddocks])}")
         qgsDebug(f"Resulting paddocks = {str([format(p) for p in resultingPaddocks])}")
@@ -331,11 +334,11 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         supersededPaddocks, plannedPaddocks = self.getRelatedPaddocks()
 
-        for paddock in supersededPaddocks:
-            edits = edits.editBefore(paddock.undoSupersedeFeature())
+        for supersededPaddock in supersededPaddocks:
+            edits = edits.editBefore(supersededPaddock.undoSupersedeFeature())
 
-        for paddock in plannedPaddocks:
-            edits = edits.editBefore(paddock.undoPlanFeature())
+        for plannedPaddock in plannedPaddocks:
+            edits = edits.editBefore(plannedPaddock.undoPlanFeature())
 
         return Edits.upsert(self).editAfter(edits)
 
@@ -348,13 +351,20 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         supersededPaddocks, plannedPaddocks = self.getRelatedPaddocks()
 
-        for paddock in supersededPaddocks:
-            edits = edits.editBefore(paddock.archiveFeature())
+        for supersededPaddock in supersededPaddocks:
+            edits = edits.editBefore(supersededPaddock.archiveFeature())
 
-        for paddock in plannedPaddocks:
-            edits = edits.editBefore(paddock.buildFeature())
+        # # qgsDebug(f"Fence.buildFeature after archive Paddock processing: {edits.upserts}")
+
+        for plannedPaddock in plannedPaddocks:
+            edits = edits.editBefore(plannedPaddock.buildFeature())
+
+        # # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
         return Edits.upsert(self).editAfter(edits)
+        
+        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
+
 
     @Edits.persistFeatures
     @FeatureAction.undoBuild.handler()
@@ -365,10 +375,10 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         archivedPaddocks, builtPaddocks = self.getRelatedPaddocks()
 
-        for paddock in archivedPaddocks:
-            edits = edits.editBefore(paddock.undoArchiveFeature())
+        for archivedPaddock in archivedPaddocks:
+            edits = edits.editBefore(archivedPaddock.undoArchiveFeature())
 
-        for paddock in builtPaddocks:
-            edits = edits.editBefore(paddock.undoBuildFeature())
+        for builtPaddock in builtPaddocks:
+            edits = edits.editBefore(builtPaddock.undoBuildFeature())
 
         return Edits.upsert(self).editAfter(edits)

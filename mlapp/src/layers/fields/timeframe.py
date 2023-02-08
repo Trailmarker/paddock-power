@@ -6,10 +6,8 @@ from .field_domain import FieldDomain
 
 class Timeframe(FieldDomain):
     f"""The two available timeframes for a {PLUGIN_NAME} workspace."""
-    Historical = "Historical"
     Current = "Current"
     Future = "Future"
-    Drafted = "Drafted"
     Undefined = "Undefined"
 
     def toColour(self):
@@ -18,12 +16,8 @@ class Timeframe(FieldDomain):
             return (215, 195, 163)
         elif Timeframe[self.name] == Timeframe.Future:
             return (163, 195, 215, 100)
-        elif Timeframe[self.name] == Timeframe.Historical:
-            raise NotImplementedError("Historical status not implemented")
         elif Timeframe[self.name] == Timeframe.Undefined:
             raise NotImplementedError("Undefined status not implemented")
-        elif Timeframe[self.name] == Timeframe.Drafted:
-            return (250, 218, 221, 100)
 
     def toForegroundColour(self):
         """Get the foreground colour associated with this status."""
@@ -31,25 +25,18 @@ class Timeframe(FieldDomain):
             return (0, 0, 0)
         elif Timeframe[self.name] == Timeframe.Future:
             return (255, 255, 255)
-        elif Timeframe[self.name] == Timeframe.Historical:
-            raise NotImplementedError("Historical status not implemented")
         elif Timeframe[self.name] == Timeframe.Undefined:
             raise NotImplementedError("Undefined status not implemented")
-        elif Timeframe[self.name] == Timeframe.Drafted:
-            return (0, 0, 0)
 
     def matchingFeatureStatuses(self):
         """Return all Feature Statuses that correspond to this Timeframe."""
         if Timeframe[self.name] == Timeframe.Current:
-            return [FeatureStatus.Built, FeatureStatus.BuiltSuperseded]
+            return [FeatureStatus.Built, FeatureStatus.BuiltSuperseded, FeatureStatus.PlannedSuperseded,
+                    FeatureStatus.BuiltArchived, FeatureStatus.PlannedArchived]
         elif Timeframe[self.name] == Timeframe.Future:
             return [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
-        elif Timeframe[self.name] == Timeframe.Historical:
-            return [FeatureStatus.BuiltArchived]
         elif Timeframe[self.name] == Timeframe.Undefined:
             return [FeatureStatus.PlannedSuperseded, FeatureStatus.PlannedArchived, FeatureStatus.Undefined]
-        elif Timeframe[self.name] == Timeframe.Drafted:
-            return [FeatureStatus.Drafted]
 
     def matchFeatureStatus(self, featureStatus):
         """Check if a Feature Status corresponds to this Timeframe."""
