@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ..fields import FeatureStatus
 from .metric_paddock import MetricPaddock
 
 
@@ -11,4 +12,5 @@ class Paddock(MetricPaddock):
     @property
     def STATUS(self):
         """Get the status of the Base Paddock that this Paddock relies on."""
-        return self.getBasePaddock().STATUS
+        basePaddock = self.getBasePaddock()
+        return basePaddock.STATUS if basePaddock else FeatureStatus.Undefined
