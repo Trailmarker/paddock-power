@@ -26,9 +26,9 @@ class FeatureStatus(StateMachineStatus):
         elif self == FeatureStatus.BuiltSuperseded:
             return (147, 151, 153, 100)
         elif self == FeatureStatus.PlannedArchived:
-            return (255, 255, 255, 100)
+            return (147, 151, 153, 100)
         elif self == FeatureStatus.BuiltArchived:
-            return (255, 255, 255, 100)
+            return (147, 151, 153, 100)
         else:
             raise NotImplementedError("Unknown status not implemented")
 

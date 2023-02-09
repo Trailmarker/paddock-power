@@ -16,7 +16,7 @@ class Pipeline(PersistedFeature, StatusFeatureMixin):
 
     @property
     def TITLE(self):
-        return f"Pipeline ({self.FID})  ({self.LENGTH} km)"
+        return f"{self.NAME} ({self.LENGTH} km)"
 
     @property
     def isInfrastructure(self):

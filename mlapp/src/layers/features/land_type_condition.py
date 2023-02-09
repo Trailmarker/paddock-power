@@ -39,7 +39,7 @@ class LandTypeCondition(IPersistedFeature, WorkspaceMixin):
 
     @property
     def featureLayer(self):
-        return self.workspace.conditionTable
+        return self.workspace.landTypeConditionTable
 
     @property
     def PADDOCK(self):

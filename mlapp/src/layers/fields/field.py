@@ -102,18 +102,29 @@ class Field(QgsField):
         def _getter(feature: QgsFeature):
             val = feature[self.name()]
             if isinstance(val, QVariant):
-                unboxedVal = val.value() if val.convert(QVariant.Double) else None
-                if unboxedVal == "NULL":
+                if val.isNull():
                     return None
+                unboxedVal = val.value() if val.convert(QVariant.Double) else None
+                return float(unboxedVal)
             else:
                 return float(val)
+        return _getter
+
+    def __makeStringGetter(self):
+        """Make a getter for the value of a string-valued field. Handle 'NULL' correctly. Should not be called directly."""
+        def _getter(feature: QgsFeature):
+            val = feature[self.name()]
+            if isinstance(val, QVariant):
+                if val.isNull():
+                    return None
+            return str(val)
         return _getter
 
     def __makeGetter(self):
         if self._domainType is not None:
             return self.__makeFieldDomainGetter()
         elif self.typeName() == "String":
-            return lambda feature: str(feature[self.name()])
+            return self.__makeStringGetter()
         elif self.typeName() == "Real":
             return self.__makeRealGetter()
         else:

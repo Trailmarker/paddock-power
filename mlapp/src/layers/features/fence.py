@@ -22,17 +22,21 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         self._plannedPaddocks = []
 
     @property
+    def TITLE(self):
+        return f"{self.NAME} ({self.LENGTH} km)"
+
+    @property
+    def isInfrastructure(self):
+        """Return True for Fence."""
+        return True
+
+    @property
     def basePaddockLayer(self):
         return self.featureLayer.workspace.basePaddockLayer
 
     @property
     def paddockLayer(self):
         return self.featureLayer.workspace.paddockLayer
-
-    @property
-    def isInfrastructure(self):
-        """Return True for Fence."""
-        return True
 
     def profile(self):
         """Return this Fence's profile."""
@@ -200,15 +204,17 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def getRelatedPaddocks(self):
         """Get the Paddocks for this Fence."""
         affectedPaddocks, resultingPaddocks = [], []
-        
+
         if self.matchStatus(FeatureStatus.Drafted):
             _, crossedPaddocks = self.getCrossedPaddocks()
             affectedPaddocks, resultingPaddocks = crossedPaddocks, []
         elif self.matchStatus(FeatureStatus.Planned):
-            plannedSupersededPaddocks, builtSupersededPaddocks, plannedPaddocks = self._getRelatedPaddocks(FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded, FeatureStatus.Planned)
+            plannedSupersededPaddocks, builtSupersededPaddocks, plannedPaddocks = self._getRelatedPaddocks(
+                FeatureStatus.PlannedSuperseded, FeatureStatus.BuiltSuperseded, FeatureStatus.Planned)
             affectedPaddocks, resultingPaddocks = (plannedSupersededPaddocks + builtSupersededPaddocks), plannedPaddocks
         elif self.matchStatus(FeatureStatus.Built):
-            plannedArchivedPaddocks, builtArchivedPaddocks, builtPaddocks = self._getRelatedPaddocks(FeatureStatus.PlannedArchived, FeatureStatus.BuiltArchived, FeatureStatus.Built)
+            plannedArchivedPaddocks, builtArchivedPaddocks, builtPaddocks = self._getRelatedPaddocks(
+                FeatureStatus.PlannedArchived, FeatureStatus.BuiltArchived, FeatureStatus.Built)
             affectedPaddocks, resultingPaddocks = (plannedArchivedPaddocks + builtArchivedPaddocks), builtPaddocks
 
         affectedPaddocks = [p for p in affectedPaddocks if p.matchTimeframe(Timeframe.Current)]
@@ -218,7 +224,6 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         qgsDebug(f"Resulting paddocks = {str([format(p) for p in resultingPaddocks])}")
 
         return affectedPaddocks, resultingPaddocks
-
 
     @Edits.persistFeatures
     @FeatureAction.draft.handler()
@@ -362,9 +367,8 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         # # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
         return Edits.upsert(self).editAfter(edits)
-        
-        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
+        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
     @Edits.persistFeatures
     @FeatureAction.undoBuild.handler()

@@ -55,7 +55,7 @@ class ProfileCanvas(FigureCanvasQTAgg):
         self.axes.fill_between(distances,
                                profile.elevations, yMinimum, alpha=0.5)
 
-        # figure.tight_layout()
+        figure.tight_layout()
 
         super().__init__(figure)
 

@@ -9,6 +9,11 @@ from .status_feature_mixin import StatusFeatureMixin
 @BasePaddockSchema.addSchema()
 class BasePaddock(PersistedFeature, StatusFeatureMixin):
 
+    @classmethod
+    def displayName(cls):
+        """Return the display name of the Base Paddock."""
+        return "Paddock"
+    
     def __init__(self,
                  featureLayer,
                  existingFeature=None):
