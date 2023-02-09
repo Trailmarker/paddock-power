@@ -1,4 +1,4 @@
-<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<?xml version="1.1"?>
 <qgis version="3.22.14-Białowieża" maxScale="0" minScale="1e+08" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0">
   <flags>
     <Identifiable>1</Identifiable>
