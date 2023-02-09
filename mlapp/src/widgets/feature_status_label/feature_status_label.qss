@@ -19,7 +19,7 @@ FeatureStatusLabel.Built {
     color: #000000;
 }
 
-FeatureStatusLabel.PlannedSuperseded, FeatureStatusLabel.BuiltSuperseded {
+FeatureStatusLabel.PlannedSuperseded, FeatureStatusLabel.BuiltSuperseded, FeatureStatusLabel.PlannedArchived, FeatureStatusLabel.BuiltArchived {
     background-color: rgb(147, 151, 153);
     color: #000000;
 }
