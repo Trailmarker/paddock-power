@@ -28,7 +28,7 @@ class PersistedFeature(Feature, IPersistedFeature):
         """Recalculate everything that can be recalculated based on the Feature schema."""
 
         if self.hasName:
-            if not self.NAME:
+            if not self.NAME or self.NAME == "NULL":
                 self.NAME = f"{self.displayName()} {self.FID}"
 
         if self.GEOMETRY:
@@ -78,8 +78,6 @@ class PersistedFeature(Feature, IPersistedFeature):
     def upsert(self):
         """Add or update the PersistedFeature in the PersistedFeatureLayer."""
 
-        # self.recalculate()
-
         if (self.FID >= 0):
             self.featureLayer.updateFeature(self)
             return self.FID
@@ -90,6 +88,11 @@ class PersistedFeature(Feature, IPersistedFeature):
             ((success, [newQf])) = self.featureLayer.dataProvider().addFeatures([qf])
 
             if success:
+                if not newQf.isValid():
+                    raise Glitch(f"{self}.upsert: new feature is not valid")
+                if newQf.id() <= 0:
+                    raise Glitch(f"{self}.upsert: new feature has invalid FID")
+                
                 self.FID = newQf.id()
             else:
                 raise Glitch(f"{self}.upsert: failed with unknown error")

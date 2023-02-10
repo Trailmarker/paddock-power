@@ -163,5 +163,5 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
                 featureProgressCallback(count, featureCount)
 
         # Check again …
-        if cancelledCallback():
+        if cancelledCallback and cancelledCallback():
             return

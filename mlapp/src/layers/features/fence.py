@@ -264,7 +264,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
         self.BUILD_ORDER = currentBuildOrder + 1
-
+        
         return Edits.upsert(self).editBefore(edits)
 
     @Edits.persistFeatures
