@@ -172,7 +172,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     @EditAction.save.handler()
     def saveItem(self):
         # saveFeature returns an Edits …
-        return persistEdits(self.feature, lambda *_: self.saveFeature())
+        return persistEdits(self.feature, lambda *_: self.featureEdit.saveFeature())
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
