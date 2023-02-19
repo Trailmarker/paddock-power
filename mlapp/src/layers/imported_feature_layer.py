@@ -40,7 +40,6 @@ class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
                 self.dataProvider().truncate()
                 features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
                 for feature in features:
-                    feature.recalculate()  # Should now assign a default name
                     feature.upsert()
                 return features
         finally:

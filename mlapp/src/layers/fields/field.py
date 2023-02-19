@@ -135,8 +135,9 @@ class Field(QgsField):
                     return None
                 unboxedVal = val.value() if val.convert(QVariant.Double) else None
                 return float(unboxedVal)
-            else:
-                return float(val)
+            elif val is None:
+                return None
+            return float(val)
         return _getter
 
     def __makeStringGetter(self):
@@ -146,6 +147,8 @@ class Field(QgsField):
             if isinstance(val, QVariant):
                 if val.isNull():
                     return None
+            elif val is None:
+                return None
             return str(val) if val else None
         return _getter
 

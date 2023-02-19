@@ -104,8 +104,8 @@ class PersistedFeature(Feature, IPersistedFeature):
                 if newQf.id() <= 0:
                     raise Glitch(f"{self}.upsert: new feature has invalid FID")
 
+                # On first insert, we calculate the stuff - including a default NAME
                 self.FID = newQf.id()
-                self.setId(self.FID)
                 self.recalculate()
                 self.featureLayer.updateFeature(self)
                 return self.FID
