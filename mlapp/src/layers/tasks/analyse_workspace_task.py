@@ -16,7 +16,6 @@ class AnalyseWorkspaceTask(QgsTask, WorkspaceMixin):
             f"workspace analysis",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
-        self.obsolete = False
         workspace = self.workspace  # WorkspaceMixin
 
         order = workspace.layerDependencyGraph.recalculateOrder()
@@ -43,11 +42,6 @@ class AnalyseWorkspaceTask(QgsTask, WorkspaceMixin):
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
         self.workspace.onTaskCompleted(self, result)
-
-    def cancelObsolete(self):
-        qgsInfo(f"{PLUGIN_NAME} cancelling task: '{self.description()}' because a newer task has been queued.")
-        self.obsolete = True
-        super().cancel()
 
     def cancel(self):
         qgsInfo(f"QGIS cancelling task: '{self.description()}' eg due to quitting or user intervention.")

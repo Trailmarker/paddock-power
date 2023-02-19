@@ -17,11 +17,17 @@ class DerivedBoundaryLayer(DerivedFeatureLayer):
         [basePaddockLayer] = self.names(*dependentLayers)
 
         query = f"""
-select st_union(geometry) as geometry, '{Timeframe.Current.name}' as {TIMEFRAME}, 0 as {FID}
-from "{basePaddockLayer}" where {Timeframe.Current.includesStatuses(f'"{basePaddockLayer}".{STATUS}')}
+select st_union(geometry) as geometry,
+0 as {FID},
+'{Timeframe.Current.name}' as {TIMEFRAME} 
+from "{basePaddockLayer}"
+where {Timeframe.Current.includesStatuses(f'"{basePaddockLayer}".{STATUS}')}
 union
-select st_union(geometry) as geometry, '{Timeframe.Future.name}' as {TIMEFRAME}, 0 as {FID}
-from "{basePaddockLayer}" where {Timeframe.Future.includesStatuses(f'"{basePaddockLayer}".{STATUS}')}
+select st_union(geometry) as geometry,
+0 as {FID},
+'{Timeframe.Future.name}' as {TIMEFRAME}
+from "{basePaddockLayer}"
+where {Timeframe.Future.includesStatuses(f'"{basePaddockLayer}".{STATUS}')}
 """
         return super().prepareQuery(query, *dependentLayers)
 

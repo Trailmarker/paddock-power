@@ -39,32 +39,32 @@ with
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Far.name}'
 	 group by {PADDOCK}, {TIMEFRAME})
 select
-	0 as {FID},
 	st_multi(geometry) as geometry,
-	'{WateredType.Near.name}' as {WATERED_TYPE},
-	{_NEAR_WATERED_AREA}.{TIMEFRAME},
-	{_NEAR_WATERED_AREA}.{PADDOCK}
+	0 as {FID},
+ 	{_NEAR_WATERED_AREA}.{PADDOCK},
+  	'{WateredType.Near.name}' as {WATERED_TYPE},
+	{_NEAR_WATERED_AREA}.{TIMEFRAME}
 from {_NEAR_WATERED_AREA}
 union
 select
-	0 as {FID},
 	st_multi(st_difference({_FAR_WATERED_AREA}.geometry, {_NEAR_WATERED_AREA}.geometry)) as geometry,
-	'{WateredType.Far.name}' as {WATERED_TYPE},
-	{_FAR_WATERED_AREA}.{TIMEFRAME},
-	{_FAR_WATERED_AREA}.{PADDOCK}
+	0 as {FID},
+	{_FAR_WATERED_AREA}.{PADDOCK},
+ 	'{WateredType.Far.name}' as {WATERED_TYPE},
+ 	{_FAR_WATERED_AREA}.{TIMEFRAME}
 from {_FAR_WATERED_AREA}
 inner join {_NEAR_WATERED_AREA}
-	on {_FAR_WATERED_AREA}.{TIMEFRAME} = {_NEAR_WATERED_AREA}.{TIMEFRAME}
-	and {_FAR_WATERED_AREA}.{PADDOCK} = {_NEAR_WATERED_AREA}.{PADDOCK}
+	on {_FAR_WATERED_AREA}.{PADDOCK} = {_NEAR_WATERED_AREA}.{PADDOCK}
+	and {_FAR_WATERED_AREA}.{TIMEFRAME} = {_NEAR_WATERED_AREA}.{TIMEFRAME}
 	and st_difference({_FAR_WATERED_AREA}.geometry, {_NEAR_WATERED_AREA}.geometry) is not null
 	and st_area(st_difference({_FAR_WATERED_AREA}.geometry, {_NEAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 union
 select
-	0 as {FID},
 	st_multi(st_difference("{basePaddockLayer}".geometry, {_FAR_WATERED_AREA}.geometry)) as geometry,
-	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	{_FAR_WATERED_AREA}.{TIMEFRAME},
-	{_FAR_WATERED_AREA}.{PADDOCK}
+	0 as {FID},
+	{_FAR_WATERED_AREA}.{PADDOCK},
+ 	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	{_FAR_WATERED_AREA}.{TIMEFRAME}
 from "{basePaddockLayer}"
 inner join {_FAR_WATERED_AREA}
 	on "{basePaddockLayer}".{FID} = {_FAR_WATERED_AREA}.{PADDOCK}
@@ -73,11 +73,11 @@ inner join {_FAR_WATERED_AREA}
 	and {Timeframe.timeframesIncludeStatuses(f'"{_FAR_WATERED_AREA}"."{TIMEFRAME}"', f'"{basePaddockLayer}"."{STATUS}"')}
 union
 select
-	0 as {FID},
 	st_multi("{basePaddockLayer}".geometry) as geometry,
-	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	'{Timeframe.Current.name}' as {TIMEFRAME},
-	"{basePaddockLayer}".{FID} as {PADDOCK}
+	0 as {FID},
+ 	"{basePaddockLayer}".{FID} as {PADDOCK},
+  	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	'{Timeframe.Current.name}' as {TIMEFRAME}
 from "{basePaddockLayer}" left join "{waterpointBufferLayer}"
 where not exists (
 	select 1
@@ -86,11 +86,11 @@ where not exists (
 	and {Timeframe.Current.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')})
 union
 select
-	0 as {FID},
 	st_multi("{basePaddockLayer}".geometry) as geometry,
-	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	'{Timeframe.Future.name}' as {TIMEFRAME},
-	"{basePaddockLayer}".{FID} as {PADDOCK}
+	0 as {FID},
+ 	"{basePaddockLayer}".{FID} as {PADDOCK},
+  	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	'{Timeframe.Future.name}' as {TIMEFRAME}
 from "{basePaddockLayer}" left join "{waterpointBufferLayer}"
 where not exists (
 	select 1

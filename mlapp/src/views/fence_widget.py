@@ -28,10 +28,6 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.fence = None
         self.setupUi(self)
         
-
-        # self.splitter.setSizes([self.fenceListGroupBox.sizeHint().width(),
-        #                        self.affectedPaddocksGroupBox.sizeHint().width(),
-        #                        self.resultingPaddocksGroupBox.sizeHint().width()])
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, False)

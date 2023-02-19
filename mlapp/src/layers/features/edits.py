@@ -78,27 +78,3 @@ class Edits:
             for layer in layers:
                 layer.rollBack()
             raise e
-
-    @staticmethod
-    def persistFeatures(function):
-        """Decorator that takes a method returning an Edits object of edits to persist,
-        and returns a method that instead persists the edits and returns None."""
-        def callableWithPersistFeatures(*args, **kwargs):
-            # Get the result of the inner function
-            edits = function(*args, **kwargs)
-            qgsInfo(f"Edits.persistFeatures: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
-
-            layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
-            workspace = next(l.workspace for l in layers)
-
-            with Edits.editAndCommit(layers):
-                for feature in edits.upserts:
-                    # feature.recalculate()
-                    feature.upsert()
-                for feature in edits.deletes:
-                    feature.delete()
-
-            allLayers = set(list(layers) + edits.layers)
-            workspace.onFeaturesPersisted([type(l) for l in allLayers])
-
-        return callableWithPersistFeatures

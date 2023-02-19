@@ -42,7 +42,7 @@ class Workspace(QObject):
         self.layerDependencyGraph = LayerDependencyGraph()
 
         self.currentTool = None
-        self.timeframe = Timeframe.Current
+        self.timeframe = Timeframe.Future
 
         self.timeframeChanged.connect(self.deselectLayers)
 
@@ -223,9 +223,7 @@ class Workspace(QObject):
         if showMessage:
             if result:
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} {task.description()} succeeded.")
-            if not result and task.obsolete:
-                guiStatusBarAndInfo(f"{PLUGIN_NAME} {task.description()} was marked obsolete.")
-            if not result and not task.obsolete:
+            else:
                 guiStatusBarAndInfo(
                     f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
 

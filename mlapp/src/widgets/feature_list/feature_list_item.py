@@ -2,9 +2,9 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
+from ...layers.features import FeatureAction, persistEdits
 from ...models import QtAbstractMeta, toStateMachine
-from ...layers.features import Edits, FeatureAction
-from ...utils import PLUGIN_FOLDER, qgsDebug
+from ...utils import PLUGIN_FOLDER
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -53,23 +53,23 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
             self.statusToolBar.addStateAction(
                 FeatureAction.undoPlan,
                 f':/plugins/{PLUGIN_FOLDER}/images/undo-plan-feature.png',
-                lambda _: self.feature.undoPlanFeature())
+                lambda *_: self.feature.undoPlanFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.plan,
                 f':/plugins/{PLUGIN_FOLDER}/images/plan-feature.png',
-                lambda _: self.feature.planFeature())
+                lambda *_: self.feature.planFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.undoBuild,
                 f':/plugins/{PLUGIN_FOLDER}/images/undo-build-feature.png',
-                lambda _: self.feature.undoBuildFeature())
+                lambda *_: self.feature.undoBuildFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.build,
                 f':/plugins/{PLUGIN_FOLDER}/images/build-feature.png',
-                lambda _: self.feature.buildFeature())
+                lambda *_: self.feature.buildFeature())
             self.statusToolBar.addStateAction(
                 FeatureAction.trash,
                 f':/plugins/{PLUGIN_FOLDER}/images/trash-feature.png',
-                lambda _: self.feature.trashFeature())
+                lambda *_: self.feature.trashFeature())
 
             self.collapse.addHeaderWidget(self.statusLabel)
             self.collapse.addHeaderWidget(self.statusToolBar)
@@ -169,11 +169,10 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     def editItem(self):
         self.collapse.setExpanded(True)
 
-    @Edits.persistFeatures
     @EditAction.save.handler()
     def saveItem(self):
         # saveFeature returns an Edits …
-        return self.featureEdit.saveFeature()
+        return persistEdits(self.feature, lambda *_: self.saveFeature())
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):

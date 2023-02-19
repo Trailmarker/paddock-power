@@ -50,8 +50,8 @@ with {_IN_PADDOCKS} as
 {_RENAMED_WATERPOINTS} as
      (select
 	     geometry,
+         {FID},
 		 {STATUS},
-		 {FID},
 		 "{NEAR_GRAZING_RADIUS}" as {_NEAR_BUFFER},
 		 "{FAR_GRAZING_RADIUS}" as {_FAR_BUFFER}
 	  from "{waterpointLayer}"
@@ -61,27 +61,27 @@ with {_IN_PADDOCKS} as
     (select
 		st_buffer(geometry, {_NEAR_BUFFER}) as geometry,
 		{FID} as "{WATERPOINT}",
-        {STATUS},
         '{GrazingRadiusType.Near.name}' as "{GRAZING_RADIUS_TYPE}",
-        {_NEAR_BUFFER} as "{GRAZING_RADIUS}"
+        {_NEAR_BUFFER} as "{GRAZING_RADIUS}",
+        {STATUS}
 	 from {_RENAMED_WATERPOINTS}
 	 union
      select
 		st_buffer(geometry, {_FAR_BUFFER}) as geometry,
 		{FID} as "{WATERPOINT}",
-        {STATUS},
         '{GrazingRadiusType.Far.name}' as "{GRAZING_RADIUS_TYPE}",
-        {_FAR_BUFFER} as "{GRAZING_RADIUS}"
+        {_FAR_BUFFER} as "{GRAZING_RADIUS}",
+        {STATUS}
 	 from {_RENAMED_WATERPOINTS})
 select
-    0 as {FID},
     st_multi(st_intersection({_BUFFERS}.geometry, {_IN_PADDOCKS}.geometry)) as geometry,
-    {_IN_PADDOCKS}."{PADDOCK}",
-    {_IN_PADDOCKS}.{TIMEFRAME},
-    {_BUFFERS}.{STATUS},
+    0 as {FID},
     {_BUFFERS}."{WATERPOINT}",
+    {_IN_PADDOCKS}."{PADDOCK}",
     {_BUFFERS}."{GRAZING_RADIUS_TYPE}",
-    {_BUFFERS}."{GRAZING_RADIUS}"
+    {_BUFFERS}."{GRAZING_RADIUS}",
+    {_BUFFERS}.{STATUS},
+    {_IN_PADDOCKS}.{TIMEFRAME}
 from {_BUFFERS}
 inner join {_IN_PADDOCKS}
 on {_BUFFERS}."{WATERPOINT}" = {_IN_PADDOCKS}."{WATERPOINT}"

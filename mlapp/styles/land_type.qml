@@ -1,20 +1,14 @@
-<?xml version="1.1"?>
-<qgis version="3.22.13-Białowieża" styleCategories="AllStyleCategories" readOnly="1" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" simplifyDrawingTol="1" labelsEnabled="0" simplifyDrawingHints="1" symbologyReferenceScale="-1" maxScale="0" simplifyLocal="1" minScale="0" simplifyMaxScale="1">
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis labelsEnabled="0" readOnly="0" version="3.22.14-Białowieża" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <temporal accumulate="0" startField="" startExpression="" durationField="" endField="" durationUnit="min" limitMode="0" enabled="0" mode="0" fixedDuration="0" endExpression="">
-    <fixedRange>
-      <start></start>
-      <end></end>
-    </fixedRange>
-  </temporal>
-  <renderer-v2 symbollevels="0" forceraster="0" referencescale="-1" enableorderby="0" type="singleSymbol">
+  <renderer-v2 enableorderby="0" type="singleSymbol" referencescale="-1" symbollevels="0" forceraster="0">
     <symbols>
-      <symbol clip_to_extent="1" name="0" type="fill" force_rhr="0" alpha="1">
+      <symbol name="0" type="fill" clip_to_extent="1" force_rhr="0" alpha="1">
         <data_defined_properties>
           <Option type="Map">
             <Option name="name" type="QString" value=""/>
@@ -22,7 +16,7 @@
             <Option name="type" type="QString" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleLine">
+        <layer enabled="1" class="SimpleLine" locked="0" pass="0">
           <Option type="Map">
             <Option name="align_dash_pattern" type="QString" value="0"/>
             <Option name="capstyle" type="QString" value="square"/>
@@ -52,33 +46,33 @@
             <Option name="use_custom_dash" type="QString" value="0"/>
             <Option name="width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
           </Option>
-          <prop k="align_dash_pattern" v="0"/>
-          <prop k="capstyle" v="square"/>
-          <prop k="customdash" v="5;2"/>
-          <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="customdash_unit" v="MM"/>
-          <prop k="dash_pattern_offset" v="0"/>
-          <prop k="dash_pattern_offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="dash_pattern_offset_unit" v="MM"/>
-          <prop k="draw_inside_polygon" v="0"/>
-          <prop k="joinstyle" v="bevel"/>
-          <prop k="line_color" v="35,35,35,255"/>
-          <prop k="line_style" v="solid"/>
-          <prop k="line_width" v="0.1"/>
-          <prop k="line_width_unit" v="MM"/>
-          <prop k="offset" v="0"/>
-          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="offset_unit" v="MM"/>
-          <prop k="ring_filter" v="0"/>
-          <prop k="trim_distance_end" v="0"/>
-          <prop k="trim_distance_end_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="trim_distance_end_unit" v="MM"/>
-          <prop k="trim_distance_start" v="0"/>
-          <prop k="trim_distance_start_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="trim_distance_start_unit" v="MM"/>
-          <prop k="tweak_dash_pattern_on_corners" v="0"/>
-          <prop k="use_custom_dash" v="0"/>
-          <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop v="0" k="align_dash_pattern"/>
+          <prop v="square" k="capstyle"/>
+          <prop v="5;2" k="customdash"/>
+          <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
+          <prop v="MM" k="customdash_unit"/>
+          <prop v="0" k="dash_pattern_offset"/>
+          <prop v="3x:0,0,0,0,0,0" k="dash_pattern_offset_map_unit_scale"/>
+          <prop v="MM" k="dash_pattern_offset_unit"/>
+          <prop v="0" k="draw_inside_polygon"/>
+          <prop v="bevel" k="joinstyle"/>
+          <prop v="35,35,35,255" k="line_color"/>
+          <prop v="solid" k="line_style"/>
+          <prop v="0.1" k="line_width"/>
+          <prop v="MM" k="line_width_unit"/>
+          <prop v="0" k="offset"/>
+          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
+          <prop v="MM" k="offset_unit"/>
+          <prop v="0" k="ring_filter"/>
+          <prop v="0" k="trim_distance_end"/>
+          <prop v="3x:0,0,0,0,0,0" k="trim_distance_end_map_unit_scale"/>
+          <prop v="MM" k="trim_distance_end_unit"/>
+          <prop v="0" k="trim_distance_start"/>
+          <prop v="3x:0,0,0,0,0,0" k="trim_distance_start_map_unit_scale"/>
+          <prop v="MM" k="trim_distance_start_unit"/>
+          <prop v="0" k="tweak_dash_pattern_on_corners"/>
+          <prop v="0" k="use_custom_dash"/>
+          <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
           <data_defined_properties>
             <Option type="Map">
               <Option name="name" type="QString" value=""/>
@@ -92,102 +86,60 @@
     <rotation/>
     <sizescale/>
   </renderer-v2>
-  <customproperties>
-    <Option type="Map">
-      <Option name="dualview/previewExpressions" type="List">
-        <Option type="QString" value="&quot;Name&quot;"/>
-      </Option>
-    </Option>
-  </customproperties>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
-  <layerOpacity>1</layerOpacity>
-  <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
-    <activeChecks/>
-    <checkConfiguration/>
-  </geometryOptions>
-  <legend type="default-vector" showLabelLegend="0"/>
-  <referencedLayers/>
   <fieldConfiguration>
     <field name="fid" configurationFlags="None">
-      <editWidget type="">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Map Unit" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Landscape Class" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Class Description" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Erosion Risk" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Area (km²)" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Perimeter (km)" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Name" configurationFlags="None">
-      <editWidget type="">
+    <field name="Land Type Name" configurationFlags="None">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
     <field name="Best AE/km² (if Condition is 'A')" configurationFlags="None">
-      <editWidget type="">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Rounded Area (km²)" configurationFlags="None">
-      <editWidget type="">
+    <field name="Perimeter (km)" configurationFlags="None">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="Area (km²)" configurationFlags="None">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
     <field name="Rounded Perimeter (km)" configurationFlags="None">
-      <editWidget type="">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="Rounded Area (km²)" configurationFlags="None">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
     <field name="Rounded Best AE/km² (if Condition is 'A')" configurationFlags="None">
-      <editWidget type="">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
@@ -195,84 +147,64 @@
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias field="fid" index="0" name=""/>
-    <alias field="Map Unit" index="1" name=""/>
-    <alias field="Landscape Class" index="2" name=""/>
-    <alias field="Class Description" index="3" name=""/>
-    <alias field="Erosion Risk" index="4" name=""/>
-    <alias field="Area (km²)" index="5" name=""/>
-    <alias field="Perimeter (km)" index="6" name=""/>
-    <alias field="Name" index="7" name=""/>
-    <alias field="Best AE/km² (if Condition is 'A')" index="8" name=""/>
-    <alias field="Rounded Area (km²)" index="9" name="Area (km²)"/>
-    <alias field="Rounded Perimeter (km)" index="10" name="Perimeter (km)"/>
-    <alias field="Rounded Best AE/km² (if Condition is 'A')" index="11" name="Best AE/km² (if Condition is 'A')"/>
+    <alias index="0" field="fid" name=""/>
+    <alias index="1" field="Land Type Name" name=""/>
+    <alias index="2" field="Best AE/km² (if Condition is 'A')" name=""/>
+    <alias index="3" field="Perimeter (km)" name=""/>
+    <alias index="4" field="Area (km²)" name=""/>
+    <alias index="5" field="Rounded Perimeter (km)" name="Perimeter (km)"/>
+    <alias index="6" field="Rounded Area (km²)" name="Area (km²)"/>
+    <alias index="7" field="Rounded Best AE/km² (if Condition is 'A')" name="Best AE/km² (if Condition is 'A')"/>
   </aliases>
   <defaults>
-    <default expression="" field="fid" applyOnUpdate="0"/>
-    <default expression="" field="Map Unit" applyOnUpdate="0"/>
-    <default expression="" field="Landscape Class" applyOnUpdate="0"/>
-    <default expression="" field="Class Description" applyOnUpdate="0"/>
-    <default expression="" field="Erosion Risk" applyOnUpdate="0"/>
-    <default expression="" field="Area (km²)" applyOnUpdate="0"/>
-    <default expression="" field="Perimeter (km)" applyOnUpdate="0"/>
-    <default expression="" field="Name" applyOnUpdate="0"/>
-    <default expression="" field="Best AE/km² (if Condition is 'A')" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Area (km²)" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Perimeter (km)" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Best AE/km² (if Condition is 'A')" applyOnUpdate="0"/>
+    <default field="fid" applyOnUpdate="0" expression=""/>
+    <default field="Land Type Name" applyOnUpdate="0" expression=""/>
+    <default field="Best AE/km² (if Condition is 'A')" applyOnUpdate="0" expression="15.0"/>
+    <default field="Perimeter (km)" applyOnUpdate="0" expression=""/>
+    <default field="Area (km²)" applyOnUpdate="0" expression=""/>
+    <default field="Rounded Perimeter (km)" applyOnUpdate="0" expression=""/>
+    <default field="Rounded Area (km²)" applyOnUpdate="0" expression=""/>
+    <default field="Rounded Best AE/km² (if Condition is 'A')" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" field="fid" unique_strength="1" exp_strength="0" constraints="3"/>
-    <constraint notnull_strength="0" field="Map Unit" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Landscape Class" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Class Description" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Erosion Risk" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Perimeter (km)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Name" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Best AE/km² (if Condition is 'A')" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Perimeter (km)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Best AE/km² (if Condition is 'A')" unique_strength="0" exp_strength="0" constraints="0"/>
+    <constraint field="fid" unique_strength="1" notnull_strength="1" constraints="3" exp_strength="0"/>
+    <constraint field="Land Type Name" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="Best AE/km² (if Condition is 'A')" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="Perimeter (km)" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="Area (km²)" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="Rounded Perimeter (km)" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="Rounded Area (km²)" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="Rounded Best AE/km² (if Condition is 'A')" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="fid" desc=""/>
-    <constraint exp="" field="Map Unit" desc=""/>
-    <constraint exp="" field="Landscape Class" desc=""/>
-    <constraint exp="" field="Class Description" desc=""/>
-    <constraint exp="" field="Erosion Risk" desc=""/>
-    <constraint exp="" field="Area (km²)" desc=""/>
-    <constraint exp="" field="Perimeter (km)" desc=""/>
-    <constraint exp="" field="Name" desc=""/>
+    <constraint exp="" field="Land Type Name" desc=""/>
     <constraint exp="" field="Best AE/km² (if Condition is 'A')" desc=""/>
-    <constraint exp="" field="Rounded Area (km²)" desc=""/>
+    <constraint exp="" field="Perimeter (km)" desc=""/>
+    <constraint exp="" field="Area (km²)" desc=""/>
     <constraint exp="" field="Rounded Perimeter (km)" desc=""/>
+    <constraint exp="" field="Rounded Area (km²)" desc=""/>
     <constraint exp="" field="Rounded Best AE/km² (if Condition is 'A')" desc=""/>
   </constraintExpressions>
   <expressionfields>
-    <field comment="" expression="round(&quot;Area (km²)&quot;, 2)" typeName="" name="Rounded Area (km²)" subType="0" precision="0" type="6" length="0"/>
-    <field comment="" expression="round(&quot;Perimeter (km)&quot;, 2)" typeName="" name="Rounded Perimeter (km)" subType="0" precision="0" type="6" length="0"/>
-    <field comment="" expression="round(&quot;Best AE/km² (if Condition is 'A')&quot;, 1)" typeName="" name="Rounded Best AE/km² (if Condition is 'A')" subType="0" precision="0" type="6" length="0"/>
+    <field name="Rounded Perimeter (km)" type="6" subType="0" typeName="" comment="" expression="round(&quot;Perimeter (km)&quot;, 2)" precision="0" length="0"/>
+    <field name="Rounded Area (km²)" type="6" subType="0" typeName="" comment="" expression="round(&quot;Area (km²)&quot;, 2)" precision="0" length="0"/>
+    <field name="Rounded Best AE/km² (if Condition is 'A')" type="6" subType="0" typeName="" comment="" expression="round(&quot;Best AE/km² (if Condition is 'A')&quot;, 1)" precision="0" length="0"/>
+    <field name="Rounded Perimeter (km)" type="6" subType="0" typeName="" comment="" expression="round(&quot;Perimeter (km)&quot;, 2)" precision="0" length="0"/>
+    <field name="Rounded Area (km²)" type="6" subType="0" typeName="" comment="" expression="round(&quot;Area (km²)&quot;, 2)" precision="0" length="0"/>
+    <field name="Rounded Best AE/km² (if Condition is 'A')" type="6" subType="0" typeName="" comment="" expression="round(&quot;Best AE/km² (if Condition is 'A')&quot;, 1)" precision="0" length="0"/>
   </expressionfields>
-  <attributeactions>
-    <defaultAction key="Canvas" value="{00000000-0000-0000-0000-000000000000}"/>
-  </attributeactions>
-  <attributetableconfig sortExpression="" sortOrder="0" actionWidgetStyle="dropDown">
+  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
     <columns>
-      <column hidden="0" width="-1" name="fid" type="field"/>
-      <column hidden="0" width="-1" name="Map Unit" type="field"/>
-      <column hidden="0" width="280" name="Landscape Class" type="field"/>
-      <column hidden="0" width="284" name="Class Description" type="field"/>
-      <column hidden="0" width="403" name="Erosion Risk" type="field"/>
-      <column hidden="1" width="-1" name="Best AE/km² (if Condition is 'A')" type="field"/>
-      <column hidden="1" width="-1" name="Area (km²)" type="field"/>
-      <column hidden="1" width="-1" name="Perimeter (km)" type="field"/>
-      <column hidden="0" width="255" name="Name" type="field"/>
-      <column hidden="0" width="165" name="Rounded Area (km²)" type="field"/>
-      <column hidden="0" width="177" name="Rounded Perimeter (km)" type="field"/>
-      <column hidden="0" width="293" name="Rounded Best AE/km² (if Condition is 'A')" type="field"/>
-      <column hidden="1" width="-1" type="actions"/>
+      <column name="fid" type="field" width="78" hidden="0"/>
+      <column name="Land Type Name" type="field" width="232" hidden="0"/>
+      <column name="Best AE/km² (if Condition is 'A')" type="field" width="-1" hidden="1"/>
+      <column name="Perimeter (km)" type="field" width="-1" hidden="1"/>
+      <column name="Area (km²)" type="field" width="-1" hidden="1"/>
+      <column name="Rounded Best AE/km² (if Condition is 'A')" type="field" width="324" hidden="0"/>
+      <column name="Rounded Perimeter (km)" type="field" width="161" hidden="0"/>
+      <column name="Rounded Area (km²)" type="field" width="204" hidden="0"/>
+      <column type="actions" width="-1" hidden="1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -304,41 +236,55 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
-    <field editable="1" name="AE/km²"/>
-    <field editable="1" name="Area (km²)"/>
-    <field editable="1" name="Class Description"/>
-    <field editable="1" name="Erosion Risk"/>
-    <field editable="1" name="Landscape Class"/>
-    <field editable="1" name="Map Unit"/>
-    <field editable="1" name="Name"/>
-    <field editable="1" name="Perimeter (km)"/>
-    <field editable="1" name="fid"/>
+    <field name="AE/km²" editable="1"/>
+    <field name="Area (km²)" editable="1"/>
+    <field name="Best AE/km² (if Condition is 'A')" editable="1"/>
+    <field name="Class Description" editable="1"/>
+    <field name="Erosion Risk" editable="1"/>
+    <field name="Land Type Name" editable="1"/>
+    <field name="Landscape Class" editable="1"/>
+    <field name="Map Unit" editable="1"/>
+    <field name="Name" editable="1"/>
+    <field name="Perimeter (km)" editable="1"/>
+    <field name="Rounded Area (km²)" editable="0"/>
+    <field name="Rounded Best AE/km² (if Condition is 'A')" editable="0"/>
+    <field name="Rounded Perimeter (km)" editable="0"/>
+    <field name="fid" editable="1"/>
   </editable>
   <labelOnTop>
     <field name="AE/km²" labelOnTop="0"/>
     <field name="Area (km²)" labelOnTop="0"/>
+    <field name="Best AE/km² (if Condition is 'A')" labelOnTop="0"/>
     <field name="Class Description" labelOnTop="0"/>
     <field name="Erosion Risk" labelOnTop="0"/>
+    <field name="Land Type Name" labelOnTop="0"/>
     <field name="Landscape Class" labelOnTop="0"/>
     <field name="Map Unit" labelOnTop="0"/>
     <field name="Name" labelOnTop="0"/>
     <field name="Perimeter (km)" labelOnTop="0"/>
+    <field name="Rounded Area (km²)" labelOnTop="0"/>
+    <field name="Rounded Best AE/km² (if Condition is 'A')" labelOnTop="0"/>
+    <field name="Rounded Perimeter (km)" labelOnTop="0"/>
     <field name="fid" labelOnTop="0"/>
   </labelOnTop>
   <reuseLastValue>
-    <field reuseLastValue="0" name="AE/km²"/>
-    <field reuseLastValue="0" name="Area (km²)"/>
-    <field reuseLastValue="0" name="Class Description"/>
-    <field reuseLastValue="0" name="Erosion Risk"/>
-    <field reuseLastValue="0" name="Landscape Class"/>
-    <field reuseLastValue="0" name="Map Unit"/>
-    <field reuseLastValue="0" name="Name"/>
-    <field reuseLastValue="0" name="Perimeter (km)"/>
-    <field reuseLastValue="0" name="fid"/>
+    <field name="AE/km²" reuseLastValue="0"/>
+    <field name="Area (km²)" reuseLastValue="0"/>
+    <field name="Best AE/km² (if Condition is 'A')" reuseLastValue="0"/>
+    <field name="Class Description" reuseLastValue="0"/>
+    <field name="Erosion Risk" reuseLastValue="0"/>
+    <field name="Land Type Name" reuseLastValue="0"/>
+    <field name="Landscape Class" reuseLastValue="0"/>
+    <field name="Map Unit" reuseLastValue="0"/>
+    <field name="Name" reuseLastValue="0"/>
+    <field name="Perimeter (km)" reuseLastValue="0"/>
+    <field name="Rounded Area (km²)" reuseLastValue="0"/>
+    <field name="Rounded Best AE/km² (if Condition is 'A')" reuseLastValue="0"/>
+    <field name="Rounded Perimeter (km)" reuseLastValue="0"/>
+    <field name="fid" reuseLastValue="0"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>
   <previewExpression>"Name"</previewExpression>
-  <mapTip></mapTip>
   <layerGeometryType>2</layerGeometryType>
 </qgis>

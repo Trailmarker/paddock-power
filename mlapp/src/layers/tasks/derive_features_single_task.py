@@ -20,7 +20,6 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
         self.layer = layer
         self.count = 0
         self.total = 0
-        self.obsolete = False
 
         if onTaskCompleted is not None:
             self.taskCompleted.connect(lambda: onTaskCompleted(type(layer), True))
@@ -60,11 +59,6 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
         self.workspace.onTaskCompleted(self, result, showMessage=False)
-
-    def cancelObsolete(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} because a newer task has been queued …")
-        self.obsolete = True
-        super().cancel()
 
     def cancel(self):
         qgsInfo(f"QGIS requesting cancellation of {self.description()} for an unknown reason …")

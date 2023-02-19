@@ -20,9 +20,6 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
         self.setupUi(self)
 
-        # self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),
-        #                         self.currentPaddockLandTypeListGroupBox.sizeHint().width(),
-        #                         self.futurePaddockLandTypeListGroupBox.sizeHint().width()])
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, False)

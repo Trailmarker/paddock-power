@@ -51,7 +51,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
                 featureProgressCallback(count, featureCount)
 
         # Check again …
-        if cancelledCallback():
+        if cancelledCallback and cancelledCallback():
             return
 
         # Clean up any instances of the virtual source …

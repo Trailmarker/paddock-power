@@ -21,7 +21,6 @@ class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
         targetFeature = self.makeFeature()
         mappedFeature = fieldMap.mapFeature(importFeature, targetFeature)
         feature = self.wrapFeature(mappedFeature)
-        feature.clearFid()
 
         # Default imported data to 'Built' status - TODO might need other things here?
         if isinstance(feature, IStatusFeature):

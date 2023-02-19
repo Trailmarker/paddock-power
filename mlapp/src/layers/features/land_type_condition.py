@@ -74,10 +74,6 @@ class LandTypeCondition(IPersistedFeature, WorkspaceMixin):
     def recalculate(self):
         pass
 
-    def clearFid(self):
-        """Nullify the PersistedFeature's id as a prelude to saving it."""
-        pass
-
     @property
     def GEOMETRY(self):
         """Return the Feature's geometry."""

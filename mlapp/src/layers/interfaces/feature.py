@@ -14,11 +14,6 @@ class Feature(ABC):
         """Return True if the app should focus on this type of Feature when selected."""
         pass
 
-    @abstractmethod
-    def clearFid(self):
-        """Nullify the PersistedFeature's id as a prelude to saving it."""
-        pass
-
     @property
     @abstractmethod
     def GEOMETRY(self):

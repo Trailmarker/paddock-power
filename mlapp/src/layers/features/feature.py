@@ -33,8 +33,8 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
             for field in self.getSchema():
                 field.setDefaultValue(self)
 
-            # Clear FID
-            self.clearFid()
+            # A new Feature does not have a valid FID
+            self.FID = -1
 
         if isinstance(existingFeature, QgsFeature):
             if not existingFeature.isValid():
@@ -47,7 +47,9 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
                 raise Glitch(f"{type(self).__name__}.__init__: incoming Feature has missing fields: {missingFields}")
 
             QgsFeature.__init__(self, existingFeature)
-            self.setAttributes(existingFeature.attributes())
+            
+            for field in self.getSchema():
+                field.setValue(self, field.getValue(existingFeature))            
             self.setGeometry(existingFeature.geometry())
 
         elif existingFeature is not None:
@@ -63,11 +65,6 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
     def __str__(self):
         """Convert the Feature to a string representation."""
         return repr(self)
-
-    def clearFid(self):
-        """Nullify the PersistedFeature's id as a prelude to saving it."""
-        self.FID = -1
-        self.setId(-1)
 
     @property
     def GEOMETRY(self):

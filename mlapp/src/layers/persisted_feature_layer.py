@@ -118,7 +118,6 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
     def addFeatures(self, features):
         """Add a batch of features to this layer."""
         for f in features:
-            f.clearFid()
             self.addFeature(f)
 
     def copyFeature(self, feature):
@@ -126,13 +125,9 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         if not self.getSchema().containsSchema(feature.getSchema()):
             raise Glitch(
                 f"{type(self).__name__}.copyFeature({feature}): {type(self).__name__}.getSchema().containsSchema({type(feature).__name__}.getSchema()) is False")
-        copyFeature = self.wrapFeature(feature)
-
-        for f in feature.getSchema():
-            copyFeature.setAttribute(f.name(), feature.attribute(f.name()))
-        copyFeature.setGeometry(copyFeature.geometry())
-        copyFeature.clearFid()
-        return copyFeature
+        copy = self.wrapFeature(feature)
+        copy.FID = -1
+        return copy
 
     def makeFeature(self):
         """Make a new PersistedFeature in this layer."""

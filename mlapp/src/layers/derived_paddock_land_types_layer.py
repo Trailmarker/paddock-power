@@ -54,18 +54,18 @@ with {_PADDOCK_WATERED_AREAS} as
 select
 	st_multi(st_collectionextract(st_union(geometry), 3)) as geometry,
 	0 as {FID},
+ 	{PADDOCK},
+  	"{LAND_TYPE}",
+   	"{PADDOCK_NAME}",
+	"{LAND_TYPE_NAME}",
+ 	"{CONDITION_TYPE}",
+	{TIMEFRAME} as {TIMEFRAME},
 	sum("{AREA}") as "{AREA}",
 	sum("{AREA}" * "{_WATERED_FACTOR}") as "{WATERED_AREA}",
 	(sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
 	(sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
 	((sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{ESTIMATED_CAPACITY}",
-	((sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{POTENTIAL_CAPACITY}",
-	"{CONDITION_TYPE}",
-	{PADDOCK},
-	"{PADDOCK_NAME}",
-	"{LAND_TYPE}",
-	"{LAND_TYPE_NAME}",
-	{TIMEFRAME} as {TIMEFRAME}
+	((sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{POTENTIAL_CAPACITY}"
 from
 	(select
 		0 as {FID},

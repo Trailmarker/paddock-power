@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from ..fields import FID, STATUS, TIMEFRAME, PADDOCK, MetricPaddockSchema
-from .feature_action import FeatureAction
 from .base_paddock import BasePaddock
 
 

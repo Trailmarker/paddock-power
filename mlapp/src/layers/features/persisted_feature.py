@@ -13,6 +13,17 @@ class PersistedFeature(Feature, IPersistedFeature):
         """Create a new Feature."""
 
         super().__init__(featureLayer, existingFeature)
+        self._currentTask = None
+
+    @property
+    def currentTask(self):
+        """Return the current task."""
+        return self._currentTask
+
+    @currentTask.setter
+    def currentTask(self, task):
+        """Set the current task."""
+        self._currentTask = task
 
     @property
     def GEOMETRY(self):
@@ -92,12 +103,15 @@ class PersistedFeature(Feature, IPersistedFeature):
                     raise Glitch(f"{self}.upsert: new feature is not valid")
                 if newQf.id() <= 0:
                     raise Glitch(f"{self}.upsert: new feature has invalid FID")
-                
+
                 self.FID = newQf.id()
+                self.setId(self.FID)
+                self.recalculate()
+                self.featureLayer.updateFeature(self)
+                return self.FID
             else:
                 raise Glitch(f"{self}.upsert: failed with unknown error")
 
-        return self.FID
 
     def delete(self):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""

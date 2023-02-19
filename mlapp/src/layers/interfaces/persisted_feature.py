@@ -1,10 +1,20 @@
 # -*- coding: utf-8 -*-
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 
 from .feature import Feature
 
 
 class PersistedFeature(Feature):
+
+    @abstractproperty
+    def currentTask(self):
+        """Return the current Task associated with this Feature."""
+        pass
+    
+    @abstractproperty
+    def currentTask(self, task):
+        """Return the current Task associated with this Feature."""
+        pass
 
     @abstractmethod
     def delete(self):

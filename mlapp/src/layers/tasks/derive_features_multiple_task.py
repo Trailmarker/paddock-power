@@ -5,7 +5,6 @@ from qgis.core import QgsTask
 from ...utils import PLUGIN_NAME, guiStatusBar, qgsInfo
 from ...models import WorkspaceMixin
 from ..features import Edits
-from ..interfaces import IPersistedDerivedFeatureLayer
 
 
 class DeriveFeaturesMultipleTask(QgsTask, WorkspaceMixin):
@@ -17,8 +16,6 @@ class DeriveFeaturesMultipleTask(QgsTask, WorkspaceMixin):
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.layers = layers
-        self.obsolete = False
-
         # self.setDependentLayers([self.layer])
 
     def run(self):
@@ -52,11 +49,6 @@ class DeriveFeaturesMultipleTask(QgsTask, WorkspaceMixin):
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
         self.workspace.onTaskCompleted(self, result)
-
-    def cancelObsolete(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} because a newer task has been queued …")
-        self.obsolete = True
-        super().cancel()
 
     def cancel(self):
         qgsInfo(f"QGIS requesting cancellation of {self.description()} for an unknown reason …")

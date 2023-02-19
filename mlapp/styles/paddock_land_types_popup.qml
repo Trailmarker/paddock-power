@@ -1,48 +1,42 @@
-<?xml version="1.1"?>
-<qgis version="3.22.13-Białowieża" styleCategories="AllStyleCategories" readOnly="1" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" simplifyDrawingTol="1" labelsEnabled="0" simplifyDrawingHints="1" symbologyReferenceScale="-1" maxScale="0" simplifyLocal="1" minScale="0" simplifyMaxScale="1">
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis readOnly="0" version="3.22.14-Białowieża" labelsEnabled="0" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <temporal accumulate="0" startField="" startExpression="" durationField="" endField="" durationUnit="min" limitMode="0" enabled="0" mode="0" fixedDuration="0" endExpression="">
-    <fixedRange>
-      <start></start>
-      <end></end>
-    </fixedRange>
-  </temporal>
-  <renderer-v2 symbollevels="0" graduatedMethod="GraduatedColor" forceraster="0" referencescale="-1" enableorderby="0" type="graduatedSymbol" attr="case&#xd;&#xa;when matchCurrentTimeframe(&quot;Timeframe&quot;) then &quot;AE/km²&quot;&#xd;&#xa;else 'Ignored'&#xd;&#xa;end&#xd;&#xa;">
+  <renderer-v2 graduatedMethod="GraduatedColor" attr="case&#xd;&#xa;when matchCurrentTimeframe(&quot;Timeframe&quot;) then &quot;AE/km²&quot;&#xd;&#xa;else 'Ignored'&#xd;&#xa;end&#xd;&#xa;" referencescale="-1" forceraster="0" symbollevels="0" type="graduatedSymbol" enableorderby="0">
     <ranges>
-      <range upper="0.000000000000000" label="Non-producing" render="true" lower="0.000000000000000" symbol="0"/>
-      <range upper="5.000000000000000" label="0 – 5 AE/km²" render="true" lower="0.000000000000000" symbol="1"/>
-      <range upper="10.000000000000000" label="5 – 10 AE/km²" render="true" lower="5.000000000000000" symbol="2"/>
-      <range upper="15.000000000000000" label="10 – 15 AE/km²" render="true" lower="10.000000000000000" symbol="3"/>
-      <range upper="20.000000000000000" label="15 – 20 AE/km²" render="true" lower="15.000000000000000" symbol="4"/>
-      <range upper="100.000000000000000" label="Over 20 AE/km²" render="true" lower="20.000000000000000" symbol="5"/>
+      <range render="true" symbol="0" lower="0.000000000000000" upper="0.000000000000000" label="Non-producing"/>
+      <range render="true" symbol="1" lower="0.000000000000000" upper="5.000000000000000" label="0 – 5 AE/km²"/>
+      <range render="true" symbol="2" lower="5.000000000000000" upper="10.000000000000000" label="5 – 10 AE/km²"/>
+      <range render="true" symbol="3" lower="10.000000000000000" upper="15.000000000000000" label="10 – 15 AE/km²"/>
+      <range render="true" symbol="4" lower="15.000000000000000" upper="20.000000000000000" label="15 – 20 AE/km²"/>
+      <range render="true" symbol="5" lower="20.000000000000000" upper="100.000000000000000" label="Over 20 AE/km²"/>
     </ranges>
     <symbols>
-      <symbol clip_to_extent="1" name="0" type="fill" force_rhr="0" alpha="1">
+      <symbol clip_to_extent="1" alpha="1" name="0" force_rhr="0" type="fill">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option value="" name="name" type="QString"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleFill">
+        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="255,103,0,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+            <Option value="255,103,0,255" name="color" type="QString"/>
+            <Option value="bevel" name="joinstyle" type="QString"/>
+            <Option value="0,0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
+            <Option value="solid" name="outline_style" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
+            <Option value="MM" name="outline_width_unit" type="QString"/>
+            <Option value="solid" name="style" type="QString"/>
           </Option>
           <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="color" v="255,103,0,255"/>
@@ -57,34 +51,34 @@
           <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" name="1" type="fill" force_rhr="0" alpha="1">
+      <symbol clip_to_extent="1" alpha="1" name="1" force_rhr="0" type="fill">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option value="" name="name" type="QString"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleFill">
+        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="161,217,155,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+            <Option value="161,217,155,255" name="color" type="QString"/>
+            <Option value="bevel" name="joinstyle" type="QString"/>
+            <Option value="0,0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
+            <Option value="solid" name="outline_style" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
+            <Option value="MM" name="outline_width_unit" type="QString"/>
+            <Option value="solid" name="style" type="QString"/>
           </Option>
           <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="color" v="161,217,155,255"/>
@@ -99,34 +93,34 @@
           <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" name="2" type="fill" force_rhr="0" alpha="1">
+      <symbol clip_to_extent="1" alpha="1" name="2" force_rhr="0" type="fill">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option value="" name="name" type="QString"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleFill">
+        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="116,196,118,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+            <Option value="116,196,118,255" name="color" type="QString"/>
+            <Option value="bevel" name="joinstyle" type="QString"/>
+            <Option value="0,0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
+            <Option value="solid" name="outline_style" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
+            <Option value="MM" name="outline_width_unit" type="QString"/>
+            <Option value="solid" name="style" type="QString"/>
           </Option>
           <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="color" v="116,196,118,255"/>
@@ -141,34 +135,34 @@
           <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" name="3" type="fill" force_rhr="0" alpha="1">
+      <symbol clip_to_extent="1" alpha="1" name="3" force_rhr="0" type="fill">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option value="" name="name" type="QString"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleFill">
+        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="65,171,93,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+            <Option value="65,171,93,255" name="color" type="QString"/>
+            <Option value="bevel" name="joinstyle" type="QString"/>
+            <Option value="0,0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
+            <Option value="solid" name="outline_style" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
+            <Option value="MM" name="outline_width_unit" type="QString"/>
+            <Option value="solid" name="style" type="QString"/>
           </Option>
           <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="color" v="65,171,93,255"/>
@@ -183,34 +177,34 @@
           <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" name="4" type="fill" force_rhr="0" alpha="1">
+      <symbol clip_to_extent="1" alpha="1" name="4" force_rhr="0" type="fill">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option value="" name="name" type="QString"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleFill">
+        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="35,139,69,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+            <Option value="35,139,69,255" name="color" type="QString"/>
+            <Option value="bevel" name="joinstyle" type="QString"/>
+            <Option value="0,0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
+            <Option value="solid" name="outline_style" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
+            <Option value="MM" name="outline_width_unit" type="QString"/>
+            <Option value="solid" name="style" type="QString"/>
           </Option>
           <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="color" v="35,139,69,255"/>
@@ -225,34 +219,34 @@
           <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" name="5" type="fill" force_rhr="0" alpha="1">
+      <symbol clip_to_extent="1" alpha="1" name="5" force_rhr="0" type="fill">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option value="" name="name" type="QString"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleFill">
+        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="0,109,44,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="255,255,0,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.66"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+            <Option value="0,109,44,255" name="color" type="QString"/>
+            <Option value="bevel" name="joinstyle" type="QString"/>
+            <Option value="0,0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="255,255,0,255" name="outline_color" type="QString"/>
+            <Option value="solid" name="outline_style" type="QString"/>
+            <Option value="0.66" name="outline_width" type="QString"/>
+            <Option value="MM" name="outline_width_unit" type="QString"/>
+            <Option value="solid" name="style" type="QString"/>
           </Option>
           <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="color" v="0,109,44,255"/>
@@ -267,36 +261,36 @@
           <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </symbols>
     <source-symbol>
-      <symbol clip_to_extent="1" name="0" type="fill" force_rhr="0" alpha="1">
+      <symbol clip_to_extent="1" alpha="1" name="0" force_rhr="0" type="fill">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" type="QString" value=""/>
+            <Option value="" name="name" type="QString"/>
             <Option name="properties"/>
-            <Option name="type" type="QString" value="collection"/>
+            <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer locked="0" pass="0" enabled="1" class="SimpleFill">
+        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="color" type="QString" value="125,139,143,255"/>
-            <Option name="joinstyle" type="QString" value="bevel"/>
-            <Option name="offset" type="QString" value="0,0"/>
-            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
-            <Option name="offset_unit" type="QString" value="MM"/>
-            <Option name="outline_color" type="QString" value="35,35,35,255"/>
-            <Option name="outline_style" type="QString" value="solid"/>
-            <Option name="outline_width" type="QString" value="0.26"/>
-            <Option name="outline_width_unit" type="QString" value="MM"/>
-            <Option name="style" type="QString" value="solid"/>
+            <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+            <Option value="125,139,143,255" name="color" type="QString"/>
+            <Option value="bevel" name="joinstyle" type="QString"/>
+            <Option value="0,0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="35,35,35,255" name="outline_color" type="QString"/>
+            <Option value="solid" name="outline_style" type="QString"/>
+            <Option value="0.26" name="outline_width" type="QString"/>
+            <Option value="MM" name="outline_width_unit" type="QString"/>
+            <Option value="solid" name="style" type="QString"/>
           </Option>
           <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <prop k="color" v="125,139,143,255"/>
@@ -311,9 +305,9 @@
           <prop k="style" v="solid"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -321,17 +315,17 @@
     </source-symbol>
     <colorramp name="[source]" type="preset">
       <Option type="Map">
-        <Option name="preset_color_0" type="QString" value="161,217,155,255"/>
-        <Option name="preset_color_1" type="QString" value="116,196,118,255"/>
-        <Option name="preset_color_2" type="QString" value="65,171,93,255"/>
-        <Option name="preset_color_3" type="QString" value="35,139,69,255"/>
-        <Option name="preset_color_4" type="QString" value="0,109,44,255"/>
-        <Option name="preset_color_name_0" type="QString" value="#a1d99b"/>
-        <Option name="preset_color_name_1" type="QString" value="#74c476"/>
-        <Option name="preset_color_name_2" type="QString" value="#41ab5d"/>
-        <Option name="preset_color_name_3" type="QString" value="#238b45"/>
-        <Option name="preset_color_name_4" type="QString" value="#006d2c"/>
-        <Option name="rampType" type="QString" value="preset"/>
+        <Option value="161,217,155,255" name="preset_color_0" type="QString"/>
+        <Option value="116,196,118,255" name="preset_color_1" type="QString"/>
+        <Option value="65,171,93,255" name="preset_color_2" type="QString"/>
+        <Option value="35,139,69,255" name="preset_color_3" type="QString"/>
+        <Option value="0,109,44,255" name="preset_color_4" type="QString"/>
+        <Option value="#a1d99b" name="preset_color_name_0" type="QString"/>
+        <Option value="#74c476" name="preset_color_name_1" type="QString"/>
+        <Option value="#41ab5d" name="preset_color_name_2" type="QString"/>
+        <Option value="#238b45" name="preset_color_name_3" type="QString"/>
+        <Option value="#006d2c" name="preset_color_name_4" type="QString"/>
+        <Option value="preset" name="rampType" type="QString"/>
       </Option>
       <prop k="preset_color_0" v="161,217,155,255"/>
       <prop k="preset_color_1" v="116,196,118,255"/>
@@ -346,8 +340,8 @@
       <prop k="rampType" v="preset"/>
     </colorramp>
     <classificationMethod id="Quantile">
-      <symmetricMode symmetrypoint="0" astride="0" enabled="0"/>
-      <labelFormat format="%1 - %2" labelprecision="4" trimtrailingzeroes="1"/>
+      <symmetricMode enabled="0" symmetrypoint="0" astride="0"/>
+      <labelFormat format="%1 - %2" trimtrailingzeroes="1" labelprecision="4"/>
       <parameters>
         <Option/>
       </parameters>
@@ -356,180 +350,164 @@
     <rotation/>
     <sizescale/>
   </renderer-v2>
-  <customproperties>
-    <Option/>
-  </customproperties>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
-  <layerOpacity>1</layerOpacity>
-  <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
-    <activeChecks/>
-    <checkConfiguration/>
-  </geometryOptions>
-  <legend type="default-vector" showLabelLegend="0"/>
-  <referencedLayers/>
   <fieldConfiguration>
-    <field name="fid" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="fid">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Area (km²)" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Paddock">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="AE/km²" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Land Type">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Potential AE/km²" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Paddock Name">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="AE" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Land Type Name">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Potential AE" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Condition" configurationFlags="None">
+    <field configurationFlags="None" name="Condition">
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
             <Option name="map" type="List">
               <Option type="Map">
-                <Option name="A" type="QString" value="A"/>
+                <Option value="A" name="A" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option name="B" type="QString" value="B"/>
+                <Option value="B" name="B" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option name="C" type="QString" value="C"/>
+                <Option value="C" name="C" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option name="D" type="QString" value="D"/>
+                <Option value="D" name="D" type="QString"/>
               </Option>
             </Option>
           </Option>
         </config>
       </editWidget>
     </field>
-    <field name="Paddock" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Paddock Name" configurationFlags="None">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="Timeframe" configurationFlags="None">
+    <field configurationFlags="None" name="Timeframe">
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
             <Option name="map" type="List">
               <Option type="Map">
-                <Option name="Historical" type="QString" value="Historical"/>
+                <Option value="Current" name="Current" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option name="Current" type="QString" value="Current"/>
+                <Option value="Future" name="Future" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option name="Future" type="QString" value="Future"/>
-              </Option>
-              <Option type="Map">
-                <Option name="Drafted" type="QString" value="Drafted"/>
-              </Option>
-              <Option type="Map">
-                <Option name="Undefined" type="QString" value="Undefined"/>
+                <Option value="Undefined" name="Undefined" type="QString"/>
               </Option>
             </Option>
           </Option>
         </config>
       </editWidget>
     </field>
-    <field name="Land Type" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Area (km²)">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Land Type Name" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Watered Area (km²)">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Watered Area (km²)" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="AE/km²">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Rounded Area (km²)" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Potential AE/km²">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Rounded Watered Area (km²)" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="AE">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Rounded AE/km²" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Potential AE">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Rounded Potential AE/km²" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Rounded Area (km²)">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Rounded AE" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Rounded Watered Area (km²)">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="Rounded Potential AE" configurationFlags="None">
-      <editWidget type="">
+    <field configurationFlags="None" name="Rounded AE/km²">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="Rounded Potential AE/km²">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="Rounded AE">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="Rounded Potential AE">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
@@ -537,40 +515,40 @@
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias field="fid" index="0" name=""/>
-    <alias field="Area (km²)" index="1" name=""/>
-    <alias field="AE/km²" index="2" name=""/>
-    <alias field="Potential AE/km²" index="3" name=""/>
-    <alias field="AE" index="4" name=""/>
-    <alias field="Potential AE" index="5" name=""/>
-    <alias field="Condition" index="6" name=""/>
-    <alias field="Paddock" index="7" name=""/>
-    <alias field="Paddock Name" index="8" name=""/>
-    <alias field="Timeframe" index="9" name=""/>
-    <alias field="Land Type" index="10" name=""/>
-    <alias field="Land Type Name" index="11" name=""/>
-    <alias field="Watered Area (km²)" index="12" name=""/>
-    <alias field="Rounded Area (km²)" index="13" name="Area (km²)"/>
-    <alias field="Rounded Watered Area (km²)" index="14" name="Watered Area (km²)"/>
-    <alias field="Rounded AE/km²" index="15" name="AE/km²"/>
-    <alias field="Rounded Potential AE/km²" index="16" name="Potential AE/km²"/>
-    <alias field="Rounded AE" index="17" name="AE"/>
-    <alias field="Rounded Potential AE" index="18" name="Potential AE"/>
+    <alias field="fid" name="" index="0"/>
+    <alias field="Paddock" name="" index="1"/>
+    <alias field="Land Type" name="" index="2"/>
+    <alias field="Paddock Name" name="" index="3"/>
+    <alias field="Land Type Name" name="" index="4"/>
+    <alias field="Condition" name="" index="5"/>
+    <alias field="Timeframe" name="" index="6"/>
+    <alias field="Area (km²)" name="" index="7"/>
+    <alias field="Watered Area (km²)" name="" index="8"/>
+    <alias field="AE/km²" name="" index="9"/>
+    <alias field="Potential AE/km²" name="" index="10"/>
+    <alias field="AE" name="" index="11"/>
+    <alias field="Potential AE" name="" index="12"/>
+    <alias field="Rounded Area (km²)" name="Area (km²)" index="13"/>
+    <alias field="Rounded Watered Area (km²)" name="Watered Area (km²)" index="14"/>
+    <alias field="Rounded AE/km²" name="AE/km²" index="15"/>
+    <alias field="Rounded Potential AE/km²" name="Potential AE/km²" index="16"/>
+    <alias field="Rounded AE" name="AE" index="17"/>
+    <alias field="Rounded Potential AE" name="Potential AE" index="18"/>
   </aliases>
   <defaults>
     <default expression="" field="fid" applyOnUpdate="0"/>
+    <default expression="" field="Paddock" applyOnUpdate="0"/>
+    <default expression="" field="Land Type" applyOnUpdate="0"/>
+    <default expression="" field="Paddock Name" applyOnUpdate="0"/>
+    <default expression="" field="Land Type Name" applyOnUpdate="0"/>
+    <default expression="'A'" field="Condition" applyOnUpdate="0"/>
+    <default expression="'Undefined'" field="Timeframe" applyOnUpdate="0"/>
     <default expression="" field="Area (km²)" applyOnUpdate="0"/>
+    <default expression="" field="Watered Area (km²)" applyOnUpdate="0"/>
     <default expression="" field="AE/km²" applyOnUpdate="0"/>
     <default expression="" field="Potential AE/km²" applyOnUpdate="0"/>
     <default expression="" field="AE" applyOnUpdate="0"/>
     <default expression="" field="Potential AE" applyOnUpdate="0"/>
-    <default expression="'A'" field="Condition" applyOnUpdate="0"/>
-    <default expression="" field="Paddock" applyOnUpdate="0"/>
-    <default expression="" field="Paddock Name" applyOnUpdate="0"/>
-    <default expression="'Undefined'" field="Timeframe" applyOnUpdate="0"/>
-    <default expression="" field="Land Type" applyOnUpdate="0"/>
-    <default expression="" field="Land Type Name" applyOnUpdate="0"/>
-    <default expression="" field="Watered Area (km²)" applyOnUpdate="0"/>
     <default expression="" field="Rounded Area (km²)" applyOnUpdate="0"/>
     <default expression="" field="Rounded Watered Area (km²)" applyOnUpdate="0"/>
     <default expression="" field="Rounded AE/km²" applyOnUpdate="0"/>
@@ -579,71 +557,82 @@
     <default expression="" field="Rounded Potential AE" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" field="fid" unique_strength="1" exp_strength="0" constraints="3"/>
-    <constraint notnull_strength="0" field="Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Potential AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="AE" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Potential AE" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Condition" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Paddock" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Paddock Name" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Timeframe" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Land Type" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Land Type Name" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Watered Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Watered Area (km²)" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Potential AE/km²" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded AE" unique_strength="0" exp_strength="0" constraints="0"/>
-    <constraint notnull_strength="0" field="Rounded Potential AE" unique_strength="0" exp_strength="0" constraints="0"/>
+    <constraint notnull_strength="1" constraints="3" field="fid" exp_strength="0" unique_strength="1"/>
+    <constraint notnull_strength="0" constraints="0" field="Paddock" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Land Type" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Paddock Name" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Land Type Name" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Condition" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Timeframe" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Area (km²)" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Watered Area (km²)" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="AE/km²" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Potential AE/km²" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="AE" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Potential AE" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Rounded Area (km²)" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Rounded Watered Area (km²)" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Rounded AE/km²" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Rounded Potential AE/km²" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Rounded AE" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Rounded Potential AE" exp_strength="0" unique_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint exp="" field="fid" desc=""/>
-    <constraint exp="" field="Area (km²)" desc=""/>
-    <constraint exp="" field="AE/km²" desc=""/>
-    <constraint exp="" field="Potential AE/km²" desc=""/>
-    <constraint exp="" field="AE" desc=""/>
-    <constraint exp="" field="Potential AE" desc=""/>
-    <constraint exp="" field="Condition" desc=""/>
-    <constraint exp="" field="Paddock" desc=""/>
-    <constraint exp="" field="Paddock Name" desc=""/>
-    <constraint exp="" field="Timeframe" desc=""/>
-    <constraint exp="" field="Land Type" desc=""/>
-    <constraint exp="" field="Land Type Name" desc=""/>
-    <constraint exp="" field="Watered Area (km²)" desc=""/>
-    <constraint exp="" field="Rounded Area (km²)" desc=""/>
-    <constraint exp="" field="Rounded Watered Area (km²)" desc=""/>
-    <constraint exp="" field="Rounded AE/km²" desc=""/>
-    <constraint exp="" field="Rounded Potential AE/km²" desc=""/>
-    <constraint exp="" field="Rounded AE" desc=""/>
-    <constraint exp="" field="Rounded Potential AE" desc=""/>
+    <constraint desc="" exp="" field="fid"/>
+    <constraint desc="" exp="" field="Paddock"/>
+    <constraint desc="" exp="" field="Land Type"/>
+    <constraint desc="" exp="" field="Paddock Name"/>
+    <constraint desc="" exp="" field="Land Type Name"/>
+    <constraint desc="" exp="" field="Condition"/>
+    <constraint desc="" exp="" field="Timeframe"/>
+    <constraint desc="" exp="" field="Area (km²)"/>
+    <constraint desc="" exp="" field="Watered Area (km²)"/>
+    <constraint desc="" exp="" field="AE/km²"/>
+    <constraint desc="" exp="" field="Potential AE/km²"/>
+    <constraint desc="" exp="" field="AE"/>
+    <constraint desc="" exp="" field="Potential AE"/>
+    <constraint desc="" exp="" field="Rounded Area (km²)"/>
+    <constraint desc="" exp="" field="Rounded Watered Area (km²)"/>
+    <constraint desc="" exp="" field="Rounded AE/km²"/>
+    <constraint desc="" exp="" field="Rounded Potential AE/km²"/>
+    <constraint desc="" exp="" field="Rounded AE"/>
+    <constraint desc="" exp="" field="Rounded Potential AE"/>
   </constraintExpressions>
   <expressionfields>
-    <field comment="" expression="round(&quot;Area (km²)&quot;, 2)" typeName="" name="Rounded Area (km²)" subType="0" precision="0" type="6" length="0"/>
-    <field comment="" expression="round(&quot;Watered Area (km²)&quot;, 2)" typeName="" name="Rounded Watered Area (km²)" subType="0" precision="0" type="6" length="0"/>
-    <field comment="" expression="round(&quot;AE/km²&quot;, 1)" typeName="" name="Rounded AE/km²" subType="0" precision="0" type="6" length="0"/>
-    <field comment="" expression="round(&quot;Potential AE/km²&quot;, 1)" typeName="" name="Rounded Potential AE/km²" subType="0" precision="0" type="6" length="0"/>
-    <field comment="" expression="round(&quot;AE&quot;, 0)" typeName="" name="Rounded AE" subType="0" precision="0" type="6" length="0"/>
-    <field comment="" expression="round(&quot;Potential AE&quot;, 0)" typeName="" name="Rounded Potential AE" subType="0" precision="0" type="6" length="0"/>
+    <field expression="round(&quot;Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Area (km²)" length="0" type="6" comment=""/>
+    <field expression="round(&quot;Watered Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Watered Area (km²)" length="0" type="6" comment=""/>
+    <field expression="round(&quot;AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded AE/km²" length="0" type="6" comment=""/>
+    <field expression="round(&quot;Potential AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded Potential AE/km²" length="0" type="6" comment=""/>
+    <field expression="round(&quot;AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded AE" length="0" type="6" comment=""/>
+    <field expression="round(&quot;Potential AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded Potential AE" length="0" type="6" comment=""/>
+    <field expression="round(&quot;Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Area (km²)" length="0" type="6" comment=""/>
+    <field expression="round(&quot;Watered Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Watered Area (km²)" length="0" type="6" comment=""/>
+    <field expression="round(&quot;AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded AE/km²" length="0" type="6" comment=""/>
+    <field expression="round(&quot;Potential AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded Potential AE/km²" length="0" type="6" comment=""/>
+    <field expression="round(&quot;AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded AE" length="0" type="6" comment=""/>
+    <field expression="round(&quot;Potential AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded Potential AE" length="0" type="6" comment=""/>
   </expressionfields>
-  <attributeactions/>
-  <attributetableconfig sortExpression="" sortOrder="0" actionWidgetStyle="dropDown">
+  <attributetableconfig sortOrder="1" actionWidgetStyle="dropDown" sortExpression="&quot;fid&quot;">
     <columns>
-      <column hidden="0" width="-1" name="Paddock" type="field"/>
-      <column hidden="0" width="369" name="Paddock Name" type="field"/>
-      <column hidden="0" width="296" name="Land Type" type="field"/>
-      <column hidden="0" width="243" name="Land Type Name" type="field"/>
-      <column hidden="1" width="280" name="AE/km²" type="field"/>
-      <column hidden="0" width="-1" name="Condition" type="field"/>
-      <column hidden="0" width="-1" name="fid" type="field"/>
-      <column hidden="1" width="-1" name="Area (km²)" type="field"/>
-      <column hidden="1" width="-1" name="AE" type="field"/>
-      <column hidden="1" width="-1" name="Potential AE" type="field"/>
-      <column hidden="1" width="-1" name="Potential AE/km²" type="field"/>
-      <column hidden="1" width="-1" name="Watered Area (km²)" type="field"/>
-      <column hidden="0" width="-1" name="Timeframe" type="field"/>
+      <column hidden="0" name="fid" width="53" type="field"/>
+      <column hidden="0" name="Paddock" width="100" type="field"/>
+      <column hidden="0" name="Land Type" width="138" type="field"/>
+      <column hidden="0" name="Paddock Name" width="163" type="field"/>
+      <column hidden="0" name="Land Type Name" width="183" type="field"/>
+      <column hidden="0" name="Condition" width="111" type="field"/>
+      <column hidden="0" name="Timeframe" width="122" type="field"/>
+      <column hidden="1" name="Area (km²)" width="-1" type="field"/>
+      <column hidden="1" name="Watered Area (km²)" width="-1" type="field"/>
+      <column hidden="1" name="AE/km²" width="280" type="field"/>
+      <column hidden="1" name="Potential AE/km²" width="-1" type="field"/>
+      <column hidden="1" name="AE" width="-1" type="field"/>
+      <column hidden="1" name="Potential AE" width="-1" type="field"/>
+      <column hidden="0" name="Rounded Area (km²)" width="-1" type="field"/>
+      <column hidden="0" name="Rounded Watered Area (km²)" width="213" type="field"/>
+      <column hidden="0" name="Rounded AE/km²" width="92" type="field"/>
+      <column hidden="0" name="Rounded Potential AE/km²" width="172" type="field"/>
+      <column hidden="0" name="Rounded AE" width="54" type="field"/>
+      <column hidden="0" name="Rounded Potential AE" width="168" type="field"/>
       <column hidden="1" width="-1" type="actions"/>
     </columns>
   </attributetableconfig>
@@ -688,8 +677,15 @@ def my_form_open(dialog, layer, feature):
     <field editable="1" name="Paddock Status"/>
     <field editable="1" name="Potential AE"/>
     <field editable="1" name="Potential AE/km²"/>
+    <field editable="0" name="Rounded AE"/>
+    <field editable="0" name="Rounded AE/km²"/>
+    <field editable="0" name="Rounded Area (km²)"/>
+    <field editable="0" name="Rounded Potential AE"/>
+    <field editable="0" name="Rounded Potential AE/km²"/>
+    <field editable="0" name="Rounded Watered Area (km²)"/>
     <field editable="1" name="Timeframe"/>
     <field editable="1" name="Watered"/>
+    <field editable="1" name="Watered Area (km²)"/>
     <field editable="1" name="Watered Area Status"/>
     <field editable="1" name="fid"/>
   </editable>
@@ -706,8 +702,15 @@ def my_form_open(dialog, layer, feature):
     <field name="Paddock Status" labelOnTop="0"/>
     <field name="Potential AE" labelOnTop="0"/>
     <field name="Potential AE/km²" labelOnTop="0"/>
+    <field name="Rounded AE" labelOnTop="0"/>
+    <field name="Rounded AE/km²" labelOnTop="0"/>
+    <field name="Rounded Area (km²)" labelOnTop="0"/>
+    <field name="Rounded Potential AE" labelOnTop="0"/>
+    <field name="Rounded Potential AE/km²" labelOnTop="0"/>
+    <field name="Rounded Watered Area (km²)" labelOnTop="0"/>
     <field name="Timeframe" labelOnTop="0"/>
     <field name="Watered" labelOnTop="0"/>
+    <field name="Watered Area (km²)" labelOnTop="0"/>
     <field name="Watered Area Status" labelOnTop="0"/>
     <field name="fid" labelOnTop="0"/>
   </labelOnTop>
@@ -724,14 +727,20 @@ def my_form_open(dialog, layer, feature):
     <field reuseLastValue="0" name="Paddock Status"/>
     <field reuseLastValue="0" name="Potential AE"/>
     <field reuseLastValue="0" name="Potential AE/km²"/>
+    <field reuseLastValue="0" name="Rounded AE"/>
+    <field reuseLastValue="0" name="Rounded AE/km²"/>
+    <field reuseLastValue="0" name="Rounded Area (km²)"/>
+    <field reuseLastValue="0" name="Rounded Potential AE"/>
+    <field reuseLastValue="0" name="Rounded Potential AE/km²"/>
+    <field reuseLastValue="0" name="Rounded Watered Area (km²)"/>
     <field reuseLastValue="0" name="Timeframe"/>
     <field reuseLastValue="0" name="Watered"/>
+    <field reuseLastValue="0" name="Watered Area (km²)"/>
     <field reuseLastValue="0" name="Watered Area Status"/>
     <field reuseLastValue="0" name="fid"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>
   <previewExpression>"Paddock Name"</previewExpression>
-  <mapTip></mapTip>
   <layerGeometryType>2</layerGeometryType>
 </qgis>

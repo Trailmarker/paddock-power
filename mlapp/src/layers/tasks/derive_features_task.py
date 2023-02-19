@@ -2,8 +2,8 @@
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, qgsInfo
-from ...models import WorkspaceMixin, TypeDict
+from ...utils import qgsInfo
+from ...models import WorkspaceMixin
 from .derive_features_single_task import DeriveFeaturesSingleTask
 
 
@@ -16,7 +16,6 @@ class DeriveFeaturesTask(QgsTask, WorkspaceMixin):
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.layers = layers
-        self.obsolete = False
         # self.setDependentLayers([self.layers])
 
         predecessor = None
@@ -47,11 +46,6 @@ class DeriveFeaturesTask(QgsTask, WorkspaceMixin):
             otherLayers = set([layer.id() for layer in otherTask.layers])
             return len(layers.intersection(otherLayers)) > 0
         return False
-
-    def cancelObsolete(self):
-        qgsInfo(f"{PLUGIN_NAME} cancelling task: '{self.description()}' because a newer task has been queued.")
-        self.obsolete = True
-        super().cancel()
 
     def cancel(self):
         qgsInfo(f"QGIS cancelling task: '{self.description()}' eg due to quitting or user intervention.")

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsProject, QgsPointXY, QgsRectangle
+from qgis.core import QgsFeatureRequest, QgsGeometry, QgsLineString, QgsPoint, QgsPointXY
 
 from ...models import Glitch
 from ...utils import PLUGIN_NAME, qgsDebug
@@ -225,8 +225,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return affectedPaddocks, resultingPaddocks
 
-    @Edits.persistFeatures
-    @FeatureAction.draft.handler()
+    @FeatureAction.draft.handleAndPersist()
     def draftFeature(self, geometry):
         """Draft a Fence."""
 
@@ -267,8 +266,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         
         return Edits.upsert(self).editBefore(edits)
 
-    @Edits.persistFeatures
-    @FeatureAction.plan.handler()
+    @FeatureAction.plan.handleAndPersist()
     def planFeature(self):
         """Plan the Paddocks that would be altered after building this Fence."""
 
@@ -330,8 +328,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         # self.basePaddockLayer now rolls back
         return Edits.upsert(self).editAfter(edits)
 
-    @Edits.persistFeatures
-    @FeatureAction.undoPlan.handler()
+    @FeatureAction.undoPlan.handleAndPersist()
     def undoPlanFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 
@@ -347,8 +344,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return Edits.upsert(self).editAfter(edits)
 
-    @Edits.persistFeatures
-    @FeatureAction.build.handler()
+    @FeatureAction.build.handleAndPersist()
     def buildFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 
@@ -370,8 +366,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
-    @Edits.persistFeatures
-    @FeatureAction.undoBuild.handler()
+    @FeatureAction.undoBuild.handleAndPersist()
     def undoBuildFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 

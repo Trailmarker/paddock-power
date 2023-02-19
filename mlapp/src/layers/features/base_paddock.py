@@ -41,49 +41,49 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
 
         return self.FID
 
-    # Note FeatureAction decorators are not accompanied by @Edits.persistFeatures(): the Base
+    # Note FeatureAction decorators do not use @FeatureAction.[action].handleAndPersistEdits(): the Base
     # Paddock is not persisted directly, but rather through the Paddock that relies on it and 
     # that reflects its STATUS
-    @FeatureAction.draft.handler()
+    @FeatureAction.draft.handle()
     def draftFeature(self, geometry, name):
         """Draft a Paddock."""
         self.NAME = name
         self.GEOMETRY = geometry
         return Edits.upsert(self)
 
-    @FeatureAction.plan.handler()
+    @FeatureAction.plan.handle()
     def planFeature(self, fence, crossedPaddock=None):
         self.BUILD_FENCE = fence.BUILD_ORDER
         self.crossedPaddockId = crossedPaddock.FID if crossedPaddock else None
         return Edits.upsert(self)
 
-    @FeatureAction.undoPlan.handler()
+    @FeatureAction.undoPlan.handle()
     def undoPlanFeature(self):
         self.BUILD_FENCE = None
         return Edits.delete(self)
 
-    @FeatureAction.build.handler()
+    @FeatureAction.build.handle()
     def buildFeature(self):
         return Edits.upsert(self)
 
-    @FeatureAction.undoBuild.handler()
+    @FeatureAction.undoBuild.handle()
     def undoBuildFeature(self):
         return Edits.upsert(self)
 
-    @FeatureAction.supersede.handler()
+    @FeatureAction.supersede.handle()
     def supersedeFeature(self, fence):
         self.BUILD_FENCE = fence.BUILD_ORDER
         return Edits.upsert(self)
 
-    @FeatureAction.undoSupersede.handler()
+    @FeatureAction.undoSupersede.handle()
     def undoSupersedeFeature(self):
         self.BUILD_FENCE = None
         return Edits.upsert(self)
     
-    @FeatureAction.archive.handler()
+    @FeatureAction.archive.handle()
     def archiveFeature(self):
         return Edits.upsert(self)
 
-    @FeatureAction.undoArchive.handler()
+    @FeatureAction.undoArchive.handle()
     def undoArchiveFeature(self):
         return Edits.upsert(self)
