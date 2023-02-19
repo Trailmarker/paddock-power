@@ -47,9 +47,9 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
                 raise Glitch(f"{type(self).__name__}.__init__: incoming Feature has missing fields: {missingFields}")
 
             QgsFeature.__init__(self, existingFeature)
-            
+
             for field in self.getSchema():
-                field.setValue(self, field.getValue(existingFeature))            
+                field.setValue(self, field.getValue(existingFeature))
             self.setGeometry(existingFeature.geometry())
 
         elif existingFeature is not None:

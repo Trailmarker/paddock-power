@@ -42,6 +42,6 @@ class PaddockDetailsEdit(QWidget, FORM_CLASS, WorkspaceMixin):
         edits = Edits.upsert(self.paddock)
         if self.basePaddock:
             self.basePaddock.NAME = self.nameLineEdit.text()
-            return Edits.upsert(self.basePaddock).editBefore(edits) # Cheeky?
+            return Edits.upsert(self.basePaddock).editBefore(edits)  # Cheeky?
         else:
             return edits

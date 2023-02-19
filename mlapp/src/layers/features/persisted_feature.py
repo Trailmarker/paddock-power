@@ -112,7 +112,6 @@ class PersistedFeature(Feature, IPersistedFeature):
             else:
                 raise Glitch(f"{self}.upsert: failed with unknown error")
 
-
     def delete(self):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""
         self.featureLayer.deleteFeature(self)

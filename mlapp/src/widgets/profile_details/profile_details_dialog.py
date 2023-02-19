@@ -22,4 +22,3 @@ class ProfileDetailsDialog(QDialog, FORM_CLASS):
     def showEvent(self, event):
         super().showEvent(event)
         self.profileDetails.refreshProfileCanvas()
-        

@@ -13,7 +13,7 @@ class PersistEditsTask(QgsTask, WorkspaceMixin):
         """Input is a closure over a FeatureAction handler for a given Feature."""
         super().__init__(
             f"PersistEditsTask",
-            flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt) # | QgsTask.Hidden) TODO not available in 3.22
+            flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)  # | QgsTask.Hidden) TODO not available in 3.22
 
         self._edits = None
         self._layers = []
@@ -52,4 +52,3 @@ def persistEdits(feature, editFunction, *args, **kwargs):
     """Utility function to queue an action returning edits to a PersistEditsTask."""
     feature.currentTask = PersistEditsTask(editFunction, feature, *args, **kwargs)
     QgsApplication.taskManager().addTask(feature.currentTask)
-

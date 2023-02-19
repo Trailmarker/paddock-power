@@ -6,6 +6,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QFrame, QListWidget, QListWid
 from ...models import WorkspaceMixin
 from ...utils import qgsDebug
 
+
 class FeatureListBase(QListWidget, WorkspaceMixin):
 
     def __init__(self, listItemFactory, parent=None):

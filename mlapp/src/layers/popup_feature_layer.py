@@ -13,6 +13,6 @@ class PopupFeatureLayer(DerivedFeatureLayer):
     def __init__(self, feature, *args):
         if not feature:
             raise Glitch(f"{type(self).__name__}.__init__({feature}, {args}): not feature")
-                         
+
         DerivedFeatureLayer.__init__(self, *args)
         self.popupFeature = feature

@@ -10,7 +10,7 @@ class PersistedFeature(Feature):
     def currentTask(self):
         """Return the current Task associated with this Feature."""
         pass
-    
+
     @abstractproperty
     def currentTask(self, task):
         """Return the current Task associated with this Feature."""

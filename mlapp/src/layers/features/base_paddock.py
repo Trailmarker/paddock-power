@@ -13,7 +13,7 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
     def displayName(cls):
         """Return the display name of the Base Paddock."""
         return "Paddock"
-    
+
     def __init__(self,
                  featureLayer,
                  existingFeature=None):
@@ -42,7 +42,7 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
         return self.FID
 
     # Note FeatureAction decorators do not use @FeatureAction.[action].handleAndPersistEdits(): the Base
-    # Paddock is not persisted directly, but rather through the Paddock that relies on it and 
+    # Paddock is not persisted directly, but rather through the Paddock that relies on it and
     # that reflects its STATUS
     @FeatureAction.draft.handle()
     def draftFeature(self, geometry, name):
@@ -79,7 +79,7 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
     def undoSupersedeFeature(self):
         self.BUILD_FENCE = None
         return Edits.upsert(self)
-    
+
     @FeatureAction.archive.handle()
     def archiveFeature(self):
         return Edits.upsert(self)

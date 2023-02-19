@@ -19,7 +19,7 @@ class DerivedBoundaryLayer(DerivedFeatureLayer):
         query = f"""
 select st_union(geometry) as geometry,
 0 as {FID},
-'{Timeframe.Current.name}' as {TIMEFRAME} 
+'{Timeframe.Current.name}' as {TIMEFRAME}
 from "{basePaddockLayer}"
 where {Timeframe.Current.includesStatuses(f'"{basePaddockLayer}".{STATUS}')}
 union

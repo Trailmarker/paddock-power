@@ -119,10 +119,10 @@ class Field(QgsField):
                 # Try a few ways to set the value
                 try:
                     feature.setAttribute(self.name(), self._domainType[domainValue].name)
-                except:
+                except BaseException:
                     try:
                         feature.setAttribute(self.name(), self._domainType(domainValue).name)
-                    except:
+                    except BaseException:
                         raise Glitch(f"Invalid value '{domainValue}' for field '{self.name()}'")
         return _setter
 

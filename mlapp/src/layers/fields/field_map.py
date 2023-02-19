@@ -68,6 +68,6 @@ class FieldMap(dict):
         # Suck the mapped import fields into the target feature fields
         for targetField in targetFeature.getSchema():
             if targetField.name() in self:
-                targetField.setValue(targetFeature, feature.attribute(self[targetField.name()]))              
-    
+                targetField.setValue(targetFeature, feature.attribute(self[targetField.name()]))
+
         return targetFeature

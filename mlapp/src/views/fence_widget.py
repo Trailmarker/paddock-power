@@ -27,7 +27,7 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
         self.fence = None
         self.setupUi(self)
-        
+
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, False)
@@ -35,7 +35,7 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
         self.affectedPaddocksMiniList.basePaddockLayer = self.basePaddockLayer
         self.resultingPaddocksMiniList.basePaddockLayer = self.basePaddockLayer
-        
+
         self.fenceLayer.featureSelected.connect(self.changeSelection)
         self.fenceLayer.featureDeselected.connect(self.removeSelection)
         self.refreshUi()
