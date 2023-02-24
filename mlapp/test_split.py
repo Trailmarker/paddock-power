@@ -127,7 +127,7 @@ def getNewBasePaddocks(fence):
             # qgsDebug("getNewPaddocks: splitGeometry in progress …")
             notPropertyGeometry = shape(getNotPropertyGeometry().__geo_interface__)
             splits = split(notPropertyGeometry, blade)
-            
+
             # The first result is always the piece of notProperty that is carved out? TODO check this
             if splits:
                 paddockGeometry = notPropertyGeometry.difference(splits[0])
@@ -148,7 +148,7 @@ def planFenceLine(fence):
     edits = Edits()
 
     _, crossedBasePaddocks = getCrossedBasePaddocks(fence)
-    
+
     fenceLine = fence.GEOMETRY
     blade = shape(fenceLine.__geo_interface__)
 
@@ -157,14 +157,14 @@ def planFenceLine(fence):
         # https://gis.stackexchange.com/questions/232771/splitting-polygon-by-linestring-in-geodjango
         crossedPaddockGeometry = shape(crossedBasePaddock.GEOMETRY.__geo_interface__)
         splits = split(crossedPaddockGeometry, blade)
-        
+
         for i, splitPaddockGeometry in enumerate(splits):
-            splitPaddock = workspace().basePaddockLayer.makeFeature()   
-         
+            splitPaddock = workspace().basePaddockLayer.makeFeature()
+
             splitPaddock.draftFeature(
                 QgsGeometry.fromWkt(splitPaddockGeometry.wkt),
                 crossedBasePaddock.NAME + ' ' + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i])
-            
+
             splitPaddock.recalculate()
             edits.editBefore(splitPaddock.planFeature(fence, crossedBasePaddock))
 

@@ -262,7 +262,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return Edits.upsert(self).editBefore(edits)
 
-    @ FeatureAction.plan.handleAndPersist()
+    @FeatureAction.plan.handleAndPersist()
     def planFeature(self):
         """Plan the Paddocks that would be altered after building this Fence."""
 
@@ -307,7 +307,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return Edits.upsert(self).editAfter(edits)
 
-    @ FeatureAction.undoPlan.handleAndPersist()
+    @FeatureAction.undoPlan.handleAndPersist()
     def undoPlanFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 
@@ -323,7 +323,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return Edits.upsert(self).editAfter(edits)
 
-    @ FeatureAction.build.handleAndPersist()
+    @FeatureAction.build.handleAndPersist()
     def buildFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 
@@ -345,7 +345,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
-    @ FeatureAction.undoBuild.handleAndPersist()
+    @FeatureAction.undoBuild.handleAndPersist()
     def undoBuildFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 

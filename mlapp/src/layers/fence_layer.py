@@ -45,7 +45,7 @@ class FenceLayer(PersistedFeatureLayer):
             f'"{BUILD_ORDER}" = {buildOrder}')
 
         try:
-            fence = next(self.getFeatures(buildOrderRequest))            
+            fence = next(self.getFeatures(buildOrderRequest))
             try:
                 next(self.getFeatures(buildOrderRequest))
                 raise Glitch(f"Integrity problem: your Workspace has multiple Fences with Build Order {buildOrder}")
@@ -53,4 +53,3 @@ class FenceLayer(PersistedFeatureLayer):
                 return fence
         except StopIteration:
             raise Glitch(f"Integrity problem: your Workspace has no Fence with Build Order {buildOrder}")
-

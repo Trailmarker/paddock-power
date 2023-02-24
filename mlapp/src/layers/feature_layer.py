@@ -105,8 +105,8 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def getFeaturesByTimeframe(self, timeframe, request=None):
         """Get the features in this layer that are in a specified timeframe."""
         request = request or QgsFeatureRequest()
-        
-        if self.getFeatureType().hasField(TIMEFRAME):    
+
+        if self.getFeatureType().hasField(TIMEFRAME):
             request.setFilterExpression(timeframe.getFilterExpression())
             return self.getFeatures(request)
         else:

@@ -253,8 +253,8 @@ class Workspace(QObject):
         """Handle a change to the features of one or more layer."""
 
         # Emit a signal to any layer subscribers that these features have changedinstance
-        # for layer in edits.layers:        
+        # for layer in edits.layers:
         #     layer.featuresChanged.emit()
-        
+
         # Re-derive other features that depend on these features
         # self.deriveLayers(featureLayerTypes)

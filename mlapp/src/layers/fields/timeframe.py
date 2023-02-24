@@ -4,6 +4,7 @@ from .feature_status import FeatureStatus
 from .field_domain import FieldDomain
 from .names import TIMEFRAME
 
+
 class Timeframe(FieldDomain):
     f"""The two available timeframes for a {PLUGIN_NAME} workspace."""
     Current = "Current"
