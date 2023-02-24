@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from collections.abc import Generator
+
 import inspect
 import os
 import random
@@ -150,6 +152,13 @@ def getComponentStyleSheet(componentFile):
 def randomString(length=8):
     """Generate a random string of a specified length."""
     return ''.join(random.choice(string.ascii_letters) for _ in range(length))
+
+
+def ensureIterated(seq):
+    """Ensure that a generator is iterated and returned as a list."""
+    if isinstance(seq, Generator):
+        return [item for item in seq]
+    return seq
 
 
 # See https://stackoverflow.com/questions/28258875/how-to-obtain-the-set-of-all-signals-for-a-given-widget

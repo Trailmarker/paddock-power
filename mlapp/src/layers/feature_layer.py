@@ -6,6 +6,7 @@ from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import resolveStylePath, PLUGIN_NAME
+from .fields import TIMEFRAME
 from .interfaces import IFeatureLayer
 from .map_layer_mixin import MapLayerMixin
 
@@ -102,14 +103,19 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         return self._wrapFeatures(super().getFeatures(request))
 
     def getFeaturesByTimeframe(self, timeframe, request=None):
-        """Get the features in this layer that are in the current timeframe."""
-        features = self.getFeatures(request)
-        return [f for f in features if f.matchTimeframe(timeframe)]
+        """Get the features in this layer that are in a specified timeframe."""
+        request = request or QgsFeatureRequest()
+        
+        if self.getFeatureType().hasField(TIMEFRAME):    
+            request.setFilterExpression(timeframe.getFilterExpression())
+            return self.getFeatures(request)
+        else:
+            features = self.getFeatures(request)
+            return [f for f in features if f.matchTimeframe(timeframe)]
 
     def getFeaturesInCurrentTimeframe(self, request=None):
         """Get the features in this layer that are in the current timeframe."""
-        features = self.getFeatures(request)
-        return [f for f in features if f.matchTimeframe(self.timeframe)]
+        return self.getFeaturesByTimeframe(self.timeframe, request)
 
     def getFeature(self, id):
         """Get a feature by its id, assumed to be the same as its FID."""

@@ -249,14 +249,12 @@ class Workspace(QObject):
             # qgsDebug(f"{type(self).__name__}.onLayerAnalysisComplete: {type(layer).__name__}.featuresChanged.emit()")
             layer.featuresChanged.emit()
 
-    def onFeaturesPersisted(self, layerTypes):
+    def onPersistEdits(self, edits):
         """Handle a change to the features of one or more layer."""
-        featureLayerTypes = [layerType for layerType in layerTypes if issubclass(layerType, IFeatureLayer)]
 
         # Emit a signal to any layer subscribers that these features have changedinstance
-        for layerType in featureLayerTypes:
-            # qgsDebug(f"{type(self).__name__}.onFeaturesPersisted: {layerType.__name__}.featuresChanged.emit()")
-            self.workspaceLayers.layer(layerType).featuresChanged.emit()
-
+        # for layer in edits.layers:        
+        #     layer.featuresChanged.emit()
+        
         # Re-derive other features that depend on these features
-        self.deriveLayers(featureLayerTypes)
+        # self.deriveLayers(featureLayerTypes)

@@ -45,7 +45,7 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
     # Paddock is not persisted directly, but rather through the Paddock that relies on it and
     # that reflects its STATUS
     @FeatureAction.draft.handle()
-    def draftFeature(self, geometry, name):
+    def draftFeature(self, geometry, name=None):
         """Draft a Paddock."""
         self.NAME = name
         self.GEOMETRY = geometry

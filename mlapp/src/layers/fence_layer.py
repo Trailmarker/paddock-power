@@ -44,12 +44,13 @@ class FenceLayer(PersistedFeatureLayer):
         buildOrderRequest = QgsFeatureRequest().setFilterExpression(
             f'"{BUILD_ORDER}" = {buildOrder}')
 
-        fences = list(self.getFeatures(buildOrderRequest))
+        try:
+            fence = next(self.getFeatures(buildOrderRequest))            
+            try:
+                next(self.getFeatures(buildOrderRequest))
+                raise Glitch(f"Integrity problem: your Workspace has multiple Fences with Build Order {buildOrder}")
+            except StopIteration:
+                return fence
+        except StopIteration:
+            raise Glitch(f"Integrity problem: your Workspace has no Fence with Build Order {buildOrder}")
 
-        if not fences:
-            return None
-
-        if len(fences) > 1:
-            raise Glitch(f"Integrity problem: your Workspace has multiple Fences with Build Order {buildOrder}")
-
-        return fences[0]

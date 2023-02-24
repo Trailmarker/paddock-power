@@ -84,9 +84,10 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
         """Return True if the Feature is infrastructure."""
         return False
 
-    def hasField(self, fieldName):
+    @classmethod
+    def hasField(cls, fieldName):
         """Return True if the Feature's Schema has a Field with the supplied name."""
-        return fieldName in [field.name() for field in self.getSchema()]
+        return fieldName in [field.name() for field in cls.getSchema()]
 
     @cached_property
     def hasArea(self):

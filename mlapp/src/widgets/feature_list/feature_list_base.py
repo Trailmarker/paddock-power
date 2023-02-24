@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QFrame, QListWidget, QListWid
 
 
 from ...models import WorkspaceMixin
-from ...utils import qgsDebug
+from ...utils import ensureIterated
 
 
 class FeatureListBase(QListWidget, WorkspaceMixin):
@@ -56,7 +56,7 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
         self.clear()
         self.removeSelection()
 
-        features = self.getFeatures()
+        features = ensureIterated(self.getFeatures())
 
         # De-duplicate Features
         features = self.deduplicateFeatures(features)

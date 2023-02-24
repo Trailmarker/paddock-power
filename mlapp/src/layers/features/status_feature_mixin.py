@@ -24,7 +24,7 @@ class StatusFeatureMixin(StateMachineMixin, IStatusFeature):
     def TIMEFRAME(self):
         """Return the timeframe for the Feature."""
         if not self.hasTimeframe:
-            return Timeframe.fromFeatureStatus(p)
+            return Timeframe.fromFeatureStatus(self.STATUS)
         else:
             return self.attribute(TIMEFRAME)
 

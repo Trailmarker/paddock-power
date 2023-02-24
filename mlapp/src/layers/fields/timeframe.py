@@ -2,7 +2,7 @@
 from ...utils import PLUGIN_NAME
 from .feature_status import FeatureStatus
 from .field_domain import FieldDomain
-
+from .names import TIMEFRAME
 
 class Timeframe(FieldDomain):
     f"""The two available timeframes for a {PLUGIN_NAME} workspace."""
@@ -27,6 +27,9 @@ class Timeframe(FieldDomain):
             return (255, 255, 255)
         elif Timeframe[self.name] == Timeframe.Undefined:
             raise NotImplementedError("Undefined status not implemented")
+
+    def getFilterExpression(self):
+        return f"\"{TIMEFRAME}\"='{self.name}'"
 
     def matchingFeatureStatuses(self):
         """Return all Feature Statuses that correspond to this Timeframe."""
