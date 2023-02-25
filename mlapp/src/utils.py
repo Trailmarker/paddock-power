@@ -20,8 +20,12 @@ PADDOCK_POWER_EPSG = 7845
 PLUGIN_NAME = "MLA Paddock Power"
 PLUGIN_FOLDER = "mlapp"
 
+# Half a second gap between running certain jobs with moving parts
+JOB_DELAY = 0.3
+
 # 16777215
 MAX_QT_DIMENSION = (2 * 24 - 1)
+
 
 
 def formatMessage(message):

@@ -2,9 +2,9 @@
 
 from qgis.core import QgsTask
 
-from ...utils import qgsInfo
 from ...models import WorkspaceMixin
-from .derive_features_single_task import DeriveEditsSingleTask
+from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
+from .derive_edits_single_task import DeriveEditsSingleTask
 
 
 class DeriveEditsTask(QgsTask, WorkspaceMixin):
@@ -19,18 +19,15 @@ class DeriveEditsTask(QgsTask, WorkspaceMixin):
         self.edits = edits
         # self.setDependentLayers([self.layers])
 
-        predecessor = None
+        predecessors = []
         for layer in self.layers:
             task = DeriveEditsSingleTask(layer, self.edits, onTaskCompleted=onTaskCompleted)
-            if predecessor:
-                self.addSubTask(
-                    task, dependencies=[predecessor],
-                    subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
-            else:
-                self.addSubTask(
-                    task, dependencies=[],
-                    subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
-            predecessor = task
+            task.taskTerminated.connect(self.cancel)
+
+            self.addSubTask(
+                task, dependencies=predecessors,
+                subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
+            predecessors.append(task)
 
     def run(self):
         """Derive features for all layers as specified in subtasks."""
@@ -38,16 +35,5 @@ class DeriveEditsTask(QgsTask, WorkspaceMixin):
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
-        # self.workspace.onTaskCompleted(self, result)
-
-    # def makesObsolete(self, otherTask):
-    #     """Return true if this task makes the other task obsolete."""
-    #     if isinstance(otherTask, DeriveEditsTask):
-    #         layers = set([layer.id() for layer in self.layers])
-    #         otherLayers = set([layer.id() for layer in otherTask.layers])
-    #         return len(layers.intersection(otherLayers)) > 0
-    #     return False
-
-    def cancel(self):
-        qgsInfo(f"QGIS cancelling task: '{self.description()}' eg due to quitting or user intervention.")
-        super().cancel()
+        if not result:
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to fully derive the '{self.workspaceName}' workspace.")

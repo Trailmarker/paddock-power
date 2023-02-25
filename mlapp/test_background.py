@@ -25,10 +25,3 @@ def testDeriveSeveral():
     testTask.taskTerminated.connect(lambda: qgsDebug(f"{testTask.description()} terminated"))
     QgsApplication.taskManager().addTask(testTask)
 
-
-def testDeriveMultiple():
-    testTask = DeriveFeaturesMultipleTask(
-        [workspace().waterpointBufferLayer, workspace().wateredAreaLayer, workspace().paddockLandTypesLayer])
-    testTask.taskCompleted.connect(lambda: qgsDebug(f"{testTask.description()} completed"))
-    testTask.taskTerminated.connect(lambda: qgsDebug(f"{testTask.description()} terminated"))
-    QgsApplication.taskManager().addTask(testTask)

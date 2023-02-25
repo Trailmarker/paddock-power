@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from time import sleep
+
 from qgis.core import QgsTask
 
-from ...models import Glitch
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsDebug, qgsError
+from ...utils import JOB_DELAY, PLUGIN_NAME, guiStatusBarAndInfo
 
 
 class LoadLayerTask(QgsTask):
@@ -23,10 +24,9 @@ class LoadLayerTask(QgsTask):
         f"""Load a layer of the nominated type in a {PLUGIN_NAME} workspace."""
         dependentLayers = [self._workspaceLayers.layer(dependentLayerType)
                            for dependentLayerType in self._dependentLayerTypes]
-        # qgsDebug(
-        #     f"LoadLayerTask.run(): self._layerType={self._layerType.__name__}, self._workspaceFile={self._workspaceFile}, dependentLayers={dependentLayers}")
 
         self._layer = self._layerType(self._workspaceFile, *dependentLayers)
+        sleep(JOB_DELAY)
         return True
 
     def finished(self, result):
@@ -36,6 +36,3 @@ class LoadLayerTask(QgsTask):
             guiStatusBarAndInfo(f"{PLUGIN_NAME} {self._layer.name()} loaded.")
         else:
             guiStatusBarAndInfo(f"{PLUGIN_NAME} error loading {self._layerType.defaultName()}")
-
-    def cancel(self):
-        super().cancel()

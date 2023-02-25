@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from functools import cached_property
 from qgis.utils import plugins
-
 
 class WorkspaceMixin:
 

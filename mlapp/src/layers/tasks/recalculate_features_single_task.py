@@ -3,7 +3,7 @@ from time import sleep
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, guiStatusBar, qgsInfo
+from ...utils import JOB_DELAY, PLUGIN_NAME, guiStatusBar, qgsInfo
 from ...models import WorkspaceMixin
 from ..features import Edits
 from ..interfaces import IPersistedDerivedFeatureLayer, IPersistedFeatureLayer
@@ -25,9 +25,6 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
         """Recalculate features for a layer."""
         guiStatusBar(f"Recalculating {self.layer.name()} features …")
 
-        # TODO bit of a hack, just trying to reduce contention between these guys
-        # sleep(0.5)
-
         assert isinstance(self.layer, IPersistedFeatureLayer)
         assert not isinstance(self.layer, IPersistedDerivedFeatureLayer)
 
@@ -46,6 +43,9 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
         finally:
             self.layer.setReadOnly(readOnly)
         self.setProgress(100.0)
+
+        sleep(JOB_DELAY)
+
         return True
 
     def updateCount(self, featureCount, total):
@@ -56,7 +56,3 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
         self.workspace.onTaskCompleted(self, result)
-
-    def cancel(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} for an unknown reason.")
-        super().cancel()

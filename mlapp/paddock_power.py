@@ -3,13 +3,12 @@ import os.path
 import sys
 import traceback
 
-from time import sleep
-
 from qgis.PyQt.QtCore import Qt, QCoreApplication, QSettings, QTranslator, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from qgis.core import QgsExpression, QgsProject
+from qgis.utils import plugins
 
 from .resources_rc import *
 
@@ -30,7 +29,6 @@ class PaddockPower(PluginStateMachine):
     caughtGlitch = pyqtSignal(Glitch)
     workspaceReady = pyqtSignal()
     workspaceUnloading = pyqtSignal()
-    triggerDetectWorkspace = pyqtSignal()
 
     def __init__(self, iface):
         super().__init__()
@@ -67,8 +65,7 @@ class PaddockPower(PluginStateMachine):
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.featureView)
 
         self._stateChanged.connect(self.refreshUi)
-        self.triggerDetectWorkspace.connect(lambda: self.detectWorkspace(warning=False))
-
+  
     def addAction(self,
                   pluginAction,
                   icon,
@@ -142,7 +139,7 @@ class PaddockPower(PluginStateMachine):
             parent=self.iface.mainWindow())
 
         if self.status == PluginStatus.NoWorkspaceLoaded:
-            self.triggerDetectWorkspace.emit()
+            self.detectWorkspace()
 
     # Override Glitch type exceptions application-wide
 

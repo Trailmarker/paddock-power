@@ -168,7 +168,12 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
 
     def onSelectionChanged(self, selection, *_):
         """Translate our own selectionChanged signal into a workspace selectFeature call."""
+        qgsDebug(f"{type(self).__name__}.onSelectionChanged({selection})")
         if len(selection) == 1:
             feature = next(self.getFeatures(QgsFeatureRequest().setFilterFids(selection)), None)
             if feature:
+                qgsDebug(f"Selecting a feature! selection={selection}, feature={feature}")
                 self.workspace.selectFeature(feature)
+            else:
+                qgsDebug(f"Not selecting a feature! selection={selection}")
+                

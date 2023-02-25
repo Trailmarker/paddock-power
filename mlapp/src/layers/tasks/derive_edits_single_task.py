@@ -3,7 +3,7 @@ from time import sleep
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, guiStatusBar, qgsInfo
+from ...utils import JOB_DELAY, PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
 from ...models import WorkspaceMixin
 from ..features import Edits
 from ..interfaces import IPersistedDerivedFeatureLayer
@@ -17,50 +17,44 @@ class DeriveEditsSingleTask(QgsTask, WorkspaceMixin):
             f"deriving {layer.name()}",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
-        self.layer = layer
-        self.edits = edits
-        self.count = 0
-        self.total = 0
+        self._layer = layer
+        self._edits = edits
+        self._count = 0
+        self._total = 0
 
         if onTaskCompleted is not None:
             self.taskCompleted.connect(lambda: onTaskCompleted(type(layer), True))
 
-        # self.setDependentLayers([self.layer])
-
     def run(self):
         """Derive features for a layer."""
-        guiStatusBar(f"{PLUGIN_NAME} deriving {self.layer.name()} …")
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} deriving {self._layer.name()} …")
 
-        # TODO bit of a hack, just trying to reduce contention between these guys
-        # sleep(0.5)
-
-        assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
-        readOnly = self.layer.readOnly()
+        assert isinstance(self._layer, IPersistedDerivedFeatureLayer)
+        readOnly = self._layer.readOnly()
 
         try:
-            self.layer.setReadOnly(False)
+            self._layer.setReadOnly(False)
 
             if self.isCanceled():
                 return False
 
-            with Edits.editAndCommit([self.layer]):
-                self.layer.deriveFeatures(self.edits,
+            with Edits.editAndCommit([self._layer]):
+                self._layer.deriveFeatures(self._edits,
                     featureProgressCallback=self.updateCount,
                     cancelledCallback=self.isCanceled)
         finally:
-            self.layer.setReadOnly(readOnly)
+            self._layer.setReadOnly(readOnly)
         self.setProgress(100.0)
+        sleep(JOB_DELAY)
         return True
 
     def updateCount(self, featureCount, total):
-        self.count = featureCount
-        self.total = total
+        self._count = featureCount
+        self._total = total
         self.setProgress((featureCount * 100.0 / total) if total > 0 else 100.0)  # Watch for divzero …
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
-        self.workspace.onTaskCompleted(self, result, showMessage=False)
+        if not result:
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to derive {self._layer.name()} …")
 
-    def cancel(self):
-        qgsInfo(f"QGIS requesting cancellation of {self.description()} for an unknown reason …")
-        super().cancel()
