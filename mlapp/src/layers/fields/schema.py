@@ -38,3 +38,8 @@ class Schema(list):
         missing = [field for field in self if field.name() not in [f.name() for f in fields]]
         extra = [field for field in fields if field.name() not in [f.name() for f in self]]
         return missing, extra
+
+    def containsSchema(self, otherSchema):
+        """Check that the given Feature is compatible with this Schema."""
+        extra = [field for field in otherSchema if field.name() not in [f.name() for f in self]]
+        return not bool(extra) and self.wkbType == otherSchema.wkbType

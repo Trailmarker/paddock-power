@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from ...layers.fields import TIMEFRAME
 from .feature_list_base import FeatureListBase
+
+from qgis.core import QgsFeatureRequest, QgsVectorLayerCache
 
 
 class FeatureLayerList(FeatureListBase):
@@ -10,11 +13,12 @@ class FeatureLayerList(FeatureListBase):
 
         self._timeframe = self.workspace.timeframe
         self._timeframeOverride = False
-        self.workspace.timeframeChanged.connect(self.refreshUi)
+        self.workspace.timeframeChanged.connect(self.refreshList)
 
         self._featureLayer = None
+        self._layerCache = None  # QgsVectorLayerCache(self._featureLayer, self._featureLayer.featureCount())
 
-        self.refreshUi()
+        # self.refreshList()
 
     @property
     def timeframe(self):
@@ -38,23 +42,66 @@ class FeatureLayerList(FeatureListBase):
         oldVal = self._featureLayer
         self._featureLayer = newVal
         self.rewireFeatureLayer(oldVal, newVal)
-        self.refreshUi()
 
-    def rewireFeatureLayer(self, oldVal, newVal):
+    def rewireFeatureLayer(self, oldLayer, newLayer):
         """Rewire the FeatureLayer."""
         # qgsDebug(f"{type(self).__name__}.rewireFeatureLayer({oldVal}, {newVal})")
-        if oldVal:
-            oldVal.featuresChanged.disconnect(self.refreshUi)
-            oldVal.featureSelected.disconnect(self.changeSelection)
-            oldVal.featureDeselected.disconnect(self.removeSelection)
-        if newVal:
-            newVal.featuresChanged.connect(self.refreshUi)
-            newVal.featureSelected.connect(self.changeSelection)
-            newVal.featureDeselected.connect(self.removeSelection)
+        if oldLayer:
+            oldLayer.featuresChanged.disconnect(self.refreshList)
+            oldLayer.featureSelected.disconnect(self.changeSelection)
+            oldLayer.featureDeselected.disconnect(self.removeSelection)
+            if self._layerCache:
+                del(self._layerCache)
+        if newLayer:
+            # newLayer.featuresChanged.connect(self.refreshList)
+            newLayer.featureSelected.connect(self.changeSelection)
+            newLayer.featureDeselected.connect(self.removeSelection)
+            self._layerCache = QgsVectorLayerCache(newLayer, newLayer.featureCount())
+            self._layerCache.cachedLayerDeleted.connect(self.clear)
+            self._layerCache.attributeValueChanged.connect(lambda fid, *_: self.refreshListItem(fid))
+            self._layerCache.featureAdded.connect(lambda fid, *_: self.refreshListItem(fid))
+            self._layerCache.finished.connect(self.refreshList)
+            self._layerCache.invalidated.connect(self.refreshCache)
+            self.refreshCache()
 
-    def getFeatures(self):
+    def listFeatures(self, request=None):
+        """Get the items in the list."""
+        return self.getFeaturesInCurrentTimeframe(request)
+
+    def refreshCache(self):
+        """Refresh the cache."""
+        if self._layerCache:
+            self._layerCache.setFullCache(True)
+
+    def getFeatures(self, request=None):
         """Get the Features."""
-        if self.featureLayer:
-            return [feature for feature in self.featureLayer.getFeaturesByTimeframe(self.timeframe)]
+        for feature in self._layerCache.getFeatures(request):
+            yield self._featureLayer.wrapFeature(feature)
+
+    def getFeaturesByTimeframe(self, timeframe, request=None):
+        """Get the features in this layer that are in a specified timeframe."""
+        request = request or QgsFeatureRequest()
+
+        if self.featureLayer.getFeatureType().hasField(TIMEFRAME):
+            request.setFilterExpression(timeframe.getFilterExpression())
+            return self.getFeatures(request)
         else:
-            return []
+            features = self.getFeatures(request)
+            return [f for f in features if f.matchTimeframe(timeframe)]
+
+    def getFeaturesInCurrentTimeframe(self, request=None):
+        """Get the features in this layer that are in the current timeframe."""
+        return self.getFeaturesByTimeframe(self.featureLayer.timeframe, request)
+
+    def getFeature(self, id):
+        """Get a feature by its id, assumed to be the same as its FID."""
+        feature = self._layerCache.getFeature(id)
+        return self.featureLayer.wrapFeature(feature) if feature and feature.isValid() else None
+
+    def getFeatureFromSelection(self, selectionId):
+        """Convenience function as in rare cases this has to behave differently."""
+        return self.getFeature(selectionId)
+
+    def countFeatures(self):
+        """Get the number of Features in the layer."""
+        return len([f for f in self.getFeatures()])

@@ -24,61 +24,52 @@ class StatusFeatureMixin(StateMachineMixin, IStatusFeature):
     def TIMEFRAME(self):
         """Return the timeframe for the Feature."""
         if not self.hasTimeframe:
-            return Timeframe.fromFeatureStatus(p)
+            return Timeframe.fromFeatureStatus(self.STATUS)
         else:
             return self.attribute(TIMEFRAME)
 
-    @Edits.persistFeatures
-    @FeatureAction.plan.handler()
+    @FeatureAction.plan.handleAndPersist()
     def planFeature(self):
         """Plan a Feature."""
 
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.undoPlan.handler()
+    @FeatureAction.undoPlan.handleAndPersist()
     def undoPlanFeature(self):
         """Undo planning a Feature."""
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.build.handler()
+    @FeatureAction.build.handleAndPersist()
     def buildFeature(self):
         """Build a Feature."""
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.undoBuild.handler()
+    @FeatureAction.undoBuild.handleAndPersist()
     def undoBuildFeature(self):
         """Undo Building a Feature."""
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.supersede.handler()
+    @FeatureAction.supersede.handleAndPersist()
     def supersedeFeature(self):
         """Supersede a Feature."""
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.undoSupersede.handler()
+    @FeatureAction.undoSupersede.handleAndPersist()
     def undoSupersedeFeature(self):
         """Undo superseding a Feature."""
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.trash.handler()
+    @FeatureAction.trash.handleAndPersist()
     def trashFeature(self):
         """Trash a Feature."""
         return Edits.delete(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.archive.handler()
+    @FeatureAction.archive.handleAndPersist()
     def archiveFeature(self):
         """Archive a Feature."""
         return Edits.upsert(self)
 
-    @Edits.persistFeatures
-    @FeatureAction.undoArchive.handler()
+    @FeatureAction.undoArchive.handleAndPersist()
     def undoArchiveFeature(self):
         """Archive a Feature."""
         return Edits.upsert(self)

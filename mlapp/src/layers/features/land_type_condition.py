@@ -39,7 +39,7 @@ class LandTypeCondition(IPersistedFeature, WorkspaceMixin):
 
     @property
     def featureLayer(self):
-        return self.workspace.conditionTable
+        return self.workspace.landTypeConditionTable
 
     @property
     def PADDOCK(self):
@@ -72,10 +72,6 @@ class LandTypeCondition(IPersistedFeature, WorkspaceMixin):
         self.featureLayer.deleteFeature(self)
 
     def recalculate(self):
-        pass
-
-    def clearFid(self):
-        """Nullify the PersistedFeature's id as a prelude to saving it."""
         pass
 
     @property

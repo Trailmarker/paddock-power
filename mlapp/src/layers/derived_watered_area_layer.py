@@ -14,8 +14,11 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return WateredArea
 
-    def prepareQuery(self, query, *dependentLayers):
-        [paddockLayer, waterpointBufferLayer] = self.names(*dependentLayers)
+    def prepareQuery(self, query, dependentLayers):
+        [basePaddockLayer, waterpointBufferLayer] = self.names(dependentLayers)
+
+  		# Set up clauses
+        paddockClause = DerivedFeatureLayer.andAllKeyClauses(self.edits, basePaddockLayer, PADDOCK, waterpointBufferLayer, PADDOCK)
 
         _NEAR_WATERED_AREA = "NearWateredArea"
         _FAR_WATERED_AREA = "FarWateredArea"
@@ -29,6 +32,7 @@ with
 		{TIMEFRAME}
 	 from "{waterpointBufferLayer}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Near.name}'
+	 {paddockClause}
 	 group by {PADDOCK}, {TIMEFRAME})
 , {_FAR_WATERED_AREA} as
 	(select
@@ -37,76 +41,77 @@ with
 		{TIMEFRAME}
 	 from "{waterpointBufferLayer}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Far.name}'
+     {paddockClause}
 	 group by {PADDOCK}, {TIMEFRAME})
 select
-	0 as {FID},
 	st_multi(geometry) as geometry,
-	'{WateredType.Near.name}' as {WATERED_TYPE},
-	{_NEAR_WATERED_AREA}.{TIMEFRAME},
-	{_NEAR_WATERED_AREA}.{PADDOCK}
+	0 as {FID},
+ 	{_NEAR_WATERED_AREA}.{PADDOCK},
+  	'{WateredType.Near.name}' as {WATERED_TYPE},
+	{_NEAR_WATERED_AREA}.{TIMEFRAME}
 from {_NEAR_WATERED_AREA}
 union
 select
-	0 as {FID},
 	st_multi(st_difference({_FAR_WATERED_AREA}.geometry, {_NEAR_WATERED_AREA}.geometry)) as geometry,
-	'{WateredType.Far.name}' as {WATERED_TYPE},
-	{_FAR_WATERED_AREA}.{TIMEFRAME},
-	{_FAR_WATERED_AREA}.{PADDOCK}
+	0 as {FID},
+	{_FAR_WATERED_AREA}.{PADDOCK},
+ 	'{WateredType.Far.name}' as {WATERED_TYPE},
+ 	{_FAR_WATERED_AREA}.{TIMEFRAME}
 from {_FAR_WATERED_AREA}
 inner join {_NEAR_WATERED_AREA}
-	on {_FAR_WATERED_AREA}.{TIMEFRAME} = {_NEAR_WATERED_AREA}.{TIMEFRAME}
-	and {_FAR_WATERED_AREA}.{PADDOCK} = {_NEAR_WATERED_AREA}.{PADDOCK}
+	on {_FAR_WATERED_AREA}.{PADDOCK} = {_NEAR_WATERED_AREA}.{PADDOCK}
+	and {_FAR_WATERED_AREA}.{TIMEFRAME} = {_NEAR_WATERED_AREA}.{TIMEFRAME}
 	and st_difference({_FAR_WATERED_AREA}.geometry, {_NEAR_WATERED_AREA}.geometry) is not null
 	and st_area(st_difference({_FAR_WATERED_AREA}.geometry, {_NEAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 union
 select
+	st_multi(st_difference("{basePaddockLayer}".geometry, {_FAR_WATERED_AREA}.geometry)) as geometry,
 	0 as {FID},
-	st_multi(st_difference({paddockLayer}.geometry, {_FAR_WATERED_AREA}.geometry)) as geometry,
-	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	{_FAR_WATERED_AREA}.{TIMEFRAME},
-	{_FAR_WATERED_AREA}.{PADDOCK}
-from "{paddockLayer}"
+	{_FAR_WATERED_AREA}.{PADDOCK},
+ 	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	{_FAR_WATERED_AREA}.{TIMEFRAME}
+from "{basePaddockLayer}"
 inner join {_FAR_WATERED_AREA}
-	on "{paddockLayer}".{FID} = {_FAR_WATERED_AREA}.{PADDOCK}
-	and st_difference({paddockLayer}.geometry, {_FAR_WATERED_AREA}.geometry) is not null
-	and st_area(st_difference({paddockLayer}.geometry, {_FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
-	and {Timeframe.timeframesIncludeStatuses(f'"{_FAR_WATERED_AREA}"."{TIMEFRAME}"', f'"{paddockLayer}"."{STATUS}"')}
+	on "{basePaddockLayer}".{FID} = {_FAR_WATERED_AREA}.{PADDOCK}
+	and st_difference("{basePaddockLayer}".geometry, {_FAR_WATERED_AREA}.geometry) is not null
+	and st_area(st_difference("{basePaddockLayer}".geometry, {_FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+	and {Timeframe.timeframesIncludeStatuses(f'"{_FAR_WATERED_AREA}"."{TIMEFRAME}"', f'"{basePaddockLayer}"."{STATUS}"')}
 union
 select
+	st_multi("{basePaddockLayer}".geometry) as geometry,
 	0 as {FID},
-	st_multi({paddockLayer}.geometry) as geometry,
-	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	'{Timeframe.Current.name}' as {TIMEFRAME},
-	"{paddockLayer}".{FID} as {PADDOCK}
-from "{paddockLayer}" left join "{waterpointBufferLayer}"
+ 	"{basePaddockLayer}".{FID} as {PADDOCK},
+  	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	'{Timeframe.Current.name}' as {TIMEFRAME}
+from "{basePaddockLayer}" left join "{waterpointBufferLayer}"
 where not exists (
 	select 1
 	from "{waterpointBufferLayer}"
-	where "{waterpointBufferLayer}".{PADDOCK} = "{paddockLayer}".{FID}
-	and {Timeframe.Current.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{paddockLayer}".{STATUS}')})
+	where "{waterpointBufferLayer}".{PADDOCK} = "{basePaddockLayer}".{FID}
+	and {Timeframe.Current.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')})
 union
 select
+	st_multi("{basePaddockLayer}".geometry) as geometry,
 	0 as {FID},
-	st_multi({paddockLayer}.geometry) as geometry,
-	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
-	'{Timeframe.Future.name}' as {TIMEFRAME},
-	"{paddockLayer}".{FID} as {PADDOCK}
-from "{paddockLayer}" left join "{waterpointBufferLayer}"
+ 	"{basePaddockLayer}".{FID} as {PADDOCK},
+  	'{WateredType.Unwatered.name}' as {WATERED_TYPE},
+	'{Timeframe.Future.name}' as {TIMEFRAME}
+from "{basePaddockLayer}" left join "{waterpointBufferLayer}"
 where not exists (
 	select 1
 	from "{waterpointBufferLayer}"
-	where "{waterpointBufferLayer}".{PADDOCK} = "{paddockLayer}".{FID}
-	and {Timeframe.Future.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{paddockLayer}".{STATUS}')})
+	where "{waterpointBufferLayer}".{PADDOCK} = "{basePaddockLayer}".{FID}
+	and {Timeframe.Future.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')})
 
 """
-        return super().prepareQuery(query, *dependentLayers)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 paddockLayer,
-                 waterpointBufferLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(
             DerivedWateredAreaLayer.defaultName(),
             DerivedWateredAreaLayer.defaultStyle(),
-            paddockLayer,
-            waterpointBufferLayer)
+            dependentLayers,
+            None) # Don't try to get fancy

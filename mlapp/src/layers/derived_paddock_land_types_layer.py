@@ -15,9 +15,9 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return PaddockLandType
 
-    def prepareQuery(self, query, *dependentLayers):
+    def prepareQuery(self, query, dependentLayers):
 
-        [landTypeConditionTable, paddockLayer, landTypeLayer, wateredAreaLayer] = self.names(*dependentLayers)
+        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.names(dependentLayers)
 
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
@@ -27,14 +27,14 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 with {_PADDOCK_WATERED_AREAS} as
 	(select
 		"{wateredAreaLayer}".geometry as geometry,
-		"{paddockLayer}".{FID} as {PADDOCK},
-		"{paddockLayer}".{NAME},
+		"{basePaddockLayer}".{FID} as {PADDOCK},
+		"{basePaddockLayer}".{NAME},
 		"{wateredAreaLayer}"."{WATERED_TYPE}",
 		"{wateredAreaLayer}".{TIMEFRAME}
-	from "{paddockLayer}"
+	from "{basePaddockLayer}"
 	inner join "{wateredAreaLayer}"
-		on "{paddockLayer}".{FID} = "{wateredAreaLayer}".{PADDOCK}
-		and {Timeframe.timeframesIncludeStatuses(f'"{wateredAreaLayer}".{TIMEFRAME}', f'"{paddockLayer}".{STATUS}')}
+		on "{basePaddockLayer}".{FID} = "{wateredAreaLayer}".{PADDOCK}
+		and {Timeframe.timeframesIncludeStatuses(f'"{wateredAreaLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')}
 	),
 {_PADDOCK_LAND_TYPES} as
 	(select
@@ -54,18 +54,18 @@ with {_PADDOCK_WATERED_AREAS} as
 select
 	st_multi(st_collectionextract(st_union(geometry), 3)) as geometry,
 	0 as {FID},
+ 	{PADDOCK},
+  	"{LAND_TYPE}",
+   	"{PADDOCK_NAME}",
+	"{LAND_TYPE_NAME}",
+ 	"{CONDITION_TYPE}",
+	{TIMEFRAME} as {TIMEFRAME},
 	sum("{AREA}") as "{AREA}",
 	sum("{AREA}" * "{_WATERED_FACTOR}") as "{WATERED_AREA}",
 	(sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
 	(sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
 	((sum("{AREA}" * ("{POTENTIAL_CAPACITY_PER_AREA}" * "{CONDITION_DISCOUNT}" * "{WATERED_DISCOUNT}")) / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{ESTIMATED_CAPACITY}",
-	((sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{POTENTIAL_CAPACITY}",
-	"{CONDITION_TYPE}",
-	{PADDOCK},
-	"{PADDOCK_NAME}",
-	"{LAND_TYPE}",
-	"{LAND_TYPE_NAME}",
-	{TIMEFRAME} as {TIMEFRAME}
+	((sum("{AREA}" * "{POTENTIAL_CAPACITY_PER_AREA}") / nullif(sum("{AREA}"), 0.0)) * "{AREA}") as "{POTENTIAL_CAPACITY}"
 from
 	(select
 		0 as {FID},
@@ -105,17 +105,13 @@ from
 where geometry is not null
 group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 """
-        return super().prepareQuery(query)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 landTypeConditionTable,
-                 paddockLayer,
-                 landTypeLayer,
-                 wateredAraLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(DerivedPaddockLandTypesLayer.defaultName(),
                          DerivedPaddockLandTypesLayer.defaultStyle(),
-                         landTypeConditionTable,
-                         paddockLayer,
-                         landTypeLayer,
-                         wateredAraLayer)
+                         dependentLayers,
+                         None) # Don't try to get fancy

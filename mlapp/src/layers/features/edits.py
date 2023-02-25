@@ -3,32 +3,31 @@ from contextlib import contextmanager
 
 from qgis.core import QgsVectorLayer
 
-from ...models import Glitch
-from ...utils import qgsInfo
-from ..interfaces import IPersistedFeature, IFeatureLayer
+from ...models import Glitch, WorkspaceMixin
+from ...utils import qgsDebug, qgsException, qgsInfo
+from ..interfaces import IPersistedFeature, IPersistedDerivedFeatureLayer
 
 
-class Edits:
+class Edits(WorkspaceMixin):
 
-    def __init__(self, upserts=[], deletes=[], layers=[]):
+    def __init__(self, upserts=[], deletes=[]):
+        super().__init__()
+
         def _filter(features=[]):
             return [f for f in (features or []) if isinstance(f, IPersistedFeature)]
         self.upserts = _filter(upserts)
         self.deletes = _filter(deletes)
-        self.layers = [d for d in (layers or []) if isinstance(d, IFeatureLayer)]
 
     def editAfter(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
         self.upserts = otherEdits.upserts + self.upserts
         self.deletes = otherEdits.deletes + self.deletes
-        self.layers = otherEdits.layers + self.layers
         return self
 
     def editBefore(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
         self.upserts = self.upserts + otherEdits.upserts
         self.deletes = self.deletes + otherEdits.deletes
-        self.layers = self.layers + otherEdits.layers
         return self
 
     @staticmethod
@@ -39,9 +38,33 @@ class Edits:
     def delete(*features):
         return Edits(deletes=list(features))
 
-    @staticmethod
-    def notifyLayers(*layers):
-        return Edits(layers=list(layers))
+    @property
+    def layers(self):
+        return set([f.featureLayer for f in self.upserts + self.deletes])
+
+    def layerUpsertFids(self, layer):
+        return [f.FID for f in self.upserts if f.featureLayer.id() == layer.id()]
+
+    def layerDeleteFids(self, layer):
+        return [f.FID for f in self.deletes if f.featureLayer.id() == layer.id()]
+
+    def layerFids(self, layer):
+        fids = self.layerUpsertFids(layer) + self.layerDeleteFids(layer)
+        # qgsDebug(f"Edits.layerFids({layer}): fids: {fids}")
+        return fids
+
+    def persist(self):
+        """Persist these edits to their layers."""
+        with Edits.editAndCommit(self.layers):
+            for feature in self.upserts:
+                feature.upsert()
+
+            for feature in self.deletes:
+                feature.delete()
+
+    def notifyPersisted(self):
+        """Called when edits are persisted."""
+        self.workspace.onPersistEdits(self)
 
     @staticmethod
     @contextmanager
@@ -54,6 +77,7 @@ class Edits:
                 layer.commitChanges()
         except Exception as e:
             qgsInfo("Edits.editAndCommit: Exception raised, rolling back edits")
+            qgsException()
             for layer in layers:
                 layer.rollBack()
             raise e
@@ -77,27 +101,3 @@ class Edits:
             for layer in layers:
                 layer.rollBack()
             raise e
-
-    @staticmethod
-    def persistFeatures(function):
-        """Decorator that takes a method returning an Edits object of edits to persist,
-        and returns a method that instead persists the edits and returns None."""
-        def callableWithPersistFeatures(*args, **kwargs):
-            # Get the result of the inner function
-            edits = function(*args, **kwargs)
-            qgsInfo(f"Edits.persistFeatures: upserts={repr(edits.upserts)}, deletes={repr(edits.deletes)}")
-
-            layers = set([f.featureLayer for f in edits.upserts + edits.deletes])
-            workspace = next(l.workspace for l in layers)
-
-            with Edits.editAndCommit(layers):
-                for feature in edits.upserts:
-                    # feature.recalculate()
-                    feature.upsert()
-                for feature in edits.deletes:
-                    feature.delete()
-
-            allLayers = set(list(layers) + edits.layers)
-            workspace.onFeaturesPersisted([type(l) for l in allLayers])
-
-        return callableWithPersistFeatures

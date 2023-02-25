@@ -12,7 +12,7 @@ class LandTypeLayer(ImportedFeatureLayer):
     def getFeatureType(cls):
         return LandType
 
-    def __init__(self, workspaceFile):
+    def __init__(self, workspaceFile, *dependentLayers):
         super().__init__(workspaceFile,
                          layerName=LandTypeLayer.defaultName(),
                          styleName=LandTypeLayer.defaultStyle())

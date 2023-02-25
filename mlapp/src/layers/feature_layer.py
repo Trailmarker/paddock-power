@@ -5,7 +5,8 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
-from ..utils import resolveStylePath, PLUGIN_NAME
+from ..utils import qgsDebug, resolveStylePath, PLUGIN_NAME
+from .fields import TIMEFRAME
 from .interfaces import IFeatureLayer
 from .map_layer_mixin import MapLayerMixin
 
@@ -55,8 +56,10 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.addInBackground()
 
         self.plugin.workspaceReady.connect(self.onWorkspaceReady)
+        qgsDebug(f"{type(self).__name__}.__init__(), workspaceReady is connected")
 
     def onWorkspaceReady(self):
+        qgsDebug("FeatureLayer.onWorkspaceReady()")
         self.selectionChanged.connect(self.onSelectionChanged)
 
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
@@ -94,33 +97,38 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
             feature = self.wrapFeature(feature)
             yield feature
 
-    def getFeaturesByTimeframe(self, timeframe, request=None):
-        """Get the features in this layer that are in the current timeframe."""
-        features = self.getFeatures(request)
-        return [f for f in features if f.matchTimeframe(timeframe)]
-
-    def getFeaturesInCurrentTimeframe(self, request=None):
-        """Get the features in this layer that are in the current timeframe."""
-        features = self.getFeatures(request)
-        return [f for f in features if f.matchTimeframe(self.timeframe)]
-
-    def getFeature(self, id):
-        """Get a feature by its id, assumed to be the same as its FID."""
-        feature = super().getFeature(id)
-        # Note the use of QgsFeature.isValid() here, an actual object is still 
-        # returned even when the id doesn't hit …
-        return self.wrapFeature(feature) if feature.isValid() else None
-
-    def getFeatureFromSelection(self, selectionId):
-        """Convenience function as in rare cases this has to behave differently."""
-        return self.getFeature(selectionId)
-
     def getFeatures(self, request=None):
         """Get the features in this layer."""
         if request is None:
             return self._wrapFeatures(super().getFeatures())
 
         return self._wrapFeatures(super().getFeatures(request))
+
+    def getFeaturesByTimeframe(self, timeframe, request=None):
+        """Get the features in this layer that are in a specified timeframe."""
+        request = request or QgsFeatureRequest()
+
+        if self.getFeatureType().hasField(TIMEFRAME):
+            request.setFilterExpression(timeframe.getFilterExpression())
+            return self.getFeatures(request)
+        else:
+            features = self.getFeatures(request)
+            return [f for f in features if f.matchTimeframe(timeframe)]
+
+    def getFeaturesInCurrentTimeframe(self, request=None):
+        """Get the features in this layer that are in the current timeframe."""
+        return self.getFeaturesByTimeframe(self.timeframe, request)
+
+    def getFeature(self, id):
+        """Get a feature by its id, assumed to be the same as its FID."""
+        feature = super().getFeature(id)
+        # Note the use of QgsFeature.isValid() here, an actual object is still
+        # returned even when the id doesn't hit …
+        return self.wrapFeature(feature) if feature.isValid() else None
+
+    def getFeatureFromSelection(self, selectionId):
+        """Convenience function as in rare cases this has to behave differently."""
+        return self.getFeature(selectionId)
 
     def countFeatures(self):
         """Get the number of Features in the layer."""
@@ -150,17 +158,22 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.triggerRepaint()
 
     def onSelectFeature(self, feature):
-        # qgsDebug(f"{type(self).__name__}.selectFeature({feature})")
+        qgsDebug(f"{type(self).__name__}.selectFeature({feature})")
         feature.zoomFeature()
         pass
 
     def onDeselectFeature(self):
-        # qgsDebug(f"{type(self).__name__}.onDeselectFeature()")
+        qgsDebug(f"{type(self).__name__}.onDeselectFeature()")
         pass
 
     def onSelectionChanged(self, selection, *_):
         """Translate our own selectionChanged signal into a workspace selectFeature call."""
+        qgsDebug(f"{type(self).__name__}.onSelectionChanged({selection})")
         if len(selection) == 1:
             feature = next(self.getFeatures(QgsFeatureRequest().setFilterFids(selection)), None)
             if feature:
+                qgsDebug(f"Selecting a feature! selection={selection}, feature={feature}")
                 self.workspace.selectFeature(feature)
+            else:
+                qgsDebug(f"Not selecting a feature! selection={selection}")
+                

@@ -20,15 +20,13 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
         self.setupUi(self)
 
-        self.splitter.setSizes([self.paddockListGroupBox.sizeHint().width(),
-                                self.currentPaddockLandTypeListGroupBox.sizeHint().width(),
-                                self.futurePaddockLandTypeListGroupBox.sizeHint().width()])
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, False)
-        self.splitter.setCollapsible(2, True)
+        self.splitter.setCollapsible(2, False)
+        self.splitter.setCollapsible(3, True)
 
-        self.currentPaddockLandTypesList.popupLayerSource = self.workspace.metricPaddockLayer
-        self.futurePaddockLandTypesList.popupLayerSource = self.workspace.metricPaddockLayer
+        self.currentPaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
+        self.futurePaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
 
         self.paddockFilterLineEdit.textChanged.connect(
             self.onPaddockFilterChanged)

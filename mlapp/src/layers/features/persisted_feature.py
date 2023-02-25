@@ -13,6 +13,17 @@ class PersistedFeature(Feature, IPersistedFeature):
         """Create a new Feature."""
 
         super().__init__(featureLayer, existingFeature)
+        self._currentTask = None
+
+    @property
+    def currentTask(self):
+        """Return the current task."""
+        return self._currentTask
+
+    @currentTask.setter
+    def currentTask(self, task):
+        """Set the current task."""
+        self._currentTask = task
 
     @property
     def GEOMETRY(self):
@@ -28,7 +39,7 @@ class PersistedFeature(Feature, IPersistedFeature):
         """Recalculate everything that can be recalculated based on the Feature schema."""
 
         if self.hasName:
-            if not self.NAME:
+            if not self.NAME or self.NAME == "NULL":
                 self.NAME = f"{self.displayName()} {self.FID}"
 
         if self.GEOMETRY:
@@ -78,8 +89,6 @@ class PersistedFeature(Feature, IPersistedFeature):
     def upsert(self):
         """Add or update the PersistedFeature in the PersistedFeatureLayer."""
 
-        # self.recalculate()
-
         if (self.FID >= 0):
             self.featureLayer.updateFeature(self)
             return self.FID
@@ -90,11 +99,18 @@ class PersistedFeature(Feature, IPersistedFeature):
             ((success, [newQf])) = self.featureLayer.dataProvider().addFeatures([qf])
 
             if success:
+                if not newQf.isValid():
+                    raise Glitch(f"{self}.upsert: new feature is not valid")
+                if newQf.id() <= 0:
+                    raise Glitch(f"{self}.upsert: new feature has invalid FID")
+
+                # On first insert, we calculate the stuff - including a default NAME
                 self.FID = newQf.id()
+                self.recalculate()
+                self.featureLayer.updateFeature(self)
+                return self.FID
             else:
                 raise Glitch(f"{self}.upsert: failed with unknown error")
-
-        return self.FID
 
     def delete(self):
         """Delete the PersistedFeature from the PersistedFeatureLayer."""

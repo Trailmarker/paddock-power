@@ -23,4 +23,4 @@ class WateredAreaLayer(PersistedDerivedFeatureLayer):
                          WateredAreaLayer.defaultName(),
                          WateredAreaLayer.defaultStyle(),
                          DerivedWateredAreaLayer,
-                         *dependentLayers)
+                         dependentLayers)

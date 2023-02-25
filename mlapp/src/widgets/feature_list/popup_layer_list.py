@@ -19,8 +19,6 @@ class PopupLayerList(FeatureLayerList, PopupLayerConsumerMixin):
         FeatureLayerList.__init__(self, listItemFactory, parent)
         PopupLayerConsumerMixin.__init__(self)
 
-        self.refreshUi()
-
     @property
     def popupLayerTypes(self):
         """Popup layer types that this layer can consume."""
@@ -40,7 +38,7 @@ class PopupLayerList(FeatureLayerList, PopupLayerConsumerMixin):
 
     def onPopupLayerAdded(self, layer):
         self._featureLayer = layer
-        self.refreshUi()
+        self.refreshList()
 
     def onPopupLayerRemoved(self):
         self._featureLayer = None

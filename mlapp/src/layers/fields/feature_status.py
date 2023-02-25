@@ -9,27 +9,9 @@ class FeatureStatus(StateMachineStatus):
     Built = "Built"
     PlannedSuperseded = "Superseded (was Planned)"
     BuiltSuperseded = "Superseded (was Built)"
-    Archived = "Archived"
+    PlannedArchived = "Archived (was Planned)"
+    BuiltArchived = "Archived (was Built)"
     Undefined = "Undefined"
-
-    @staticmethod
-    def builtStatuses():
-        return [FeatureStatus.Built, FeatureStatus.BuiltSuperseded]
-
-    @staticmethod
-    def plannedStatuses():
-        return [FeatureStatus.Planned, FeatureStatus.Built]
-
-    @staticmethod
-    def workingStatuses():
-        return [FeatureStatus.Drafted, FeatureStatus.Planned, FeatureStatus.Built]
-
-    def isBuilt(self):
-        """Check if a status is built."""
-        return self.match(FeatureStatus.Built, FeatureStatus.BuiltSuperseded)
-
-    def isPlanned(self):
-        return self.match(FeatureStatus.Planned, FeatureStatus.Built)
 
     def toColour(self):
         """Get the colour associated with this status."""
@@ -43,8 +25,10 @@ class FeatureStatus(StateMachineStatus):
             return (147, 151, 153, 100)
         elif self == FeatureStatus.BuiltSuperseded:
             return (147, 151, 153, 100)
-        elif self == FeatureStatus.Archived:
-            raise NotImplementedError("Archived status not implemented")
+        elif self == FeatureStatus.PlannedArchived:
+            return (147, 151, 153, 100)
+        elif self == FeatureStatus.BuiltArchived:
+            return (147, 151, 153, 100)
         else:
             raise NotImplementedError("Unknown status not implemented")
 
@@ -60,7 +44,9 @@ class FeatureStatus(StateMachineStatus):
             return (0, 0, 0)
         elif self == FeatureStatus.BuiltSuperseded:
             return (0, 0, 0)
-        elif self == FeatureStatus.Archived:
-            raise NotImplementedError("Archived status not implemented")
+        elif self == FeatureStatus.PlannedArchived:
+            return (0, 0, 0)
+        elif self == FeatureStatus.BuiltArchived:
+            return (0, 0, 0)
         else:
             raise NotImplementedError("Unknown status not implemented")

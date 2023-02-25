@@ -17,7 +17,8 @@ class FenceLayer(PersistedFeatureLayer):
         return Fence
 
     def __init__(self,
-                 workspaceFile):
+                 workspaceFile,
+                 *dependentLayers):
         super().__init__(workspaceFile,
                          layerName=FenceLayer.defaultName(),
                          styleName=FenceLayer.defaultStyle())
@@ -33,9 +34,9 @@ class FenceLayer(PersistedFeatureLayer):
 
         currentBuildOrder = max([bo for (bo, _) in pairs], default=0)
         lowestDraftBuildOrder = min(
-            [bo for(bo, f) in pairs if f.STATUS == FeatureStatus.Drafted],
+            [bo for(bo, f) in pairs if f.matchStatus(FeatureStatus.Drafted)],
             default=currentBuildOrder + 1)
-        highestPlannedBuildOrder = max([bo for (bo, f) in pairs if f.STATUS == FeatureStatus.Planned], default=0)
+        highestPlannedBuildOrder = max([bo for (bo, f) in pairs if f.matchStatus(FeatureStatus.Planned)], default=0)
 
         return (currentBuildOrder, lowestDraftBuildOrder, highestPlannedBuildOrder)
 
@@ -44,12 +45,12 @@ class FenceLayer(PersistedFeatureLayer):
         buildOrderRequest = QgsFeatureRequest().setFilterExpression(
             f'"{BUILD_ORDER}" = {buildOrder}')
 
-        fences = list(self.getFeatures(buildOrderRequest))
-
-        if not fences:
-            return None
-
-        if len(fences) > 1:
-            raise Glitch(f"Integrity problem: your Workspace has multiple Fences with Build Order {buildOrder}")
-
-        return fences[0]
+        try:
+            fence = next(self.getFeatures(buildOrderRequest))
+            try:
+                next(self.getFeatures(buildOrderRequest))
+                raise Glitch(f"Integrity problem: your Workspace has multiple Fences with Build Order {buildOrder}")
+            except StopIteration:
+                return fence
+        except StopIteration:
+            raise Glitch(f"Integrity problem: your Workspace has no Fence with Build Order {buildOrder}")

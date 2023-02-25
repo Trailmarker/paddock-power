@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ...utils import qgsDebug
 from ...layers.fields import Timeframe
-from ...layers.metric_paddock_land_types_popup_layer import MetricPaddockCurrentLandTypesPopupLayer, MetricPaddockFutureLandTypesPopupLayer
+from ...layers.paddock_land_types_popup_layer import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
 from ..paddock_land_type_details.paddock_land_type_details import PaddockLandTypeDetails
 from ..paddock_land_type_details.paddock_land_type_details_edit import PaddockLandTypeDetailsEdit
 from .popup_layer_list import PopupLayerList
@@ -28,7 +28,7 @@ class PaddockLandTypesLayerList(PopupLayerList):
     @featureLayer.setter
     def featureLayer(self, value):
         self._featureLayer = value
-        self.refreshUi()
+        self.refreshList()
 
     def onPopupLayerAdded(self, layer):
         if type(layer) not in self.popupLayerTypes:
@@ -55,7 +55,7 @@ class CurrentPaddockLandTypesLayerList(PaddockLandTypesLayerList):
 
     @property
     def popupLayerType(self):
-        return MetricPaddockCurrentLandTypesPopupLayer
+        return PaddockCurrentLandTypesPopupLayer
 
     @property
     def timeframe(self):
@@ -71,7 +71,7 @@ class FuturePaddockLandTypesLayerList(PaddockLandTypesLayerList):
 
     @property
     def popupLayerType(self):
-        return MetricPaddockFutureLandTypesPopupLayer
+        return PaddockFutureLandTypesPopupLayer
 
     @property
     def timeframe(self):

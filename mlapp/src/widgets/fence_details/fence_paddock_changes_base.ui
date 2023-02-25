@@ -6,17 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>297</height>
+    <width>648</width>
+    <height>462</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>6</number>
-   </property>
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -30,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="supersededPaddockGroupBox">
+    <widget class="QGroupBox" name="affectedPaddockGroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -38,7 +35,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Current Paddocks that are split by this Fence</string>
+      <string>Affected Paddocks</string>
      </property>
      <layout class="QVBoxLayout" name="supersededPaddockVerticalLayout">
       <property name="leftMargin">
@@ -54,7 +51,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="MetricPaddockMiniList" name="supersededMetricPaddockMiniList">
+       <widget class="PaddockMiniList" name="affectedPaddockMiniList">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -67,7 +64,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="plannedPaddockGroupBox">
+    <widget class="QGroupBox" name="resultingPaddockGroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -75,7 +72,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Future Paddocks after building this Fence (and Waterpoints)</string>
+      <string>Resulting Paddocks</string>
      </property>
      <layout class="QVBoxLayout" name="plannedPaddocksVerticalLayout">
       <property name="leftMargin">
@@ -91,7 +88,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="MetricPaddockMiniList" name="plannedMetricPaddockMiniList">
+       <widget class="PaddockMiniList" name="resultingPaddockMiniList">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -107,9 +104,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MetricPaddockMiniList</class>
+   <class>PaddockMiniList</class>
    <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/metric_paddock_mini_list</header>
+   <header>mlapp/src/widgets/feature_list/paddock_mini_list</header>
   </customwidget>
  </customwidgets>
  <resources/>

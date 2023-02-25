@@ -24,4 +24,4 @@ class PaddockLandTypesLayer(PersistedDerivedFeatureLayer):
                          PaddockLandTypesLayer.defaultName(),
                          PaddockLandTypesLayer.defaultStyle(),
                          DerivedPaddockLandTypesLayer,
-                         *dependentLayers)
+                         dependentLayers)

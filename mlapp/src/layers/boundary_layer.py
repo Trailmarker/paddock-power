@@ -24,4 +24,4 @@ class BoundaryLayer(PersistedDerivedFeatureLayer):
                          BoundaryLayer.defaultName(),
                          BoundaryLayer.defaultStyle(),
                          DerivedBoundaryLayer,
-                         *dependentLayers)
+                         dependentLayers)

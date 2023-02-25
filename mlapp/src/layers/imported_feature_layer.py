@@ -21,7 +21,6 @@ class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
         targetFeature = self.makeFeature()
         mappedFeature = fieldMap.mapFeature(importFeature, targetFeature)
         feature = self.wrapFeature(mappedFeature)
-        feature.clearFid()
 
         # Default imported data to 'Built' status - TODO might need other things here?
         if isinstance(feature, IStatusFeature):
@@ -41,7 +40,6 @@ class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
                 self.dataProvider().truncate()
                 features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
                 for feature in features:
-                    feature.recalculate() # Should now assign a default name
                     feature.upsert()
                 return features
         finally:

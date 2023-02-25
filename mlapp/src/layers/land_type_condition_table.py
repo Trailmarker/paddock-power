@@ -21,7 +21,7 @@ class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass
         """Return the default name for this layer."""
         return cls.LAYER_NAME
 
-    def __init__(self, workspaceFile):
+    def __init__(self, workspaceFile, *dependentLayers):
         QObject.__init__(self)
         WorkspaceMixin.__init__(self)
 
@@ -35,6 +35,14 @@ class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass
 
         self.workspaceFile = workspaceFile
         self.gpkgUrl = f"{workspaceFile}|layername={self.tableName}"
+
+    def __repr__(self):
+        """Return a string representation of the Field."""
+        return f"{type(self).__name__}(name={self.name()})"
+
+    def __str__(self):
+        """Convert the Field to a string representation."""
+        return repr(self)
 
     def makeExistsQuery(self, tableName):
         return f"""

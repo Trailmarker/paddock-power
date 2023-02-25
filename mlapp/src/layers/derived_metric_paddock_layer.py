@@ -15,48 +15,37 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return MetricPaddock
 
-    def prepareQuery(self, query, *dependentLayers):
-        [paddockLayer, paddockLandTypesLayer] = self.names(*dependentLayers)
+    def prepareQuery(self, query, dependentLayers):
+        [basePaddockLayer, paddockLandTypesLayer] = self.names(dependentLayers)
 
         query = f"""
 select
-	"{paddockLayer}".geometry as geometry,
-	"{paddockLayer}".{FID} as {FID},
-	"{paddockLayer}".{FID} as {PADDOCK},
-	"{paddockLayer}".{NAME} as {NAME},
-	"{paddockLayer}".{STATUS} as {STATUS},
+	"{basePaddockLayer}".geometry as geometry,
+	"{basePaddockLayer}".{FID} as {FID},
+	"{basePaddockLayer}".{FID} as {PADDOCK},
+	"{basePaddockLayer}".{NAME} as {NAME},
+	"{basePaddockLayer}"."{BUILD_FENCE}" as "{BUILD_FENCE}",
+	"{basePaddockLayer}".{STATUS} as {STATUS},
     "{paddockLandTypesLayer}".{TIMEFRAME} as {TIMEFRAME},
+	"{basePaddockLayer}"."{PERIMETER}" as "{PERIMETER}",
 	sum("{paddockLandTypesLayer}"."{AREA}") as "{AREA}",
     sum("{paddockLandTypesLayer}"."{WATERED_AREA}") as "{WATERED_AREA}",
-	"{paddockLayer}"."{PERIMETER}" as "{PERIMETER}",
-	"{paddockLayer}"."{BUILD_FENCE}" as "{BUILD_FENCE}",
-	(sum("{paddockLandTypesLayer}"."{ESTIMATED_CAPACITY}") / nullif("{paddockLayer}"."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
+	(sum("{paddockLandTypesLayer}"."{ESTIMATED_CAPACITY}") / nullif("{basePaddockLayer}"."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
 	sum("{paddockLandTypesLayer}"."{ESTIMATED_CAPACITY}") as "{ESTIMATED_CAPACITY}",
-	(sum("{paddockLandTypesLayer}"."{POTENTIAL_CAPACITY}") / nullif("{paddockLayer}"."{AREA}", 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
+	(sum("{paddockLandTypesLayer}"."{POTENTIAL_CAPACITY}") / nullif("{basePaddockLayer}"."{AREA}", 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
 	sum("{paddockLandTypesLayer}"."{POTENTIAL_CAPACITY}") as "{POTENTIAL_CAPACITY}"
-from "{paddockLayer}"
+from "{basePaddockLayer}"
 inner join "{paddockLandTypesLayer}"
-	on "{paddockLayer}".{FID} = "{paddockLandTypesLayer}".{PADDOCK}
-group by "{paddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
+	on "{basePaddockLayer}".{FID} = "{paddockLandTypesLayer}".{PADDOCK}
+group by "{basePaddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
 """
-        return super().prepareQuery(query, *dependentLayers)
-
-    def getFeatureByPaddockId(self, paddockId):
-        """Return a MetricPaddock based on a Paddock FID."""
-        paddockIdRequest = QgsFeatureRequest().setFilterExpression(f'"{PADDOCK}" = {paddockId}')
-        features = [f for f in self.getFeatures(paddockIdRequest)]
-        if not features:
-            return None
-        else:
-            for f in features:
-                if Timeframe[f.timeframe.name] == Timeframe[self.timeframe.name]:
-                    return f
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 paddockLayer,
-                 paddockLandTypesLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(DerivedMetricPaddockLayer.defaultName(),
                          DerivedMetricPaddockLayer.defaultStyle(),
-                         paddockLayer,
-                         paddockLandTypesLayer)
+                         dependentLayers,
+                         None) # Don't try to get fancy

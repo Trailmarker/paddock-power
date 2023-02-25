@@ -7,6 +7,7 @@ from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsFiel
 
 from ...models import Glitch
 from .field_domain import FieldDomain
+from .names import FID
 
 
 class Field(QgsField):
@@ -78,6 +79,26 @@ class Field(QgsField):
         }
         return QgsEditorWidgetSetup('ValueMap', config)
 
+    def __makeIdGetter(self):
+        """Make a getter for the value of a FID field. Should not be called directly."""
+        def _getter(feature: QgsFeature):
+            fid = feature.id()
+            if fid != feature.attribute(self.name()):
+                feature.setAttribute(self.name(), fid)
+            return fid
+        return _getter
+
+    def __makeIdSetter(self):
+        """Make a setter for the value of a FID field. Should not be called directly."""
+        def _setter(feature: QgsFeature, value):
+            if value and value >= 0:
+                feature.setId(value)
+                feature.setAttribute(self.name(), value)
+            else:
+                feature.setId(-1)
+                feature.setAttribute(self.name(), -1)
+        return _setter
+
     def __makeFieldDomainGetter(self):
         """Make a getter for the value of a domain-valued field. Should not be called directly."""
         def _getter(feature: QgsFeature):
@@ -92,9 +113,17 @@ class Field(QgsField):
     def __makeFieldDomainSetter(self):
         """Make a setter for the value of a domain-valued field. Should not be called directly."""
         def _setter(feature: QgsFeature, domainValue):
-            if not isinstance(domainValue, self._domainType):
-                raise Glitch(f"{domainValue} must be a {self._domainType.__name__}")
-            feature.setAttribute(self.name(), domainValue.name)
+            if isinstance(domainValue, self._domainType):
+                feature.setAttribute(self.name(), domainValue.name)
+            elif isinstance(domainValue, str):
+                # Try a few ways to set the value
+                try:
+                    feature.setAttribute(self.name(), self._domainType[domainValue].name)
+                except BaseException:
+                    try:
+                        feature.setAttribute(self.name(), self._domainType(domainValue).name)
+                    except BaseException:
+                        raise Glitch(f"Invalid value '{domainValue}' for field '{self.name()}'")
         return _setter
 
     def __makeRealGetter(self):
@@ -102,28 +131,54 @@ class Field(QgsField):
         def _getter(feature: QgsFeature):
             val = feature[self.name()]
             if isinstance(val, QVariant):
-                unboxedVal = val.value() if val.convert(QVariant.Double) else None
-                if unboxedVal == "NULL":
+                if val.isNull():
                     return None
-            else:
-                return float(val)
+                unboxedVal = val.value() if val.convert(QVariant.Double) else None
+                return float(unboxedVal)
+            elif val is None:
+                return None
+            return float(val)
+        return _getter
+
+    def __makeStringGetter(self):
+        """Make a getter for the value of a string-valued field. Handle 'NULL' correctly. Should not be called directly."""
+        def _getter(feature: QgsFeature):
+            val = feature[self.name()]
+            if isinstance(val, QVariant):
+                if val.isNull():
+                    return None
+            elif val is None:
+                return None
+            return str(val) if val else None
         return _getter
 
     def __makeGetter(self):
+        if self.name() == FID:
+            return self.__makeIdGetter()
         if self._domainType is not None:
             return self.__makeFieldDomainGetter()
         elif self.typeName() == "String":
-            return lambda feature: str(feature[self.name()])
+            return self.__makeStringGetter()
         elif self.typeName() == "Real":
             return self.__makeRealGetter()
         else:
             return lambda feature: feature[self.name()]
 
     def __makeSetter(self):
+        if self.name() == FID:
+            return self.__makeIdSetter()
         if self._domainType is not None:
             return self.__makeFieldDomainSetter()
         else:
             return lambda feature, value: feature.setAttribute(self.name(), value)
+
+    def getValue(self, feature):
+        """Get the value of a Field on a Feature."""
+        return self.__makeGetter()(feature)
+
+    def setValue(self, feature, value):
+        """Set the value of a Field on a Feature."""
+        self.__makeSetter()(feature, value)
 
     def setDefaultValue(self, feature):
         """Set the default value of a field on a feature."""

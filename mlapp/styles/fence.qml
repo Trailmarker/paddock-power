@@ -1,4 +1,4 @@
-<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<?xml version="1.1"?>
 <qgis version="3.22.13-Białowieża" styleCategories="AllStyleCategories" readOnly="0" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" simplifyDrawingTol="1" labelsEnabled="0" simplifyDrawingHints="1" symbologyReferenceScale="-1" maxScale="0" simplifyLocal="1" minScale="0" simplifyMaxScale="1">
   <flags>
     <Identifiable>1</Identifiable>
@@ -229,7 +229,10 @@
                 <Option name="Superseded (was Built)" type="QString" value="BuiltSuperseded"/>
               </Option>
               <Option type="Map">
-                <Option name="Archived" type="QString" value="Archived"/>
+                <Option name="Archived (was Planned)" type="QString" value="PlannedArchived"/>
+              </Option>
+              <Option type="Map">
+                <Option name="Archived (was Built)" type="QString" value="BuiltArchived"/>
               </Option>
               <Option type="Map">
                 <Option name="Undefined" type="QString" value="Undefined"/>

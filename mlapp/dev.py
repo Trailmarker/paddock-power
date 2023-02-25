@@ -82,11 +82,11 @@ def exportStyles(relativeOutDir, overwrite=False):
 layerTypes = [
     LandTypeConditionTable,
     BoundaryLayer,
-    MetricPaddockLayer,
+    PaddockLayer,
     ElevationLayer,
     FenceLayer,
     LandTypeLayer,
-    PaddockLayer,
+    BasePaddockLayer,
     PaddockLandTypesLayer,
     PipelineLayer,
     WateredAreaLayer,
@@ -99,7 +99,7 @@ def checkLayers():
 
 
 if workspace():
-    [landTypeConditionTable, boundaryLayer, metricPaddockLayer,
+    [landTypeConditionTable, boundaryLayer, paddockLayer,
      elevationLayer, fenceLayer, landTypeLayer,
-     paddockLayer, paddockLandTypeLayer, pipelineLayer,
+     basePaddockLayer, paddockLandTypeLayer, pipelineLayer,
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()

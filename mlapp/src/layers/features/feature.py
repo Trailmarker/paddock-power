@@ -33,8 +33,8 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
             for field in self.getSchema():
                 field.setDefaultValue(self)
 
-            # Clear FID
-            self.clearFid()
+            # A new Feature does not have a valid FID
+            self.FID = -1
 
         if isinstance(existingFeature, QgsFeature):
             if not existingFeature.isValid():
@@ -47,7 +47,9 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
                 raise Glitch(f"{type(self).__name__}.__init__: incoming Feature has missing fields: {missingFields}")
 
             QgsFeature.__init__(self, existingFeature)
-            self.setAttributes(existingFeature.attributes())
+
+            for field in self.getSchema():
+                field.setValue(self, field.getValue(existingFeature))
             self.setGeometry(existingFeature.geometry())
 
         elif existingFeature is not None:
@@ -57,16 +59,12 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        return f"{self.__class__.__name__}(id()={self.id()},FID={self.FID})"
+        attrs = [f"{f}={self.attribute(f)}" for f in [FID, STATUS, TIMEFRAME] if self.hasField(f)]
+        return f"{type(self).__name__}({', '.join(attrs)})"
 
     def __str__(self):
         """Convert the Feature to a string representation."""
         return repr(self)
-
-    def clearFid(self):
-        """Nullify the PersistedFeature's id as a prelude to saving it."""
-        self.FID = -1
-        self.setId(-1)
 
     @property
     def GEOMETRY(self):
@@ -86,9 +84,10 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
         """Return True if the Feature is infrastructure."""
         return False
 
-    def hasField(self, fieldName):
+    @classmethod
+    def hasField(cls, fieldName):
         """Return True if the Feature's Schema has a Field with the supplied name."""
-        return fieldName in [field.name() for field in self.getSchema()]
+        return fieldName in [field.name() for field in cls.getSchema()]
 
     @cached_property
     def hasArea(self):
@@ -140,13 +139,20 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
         """Return True if this layer has a status."""
         return self.hasField(STATUS)
 
+    def matchStatus(self, status):
+        """Return True if this feature's status matches the supplied status."""
+        if self.hasStatus:
+            return self.STATUS.name == status.name
+        else:
+            return False
+
     def matchTimeframe(self, timeframe):
         """Return True if this feature's timeframe or status matches the supplied timeframe."""
-        if self.hasStatus:
-            # STATUS gets precedence because the results are more interesting
-            return timeframe.matchFeatureStatus(self.STATUS)
-        elif self.hasTimeframe:
+        if self.hasTimeframe:
+            # TIMEFRAME gets precedence if it is defined
             return timeframe.matchTimeframe(self.TIMEFRAME)
+        elif self.hasStatus:
+            return timeframe.matchFeatureStatus(self.STATUS)
         else:
             return False
 

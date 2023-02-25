@@ -12,9 +12,16 @@ class FeatureMiniList(FeatureListBase):
         super().__init__(listItemFactory, parent)
         self.features = []
 
-    def getFeatures(self):
-        """Get the paddocks."""
+    def listFeatures(self):
+        """Get the features."""
         return self.features
+    
+    def getFeature(self, fid):
+        """Get a feature by its fid."""
+        for feature in self.features:
+            if feature.FID == fid:
+                return feature
+        return None
 
     def setFeatures(self, features):
         """Set the paddocks."""
@@ -25,4 +32,4 @@ class FeatureMiniList(FeatureListBase):
                 "The content passed to a Feature mini-list should be a list of Features")
         else:
             self.features = features
-        self.refreshUi()
+        self.refreshList()

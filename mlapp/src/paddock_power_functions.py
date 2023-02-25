@@ -33,7 +33,7 @@ def matchCurrentFeatureStatus(vals, *_):
 
 @qgsfunction(args=1, group=PLUGIN_NAME)
 def matchCurrentTimeframe(vals, *_):
-    f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe."""
+    f"""Return True if a Feature Timeframe matches the current {PLUGIN_NAME} Timeframe."""
     try:
         workspace = getWorkspace()
         return workspace and vals[0] and workspace.timeframe == Timeframe[vals[0]]
@@ -73,13 +73,11 @@ def timeframeWaterpointColour(vals, *_):
     try:
         timeframe = getWorkspace().timeframe
 
-        if timeframe == Timeframe.Current:
+        if timeframe.matchTimeframe(Timeframe.Current):
             return "#026b7f"
-        elif timeframe == Timeframe.Future:
+        elif timeframe.matchTimeframe(Timeframe.Future):
             return "#83e9fd"
-        elif timeframe == Timeframe.Drafted:
-            return "#fadadd"
-        elif timeframe == Timeframe.Undefined:
+        elif timeframe.matchTimeframe(Timeframe.Undefined):
             return "#00000000"
         else:
             return None
@@ -93,11 +91,11 @@ def timeframeWaterpointForegroundColour(vals, *_):
     try:
         timeframe = getWorkspace().timeframe
 
-        if timeframe == Timeframe.Current:
+        if timeframe.matchTimeframe(Timeframe.Current):
             return "#ffffff"
-        elif timeframe in [Timeframe.Drafted, Timeframe.Future]:
+        elif timeframe.matchTimeframe(Timeframe.Future):
             return "#000000"
-        elif timeframe == Timeframe.Undefined:
+        elif timeframe.matchTimeframe(Timeframe.Undefined):
             return "#00000000"
         else:
             return None

@@ -88,9 +88,6 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
 
             self.refreshProfileCanvas()
 
-            # Repaint the whole widget
-            self.update()
-
     def cleanupProfileCanvas(self):
         if self.profileCanvas is not None:
             self.canvasLayout.removeWidget(self.profileCanvas)
@@ -102,11 +99,6 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
         self.profileCanvas = ProfileCanvas(self.feature.profile(), layout=self.canvasLayout)
         self.profileCanvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.canvasLayout.addWidget(self.profileCanvas)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-
-        self.refreshUi()
 
     def onSelectedFeatureChanged(self, layerType):
         """Handle a change to the selected Fence."""

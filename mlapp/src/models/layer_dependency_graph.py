@@ -14,16 +14,16 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(LandTypeLayer, [])
         self.addDependencies(LandTypeConditionTable, [])
         self.addDependencies(ElevationLayer, [])
-        self.addDependencies(PaddockLayer, [LandTypeConditionTable])
+        self.addDependencies(BasePaddockLayer, [])
         self.addDependencies(WaterpointLayer, [ElevationLayer])
-        self.addDependencies(WaterpointBufferLayer, [PaddockLayer, WaterpointLayer])
-        self.addDependencies(WateredAreaLayer, [PaddockLayer, WaterpointBufferLayer])
+        self.addDependencies(WaterpointBufferLayer, [BasePaddockLayer, WaterpointLayer])
+        self.addDependencies(WateredAreaLayer, [BasePaddockLayer, WaterpointBufferLayer])
         self.addDependencies(PaddockLandTypesLayer, [LandTypeConditionTable,
-                             PaddockLayer, LandTypeLayer, WateredAreaLayer])
-        self.addDependencies(MetricPaddockLayer, [PaddockLayer, PaddockLandTypesLayer])
-        self.addDependencies(FenceLayer, [ElevationLayer, PaddockLayer, MetricPaddockLayer])
+                             BasePaddockLayer, LandTypeLayer, WateredAreaLayer])
+        self.addDependencies(PaddockLayer, [BasePaddockLayer, PaddockLandTypesLayer])
+        self.addDependencies(FenceLayer, [ElevationLayer, BasePaddockLayer, PaddockLayer])
         self.addDependencies(PipelineLayer, [ElevationLayer])
-        self.addDependencies(BoundaryLayer, [PaddockLayer])
+        self.addDependencies(BoundaryLayer, [BasePaddockLayer])
 
     def loadOrder(self):
         """Return a list of layer types in the order they should be initialised."""

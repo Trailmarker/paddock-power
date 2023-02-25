@@ -27,8 +27,7 @@ class Waterpoint(PersistedFeature, StatusFeatureMixin):
             return f"{self.NAME} ({self.WATERPOINT_TYPE})"
         return f"Waterpoint ({self.FID}) ({self.WATERPOINT_TYPE})"
 
-    @Edits.persistFeatures
-    @FeatureAction.draft.handler()
+    @FeatureAction.draft.handleAndPersist()
     def draftFeature(self, point):
         """Draft a Waterpoint."""
         self.GEOMETRY = point

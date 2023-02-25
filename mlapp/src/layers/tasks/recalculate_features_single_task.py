@@ -3,7 +3,7 @@ from time import sleep
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, guiStatusBar, qgsInfo
+from ...utils import JOB_DELAY, PLUGIN_NAME, guiStatusBar, qgsInfo
 from ...models import WorkspaceMixin
 from ..features import Edits
 from ..interfaces import IPersistedDerivedFeatureLayer, IPersistedFeatureLayer
@@ -14,20 +14,16 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
     def __init__(self, layer):
         """Input is a correctly ordered batch of layers."""
         super().__init__(
-            f"recalculating {layer.name()}",
+            f"Recalculating {layer.name()}",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.layer = layer
-        self.obsolete = False
         self.count = 0
         self.total = 0
 
     def run(self):
         """Recalculate features for a layer."""
-        guiStatusBar(f"{PLUGIN_NAME} recalculating {self.layer.name()} features …")
-
-        # TODO bit of a hack, just trying to reduce contention between these guys
-        sleep(0.5)
+        guiStatusBar(f"Recalculating {self.layer.name()} features …")
 
         assert isinstance(self.layer, IPersistedFeatureLayer)
         assert not isinstance(self.layer, IPersistedDerivedFeatureLayer)
@@ -47,6 +43,9 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
         finally:
             self.layer.setReadOnly(readOnly)
         self.setProgress(100.0)
+
+        sleep(JOB_DELAY)
+
         return True
 
     def updateCount(self, featureCount, total):
@@ -57,12 +56,3 @@ class RecalculateFeaturesSingleTask(QgsTask, WorkspaceMixin):
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
         self.workspace.onTaskCompleted(self, result)
-
-    def cancelObsolete(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} because a newer task has been queued.")
-        self.obsolete = True
-        super().cancel()
-
-    def cancel(self):
-        qgsInfo(f"{PLUGIN_NAME} requesting cancellation of {self.description()} for an unknown reason.")
-        super().cancel()

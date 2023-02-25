@@ -55,7 +55,7 @@ class ProfileCanvas(FigureCanvasQTAgg):
         self.axes.fill_between(distances,
                                profile.elevations, yMinimum, alpha=0.5)
 
-        # figure.tight_layout()
+        figure.tight_layout()
 
         super().__init__(figure)
 
@@ -73,7 +73,5 @@ class ProfileCanvas(FigureCanvasQTAgg):
         if self.layout:
             # If we have a parent layout, use that to determine the height
             height = min(height, self.layout.contentsRect().height())
-
-        # qgsDebug(f"Profile canvas screen metrics: {(width / dpi, height / dpi, dpi)}")
 
         return (width / dpi, height / dpi, dpi)

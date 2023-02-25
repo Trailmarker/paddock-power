@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from collections.abc import Generator
+
 import inspect
 import os
 import random
@@ -18,8 +20,12 @@ PADDOCK_POWER_EPSG = 7845
 PLUGIN_NAME = "MLA Paddock Power"
 PLUGIN_FOLDER = "mlapp"
 
+# Half a second gap between running certain jobs with moving parts
+JOB_DELAY = 0.3
+
 # 16777215
 MAX_QT_DIMENSION = (2 * 24 - 1)
+
 
 
 def formatMessage(message):
@@ -150,6 +156,13 @@ def getComponentStyleSheet(componentFile):
 def randomString(length=8):
     """Generate a random string of a specified length."""
     return ''.join(random.choice(string.ascii_letters) for _ in range(length))
+
+
+def ensureIterated(seq):
+    """Ensure that a generator is iterated and returned as a list."""
+    if isinstance(seq, Generator):
+        return [item for item in seq]
+    return seq
 
 
 # See https://stackoverflow.com/questions/28258875/how-to-obtain-the-set-of-all-signals-for-a-given-widget
