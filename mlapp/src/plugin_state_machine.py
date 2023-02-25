@@ -17,6 +17,7 @@ class PluginAction(StateMachineAction):
     """Allowed transitions for a StatusFeature."""
     detectWorkspace = "Detect Workspace"
     createWorkspace = "Create Workspace"
+    loadWorkspace = "Load Workspace"
     analyseWorkspace = "Analyse Workspace"
     openFeatureView = "Open Feature View"
     closeFeatureView = "Close Feature View"
@@ -45,11 +46,12 @@ class PluginStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
     # State machine interface
     __TRANSITIONS = {
 
-        (PluginStatus.NoWorkspaceLoaded, PluginAction.createWorkspace): PluginStatus.WorkspaceLoaded,
-        (PluginStatus.NoWorkspaceLoaded, PluginAction.detectWorkspace): PluginStatus.WorkspaceLoaded,
+        (PluginStatus.NoWorkspaceLoaded, PluginAction.createWorkspace): PluginStatus.NoWorkspaceLoaded,
+        (PluginStatus.NoWorkspaceLoaded, PluginAction.detectWorkspace): PluginStatus.NoWorkspaceLoaded,
+        (PluginStatus.NoWorkspaceLoaded, PluginAction.loadWorkspace): PluginStatus.WorkspaceLoaded,
         (PluginStatus.NoWorkspaceLoaded, PluginAction.projectClosed): PluginStatus.NoWorkspaceLoaded,
 
-        (PluginStatus.WorkspaceLoaded, PluginAction.detectWorkspace): PluginStatus.WorkspaceLoaded,
+        (PluginStatus.WorkspaceLoaded, PluginAction.detectWorkspace): PluginStatus.NoWorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.analyseWorkspace): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.openFeatureView): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.closeFeatureView): PluginStatus.WorkspaceLoaded,

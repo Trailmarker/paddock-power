@@ -15,8 +15,8 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return MetricPaddock
 
-    def prepareQuery(self, query, *dependentLayers):
-        [basePaddockLayer, paddockLandTypesLayer] = self.names(*dependentLayers)
+    def prepareQuery(self, query, dependentLayers):
+        [basePaddockLayer, paddockLandTypesLayer] = self.names(dependentLayers)
 
         query = f"""
 select
@@ -39,13 +39,13 @@ inner join "{paddockLandTypesLayer}"
 	on "{basePaddockLayer}".{FID} = "{paddockLandTypesLayer}".{PADDOCK}
 group by "{basePaddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
 """
-        return super().prepareQuery(query, *dependentLayers)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 basePaddockLayer,
-                 paddockLandTypesLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(DerivedMetricPaddockLayer.defaultName(),
                          DerivedMetricPaddockLayer.defaultStyle(),
-                         basePaddockLayer,
-                         paddockLandTypesLayer)
+                         dependentLayers,
+                         None) # Don't try to get fancy

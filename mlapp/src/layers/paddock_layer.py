@@ -25,7 +25,7 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
                          PaddockLayer.defaultName(),
                          PaddockLayer.defaultStyle(),
                          DerivedMetricPaddockLayer,
-                         *dependentLayers)
+                         dependentLayers)
 
     @property
     def popupLayerTypes(self):

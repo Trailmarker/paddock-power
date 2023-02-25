@@ -4,7 +4,7 @@ from qgis.core import QgsTask
 
 from ...utils import PLUGIN_NAME, qgsInfo
 from ...models import WorkspaceMixin
-from .derive_features_task import DeriveFeaturesTask
+from .derive_edits_task import DeriveEditsTask
 from .recalculate_features_task import RecalculateFeaturesTask
 
 
@@ -29,7 +29,7 @@ class AnalyseWorkspaceTask(QgsTask, WorkspaceMixin):
 
         order = workspace.layerDependencyGraph.deriveOrder()
         deriveLayers = [workspace.workspaceLayers.layer(layerType) for layerType in order]
-        deriveTask = DeriveFeaturesTask(deriveLayers, workspace.onLayerAnalysisComplete)
+        deriveTask = DeriveEditsTask(deriveLayers, None, workspace.onLayerAnalysisComplete)
         self.addSubTask(
             deriveTask,
             dependencies=[recalculateTask],

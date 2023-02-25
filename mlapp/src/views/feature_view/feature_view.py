@@ -6,6 +6,8 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
+from qgis.core import QgsApplication, QgsTask
+
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsDebug, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from ..fence_widget import FenceWidget
@@ -22,6 +24,7 @@ STYLESHEET = getComponentStyleSheet(__file__)
 class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
     closingView = pyqtSignal(type)
+    buildUiFinished = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -29,11 +32,17 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         FORM_CLASS.__init__(self)
         WorkspaceMixin.__init__(self)
 
-        self.pluginInitGui = False
-        self.uiBuilt = False
+        self._pluginInitGui = False
+        self._uiBuilt = False
+        self._buildUiTask = None
 
         self.setupUi(self)
         self.setStyleSheet(STYLESHEET)
+
+        self.paddockTab = None
+        self.fenceTab = None
+        self.pipelineTab = None
+        self.waterpointTab = None
 
         self.toolBar = QToolBar()
         self.toolBar.setMovable(False)
@@ -54,10 +63,11 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
     def initGui(self):
         f"""Called when the {PLUGIN_NAME} plugin calls initGui()."""
-        if not self.pluginInitGui:
-            self.plugin.workspaceReady.connect(self.buildUi)
+        if not self._pluginInitGui:
+            self.buildUiFinished.connect(self.refreshUi)
             self.plugin.workspaceUnloading.connect(self.clearUi)
-            self.pluginInitGui = True
+            self.plugin.workspaceReady.connect(self.buildUi)
+            self._pluginInitGui = True
 
     def refreshUi(self):
         self.paddockTab.refreshUi()
@@ -67,8 +77,8 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             self.futureTimeframeButton.setChecked(self.workspace.timeframe.name == 'Future')
 
     def buildUi(self):
-        if self.uiBuilt:
-            return
+        if self._uiBuilt:
+            qgsInfo(f"{PLUGIN_NAME} already built?")
 
         qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
 
@@ -97,14 +107,12 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
-        self.update()
-        self.refreshUi()
 
-        self.uiBuilt = True
+        self._uiBuilt = True
         qgsInfo(f"{PLUGIN_NAME} rebuilt.")
 
     def clearUi(self):
-        if not self.uiBuilt:
+        if not self._uiBuilt:
             return
 
         qgsInfo(f"{PLUGIN_NAME} tearing down old feature view …")
@@ -124,7 +132,7 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             except BaseException:
                 pass
         self.timeframeButtonGroup = None
-        self.uiBuilt = False
+        self._uiBuilt = False
         qgsInfo(f"{PLUGIN_NAME} torn down.")
 
         # self.update()

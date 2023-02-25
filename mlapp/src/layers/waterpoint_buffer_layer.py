@@ -23,4 +23,4 @@ class WaterpointBufferLayer(PersistedDerivedFeatureLayer):
                          WaterpointBufferLayer.defaultName(),
                          WaterpointBufferLayer.defaultStyle(),
                          DerivedWaterpointBufferLayer,
-                         *dependentLayers)
+                         dependentLayers)

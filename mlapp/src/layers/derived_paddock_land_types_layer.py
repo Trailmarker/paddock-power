@@ -15,9 +15,9 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return PaddockLandType
 
-    def prepareQuery(self, query, *dependentLayers):
+    def prepareQuery(self, query, dependentLayers):
 
-        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.names(*dependentLayers)
+        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.names(dependentLayers)
 
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
@@ -105,17 +105,13 @@ from
 where geometry is not null
 group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 """
-        return super().prepareQuery(query)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 landTypeConditionTable,
-                 basePaddockLayer,
-                 landTypeLayer,
-                 wateredAraLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(DerivedPaddockLandTypesLayer.defaultName(),
                          DerivedPaddockLandTypesLayer.defaultStyle(),
-                         landTypeConditionTable,
-                         basePaddockLayer,
-                         landTypeLayer,
-                         wateredAraLayer)
+                         dependentLayers,
+                         None) # Don't try to get fancy

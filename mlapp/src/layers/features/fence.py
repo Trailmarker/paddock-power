@@ -226,8 +226,8 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         affectedPaddocks = [p for p in affectedPaddocks if p.matchTimeframe(Timeframe.Current)]
         resultingPaddocks = [p for p in resultingPaddocks if p.matchTimeframe(Timeframe.Future)]
 
-        qgsDebug(f"Affected paddocks = {str([format(p) for p in affectedPaddocks])}")
-        qgsDebug(f"Resulting paddocks = {str([format(p) for p in resultingPaddocks])}")
+        # qgsDebug(f"Affected paddocks = {str([format(p) for p in affectedPaddocks])}")
+        # qgsDebug(f"Resulting paddocks = {str([format(p) for p in resultingPaddocks])}")
 
         return affectedPaddocks, resultingPaddocks
 

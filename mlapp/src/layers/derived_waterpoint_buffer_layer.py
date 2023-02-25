@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ..utils import qgsDebug
 from .calculator import Calculator
 from .features import WaterpointBuffer
 from .fields import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
@@ -14,8 +15,26 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return WaterpointBuffer
 
-    def prepareQuery(self, query, *dependentLayers):
-        [basePaddockLayer, waterpointLayer] = self.names(*dependentLayers)
+    def cleanDerivedFeatures(self, layer, edits):
+        """Remove the features within a target layer that depend on some edits."""
+        if not edits:
+            layer.dataProvider().truncate()
+        else:
+            [basePaddockLayer, waterpointLayer] = self.dependentLayers
+            fids = self.getDerivedFids(layer, self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
+
+            # qgsDebug(f"{self}.cleanDerivedFeatures({layer}, {edits}): fids={fids})")
+
+            layer.dataProvider().deleteFeatures(fids)
+
+    def prepareQuery(self, query, dependentLayers):
+        [basePaddockLayer, waterpointLayer] = dependentLayers
+        [basePaddocks, waterpoints] = self.names(dependentLayers)
+        
+        # Set up clauses
+        inPaddocksClause = DerivedFeatureLayer.andAllKeyClauses(
+            self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
+        renamedWaterpointsClause = DerivedFeatureLayer.andAllKeyClauses(self.edits, waterpointLayer, FID)
 
         _BUFFERS = "Buffers"
         _FAR_BUFFER = "FarBuffer"
@@ -26,27 +45,27 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
         query = f"""
 with {_IN_PADDOCKS} as
     (select
-        "{basePaddockLayer}".geometry,
-        "{basePaddockLayer}".{FID} as "{PADDOCK}",
-        "{waterpointLayer}".{FID} as "{WATERPOINT}",
+        "{basePaddocks}".geometry,
+        "{basePaddocks}".{FID} as "{PADDOCK}",
+        "{waterpoints}".{FID} as "{WATERPOINT}",
         '{Timeframe.Current.name}' as "{TIMEFRAME}"
-	 from "{waterpointLayer}"
-	 inner join "{basePaddockLayer}"
-     on {Timeframe.Current.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{basePaddockLayer}"."{STATUS}"')}
-	 and st_contains("{basePaddockLayer}".geometry, "{waterpointLayer}".geometry)
-     where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
+	 from "{waterpoints}"
+	 inner join "{basePaddocks}"
+     on {Timeframe.Current.includesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
+	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
+     where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
      union
      select
-        "{basePaddockLayer}".geometry,
-        "{basePaddockLayer}".{FID} as "{PADDOCK}",
-        "{waterpointLayer}".{FID} as "{WATERPOINT}",
+        "{basePaddocks}".geometry,
+        "{basePaddocks}".{FID} as "{PADDOCK}",
+        "{waterpoints}".{FID} as "{WATERPOINT}",
         '{Timeframe.Future.name}' as "{TIMEFRAME}"
-	 from "{waterpointLayer}"
-	 inner join "{basePaddockLayer}"
-     on {Timeframe.Future.includesStatuses(f'"{waterpointLayer}"."{STATUS}"', f'"{basePaddockLayer}"."{STATUS}"')}
-	 and st_contains("{basePaddockLayer}".geometry, "{waterpointLayer}".geometry)
-     where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
-     ),
+	 from "{waterpoints}"
+	 inner join "{basePaddocks}"
+     on {Timeframe.Future.includesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
+	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
+     where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
+     {inPaddocksClause}),
 {_RENAMED_WATERPOINTS} as
      (select
 	     geometry,
@@ -54,10 +73,10 @@ with {_IN_PADDOCKS} as
 		 {STATUS},
 		 "{NEAR_GRAZING_RADIUS}" as {_NEAR_BUFFER},
 		 "{FAR_GRAZING_RADIUS}" as {_FAR_BUFFER}
-	  from "{waterpointLayer}"
-      where {WaterpointType.givesWaterSql(f'"{waterpointLayer}"."{WATERPOINT_TYPE}"')}
-      ),
-{_BUFFERS} as
+	  from "{waterpoints}"
+      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
+      {renamedWaterpointsClause}),
+    {_BUFFERS} as
     (select
 		st_buffer(geometry, {_NEAR_BUFFER}) as geometry,
 		{FID} as "{WATERPOINT}",
@@ -88,14 +107,16 @@ on {_BUFFERS}."{WATERPOINT}" = {_IN_PADDOCKS}."{WATERPOINT}"
 and st_area(st_intersection({_BUFFERS}.geometry, {_IN_PADDOCKS}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BUFFERS}."{STATUS}"')}
 """
-        return super().prepareQuery(query, *dependentLayers)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 basePaddockLayer,
-                 waterpointLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(
             DerivedWaterpointBufferLayer.defaultName(),
             DerivedWaterpointBufferLayer.defaultStyle(),
-            basePaddockLayer,
-            waterpointLayer)
+            dependentLayers,
+            edits)
+        
+        # qgsDebug(f"{self}.__init__({dependentLayers}, {edits})")

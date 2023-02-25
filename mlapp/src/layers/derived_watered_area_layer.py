@@ -14,8 +14,11 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return WateredArea
 
-    def prepareQuery(self, query, *dependentLayers):
-        [basePaddockLayer, waterpointBufferLayer] = self.names(*dependentLayers)
+    def prepareQuery(self, query, dependentLayers):
+        [basePaddockLayer, waterpointBufferLayer] = self.names(dependentLayers)
+
+  		# Set up clauses
+        paddockClause = DerivedFeatureLayer.andAllKeyClauses(self.edits, basePaddockLayer, PADDOCK, waterpointBufferLayer, PADDOCK)
 
         _NEAR_WATERED_AREA = "NearWateredArea"
         _FAR_WATERED_AREA = "FarWateredArea"
@@ -29,6 +32,7 @@ with
 		{TIMEFRAME}
 	 from "{waterpointBufferLayer}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Near.name}'
+	 {paddockClause}
 	 group by {PADDOCK}, {TIMEFRAME})
 , {_FAR_WATERED_AREA} as
 	(select
@@ -37,6 +41,7 @@ with
 		{TIMEFRAME}
 	 from "{waterpointBufferLayer}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Far.name}'
+     {paddockClause}
 	 group by {PADDOCK}, {TIMEFRAME})
 select
 	st_multi(geometry) as geometry,
@@ -99,14 +104,14 @@ where not exists (
 	and {Timeframe.Future.timeframeIncludesStatuses(f'"{waterpointBufferLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')})
 
 """
-        return super().prepareQuery(query, *dependentLayers)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 basePaddockLayer,
-                 waterpointBufferLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(
             DerivedWateredAreaLayer.defaultName(),
             DerivedWateredAreaLayer.defaultStyle(),
-            basePaddockLayer,
-            waterpointBufferLayer)
+            dependentLayers,
+            None) # Don't try to get fancy

@@ -4,8 +4,8 @@ from contextlib import contextmanager
 from qgis.core import QgsVectorLayer
 
 from ...models import Glitch, WorkspaceMixin
-from ...utils import qgsException, qgsInfo
-from ..interfaces import IPersistedFeature, IFeatureLayer
+from ...utils import qgsDebug, qgsException, qgsInfo
+from ..interfaces import IPersistedFeature, IPersistedDerivedFeatureLayer
 
 
 class Edits(WorkspaceMixin):
@@ -41,6 +41,17 @@ class Edits(WorkspaceMixin):
     @property
     def layers(self):
         return set([f.featureLayer for f in self.upserts + self.deletes])
+
+    def layerUpsertFids(self, layer):
+        return [f.FID for f in self.upserts if f.featureLayer.id() == layer.id()]
+
+    def layerDeleteFids(self, layer):
+        return [f.FID for f in self.deletes if f.featureLayer.id() == layer.id()]
+
+    def layerFids(self, layer):
+        fids = self.layerUpsertFids(layer) + self.layerDeleteFids(layer)
+        # qgsDebug(f"Edits.layerFids({layer}): fids: {fids}")
+        return fids
 
     def persist(self):
         """Persist these edits to their layers."""

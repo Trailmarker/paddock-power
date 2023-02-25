@@ -35,5 +35,5 @@ class PipelineWidget(QWidget, FORM_CLASS, WorkspaceMixin):
     @pyqtSlot(QgsGeometry)
     def onSketchPipelineFinished(self, sketchLine):
         pipeline = self.workspace.pipelineLayer.makeFeature()
-        pipeline.planFeature(sketchLine)
-        # self.workspace.selectFeature(pipeline)
+        pipeline.draftFeature(sketchLine)
+        self.workspace.selectFeature(pipeline)

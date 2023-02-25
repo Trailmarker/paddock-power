@@ -13,7 +13,8 @@ class PipelineLayer(ImportedFeatureLayer):
         return Pipeline
 
     def __init__(self,
-                 workspaceFile):
+                 workspaceFile,
+                 *dependentLayers):
         """Create or open a Pipeline layer."""
 
         super().__init__(workspaceFile,

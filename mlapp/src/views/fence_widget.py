@@ -61,9 +61,7 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.workspace.selectFeature(fence)
 
     def changeSelection(self, layerType):
-        qgsDebug("FenceWidget.changeSelection")
         feature = self.workspace.selectedFeature(layerType)
-        qgsDebug(f"FenceWidget.changeSelection: feature = {feature}")
 
         if isinstance(feature, Fence):
             self.fence = feature

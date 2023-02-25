@@ -17,7 +17,8 @@ class FenceLayer(PersistedFeatureLayer):
         return Fence
 
     def __init__(self,
-                 workspaceFile):
+                 workspaceFile,
+                 *dependentLayers):
         super().__init__(workspaceFile,
                          layerName=FenceLayer.defaultName(),
                          styleName=FenceLayer.defaultStyle())

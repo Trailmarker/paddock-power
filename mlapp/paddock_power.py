@@ -3,6 +3,8 @@ import os.path
 import sys
 import traceback
 
+from time import sleep
+
 from qgis.PyQt.QtCore import Qt, QCoreApplication, QSettings, QTranslator, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -14,7 +16,7 @@ from .resources_rc import *
 from .src.models import Glitch, Workspace
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus
-from .src.utils import guiConfirm, guiStatusBar, guiWarning, qgsDebug, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
+from .src.utils import guiConfirm, guiStatusBar, guiStatusBarAndInfo, guiWarning, qgsDebug, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
 from .src.views.feature_view.feature_view import FeatureView
 from .src.widgets.import_dialog.import_dialog import ImportDialog
 
@@ -139,9 +141,6 @@ class PaddockPower(PluginStateMachine):
             callback=lambda *_: self.openImportDialog(),
             parent=self.iface.mainWindow())
 
-        self.featureView.initGui()
-        self.refreshUi()
-
         if self.status == PluginStatus.NoWorkspaceLoaded:
             self.triggerDetectWorkspace.emit()
 
@@ -232,10 +231,16 @@ class PaddockPower(PluginStateMachine):
     def initWorkspace(self, workspaceFile):
         if self.workspace:
             self.workspaceUnloading.emit()
-        self.workspace = Workspace(self.iface, workspaceFile)
+        workspace = Workspace(self.iface, workspaceFile)
+        workspace.workspaceLoaded.connect(lambda: self.onWorkspaceLoaded(workspace))
+
+    @PluginAction.loadWorkspace.handler()
+    def onWorkspaceLoaded(self, workspace):
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} workspace loaded: {workspace.workspaceName}")
+        self.workspace = workspace
+        self.featureView.initGui()
         self.workspaceReady.emit()
 
-    @PluginAction.detectWorkspace.handler()
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
 
@@ -249,8 +254,8 @@ class PaddockPower(PluginStateMachine):
                 workspaceFile = resolveWorkspaceFile(projectFilePath=projectFile)
                 if workspaceFile and os.path.exists(workspaceFile):
                     self.initWorkspace(workspaceFile)
-                    self.__successMessage(
-                        f"{PLUGIN_NAME} loaded workspace (.gpkg) from {os.path.split(os.path.basename(workspaceFile))[1]}.")
+                    # self.__successMessage(
+                    #     f"{PLUGIN_NAME} loaded workspace (.gpkg) from {os.path.split(os.path.basename(workspaceFile))[1]}.")
                 else:
                     if warning:
                         self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
@@ -263,7 +268,7 @@ class PaddockPower(PluginStateMachine):
             self.__failureMessage(
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
-    @PluginAction.createWorkspace.handler()
+
     def createWorkspace(self):
         f"""Create a new {PLUGIN_NAME} workspace in the current QGIS project."""
 
@@ -281,9 +286,9 @@ class PaddockPower(PluginStateMachine):
                         raise PluginActionFailure()
                     else:
                         self.initWorkspace(workspaceFile)
-                        qgsInfo(f"{PLUGIN_NAME} created workspace …")
-                        self.__successMessage(
-                            f"A new {PLUGIN_NAME} workspace file, {os.path.split(os.path.basename(workspaceFile))[1]} has been created alongside your QGIS project file.")
+                        # qgsInfo(f"{PLUGIN_NAME} created workspace …")
+                        # self.__successMessage(
+                        #     f"A new {PLUGIN_NAME} workspace file, {os.path.split(os.path.basename(workspaceFile))[1]} has been created alongside your QGIS project file.")
                 else:
                     qgsInfo(f"No workspace {PLUGIN_NAME} (.gpkg) file was located …")
         except PluginActionFailure as e:

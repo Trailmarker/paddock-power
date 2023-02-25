@@ -9,15 +9,16 @@ from ..features import Edits
 from ..interfaces import IPersistedDerivedFeatureLayer
 
 
-class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
+class DeriveEditsSingleTask(QgsTask, WorkspaceMixin):
 
-    def __init__(self, layer, onTaskCompleted=None):
+    def __init__(self, layer, edits, onTaskCompleted=None):
         """Input is a correctly ordered batch of layers."""
         super().__init__(
             f"deriving {layer.name()}",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.layer = layer
+        self.edits = edits
         self.count = 0
         self.total = 0
 
@@ -31,7 +32,7 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
         guiStatusBar(f"{PLUGIN_NAME} deriving {self.layer.name()} …")
 
         # TODO bit of a hack, just trying to reduce contention between these guys
-        sleep(0.5)
+        # sleep(0.5)
 
         assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
         readOnly = self.layer.readOnly()
@@ -43,7 +44,7 @@ class DeriveFeaturesSingleTask(QgsTask, WorkspaceMixin):
                 return False
 
             with Edits.editAndCommit([self.layer]):
-                self.layer.deriveFeatures(
+                self.layer.deriveFeatures(self.edits,
                     featureProgressCallback=self.updateCount,
                     cancelledCallback=self.isCanceled)
         finally:

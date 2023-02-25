@@ -13,8 +13,8 @@ class DerivedBoundaryLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return Boundary
 
-    def prepareQuery(self, query, *dependentLayers):
-        [basePaddockLayer] = self.names(*dependentLayers)
+    def prepareQuery(self, query, dependentLayers):
+        [basePaddockLayer] = self.names(dependentLayers)
 
         query = f"""
 select st_union(geometry) as geometry,
@@ -29,11 +29,13 @@ select st_union(geometry) as geometry,
 from "{basePaddockLayer}"
 where {Timeframe.Future.includesStatuses(f'"{basePaddockLayer}".{STATUS}')}
 """
-        return super().prepareQuery(query, *dependentLayers)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
-                 basePaddockLayer):
+                 dependentLayers,
+                 edits):
 
         super().__init__(DerivedBoundaryLayer.defaultName(),
                          DerivedBoundaryLayer.defaultStyle(),
-                         basePaddockLayer)
+                         dependentLayers,
+                         None) # Don't try to get fancy
