@@ -38,7 +38,7 @@ class DeriveEditsTask(QgsTask, WorkspaceMixin):
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
-        self.workspace.onTaskCompleted(self, result)
+        # self.workspace.onTaskCompleted(self, result)
 
     # def makesObsolete(self, otherTask):
     #     """Return true if this task makes the other task obsolete."""

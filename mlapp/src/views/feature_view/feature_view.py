@@ -6,8 +6,6 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
-from qgis.core import QgsApplication, QgsTask
-
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsDebug, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from ..fence_widget import FenceWidget
@@ -82,28 +80,28 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
 
-        self.paddockTab = PaddockWidget(self.tabWidget)
+        # self.paddockTab = PaddockWidget(self.tabWidget)
         # self.fenceTab = FenceWidget(self.tabWidget)
         # self.pipelineTab = PipelineWidget(self.tabWidget)
-        # self.waterpointTab = WaterpointWidget(self.tabWidget)
+        self.waterpointTab = WaterpointWidget(self.tabWidget)
 
-        self.tabWidget.addTab(self.paddockTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
+        # self.tabWidget.addTab(self.paddockTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
         # self.tabWidget.addTab(self.fenceTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
         # self.tabWidget.addTab(
         #     self.pipelineTab,
         #     QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pipeline-dashed.png"),
         #     'Pipelines')
-        # self.tabWidget.addTab(
-        #     self.waterpointTab,
-        #     QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png"),
-        #     'Waterpoints')
+        self.tabWidget.addTab(
+            self.waterpointTab,
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png"),
+            'Waterpoints')
 
         self.currentTimeframeButton.clicked.connect(lambda: self.workspace.setTimeframe("Current"))
         self.futureTimeframeButton.clicked.connect(lambda: self.workspace.setTimeframe("Future"))
 
         # self.sketchFenceButton.clicked.connect(self.fenceTab.sketchFence)
         # self.sketchPipelineButton.clicked.connect(self.pipelineTab.sketchPipeline)
-        # self.sketchWaterpointButton.clicked.connect(self.waterpointTab.sketchWaterpoint)
+        self.sketchWaterpointButton.clicked.connect(self.waterpointTab.sketchWaterpoint)
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
@@ -125,8 +123,12 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.pipelineTab = None
         self.waterpointTab = None
 
-        for item in [self.currentTimeframeButton, self.futureTimeframeButton,
-                     self.sketchFenceButton, self.sketchPipelineButton, self.sketchWaterpointButton]:
+        for item in [
+            self.currentTimeframeButton, self.futureTimeframeButton,
+            # self.sketchFenceButton,
+            # self.sketchPipelineButton,
+            self.sketchWaterpointButton
+        ]:
             try:
                 item.clicked.disconnect()
             except BaseException:
@@ -139,11 +141,11 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
     def onFeatureLayerSelected(self, featureLayerType):
         name = featureLayerType.__name__
-        if name == 'FenceLayer':
-            self.tabWidget.setCurrentWidget(self.fenceTab)
-        elif name == 'PaddockLayer':
-            self.tabWidget.setCurrentWidget(self.paddockTab)
-        elif name == 'PipelineLayer':
-            self.tabWidget.setCurrentWidget(self.pipelineTab)
-        elif name == 'WaterpointLayer':
+        # if name == 'FenceLayer':
+        #     self.tabWidget.setCurrentWidget(self.fenceTab)
+        # elif name == 'PaddockLayer':
+        #     self.tabWidget.setCurrentWidget(self.paddockTab)
+        # elif name == 'PipelineLayer':
+        #     self.tabWidget.setCurrentWidget(self.pipelineTab)
+        if name == 'WaterpointLayer':
             self.tabWidget.setCurrentWidget(self.waterpointTab)

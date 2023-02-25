@@ -1,29 +1,42 @@
 # -*- coding: utf-8 -*-
+import os
 
-from qgis.PyQt.QtWidgets import QVBoxLayout, QWidget
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QWidget
 
-from ..models.workspace_mixin import WorkspaceMixin
-#from .feature_attribute_table_view import FeatureAttributeTableView
-from .feature_list_view import FeatureListView
-class PaddockWidget(QWidget, WorkspaceMixin):
+from ..models import WorkspaceMixin
+
+FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
+    os.path.dirname(__file__), 'paddock_widget_base.ui')))
+
+
+class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
     def __init__(self, parent=None):
         """Constructor."""
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
+        FORM_CLASS.__init__(self)
+        WorkspaceMixin.__init__(self)
 
-        # self.paddockView = FeatureAttributeTableView(self)
-       
-        self.paddockView = None
-        self.layout = QVBoxLayout()
-        self.setLayout(self.layout)
-        
-        self.plugin.workspaceReady.connect(self.onWorkspaceReady)
-        
-        
-    def onWorkspaceReady(self):
-        if not self.paddockView:
-            self.paddockView = FeatureListView(self.workspace.paddockLayer, self)
-            self.layout.addWidget(self.paddockView)
-        
+        self.setupUi(self)
 
-     
+        self.splitter.setCollapsible(0, False)
+        self.splitter.setCollapsible(1, False)
+        self.splitter.setCollapsible(2, False)
+        self.splitter.setCollapsible(3, True)
+
+        self.currentPaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
+        self.futurePaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
+
+        self.paddockFilterLineEdit.textChanged.connect(
+            self.onPaddockFilterChanged)
+        self.clearPaddockFilterButton.clicked.connect(
+            self.paddockFilterLineEdit.clear)
+
+    def onPaddockFilterChanged(self, text):
+        self.paddockList.filterByName(text)
+
+    def refreshUi(self):
+        self.paddockList.refreshUi()
+        self.currentPaddockLandTypesList.refreshUi()
+        self.futurePaddockLandTypesList.refreshUi()

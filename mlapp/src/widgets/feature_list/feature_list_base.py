@@ -3,11 +3,12 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QFrame, QListWidget, QListWidgetItem, QSizePolicy
 
 
-from ...models import WorkspaceMixin
-from ...utils import ensureIterated
+from ...models import QtAbstractMeta, WorkspaceMixin
+from ...utils import ensureIterated, qgsDebug
+from .interfaces import IFeatureList
 
 
-class FeatureListBase(QListWidget, WorkspaceMixin):
+class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbstractMeta):
 
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
@@ -34,9 +35,18 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
             item.setHidden(not filter.lower()
                            in widget.feature.NAME.lower())
 
-    def getFeatures():
+    def listFeatures(self, request=None):
         """Get the Features."""
         raise NotImplementedError("getFeatures() must be implemented in a subclass")
+
+    def getFeature(self, fid):
+        """Get a Feature by ID."""
+        raise NotImplementedError("getFeatures() must be implemented in a subclass")
+
+    def clear(self):
+        """Clear the list."""
+        super().clear()
+        self.removeSelection()
 
     def sortFeatures(self, features):
         """Sort the Features."""
@@ -47,16 +57,44 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
         """De-duplicate the Features. May be necessary to provide this for some FeatureLayerList subclasses."""
         return features
 
-    def refreshUi(self):
-        """Show the Feature List."""
+    def addListItem(self, feature):
+        """Add one item in the list specified by a Feature."""
+        widget = self._listItemFactory(feature)
+        item = QListWidgetItem(self)
+        item.setSizeHint(widget.sizeHint())
 
-        # qgsDebug(f"{type(self).__name__}.refreshUi()")
+        # Prevent selection of the items
+        item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
+
+        self.addItem(item)
+        self.setItemWidget(item, widget)
+
+        if self._selectedFeature and self._selectedFeature.FID == feature.FID:
+            self._selectedItem = item
+        
+        widget.layoutRefreshNeeded.connect(self.refreshLayout)
+
+    def refreshListItem(self, fid):
+        qgsDebug(f"{type(self).__name__}.refreshListItem(): fid = {fid}")
+        
+        feature = self.getFeature(fid)
+
+        if feature and feature.FID > 0:
+            for item in [self.item(i) for i in range(self.count())]:
+                widget = self.itemWidget(item)
+                if widget.feature.FID == feature.FID:
+                    refreshedWidget = self._listItemFactory(feature)
+                    item.setSizeHint(refreshedWidget.sizeHint())
+                    self.setItemWidget(item, refreshedWidget)
+                    return
+
+    def refreshList(self):
+        """Show the Feature List."""
 
         # Initially clear the list
         self.clear()
-        self.removeSelection()
 
-        features = ensureIterated(self.getFeatures())
+        features = ensureIterated(self.listFeatures())
 
         # De-duplicate Features
         features = self.deduplicateFeatures(features)
@@ -66,20 +104,9 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
 
         # Repopulate list since we have Features
         for feature in features:
-            widget = self._listItemFactory(feature)
-            item = QListWidgetItem(self)
-            item.setSizeHint(widget.sizeHint())
-
-            # Prevent selection of the items
-            item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
-
-            self.addItem(item)
-            self.setItemWidget(item, widget)
-
-            if self._selectedFeature and self._selectedFeature.FID == feature.FID:
-                self._selectedItem = item
-                # qgsDebug(f"{type(self).__name__}.refreshUi(): selectedItem = {feature}")
-            widget.layoutRefreshNeeded.connect(self.refreshLayout)
+            self.addListItem(feature)
+            # qgsDebug(f"{type(self).__name__}.refreshUi(): selectedItem = {feature}")
+            # widget.layoutRefreshNeeded.connect(self.refreshLayout)
 
         if self._selectedItem:
             self.itemWidget(self._selectedItem).setSelected(True)
@@ -109,4 +136,4 @@ class FeatureListBase(QListWidget, WorkspaceMixin):
     def changeSelection(self, layerType):
         """Select the Feature."""
         self._selectedFeature = self.workspace.selectedFeature(layerType)
-        self.refreshUi()
+        self.refreshList()

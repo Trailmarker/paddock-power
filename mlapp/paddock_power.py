@@ -240,6 +240,7 @@ class PaddockPower(PluginStateMachine):
         self.workspace = workspace
         self.featureView.initGui()
         self.workspaceReady.emit()
+        guiStatusBarAndInfo("Workspace ready.")
 
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""

@@ -36,9 +36,8 @@ class Pipeline(PersistedFeature, StatusFeatureMixin):
         return Edits.upsert(self)
 
     @FeatureAction.plan.handleAndPersist()
-    def planFeature(self, geometry):
+    def planFeature(self):
         """Plan a Pipeline (skip the Draft step)."""
-        self.GEOMETRY = geometry
         return Edits.upsert(self)
 
     @FeatureAction.undoPlan.handleAndPersist()

@@ -5,7 +5,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
-from ..utils import resolveStylePath, PLUGIN_NAME
+from ..utils import qgsDebug, resolveStylePath, PLUGIN_NAME
 from .fields import TIMEFRAME
 from .interfaces import IFeatureLayer
 from .map_layer_mixin import MapLayerMixin
@@ -56,8 +56,10 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.addInBackground()
 
         self.plugin.workspaceReady.connect(self.onWorkspaceReady)
+        qgsDebug(f"{type(self).__name__}.__init__(), workspaceReady is connected")
 
     def onWorkspaceReady(self):
+        qgsDebug("FeatureLayer.onWorkspaceReady()")
         self.selectionChanged.connect(self.onSelectionChanged)
 
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
@@ -156,12 +158,12 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.triggerRepaint()
 
     def onSelectFeature(self, feature):
-        # qgsDebug(f"{type(self).__name__}.selectFeature({feature})")
+        qgsDebug(f"{type(self).__name__}.selectFeature({feature})")
         feature.zoomFeature()
         pass
 
     def onDeselectFeature(self):
-        # qgsDebug(f"{type(self).__name__}.onDeselectFeature()")
+        qgsDebug(f"{type(self).__name__}.onDeselectFeature()")
         pass
 
     def onSelectionChanged(self, selection, *_):

@@ -201,7 +201,7 @@ class Workspace(QObject):
         """Handle a completed recalculation of a layer."""
         if result:
             layer = self.workspaceLayers.layer(layerType)
-            # qgsDebug(f"{type(self).__name__}.onLayerAnalysisComplete: {type(layer).__name__}.featuresChanged.emit()")
+            qgsDebug(f"{type(self).__name__}.onLayerAnalysisComplete: {type(layer).__name__}.featuresChanged.emit()")
             layer.featuresChanged.emit()
 
     def onPersistEdits(self, edits):
