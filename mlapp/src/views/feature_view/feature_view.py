@@ -83,27 +83,27 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
 
         self.paddockTab = PaddockWidget(self.tabWidget)
-        self.fenceTab = FenceWidget(self.tabWidget)
-        self.pipelineTab = PipelineWidget(self.tabWidget)
-        self.waterpointTab = WaterpointWidget(self.tabWidget)
+        # self.fenceTab = FenceWidget(self.tabWidget)
+        # self.pipelineTab = PipelineWidget(self.tabWidget)
+        # self.waterpointTab = WaterpointWidget(self.tabWidget)
 
         self.tabWidget.addTab(self.paddockTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
-        self.tabWidget.addTab(self.fenceTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
-        self.tabWidget.addTab(
-            self.pipelineTab,
-            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pipeline-dashed.png"),
-            'Pipelines')
-        self.tabWidget.addTab(
-            self.waterpointTab,
-            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png"),
-            'Waterpoints')
+        # self.tabWidget.addTab(self.fenceTab, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
+        # self.tabWidget.addTab(
+        #     self.pipelineTab,
+        #     QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pipeline-dashed.png"),
+        #     'Pipelines')
+        # self.tabWidget.addTab(
+        #     self.waterpointTab,
+        #     QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png"),
+        #     'Waterpoints')
 
         self.currentTimeframeButton.clicked.connect(lambda: self.workspace.setTimeframe("Current"))
         self.futureTimeframeButton.clicked.connect(lambda: self.workspace.setTimeframe("Future"))
 
-        self.sketchFenceButton.clicked.connect(self.fenceTab.sketchFence)
-        self.sketchPipelineButton.clicked.connect(self.pipelineTab.sketchPipeline)
-        self.sketchWaterpointButton.clicked.connect(self.waterpointTab.sketchWaterpoint)
+        # self.sketchFenceButton.clicked.connect(self.fenceTab.sketchFence)
+        # self.sketchPipelineButton.clicked.connect(self.pipelineTab.sketchPipeline)
+        # self.sketchWaterpointButton.clicked.connect(self.waterpointTab.sketchWaterpoint)
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
         self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
