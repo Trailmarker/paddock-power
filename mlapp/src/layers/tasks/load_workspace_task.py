@@ -13,7 +13,7 @@ class LoadWorkspaceTask(QgsTask):
         """Input is a Workspace."""
         
         super().__init__(
-            f"{PLUGIN_NAME} is loading the 'workspaceName' workspace …",
+            f"{PLUGIN_NAME} is loading the '{workspaceName}' workspace …",
             flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
 
         self.workspaceFile = workspaceFile
