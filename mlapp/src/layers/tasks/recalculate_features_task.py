@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
+from ...utils import JOB_DELAY, PLUGIN_NAME, guiStatusBarAndInfo
 from ...models import WorkspaceMixin
 from .recalculate_features_single_task import RecalculateFeaturesSingleTask
 
@@ -26,6 +27,7 @@ class RecalculateFeaturesTask(QgsTask, WorkspaceMixin):
 
     def run(self):
         """Recalculate features for all layers as specified in subtasks."""
+        sleep(JOB_DELAY)
         return True
 
     def finished(self, result):

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 
 from qgis.core import QgsTask
 
-from ...utils import PLUGIN_NAME, qgsInfo
+from ...utils import JOB_DELAY, PLUGIN_NAME, qgsInfo
 from ...models import WorkspaceMixin
 from .derive_edits_task import DeriveEditsTask
 from .recalculate_features_task import RecalculateFeaturesTask
@@ -39,6 +40,7 @@ class AnalyseWorkspaceTask(QgsTask, WorkspaceMixin):
 
     def run(self):
         """Derive features for all layers as specified in subtasks."""
+        sleep(JOB_DELAY)
         return True
 
     def finished(self, result):

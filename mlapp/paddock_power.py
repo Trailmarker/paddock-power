@@ -139,7 +139,7 @@ class PaddockPower(PluginStateMachine):
             parent=self.iface.mainWindow())
 
         if self.status == PluginStatus.NoWorkspaceLoaded:
-            self.detectWorkspace()
+            self.detectWorkspace(False)
 
     # Override Glitch type exceptions application-wide
 
@@ -247,19 +247,15 @@ class PaddockPower(PluginStateMachine):
             if projectFile is None:
                 if warning:
                     self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
-                raise PluginActionFailure()
+                return
             else:
                 workspaceFile = resolveWorkspaceFile(projectFilePath=projectFile)
                 if workspaceFile and os.path.exists(workspaceFile):
                     self.initWorkspace(workspaceFile)
-                    # self.__successMessage(
-                    #     f"{PLUGIN_NAME} loaded workspace (.gpkg) from {os.path.split(os.path.basename(workspaceFile))[1]}.")
                 else:
                     if warning:
                         self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
-                    raise PluginActionFailure()
-        except PluginActionFailure as e:
-            raise e
+                    return
         except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred detecting workspace …")
             qgsException()
@@ -274,23 +270,18 @@ class PaddockPower(PluginStateMachine):
             projectFile = resolveProjectFile()
             if projectFile is None:
                 self.__failureMessage(f"{PLUGIN_NAME} no QGIS project file located …")
-                raise PluginActionFailure()
+                return
             else:
                 workspaceFile = resolveWorkspaceFile()
                 if workspaceFile is not None:
                     if os.path.exists(workspaceFile):
                         self.__failureMessage(
                             f"A {PLUGIN_NAME} workspace (.gpkg) file already exists. Stopping creation …")
-                        raise PluginActionFailure()
+                        return
                     else:
                         self.initWorkspace(workspaceFile)
-                        # qgsInfo(f"{PLUGIN_NAME} created workspace …")
-                        # self.__successMessage(
-                        #     f"A new {PLUGIN_NAME} workspace file, {os.path.split(os.path.basename(workspaceFile))[1]} has been created alongside your QGIS project file.")
                 else:
                     qgsInfo(f"No workspace {PLUGIN_NAME} (.gpkg) file was located …")
-        except PluginActionFailure as e:
-            raise e
         except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred creating workspace …")
             qgsException()

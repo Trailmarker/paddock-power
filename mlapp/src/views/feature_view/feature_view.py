@@ -68,7 +68,7 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             self._pluginInitGui = True
 
     def refreshUi(self):
-        self.paddockTab.refreshUi()
+        # self.paddockTab.refreshUi()
 
         if self.workspace:
             self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
