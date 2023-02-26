@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from ..utils import qgsDebug
 from .calculator import Calculator
-from .features import WaterpointBuffer
+from .features import Edits, WaterpointBuffer
 from .fields import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
 
@@ -15,22 +14,24 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return WaterpointBuffer
 
-    def cleanDerivedFeatures(self, layer, edits):
-        """Remove the features within a target layer that depend on some edits."""
+    def removeDerivedFeatures(self, layer, edits):
+        """Define which features must be removed from a target layer to be re-derived."""
         if not edits:
-            layer.dataProvider().truncate()
+            return super().removeDerivedFeatures(layer, edits)
         else:
             [basePaddockLayer, waterpointLayer] = self.dependentLayers
             fids = self.getDerivedFids(layer, self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
-
-            # qgsDebug(f"{self}.cleanDerivedFeatures({layer}, {edits}): fids={fids})")
-
-            layer.dataProvider().deleteFeatures(fids)
+            
+            deletes = Edits()
+            for fid in fids:
+                deletes.editBefore(Edits.delete(self.getFeature(fid)))
+            return deletes
+            
 
     def prepareQuery(self, query, dependentLayers):
         [basePaddockLayer, waterpointLayer] = dependentLayers
         [basePaddocks, waterpoints] = self.names(dependentLayers)
-        
+
         # Set up clauses
         inPaddocksClause = DerivedFeatureLayer.andAllKeyClauses(
             self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
@@ -118,5 +119,5 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
             DerivedWaterpointBufferLayer.defaultStyle(),
             dependentLayers,
             edits)
-        
+
         # qgsDebug(f"{self}.__init__({dependentLayers}, {edits})")

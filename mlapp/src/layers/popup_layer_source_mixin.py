@@ -4,6 +4,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsProject
 
+from ..utils import qgsDebug
 from .interfaces import IFeature, IMapLayer
 from .popup_feature_layer import PopupFeatureLayer
 
@@ -17,11 +18,11 @@ class PopupLayerSourceMixin(IMapLayer):
         super().__init__()
 
         self.__popupLayers = {}
-        self.popupLayerAdded.connect(self.onPopupLayerAdded)
-        self.popupLayerRemoved.connect(self.onPopupLayerRemoved)
+        self.popupLayerAdded.connect(lambda layer: self.onPopupLayerAdded(layer))
+        self.popupLayerRemoved.connect(lambda: self.onPopupLayerRemoved())
 
-        self.featureSelected.connect(self.onPopupFeatureSelected)
-        self.featureDeselected.connect(self.onPopupFeatureDeselected)
+        self.featureSelected.connect(lambda id: self.onPopupFeatureSelected(id))
+        self.featureDeselected.connect(lambda id: self.onPopupFeatureDeselected(id))
 
     @property
     def hasPopups(self):
@@ -110,12 +111,13 @@ class PopupLayerSourceMixin(IMapLayer):
             if layerId in QgsProject.instance().mapLayers():
                 self.removePopupLayer(QgsProject.instance().mapLayer(layerId))
 
-    def onPopupFeatureSelected(self, layerType):
+    def onPopupFeatureSelected(self, layerId):
         """To be overridden and called when the popup layer source selects a popup feature."""
-        feature = self.workspace.selectedFeature(layerType)
+        qgsDebug(f"{self}.onPopupFeatureSelected()")
+        feature = self.workspace.selectedFeature(layerId)
         self.addAllPopupLayers(feature)
 
-    def onPopupFeatureDeselected(self, layerType):
+    def onPopupFeatureDeselected(self, layerId):
         """To be overridden and called when the popup layer source deselects a popup feature."""
         self.removeAllPopupLayers()
 

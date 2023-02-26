@@ -4,43 +4,50 @@ from contextlib import contextmanager
 from qgis.core import QgsVectorLayer
 
 from ...models import Glitch, WorkspaceMixin
-from ...utils import qgsDebug, qgsException, qgsInfo
+from ...utils import ensureIterated, qgsException, qgsInfo
 from ..interfaces import IPersistedFeature, IPersistedDerivedFeatureLayer
 
 
 class Edits(WorkspaceMixin):
 
-    def __init__(self, upserts=[], deletes=[]):
+    def __init__(self, truncates=[], upserts=[], deletes=[]):
         super().__init__()
+        self.truncates = ensureIterated(truncates)
+        self.upserts = ensureIterated(upserts)
+        self.deletes = ensureIterated(deletes)
 
-        def _filter(features=[]):
-            return [f for f in (features or []) if isinstance(f, IPersistedFeature)]
-        self.upserts = _filter(upserts)
-        self.deletes = _filter(deletes)
+        # def _filter(features=[]):
+        #     return [f for f in (features or []) if isinstance(f, IPersistedFeature)]
 
     def editAfter(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
+        self.truncates = otherEdits.truncates + self.truncates
         self.upserts = otherEdits.upserts + self.upserts
         self.deletes = otherEdits.deletes + self.deletes
         return self
 
     def editBefore(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
+        self.truncates = self.truncates + otherEdits.truncates
         self.upserts = self.upserts + otherEdits.upserts
         self.deletes = self.deletes + otherEdits.deletes
         return self
 
     @staticmethod
-    def upsert(*features):
-        return Edits(upserts=list(features))
+    def truncate(layer):
+        return Edits(truncates=[layer])
 
     @staticmethod
-    def delete(*features):
-        return Edits(deletes=list(features))
+    def upsert(feature):
+        return Edits(upserts=[feature])
+
+    @staticmethod
+    def delete(feature):
+        return Edits(deletes=[feature])
 
     @property
     def layers(self):
-        return set([f.featureLayer for f in self.upserts + self.deletes])
+        return set([f.featureLayer for f in (self.upserts + self.deletes)] + self.truncates)
 
     def layerUpsertFids(self, layer):
         return [f.FID for f in self.upserts if f.featureLayer.id() == layer.id()]
@@ -56,11 +63,20 @@ class Edits(WorkspaceMixin):
     def persist(self):
         """Persist these edits to their layers."""
         with Edits.editAndCommit(self.layers):
-            for feature in self.upserts:
-                feature.upsert()
+            for layer in self.truncates:
+                if not isinstance(layer, IPersistedDerivedFeatureLayer):
+                    raise Glitch(
+                        f"Cannot truncate layer {layer.name()} because it is not an IPersistedDerivedFeatureLayer")
+                layer.dataProvider().truncate()
 
             for feature in self.deletes:
                 feature.delete()
+
+            for feature in self.upserts:
+                feature.upsert()
+        
+            # Return a response … 
+            return self
 
     def notifyPersisted(self):
         """Called when edits are persisted."""
@@ -69,8 +85,10 @@ class Edits(WorkspaceMixin):
     @staticmethod
     @contextmanager
     def editAndCommit(layers):
+        readOnlies = [(layer, layer.readOnly()) for layer in layers]
         try:
             for layer in layers:
+                layer.setReadOnly(False)
                 layer.startEditing()
             yield
             for layer in layers:
@@ -81,6 +99,11 @@ class Edits(WorkspaceMixin):
             for layer in layers:
                 layer.rollBack()
             raise e
+        finally:
+            # Restore previous read only status if necessary
+            for layer, readOnly in readOnlies:
+                layer.setReadOnly(readOnly)
+                
 
     @staticmethod
     @contextmanager

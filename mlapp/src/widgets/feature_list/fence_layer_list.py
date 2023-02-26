@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from ...utils import qgsDebug
 from .infrastructure_list_item import InfrastructureListItem
 from .feature_layer_list import FeatureLayerList
 

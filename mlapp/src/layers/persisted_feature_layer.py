@@ -6,6 +6,7 @@ import processing
 
 from ..models import Glitch
 from ..utils import PADDOCK_POWER_EPSG, PLUGIN_NAME, qgsInfo
+from .features import Edits
 from .feature_layer import FeatureLayer
 from .interfaces import IPersistedFeatureLayer
 
@@ -137,26 +138,14 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.FID)
 
-    def recalculateFeatures(self, featureProgressCallback=None, cancelledCallback=None):
+    def recalculateFeatures(self):
         """Recalculate features in this layer."""
-
-        if not self.isEditable():
-            raise Glitch(f"{type(self).__name__}.recalculateFeatures(): this can only be run during an edit session …")
-
+        edits = Edits()
+        
         qgsInfo(f"Recalculating {self.name()} …")
 
-        features = list(self.getFeatures())
-        featureCount = len(features)
-        count = 0
-
-        for feature in features:
-            if cancelledCallback and cancelledCallback():
-                return
+        for feature in self.getFeatures():
             feature.recalculate()
-            feature.upsert()
-            if featureProgressCallback:
-                featureProgressCallback(count, featureCount)
+            edits.editBefore(Edits.upsert(feature))
 
-        # Check again …
-        if cancelledCallback and cancelledCallback():
-            return
+        return edits

@@ -100,9 +100,9 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
         self.profileCanvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.canvasLayout.addWidget(self.profileCanvas)
 
-    def onSelectedFeatureChanged(self, layerType):
+    def onSelectedFeatureChanged(self, layerId):
         """Handle a change to the selected Fence."""
-        feature = self.workspace.selectedFeature(layerType)
+        feature = self.workspace.selectedFeature(layerId)
 
         if feature and feature.isInfrastructure:
             self.setFeature(feature)

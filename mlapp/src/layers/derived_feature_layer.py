@@ -39,14 +39,11 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
             QgsFeatureRequest.NoGeometry).setFilterExpression(orClauses)
         return [f.id() for f in layer.getFeatures(request)]
 
-    def cleanDerivedFeatures(self, layer, edits):
+    def removeDerivedFeatures(self, layer, edits):
         """Given a layer, remove the features within it that depend on some edits."""
-        if not edits:
-            layer.dataProvider().truncate()
-        else:
-            pass
+        return Edits.truncate(layer) if not edits else Edits()
 
-    def __init__(self, layerName, styleName, dependentLayers, edits):
+    def __init__(self, layerName, styleName, dependentLayers, edits=None):
 
         self.dependentLayers = dependentLayers
         self.edits = edits or Edits()

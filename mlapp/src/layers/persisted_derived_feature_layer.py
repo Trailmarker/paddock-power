@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from mlapp.src.layers.features.edits import Edits
+
 from ..models import Glitch
 from ..utils import PLUGIN_NAME, qgsDebug, qgsInfo
 from .interfaces import IPersistedDerivedFeatureLayer
@@ -15,7 +17,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
         self.derivedLayerType = derivedLayerType
         self.dependentLayers = dependentLayers
-        
+
         self.setReadOnly(True)
 
     def getDerivedLayerInstance(self, edits):
@@ -26,40 +28,21 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         """Add an instance of the derived layer for this layer to the map."""
         self.getDerivedLayerInstance(edits=None).addToMap()
 
-    def deriveFeatures(self, edits, featureProgressCallback=None, cancelledCallback=None):
+    def deriveFeatures(self, edits):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
         # Clean up any instances of the virtual source …
         # self.derivedLayerType.detectAndRemoveAllOfType()
-
-        if not self.isEditable():
-            raise Glitch(f"{type(self).__name__}.deriveFeatures(): this can only be run during an edit session …")
-
         derivedLayer = self.getDerivedLayerInstance(edits)
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
         qgsInfo(f"Deriving {self.name()} …")
-       
-        # Remove features based on the edits that have been applied upstream …
-        derivedLayer.cleanDerivedFeatures(self, edits)
 
-        derivedFeatures = list(derivedLayer.getFeatures())
+        # Get a first batch of edits that clears away existing records …
+        edits = derivedLayer.removeDerivedFeatures(self, edits)
 
-        featureCount = len(derivedFeatures)
-        count = 0
-
-        for derivedFeature in derivedFeatures:
-            if cancelledCallback and cancelledCallback():
-                return
-            feature = self.copyFeature(derivedFeature)
-            feature.upsert()
-            if featureProgressCallback:
-                featureProgressCallback(count, featureCount)
-
-        # Check again …
-        if cancelledCallback and cancelledCallback():
-            return
-
-        # Clean up any instances of the virtual source …
-        # type(derivedLayer).detectAndRemoveAllOfType()
+        # Get a second batch of edits that copies the new records to this layer …
+        for feature in derivedLayer.getFeatures():
+            edits.editBefore(Edits.upsert(self.copyFeature(feature)))
+        

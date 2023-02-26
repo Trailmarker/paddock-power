@@ -2,7 +2,7 @@
 from qgis.core import QgsMapLayer, QgsProject
 
 
-from ..utils import qgsDebug, qgsInfo, resolveStylePath
+from ..utils import resolveStylePath
 from .interfaces import IMapLayer
 
 

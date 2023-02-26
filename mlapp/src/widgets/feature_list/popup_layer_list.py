@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-
 from ...models import Glitch
 from ...layers.popup_layer_consumer_mixin import PopupLayerConsumerMixin
-from ...utils import qgsDebug
 from .feature_layer_list import FeatureLayerList
 
 

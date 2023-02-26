@@ -1,36 +1,24 @@
 # -*- coding: utf-8 -*-
-from time import sleep
-
-from qgis.core import QgsTask
-
-from ...utils import JOB_DELAY, PLUGIN_NAME, guiStatusBarAndInfo
-from ...models import WorkspaceMixin
+from ...models import SafeTask
+from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
 from .recalculate_features_single_task import RecalculateFeaturesSingleTask
 
 
-class RecalculateFeaturesTask(QgsTask, WorkspaceMixin):
+class RecalculateFeaturesTask(SafeTask):
 
-    def __init__(self, layers, onTaskCompleted=None):
+    def __init__(self, layers):
         """Input is a batch of layers (order not important)."""
-        super().__init__(
-            f"{PLUGIN_NAME} recalculating features for {len(layers)} layers",
-            flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
+        super().__init__(f"{PLUGIN_NAME} recalculating features for {len(layers)} layers")
 
         self.layers = layers
+        allLayerNames = ", ".join(layer.name() for layer in self.layers)
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} recalculating {allLayerNames}")
 
         for layer in self.layers:
-            task = RecalculateFeaturesSingleTask(layer)
-            if onTaskCompleted:
-                task.taskCompleted.connect(lambda: onTaskCompleted(type(layer), True))
-                task.taskTerminated.connect(lambda: onTaskCompleted(type(layer), False))
-            self.addSubTask(task, dependencies=[])
+            self.safeAddSubTask(RecalculateFeaturesSingleTask(layer))
 
-    def run(self):
-        """Recalculate features for all layers as specified in subtasks."""
-        sleep(JOB_DELAY)
-        return True
-
-    def finished(self, result):
+    def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
         if not result:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to fully recalculate the '{self.workspaceName}' workspace.")
+            guiStatusBarAndInfo(
+                f"{PLUGIN_NAME} failed to recalculate features for {len(self.layers)} layers.")

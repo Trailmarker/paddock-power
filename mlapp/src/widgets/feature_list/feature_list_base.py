@@ -133,7 +133,7 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
         self._selectedItem = None
         self.clearSelection()
 
-    def changeSelection(self, layerType):
+    def changeSelection(self, layerId):
         """Select the Feature."""
-        self._selectedFeature = self.workspace.selectedFeature(layerType)
+        self._selectedFeature = self.workspace.selectedFeature(layerId)
         self.refreshList()

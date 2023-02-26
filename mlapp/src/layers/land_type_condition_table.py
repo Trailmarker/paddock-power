@@ -5,7 +5,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import PLUGIN_NAME, qgsInfo
-from .features import LandTypeCondition
+from .features import Edits, LandTypeCondition
 from .fields import LAND_TYPE, PADDOCK, CONDITION_TYPE, ConditionType
 from .interfaces import IPersistedLayer
 
@@ -249,4 +249,4 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
 
     def recalculateFeatures(self):
         """Recalculate features in this layer."""
-        pass
+        return Edits()

@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ...layers.features import FeatureAction, persistEdits
 from ...models import QtAbstractMeta, toStateMachine
-from ...utils import PLUGIN_FOLDER
+from ...utils import PLUGIN_FOLDER, qgsDebug
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -172,7 +172,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
     @EditAction.save.handler()
     def saveItem(self):
         # saveFeature returns an Edits …
-        return persistEdits(self.feature, lambda *_: self.featureEdit.saveFeature())
+        return persistEdits(lambda *_: self.featureEdit.saveFeature())
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
@@ -206,6 +206,7 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
+        qgsDebug(f"Refreshed UI for {self.feature.displayName()}")
 
     def sizeHint(self):
         """Return the size of the widget."""

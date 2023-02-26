@@ -8,7 +8,6 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from qgis.core import QgsExpression, QgsProject
-from qgis.utils import plugins
 
 from .resources_rc import *
 
@@ -38,7 +37,7 @@ class PaddockPower(PluginStateMachine):
 
         self.iface = iface
         self.actions = {}
-
+        
         self.setupGlitchHook()
         self.caughtGlitch.connect(Glitch.popup)
 
@@ -65,7 +64,7 @@ class PaddockPower(PluginStateMachine):
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.featureView)
 
         self._stateChanged.connect(self.refreshUi)
-  
+
     def addAction(self,
                   pluginAction,
                   icon,
@@ -113,8 +112,15 @@ class PaddockPower(PluginStateMachine):
         self.detectWorkspaceAction = self.addAction(
             PluginAction.detectWorkspace,
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
-            text=f"Refresh {PLUGIN_NAME} workspace …",
+            text=f"Detect {PLUGIN_NAME} workspace …",
             callback=lambda *_: self.detectWorkspace(),
+            parent=self.iface.mainWindow())
+
+        self.refreshWorkspaceAction = self.addAction(
+            PluginAction.refreshWorkspace,
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
+            text=f"Refresh {PLUGIN_NAME} workspace …",
+            callback=lambda *_: self.refreshWorkspace(),
             parent=self.iface.mainWindow())
 
         self.analyseWorkspaceAction = self.addAction(
@@ -237,8 +243,7 @@ class PaddockPower(PluginStateMachine):
         self.workspace = workspace
         self.featureView.initGui()
         self.workspaceReady.emit()
-        guiStatusBarAndInfo("Workspace ready.")
-
+        
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
 
@@ -262,6 +267,11 @@ class PaddockPower(PluginStateMachine):
             self.__failureMessage(
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
+    def refreshWorkspace(self):
+        f"""Refresh the {PLUGIN_NAME} workspace."""
+        if self.status == PluginStatus.WorkspaceLoaded:
+            self.doAction(PluginAction.unloadWorkspace)
+        self.detectWorkspace()
 
     def createWorkspace(self):
         f"""Create a new {PLUGIN_NAME} workspace in the current QGIS project."""
@@ -295,7 +305,7 @@ class PaddockPower(PluginStateMachine):
         if guiConfirm(
             f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock metrics.",
                 f"Analyse {PLUGIN_NAME} workspace?"):
-            self.workspace.recalculateLayers()
+            self.workspace.analyseWorkspace()
 
     @PluginAction.projectClosed.handler()
     def projectClosed(self):
