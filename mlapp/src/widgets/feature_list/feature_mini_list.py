@@ -15,7 +15,7 @@ class FeatureMiniList(FeatureListBase):
     def listFeatures(self):
         """Get the features."""
         return self.features
-    
+
     def getFeature(self, fid):
         """Get a feature by its fid."""
         for feature in self.features:

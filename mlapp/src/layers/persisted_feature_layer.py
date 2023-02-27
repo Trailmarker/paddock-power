@@ -141,7 +141,7 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
     def recalculateFeatures(self):
         """Recalculate features in this layer."""
         edits = Edits()
-        
+
         qgsInfo(f"Recalculating {self.name()} …")
 
         for feature in self.getFeatures():

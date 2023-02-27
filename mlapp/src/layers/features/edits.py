@@ -118,7 +118,7 @@ class Edits(WorkspaceMixin):
     def __repr__(self):
         """Return a string representation of the Field."""
         return f"{type(self).__name__}(edits={dict.__repr__(self.edits)})"
-        
+
     def __str__(self):
         return repr(self)
 

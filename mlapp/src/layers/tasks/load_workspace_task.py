@@ -13,7 +13,7 @@ class LoadWorkspaceTask(SafeTask):
         super().__init__(f"{PLUGIN_NAME} is loading the '{workspaceName}' workspace …")
 
         loadOrder = layerDependencyGraph.loadOrder()
-        
+
         self.safeAddSubTask(CleanupLayersTask(loadOrder))
 
         for layerType in loadOrder:

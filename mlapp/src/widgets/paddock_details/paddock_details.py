@@ -18,7 +18,7 @@ class PaddockDetails(QWidget, FORM_CLASS):
 
         self.paddock = paddock
         self.refreshUi()
-        
+
     def refreshUi(self):
         if self.paddock is not None:
             self.areaText.setValue(self.paddock.AREA, "{0:.2f}")

@@ -38,28 +38,28 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
         rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest()
-        
+
         edits = Edits()
         if not rederiveFeaturesRequest:
             qgsInfo(f"Removing and re-deriving the whole {self.name()} layer …")
             edits.editBefore(Edits.truncate(self))
         else:
-            qgsInfo(f"Filter expression for re-deriving features: {rederiveFeaturesRequest.filterExpression().expression()}")
-            
+            qgsInfo(
+                f"Filter expression for re-deriving features: {rederiveFeaturesRequest.filterExpression().expression()}")
+
             rederivedFeatures = [f for f in self.getFeatures(rederiveFeaturesRequest)]
             qgsInfo(f"Removing {len(rederivedFeatures)} features in the {self.name()} layer …")
-            
+
             for rederivedFeature in rederivedFeatures:
                 edits.editBefore(Edits.delete(rederivedFeature))
 
-        derivedFeatures = [self.copyFeature(f) for f in derivedLayer.getFeatures()] 
+        derivedFeatures = [self.copyFeature(f) for f in derivedLayer.getFeatures()]
         qgsInfo(f"Deriving {len(derivedFeatures)} features in the {self.name()} layer …")
-        
+
         # Get a second batch of edits that copies the new records to this layer …
         edits.editBefore(Edits.bulkAdd(self, derivedFeatures))
-        
+
         # for derivedFeature in derivedFeatures:
         #     edits.editBefore(Edits.upsert(self.copyFeature(derivedFeature)))
-        
+
         return edits
-        

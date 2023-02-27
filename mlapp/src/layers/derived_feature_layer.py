@@ -14,9 +14,10 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
     def keyClause(self, changeset, dependentLayer, derivedKeyFieldName, dependentKeyFieldName):
         keyValues = changeset.layerKeyValues(dependentLayer, dependentKeyFieldName)
         return (f'{derivedKeyFieldName} in ({",".join([str(fid) for fid in keyValues])})' if keyValues else "")
-    
+
     def allKeyClauses(self, changeset, *args):
-        keyClauses = [self.keyClause(changeset, layer, derivedKeyFieldName, dependentKeyFieldName) for (layer, derivedKeyFieldName, dependentKeyFieldName) in zip(*([iter(args)] * 3))]
+        keyClauses = [self.keyClause(changeset, layer, derivedKeyFieldName, dependentKeyFieldName)
+                      for (layer, derivedKeyFieldName, dependentKeyFieldName) in zip(*([iter(args)] * 3))]
         keyClauses = [clause for clause in keyClauses if clause]
         if not keyClauses:
             return ""
@@ -36,7 +37,6 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
 
         # return QgsFeatureRequest().setNoAttributes().setFlags(
         #     QgsFeatureRequest.NoGeometry).setFilterExpression(orClauses)
-  
 
     def getRederiveFeaturesRequest(self):
         """Given a layer, remove the features within it that depend on some edits."""

@@ -19,25 +19,24 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
         """Define which features must be removed from a target layer to be re-derived."""
         if not self.changeset:
             return None
-        
+
         # TODO Land Type condition table?
-        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.dependentLayers           
+        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.dependentLayers
         return self.prepareRederiveFeaturesRequest(
             basePaddockLayer, PADDOCK, FID,
             wateredAreaLayer, PADDOCK, PADDOCK,
-            landTypeLayer, LAND_TYPE, FID)    
-
+            landTypeLayer, LAND_TYPE, FID)
 
     def prepareQuery(self, query, dependentLayers):
         [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = dependentLayers
         [landTypeConditions, basePaddocks, landTypes, wateredAreas] = self.names(dependentLayers)
 
-        
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
         _WATERED_FACTOR = "WateredFactor"
 
-        filterPaddocks = self.andAllKeyClauses(self.changeset, basePaddockLayer, FID, FID, wateredAreaLayer, FID, PADDOCK)
+        filterPaddocks = self.andAllKeyClauses(self.changeset, basePaddockLayer,
+                                               FID, FID, wateredAreaLayer, FID, PADDOCK)
 
         if filterPaddocks:
             _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
@@ -50,7 +49,6 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
         else:
             _FILTERED_PADDOCKS = basePaddocks
             withFilteredPaddocks = ""
-
 
         query = f"""
 with

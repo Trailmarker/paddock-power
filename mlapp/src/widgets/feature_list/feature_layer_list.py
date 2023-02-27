@@ -8,15 +8,15 @@ from qgis.core import QgsFeatureRequest, QgsVectorLayerCache
 
 
 class FeatureLayerList(FeatureListBase):
-    
+
     class FeatureCache(QgsVectorLayerCache):
         def __init__(self, layer, count):
             super().__init__(layer, count)
-            
+
         def featureRemoved(self, fid):
             super().featureRemoved(fid)
             self.removeListItem(fid)
-    
+
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
         super().__init__(listItemFactory, parent)
@@ -60,7 +60,7 @@ class FeatureLayerList(FeatureListBase):
             oldLayer.featuresUpserted.disconnect(self.refreshList)
             oldLayer.featuresDeleted.disconnect(self.refreshList)
             oldLayer.featuresBulkAdded.disconnect(self.clearAndRefreshCache)
-            
+
             oldLayer.featureSelected.disconnect(self.changeSelection)
             oldLayer.featureDeselected.disconnect(self.removeSelection)
 
@@ -72,13 +72,13 @@ class FeatureLayerList(FeatureListBase):
             newLayer.featuresUpserted.connect(self.clearAndRefreshCache)
             newLayer.featuresDeleted.connect(self.removeListItems)
             newLayer.featuresBulkAdded.connect(self.clearAndRefreshCache)
-                        
+
             newLayer.featureSelected.connect(self.changeSelection)
             newLayer.featureDeselected.connect(self.removeSelection)
             self._layerCache = QgsVectorLayerCache(newLayer, newLayer.featureCount())
-      
+
             self._layerCache.finished.connect(self.refreshList)
-            self._layerCache.invalidated.connect(self.clearAndRefreshCache)            
+            self._layerCache.invalidated.connect(self.clearAndRefreshCache)
             self.clearAndRefreshCache()
 
     def listFeatures(self, request=None):

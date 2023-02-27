@@ -71,7 +71,7 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
 
         if self._selectedFeature and self._selectedFeature.FID == feature.FID:
             self._selectedItem = item
-        
+
         widget.layoutRefreshNeeded.connect(self.refreshLayout)
         # widget.stateChanged.connect(lambda: self.refreshListItem(feature.FID))
 
@@ -84,7 +84,7 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
 
     def refreshListItem(self, fid):
         qgsDebug(f"{type(self).__name__}.refreshListItem(): fid = {fid}")
-        
+
         feature = self.getFeature(fid)
 
         if feature and feature.FID > 0:

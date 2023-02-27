@@ -10,11 +10,12 @@ class FeatureAction(StateMachineAction):
     def handle(self):
         return partial(actionHandler, self)
 
-    def handleAndPersist(action):                                                 # Result of @FeatureAction.action.handleAndPersist()
+    # Result of @FeatureAction.action.handleAndPersist()
+    def handleAndPersist(action):
         def withPersistedEdits(method):                                           # Resulting decorator
             def callWithPersistedEdits(*args, **kwargs):                          # Resulting decorated method
                 edits = actionHandler(action, method)(*args, **kwargs)
-                
+
                 edits.persist()
                 edits.notifyPersisted()
             return callWithPersistedEdits

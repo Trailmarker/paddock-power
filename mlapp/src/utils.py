@@ -24,7 +24,6 @@ PLUGIN_FOLDER = "mlapp"
 MAX_QT_DIMENSION = (2 * 24 - 1)
 
 
-
 def formatMessage(message):
     if isinstance(message, str):
         return message

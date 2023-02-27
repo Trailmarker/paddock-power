@@ -20,7 +20,7 @@ class DeriveEditsTask(SafeTask):
 
         for layer in self.layers:
             self.safeAddSubTask(DeriveEditsSingleTask(layer, self.changeset))
-            
+
         self.safeAddSubTask(CleanupLayersTask([
             DerivedBoundaryLayer,
             DerivedWaterpointBufferLayer,

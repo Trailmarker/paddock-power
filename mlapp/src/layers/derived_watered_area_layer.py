@@ -19,17 +19,32 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
         """Define which features must be removed from a target layer to be re-derived."""
         if not self.changeset:
             return None
-        
-        [basePaddockLayer, waterpointBufferLayer] = self.dependentLayers            
-        return self.prepareRederiveFeaturesRequest(basePaddockLayer, PADDOCK, FID, waterpointBufferLayer, PADDOCK, PADDOCK)    
 
-    def prepareQuery(self, query, dependentLayers):        
+        [basePaddockLayer, waterpointBufferLayer] = self.dependentLayers
+        return self.prepareRederiveFeaturesRequest(
+            basePaddockLayer, PADDOCK, FID, waterpointBufferLayer, PADDOCK, PADDOCK)
+
+    def prepareQuery(self, query, dependentLayers):
         [basePaddockLayer, waterpointBufferLayer] = dependentLayers
         [basePaddocks, waterpointBuffers] = self.names(dependentLayers)
 
-  		# Set up clauses
-        filterWaterpointBuffers = self.andAllKeyClauses(self.changeset, basePaddockLayer, PADDOCK, FID, waterpointBufferLayer, PADDOCK, PADDOCK)
-        filterPaddocks = self.andAllKeyClauses(self.changeset, basePaddockLayer, FID, FID, waterpointBufferLayer, FID, PADDOCK)
+        # Set up clauses
+        filterWaterpointBuffers = self.andAllKeyClauses(
+            self.changeset,
+            basePaddockLayer,
+            PADDOCK,
+            FID,
+            waterpointBufferLayer,
+            PADDOCK,
+            PADDOCK)
+        filterPaddocks = self.andAllKeyClauses(
+            self.changeset,
+            basePaddockLayer,
+            FID,
+            FID,
+            waterpointBufferLayer,
+            FID,
+            PADDOCK)
 
         _NEAR_WATERED_AREA = f"NearWateredArea{randomString()}"
         _FAR_WATERED_AREA = f"FarWateredArea{randomString()}"

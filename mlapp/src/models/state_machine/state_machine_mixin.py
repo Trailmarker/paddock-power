@@ -23,6 +23,7 @@ class StateMachineMixin:
     def emitStateChanged(self):
         self.machine.emitStateChanged()
 
+
 def toStateMachine(obj):
     """Retrieve the machine from the object."""
     if isinstance(obj, StateMachineMixin):

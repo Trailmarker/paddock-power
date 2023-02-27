@@ -37,7 +37,7 @@ class PaddockPower(PluginStateMachine):
 
         self.iface = iface
         self.actions = {}
-        
+
         self.setupGlitchHook()
         self.caughtGlitch.connect(Glitch.popup)
 
@@ -243,7 +243,7 @@ class PaddockPower(PluginStateMachine):
         self.workspace = workspace
         self.featureView.initGui()
         self.workspaceReady.emit()
-        
+
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
 

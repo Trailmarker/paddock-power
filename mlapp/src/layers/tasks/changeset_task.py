@@ -21,10 +21,7 @@ class ChangesetTask(SafeTask):
         self.changeset.editBefore(self.edits)
 
         return True
-    
+
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
         pass
-   
-
-    

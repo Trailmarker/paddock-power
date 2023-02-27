@@ -71,7 +71,6 @@ class Workspace(QObject):
         self.workspaceLoaded.emit()
 
         self.addToMap()
-     
 
     def findGroup(self):
         """Find this workspace's group in the Layers panel."""
@@ -210,5 +209,3 @@ class Workspace(QObject):
 
         self._analyseWorkspaceTask = AnalyseWorkspaceTask()
         self._analyseWorkspaceTaskId = QgsApplication.taskManager().addTask(self._analyseWorkspaceTask)
-
-  

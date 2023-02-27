@@ -34,12 +34,12 @@ class FeatureList(ABC):
     def deduplicateFeatures(self, features):
         """De-duplicate the Features. May be necessary to provide this for some FeatureLayerList subclasses."""
         pass
-    
+
     @abstractmethod
     def addListItem(self, feature):
         """Add one item in the list specified a Feature."""
         pass
-    
+
     @abstractmethod
     def refreshListItem(self, fid):
         """Refresh one item in the list specified by Feature ID."""
