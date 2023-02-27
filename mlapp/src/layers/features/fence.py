@@ -4,11 +4,11 @@ from shapely.ops import split
 
 from qgis.core import QgsGeometry
 from collections import defaultdict
-from qgis.core import QgsFeatureRequest, QgsGeometry, QgsSpatialIndex
+from qgis.core import QgsFeatureRequest, QgsGeometry
 
 from ...models import Glitch
-from ...utils import PLUGIN_NAME, qgsDebug, qgsInfo
-from ..fields import BUILD_FENCE, NAME, PADDOCK, FeatureStatus, Timeframe, FenceSchema
+from ...utils import PLUGIN_NAME, qgsInfo
+from ..fields import BUILD_FENCE, FeatureStatus, Timeframe, FenceSchema
 from .edits import Edits
 from .feature_action import FeatureAction
 from .persisted_feature import PersistedFeature
@@ -274,8 +274,6 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         if self.BUILD_ORDER <= 0:
             raise Glitch("Fence must have a positive Build Order to be Planned")
-
-        index = QgsSpatialIndex
 
         _, crossedBasePaddocks = self.getCrossedBasePaddocks()
 
