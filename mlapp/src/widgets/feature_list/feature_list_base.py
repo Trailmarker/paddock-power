@@ -73,6 +73,7 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
             self._selectedItem = item
         
         widget.layoutRefreshNeeded.connect(self.refreshLayout)
+        # widget.stateChanged.connect(lambda: self.refreshListItem(feature.FID))
 
     def refreshListItem(self, fid):
         qgsDebug(f"{type(self).__name__}.refreshListItem(): fid = {fid}")
@@ -86,6 +87,9 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
                     refreshedWidget = self._listItemFactory(feature)
                     item.setSizeHint(refreshedWidget.sizeHint())
                     self.setItemWidget(item, refreshedWidget)
+                    refreshedWidget.layoutRefreshNeeded.connect(self.refreshLayout)
+                    # refreshedWidget.stateChanged.connect(lambda: self.refreshListItem(feature.FID))
+                    refreshedWidget.layoutRefreshNeeded.emit()
                     return
 
     def refreshList(self):

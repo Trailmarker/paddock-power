@@ -190,17 +190,17 @@ class Workspace(QObject):
                 guiStatusBarAndInfo(
                     f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
 
-    def deriveEdits(self, edits):
+    def deriveEdits(self, changeset):
         """Winnow and re-analyse a batch of updated layers."""
         deriveEditsTask = QgsApplication.taskManager().task(self._deriveFeaturesTaskId)
         if deriveEditsTask and deriveEditsTask.isActive():
             deriveEditsTask.cancel()
             self._deriveFeaturesTaskId = -1
 
-        order = self.layerDependencyGraph.deriveOrder(type(layer) for layer in edits.layers)
+        order = self.layerDependencyGraph.deriveOrder(type(layer) for layer in changeset.layers)
         layers = [self.workspaceLayers.layer(layerType) for layerType in order]
-        self._deriveEditsTask = DeriveEditsTask(layers, edits)
-        self._deriveFeaturesTaskId = QgsApplication.taskManager().addTask(self.deriveEditsTask)
+        self._deriveEditsTask = DeriveEditsTask(layers, changeset)
+        self._deriveFeaturesTaskId = QgsApplication.taskManager().addTask(self._deriveEditsTask)
 
     def analyseWorkspace(self):
         """Winnow and re-analyse a batch of updated layers."""

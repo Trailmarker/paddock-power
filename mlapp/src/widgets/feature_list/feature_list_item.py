@@ -171,8 +171,10 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
     @EditAction.save.handler()
     def saveItem(self):
-        # saveFeature returns an Edits …
-        return persistEdits(lambda *_: self.featureEdit.saveFeature())
+        edits = self.featureEdit.saveFeature()
+        edits.persist()
+        self.refreshUi()
+        edits.notifyPersisted()
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
@@ -184,6 +186,9 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
     def refreshUi(self):
         """Refresh the UI based on the current state of the fence."""
+
+        if self.hasDetails:
+            self.featureDetails.refreshUi()
 
         # Set title to Feature title
         self.collapse.setTitle(self.feature.TITLE)
@@ -206,7 +211,6 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
         # Force a layout refresh
         self.layoutRefreshNeeded.emit()
-        qgsDebug(f"Refreshed UI for {self.feature.displayName()}")
 
     def sizeHint(self):
         """Return the size of the widget."""

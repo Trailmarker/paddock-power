@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject
+
 from ...models import Glitch
+from ...utils import qgsDebug
 from ...layers.popup_layer_consumer_mixin import PopupLayerConsumerMixin
 from .feature_layer_list import FeatureLayerList
 
@@ -34,9 +37,12 @@ class PopupLayerList(FeatureLayerList, PopupLayerConsumerMixin):
         """Get the FeatureLayer - override this."""
         return self._featureLayer
 
-    def onPopupLayerAdded(self, layer):
-        self._featureLayer = layer
+    def onPopupLayerAdded(self, layerId):
+        qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId})")
+        self._featureLayer = QgsProject.instance().mapLayer(layerId)
         self.refreshList()
 
     def onPopupLayerRemoved(self):
+        qgsDebug(f"{type(self).__name__}.onPopupLayerRemoved()")
         self._featureLayer = None
+        self.refreshList()

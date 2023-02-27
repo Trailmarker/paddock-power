@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ..utils import qgsDebug
 from .calculator import Calculator
 from .features import Edits, WaterpointBuffer
 from .fields import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
@@ -14,19 +15,13 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return WaterpointBuffer
 
-    def removeDerivedFeatures(self, layer, edits):
+    def getRederiveFeaturesRequest(self, edits):
         """Define which features must be removed from a target layer to be re-derived."""
         if not edits:
-            return super().removeDerivedFeatures(layer, edits)
+            return None
         else:
-            [basePaddockLayer, waterpointLayer] = self.dependentLayers
-            fids = self.getDerivedFids(layer, self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
-            
-            deletes = Edits()
-            for fid in fids:
-                deletes.editBefore(Edits.delete(self.getFeature(fid)))
-            return deletes
-            
+            [basePaddockLayer, waterpointLayer] = self.dependentLayers            
+            return self.prepareRederiveFeaturesRequest(self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)    
 
     def prepareQuery(self, query, dependentLayers):
         [basePaddockLayer, waterpointLayer] = dependentLayers

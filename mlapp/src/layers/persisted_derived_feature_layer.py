@@ -39,10 +39,24 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
         qgsInfo(f"Deriving {self.name()} …")
 
-        # Get a first batch of edits that clears away existing records …
-        edits = derivedLayer.removeDerivedFeatures(self, edits)
+        rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest(edits)
+        
+        edits = Edits()
+        if not rederiveFeaturesRequest:
+            edits.editBefore(Edits.truncate(self))
+        else:
+            rederiveFeatures = [f for f in self.getFeatures(rederiveFeaturesRequest)]
+            
+            qgsDebug(f"rederiveFeaturesRequest.filterExpression={rederiveFeaturesRequest.filterExpression()}")
+            
+            qgsDebug(f"rederiveFeatures={[str(f) for f in rederiveFeatures]}")
+            
+            for derivedFeature in rederiveFeatures:
+                edits.editBefore(Edits.delete(derivedFeature))
 
         # Get a second batch of edits that copies the new records to this layer …
-        for feature in derivedLayer.getFeatures():
-            edits.editBefore(Edits.upsert(self.copyFeature(feature)))
+        for derivedFeature in derivedLayer.getFeatures():
+            edits.editBefore(Edits.upsert(self.copyFeature(derivedFeature)))
+        
+        return edits
         

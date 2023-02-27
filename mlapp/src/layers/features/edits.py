@@ -19,6 +19,13 @@ class Edits(WorkspaceMixin):
         # def _filter(features=[]):
         #     return [f for f in (features or []) if isinstance(f, IPersistedFeature)]
 
+    def __repr__(self):
+        """Return a string representation of the Field."""
+        return f"{type(self).__name__}(truncates={[repr(t) for t in self.truncates]}, upserts={[repr(u) for u in self.upserts]}, deletes={[repr(d) for d in self.deletes]})"
+
+    def __str__(self):
+        return repr(self)
+
     def editAfter(self, otherEdits=None):
         otherEdits = otherEdits or Edits()
         self.truncates = otherEdits.truncates + self.truncates

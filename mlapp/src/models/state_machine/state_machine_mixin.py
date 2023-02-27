@@ -16,6 +16,12 @@ class StateMachineMixin:
     def machine(self):
         pass
 
+    @property
+    def stateChanged(self):
+        return self.machine.stateChanged
+
+    def emitStateChanged(self):
+        self.machine.emitStateChanged()
 
 def toStateMachine(obj):
     """Retrieve the machine from the object."""

@@ -5,7 +5,6 @@ from re import finditer
 from qgis.core import QgsFeature, QgsRectangle, QgsVectorLayer
 
 from ...models import Glitch, QtAbstractMeta
-from ...utils import qgsDebug
 from ..fields import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, NAME, STATUS, PERIMETER, TIMEFRAME, Timeframe
 from ..interfaces import IFeature
 

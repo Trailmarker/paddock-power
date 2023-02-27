@@ -2,7 +2,7 @@
 from qgis.core import QgsApplication
 
 from ...models import SafeTask
-from ...utils import PLUGIN_NAME, qgsInfo
+from ...utils import PLUGIN_NAME, qgsDebug, qgsInfo
 from .edits import Edits
 
 
@@ -21,19 +21,22 @@ class PersistEditsTask(SafeTask):
         """Carry out a function that generates Feature edit operations, and persist the edits."""
         if self.isCanceled():
             return False
-
+        qgsDebug(f"PersistEditsTask.safeRun: self._editFunction={self._editFunction}")
         self.edits = self._editFunction(*self._args, **self._kwargs) or Edits()
+        qgsDebug(f"PersistEditsTask.safeRun: self.edits={self.edits}")
         self.edits.persist()
         return True
 
-    # def safeFinished(self, result):
-    #     """Called when task completes (successfully or otherwise)."""
-    #     pass
-    #     # if result:
-    #     #     self.edits.notifyPersisted()
+    def safeFinished(self, result):
+        """Called when task completes (successfully or otherwise)."""
+        pass
+        # qgsDebug("PersistEditsTask.safeFinished")
+        # if result:
+        #     self.edits.notifyPersisted()
 
 
 def persistEdits(editFunction, *args, **kwargs):
     """Utility function to queue an action returning edits to a PersistEditsTask."""
+    qgsDebug(f"persistEdits({editFunction}, {args}, {kwargs})")
     currentTask = PersistEditsTask(f"{PLUGIN_NAME} saving your data …", editFunction, *args, **kwargs)
     QgsApplication.taskManager().addTask(currentTask)

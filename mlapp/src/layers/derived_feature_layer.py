@@ -30,18 +30,19 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
         return f"and ({allKeyClauses})" if allKeyClauses else ""
 
     @classmethod
-    def getDerivedFids(cls, layer, edits, *args):
-        """Given a layer, return the persistent FIDs of the features within it that will be derived based on some edits."""
+    def prepareRederiveFeaturesRequest(cls, edits, *args):
+        """Return a QgsFeatureRequest to figure out which featurs to rederive based on some edits."""
         orClauses = cls.allKeyClauses(edits, *args)
-        # qgsDebug(f"DerivedFeatureLayer.getDerivedFids({layer}, {edits}, {args}): orClauses: {orClauses}")
+        qgsDebug(f"DerivedFeatureLayer.getRederiveFeaturesRequest({edits}, {args}): orClauses: {orClauses}")
 
-        request = QgsFeatureRequest().setNoAttributes().setFlags(
-            QgsFeatureRequest.NoGeometry).setFilterExpression(orClauses)
-        return [f.id() for f in layer.getFeatures(request)]
+        return QgsFeatureRequest().setFilterExpression(orClauses)
+        # return QgsFeatureRequest().setNoAttributes().setFlags(
+        #     QgsFeatureRequest.NoGeometry).setFilterExpression(orClauses)
 
-    def removeDerivedFeatures(self, layer, edits):
+
+    def getRederiveFeaturesRequest(self, edits):
         """Given a layer, remove the features within it that depend on some edits."""
-        return Edits.truncate(layer) if not edits else Edits()
+        return None
 
     def __init__(self, layerName, styleName, dependentLayers, edits=None):
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
+from ...utils import PLUGIN_NAME, qgsDebug, guiStatusBarAndInfo
 from ..interfaces import IPersistedDerivedFeatureLayer
 from .changeset_task import ChangesetTask
 
@@ -11,11 +11,19 @@ class DeriveEditsSingleTask(ChangesetTask):
         self.layer = layer
         super().__init__(f"{PLUGIN_NAME} deriving {layer.name()}", self.editFunction, changeset)
 
+    def __repr__(self):
+        return f"{type(self).__name__}(layer={self.layer}, changeset={self.changeset})"
+
+    def __str__(self):
+        return repr(self)
+
     def editFunction(self):
         assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
         guiStatusBarAndInfo(self.description())
-        
-        return self.layer.deriveFeatures(self.changeset)
+        qgsDebug(f"{self}")
+        edits = self.layer.deriveFeatures(self.changeset)
+        qgsDebug(f"Derived edits={edits}")
+        return edits
 
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""

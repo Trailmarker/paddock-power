@@ -11,14 +11,14 @@ from .popup_feature_layer import PopupFeatureLayer
 
 class PopupLayerSourceMixin(IMapLayer):
 
-    popupLayerAdded = pyqtSignal(PopupFeatureLayer)
+    popupLayerAdded = pyqtSignal(str)
     popupLayerRemoved = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
         self.__popupLayers = {}
-        self.popupLayerAdded.connect(lambda layer: self.onPopupLayerAdded(layer))
+        self.popupLayerAdded.connect(lambda id: self.onPopupLayerAdded(id))
         self.popupLayerRemoved.connect(lambda: self.onPopupLayerRemoved())
 
         self.featureSelected.connect(lambda id: self.onPopupFeatureSelected(id))
@@ -78,7 +78,7 @@ class PopupLayerSourceMixin(IMapLayer):
         # The relativeLayerPosition determines where a popup layer is inserted in the group
         group.insertLayer(max(0, layerIndex + self.relativeLayerPosition), popupLayer)
 
-        self.popupLayerAdded.emit(popupLayer)
+        self.popupLayerAdded.emit(popupLayer.id())
 
     def addAllPopupLayers(self, feature):
         for layerType in self.popupLayerTypes:
@@ -121,7 +121,7 @@ class PopupLayerSourceMixin(IMapLayer):
         """To be overridden and called when the popup layer source deselects a popup feature."""
         self.removeAllPopupLayers()
 
-    def onPopupLayerAdded(self, layer):
+    def onPopupLayerAdded(self, layerId):
         """To be overridden and called when the popup layer source adds a popup layer."""
         pass
 
