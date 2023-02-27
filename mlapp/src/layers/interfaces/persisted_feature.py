@@ -6,16 +6,6 @@ from .feature import Feature
 
 class PersistedFeature(Feature):
 
-    @abstractproperty
-    def currentTask(self):
-        """Return the current Task associated with this Feature."""
-        pass
-
-    @abstractproperty
-    def currentTask(self, task):
-        """Return the current Task associated with this Feature."""
-        pass
-
     @abstractmethod
     def delete(self):
         """Delete the Persisted item."""

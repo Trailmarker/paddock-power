@@ -15,29 +15,12 @@ class PaddockLandTypesLayerList(PopupLayerList):
     def __init__(self, parent=None):
         """Constructor."""
 
-        self._featureLayer = None
-
         def listItemFactory(paddockLandType):
             return FeatureListItem(paddockLandType, detailsWidgetFactory=PaddockLandTypeDetails,
                                    editWidgetFactory=PaddockLandTypeDetailsEdit, parent=parent)
 
         super().__init__(listItemFactory, parent)
 
-    @property
-    def featureLayer(self):
-        return self._featureLayer
-
-    @featureLayer.setter
-    def featureLayer(self, value):
-        self._featureLayer = value
-        self.refreshList()
-
-    def onPopupLayerAdded(self, layerId):
-        qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId})")
-        self.featureLayer = QgsProject.instance().mapLayer(layerId)
-
-    def onPopupLayerRemoved(self):
-        self.featureLayer = None
 
     def getFeatures(self, request=None):
         """Get the current popup layer of the given type."""

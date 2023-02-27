@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ...models import SafeTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
+from .cleanup_derived_layers_task import CleanupDerivedLayersTask
 from .cleanup_layers_task import CleanupLayersTask
 from .load_layer_task import LoadLayerTask
 
@@ -14,6 +15,7 @@ class LoadWorkspaceTask(SafeTask):
 
         loadOrder = layerDependencyGraph.loadOrder()
 
+        # self.safeAddSubTask(CleanupDerivedLayersTask())
         self.safeAddSubTask(CleanupLayersTask(loadOrder))
 
         for layerType in loadOrder:

@@ -3,11 +3,12 @@ from abc import ABC, abstractmethod, abstractproperty
 from collections import defaultdict
 from contextlib import contextmanager
 
-from qgis.core import QgsProject, QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from ...models import Glitch, WorkspaceMixin
 from ...utils import qgsDebug, qgsException, qgsInfo
 from ..interfaces import IPersistedDerivedFeatureLayer
+from .land_type_condition import LandTypeCondition
 
 
 class Edits(WorkspaceMixin):
@@ -91,6 +92,26 @@ class Edits(WorkspaceMixin):
         def layer(self):
             return self.feature.featureLayer
 
+    class UpsertTable(Edit):
+        def __init__(self, feature):
+            super().__init__()
+            self.order = 3
+            self.feature = feature
+
+        def __repr__(self):
+            """Return a string representation of the Edit."""
+            return f"{type(self).__name__}(feature={self.feature})"
+
+        def __str__(self):
+            return repr(self)
+
+        def persist(self):
+            self.feature.upsert()
+
+        @property
+        def layer(self):
+            return self.feature.featureLayer
+
     class Delete(Edit):
         def __init__(self, feature):
             super().__init__()
@@ -150,6 +171,8 @@ class Edits(WorkspaceMixin):
 
     @staticmethod
     def upsert(feature):
+        if isinstance(feature, LandTypeCondition):
+            return Edits().append(Edits.UpsertTable(feature))
         return Edits().append(Edits.Upsert(feature))
 
     @staticmethod
@@ -176,7 +199,7 @@ class Edits(WorkspaceMixin):
 
     @property
     def layers(self):
-        return [QgsProject.instance().mapLayer(layerId) for layerId in self.edits.keys()]
+        return [self.workspace.mapLayer(layerId) for layerId in self.edits.keys()]
 
     def layerFeatures(self, layer):
         return self.getFeatures(self.edits[layer.id()])
@@ -212,7 +235,7 @@ class Edits(WorkspaceMixin):
                 qgsDebug(f"{layer}.layerTruncated.emit()")
                 layer.layerTruncated.emit()
 
-            upsertedFids = [edit.feature.FID for edit in edits if isinstance(edit, Edits.Upsert)]
+            upsertedFids = [edit.feature.FID for edit in edits if isinstance(edit, Edits.Upsert) and not isinstance(edit, Edits.UpsertTable)]
             if upsertedFids:
                 qgsDebug(f"{layer}.featuresUpserted.emit({upsertedFids})")
                 layer.featuresUpserted.emit(upsertedFids)

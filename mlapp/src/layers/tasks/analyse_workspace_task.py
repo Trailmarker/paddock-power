@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from ...layers import DerivedBoundaryLayer, DerivedWaterpointBufferLayer, DerivedMetricPaddockLayer, DerivedPaddockLandTypesLayer, DerivedWateredAreaLayer
 from ...models import SafeTask, WorkspaceMixin
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
-from .cleanup_layers_task import CleanupLayersTask
+from .cleanup_derived_layers_task import CleanupDerivedLayersTask
 from .derive_edits_single_task import DeriveEditsSingleTask
 from .recalculate_features_single_task import RecalculateFeaturesSingleTask
 
@@ -30,12 +29,7 @@ class AnalyseWorkspaceTask(SafeTask, WorkspaceMixin):
         for layer in deriveLayers:
             self.safeAddSubTask(DeriveEditsSingleTask(layer, self.changeset))
 
-        self.safeAddSubTask(CleanupLayersTask([
-            DerivedBoundaryLayer,
-            DerivedWaterpointBufferLayer,
-            DerivedMetricPaddockLayer,
-            DerivedPaddockLandTypesLayer,
-            DerivedWateredAreaLayer], delay=1))
+        self.safeAddSubTask(CleanupDerivedLayersTask())
 
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""

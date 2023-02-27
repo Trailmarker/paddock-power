@@ -37,6 +37,6 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.paddockList.filterByName(text)
 
     def refreshUi(self):
-        self.paddockList.refreshUi()
-        self.currentPaddockLandTypesList.refreshUi()
-        self.futurePaddockLandTypesList.refreshUi()
+        self.paddockList.clearAndRefreshCache()
+        self.currentPaddockLandTypesList.clearAndRefreshCache()
+        self.futurePaddockLandTypesList.clearAndRefreshCache()

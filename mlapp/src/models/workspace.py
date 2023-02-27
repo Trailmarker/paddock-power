@@ -177,6 +177,12 @@ class Workspace(QObject):
         for layerType in self.layerDependencyGraph.unloadOrder():
             self.workspaceLayers.unloadLayer(layerType)
 
+    def mapLayer(self, layerId):
+        if layerId == self.landTypeConditionTable.id():
+            return self.landTypeConditionTable
+        else:
+            return QgsProject.instance().mapLayer(layerId)
+
     def onLayerLoaded(self, layer):
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {layer.name()} loaded …")
 

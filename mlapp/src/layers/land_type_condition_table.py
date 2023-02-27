@@ -23,6 +23,7 @@ class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass
         QObject.__init__(self)
         WorkspaceMixin.__init__(self)
 
+        self._readOnly = False
         self._editable = False
         self.tableName = self.defaultName()
 
@@ -198,6 +199,12 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landTypeId=landTypeId))
+
+    def readOnly(self):
+        return self._readOnly
+
+    def setReadOnly(self, readOnly):
+        self._readOnly = readOnly
 
     def isEditable(self):
         return self._editable

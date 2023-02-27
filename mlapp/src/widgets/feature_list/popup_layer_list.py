@@ -37,10 +37,19 @@ class PopupLayerList(FeatureLayerList, PopupLayerConsumerMixin):
         """Get the FeatureLayer - override this."""
         return self._featureLayer
 
+    @featureLayer.setter
+    def featureLayer(self, value):
+        """Set the FeatureLayer - override this."""
+        self._featureLayer = value
+        self.refreshList()
+
     def onPopupLayerAdded(self, layerId):
         qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId})")
-        self._featureLayer = QgsProject.instance().mapLayer(layerId)
-        self.refreshList()
+        featureLayer = QgsProject.instance().mapLayer(layerId)
+
+        if type(featureLayer) in self.popupLayerTypes:
+            self._featureLayer = featureLayer
+            self.refreshList()
 
     def onPopupLayerRemoved(self):
         qgsDebug(f"{type(self).__name__}.onPopupLayerRemoved()")
