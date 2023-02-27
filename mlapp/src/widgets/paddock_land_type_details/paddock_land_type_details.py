@@ -15,8 +15,9 @@ class PaddockLandTypeDetails(QWidget, FORM_CLASS):
         super().__init__(parent)
 
         self.setupUi(self)
-
         self.paddockLandType = paddockLandType
+
+    def refreshUi(self):
         if self.paddockLandType is not None:
             self.landTypeNameText.setValue(self.paddockLandType.LAND_TYPE_NAME, "{0}")
             self.conditionTypeText.setValue(self.paddockLandType.CONDITION_TYPE.value, "{0}")

@@ -34,16 +34,16 @@ class PaddockLandTypesLayerList(PopupLayerList):
 
     def onPopupLayerAdded(self, layerId):
         qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId})")
-        self.featureLayer = QgsProject.instance().mapLayer(layerId)        
-   
+        self.featureLayer = QgsProject.instance().mapLayer(layerId)
+
     def onPopupLayerRemoved(self):
         self.featureLayer = None
 
-    def getFeatures(self):
+    def getFeatures(self, request=None):
         """Get the current popup layer of the given type."""
         if not self._featureLayer:
             return []
-        features = self._featureLayer.getFeaturesByTimeframe(self.timeframe)
+        features = self._featureLayer.getFeaturesByTimeframe(self.timeframe, request)
         return features
 
 
