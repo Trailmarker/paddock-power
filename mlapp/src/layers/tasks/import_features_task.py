@@ -12,7 +12,7 @@ class ImportFeaturesTask(PersistEditsTask):
         self.importLayer = importLayer
         self.fieldMap = fieldMap
 
-        super().__init__(f"{PLUGIN_NAME} importing {layer.name()}", self.editFunction)
+        super().__init__(f"{PLUGIN_NAME} importing {layer.name()}", True, self.editFunction) # notify=True
 
     def editFunction(self):
         assert isinstance(self.layer, IImportedFeatureLayer)

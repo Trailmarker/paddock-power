@@ -99,24 +99,30 @@ class FeatureLayerList(FeatureListBase):
 
     def getFeatures(self, request=None):
         """Get the Features."""
-        for feature in self._layerCache.getFeatures(request):
-            yield self._featureLayer.wrapFeature(feature)
+        if self.featureLayer:
+            for feature in self._layerCache.getFeatures(request):
+                yield self._featureLayer.wrapFeature(feature)
+        return []
 
     def getFeaturesByTimeframe(self, timeframe, request=None):
         """Get the features in this layer that are in a specified timeframe."""
-        request = request or QgsFeatureRequest()
+        if self.featureLayer:
+            request = request or QgsFeatureRequest()
 
-        if self.featureLayer.getFeatureType().hasField(TIMEFRAME):
-            request.setFilterExpression(timeframe.getFilterExpression())
-            return self.getFeatures(request)
-        else:
-            features = self.getFeatures(request)
-            return [f for f in features if f.matchTimeframe(timeframe)]
+            if self.featureLayer.getFeatureType().hasField(TIMEFRAME):
+                request.setFilterExpression(timeframe.getFilterExpression())
+                return self.getFeatures(request)
+            else:
+                features = self.getFeatures(request)
+                return [f for f in features if f.matchTimeframe(timeframe)]
+        return []
 
     def getFeaturesInCurrentTimeframe(self, request=None):
         """Get the features in this layer that are in the current timeframe."""
-        return self.getFeaturesByTimeframe(self.featureLayer.timeframe, request)
-
+        if self.featureLayer:
+            return self.getFeaturesByTimeframe(self.featureLayer.timeframe, request)
+        return []
+    
     def getFeature(self, id):
         """Get a feature by its id, assumed to be the same as its FID."""
         feature = self._layerCache.getFeature(id)

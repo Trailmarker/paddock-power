@@ -2,9 +2,9 @@
 from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
-from ...layers.features import FeatureAction, persistEdits
+from ...layers.features import FeatureAction
 from ...models import QtAbstractMeta, toStateMachine
-from ...utils import PLUGIN_FOLDER, qgsDebug
+from ...utils import PLUGIN_FOLDER
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel

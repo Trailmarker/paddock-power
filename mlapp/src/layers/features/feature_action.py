@@ -3,23 +3,22 @@ from functools import partial
 
 
 from ...models import StateMachineAction, actionHandler
-from ...utils import qgsDebug
-
+from ...utils import PLUGIN_NAME
+from .persist_edits_task import PersistEditsTask
 
 class FeatureAction(StateMachineAction):
     def handle(self):
         return partial(actionHandler, self)
 
-    # Result of @FeatureAction.action.handleAndPersist()
-    def handleAndPersist(action):
-        def withPersistedEdits(method):                                           # Resulting decorator
-            def callWithPersistedEdits(*args, **kwargs):                          # Resulting decorated method
-                edits = actionHandler(action, method)(*args, **kwargs)
-
-                edits.persist()
-                edits.notifyPersisted()
-            return callWithPersistedEdits
-        return withPersistedEdits
+    # Result of @FeatureAction.action.save()
+    def handleWithSave(action):
+        def withSave(method):
+            def saveInBackground(feature, *args, **kwargs):
+                feature.featureLayer.task = PersistEditsTask(
+                    f"{PLUGIN_NAME} saving your data …", True, # notify=True 
+                    actionHandler(action, method), feature, *args, **kwargs)
+            return saveInBackground
+        return withSave
 
     """Allowed transitions for a StatusFeature."""
     draft = "Draft"

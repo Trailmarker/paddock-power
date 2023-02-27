@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from os import path
 
-from qgis.core import QgsVectorLayer, QgsWkbTypes
+from qgis.core import QgsApplication, QgsVectorLayer, QgsWkbTypes
 import processing
 
 from ..models import Glitch
@@ -84,6 +84,9 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
 
         assert workspaceFile
         assert layerName
+        
+        self._taskId = None
+        self._task = None
 
         # If not found, create
         if not self.detectInStore(workspaceFile, layerName):
@@ -115,6 +118,20 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         # Apply editor widgets and other Field-specific layer setup
         for field in self.getSchema():
             field.setupLayer(self)
+
+    @property
+    def task(self):
+        return self._task
+
+    @task.setter
+    def task(self, ts):
+        self._task = ts
+        self._taskId = QgsApplication.taskManager().addTask(ts)
+
+    @property
+    def taskActive(self):
+        ts = QgsApplication.taskManager().task(self._taskId)
+        return ts and ts.isActive()
 
     def addFeatures(self, features):
         """Add a batch of features to this layer."""

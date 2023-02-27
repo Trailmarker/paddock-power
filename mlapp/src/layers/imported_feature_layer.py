@@ -36,7 +36,5 @@ class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
         edits = Edits.truncate(self)
         features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
 
-        for feature in features:
-            edits.editBefore(Edits.upsert(feature))
-
-        return edits
+        # Import as a bulkAdd
+        return edits.editBefore(Edits.bulkAdd(self, features))

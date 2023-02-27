@@ -29,18 +29,18 @@ class Pipeline(PersistedFeature, StatusFeatureMixin):
             self.recalculate()
         return self._profile
 
-    @FeatureAction.draft.handleAndPersist()
+    @FeatureAction.draft.handleWithSave()
     def draftFeature(self, geometry):
         """Draft a Pipeline."""
         self.GEOMETRY = geometry
         return Edits.upsert(self)
 
-    @FeatureAction.plan.handleAndPersist()
+    @FeatureAction.plan.handleWithSave()
     def planFeature(self):
         """Plan a Pipeline (skip the Draft step)."""
         return Edits.upsert(self)
 
-    @FeatureAction.undoPlan.handleAndPersist()
+    @FeatureAction.undoPlan.handleWithSave()
     def undoPlanFeature(self):
         """Undo planning a Pipeline."""
         return Edits.delete(self)

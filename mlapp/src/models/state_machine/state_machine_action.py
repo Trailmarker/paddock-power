@@ -34,7 +34,6 @@ def actionHandler(action, method=lambda x: x):
         if toStateMachine(obj).isPermitted(action):
             result = ((Glitch.glitchy())(method))(obj, *args, **kwargs)
             toStateMachine(obj).doAction(action)
-            # qgsDebug(f"actionHandler: action={action}, result={result}")
             return result
         else:
             raise Glitch(
