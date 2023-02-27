@@ -59,7 +59,7 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
 
     def __repr__(self):
         """Return a string representation of the Feature."""
-        attrs = [f"{f}={self.attribute(f)}" for f in [FID, STATUS, TIMEFRAME] if self.hasField(f)]
+        attrs = [f"{f}={self.attribute(f)}" for f in [FID, NAME, STATUS, TIMEFRAME] if self.hasField(f)]
         return f"{type(self).__name__}({', '.join(attrs)})"
 
     def __str__(self):

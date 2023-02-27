@@ -182,8 +182,8 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def getCrossedBasePaddocks(self):
         """Same as getCrossedPaddocks but returns the crossed Base Paddock features."""
         fenceLines, crossedPaddocks = self.getCrossedPaddocks()
-        return fenceLines, self.basePaddockLayer.getFeatures(
-            QgsFeatureRequest().setFilterFids([p.PADDOCK for p in crossedPaddocks]))
+        return fenceLines, [f for f in self.basePaddockLayer.getFeatures(
+            QgsFeatureRequest().setFilterFids([p.PADDOCK for p in crossedPaddocks]))]
 
     def _getRelatedPaddocks(self, *statuses):
         """Get the Paddocks with the specified Build Order and group them by STATUS."""
