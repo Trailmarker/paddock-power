@@ -146,19 +146,22 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
 
     def onFeatureLayerSelected(self, layerId):
         """Handle workspace feature selection."""
-        # qgsDebug(f"{type(self).__name__}.onFeatureLayerSelected({layerId})")
         if self.sameId(layerId):
             feature = self.workspace.selectedFeature(layerId)
             self.onSelectFeature(feature)
             self.featureSelected.emit(layerId)
+            
+            if self.hasPopups:
+                self.onPopupFeatureSelected(layerId)
 
     def onFeatureLayerDeselected(self, layerId):
         """Handle workspace feature deselection."""
-        # qgsDebug(f"{type(self).__name__}.onFeatureLayerDeselected({layerId})")
         if self.sameId(layerId):
-            # self.removeSelection()
             self.onDeselectFeature()
             self.featureDeselected.emit(layerId)
+            
+            if self.hasPopups:
+                self.onPopupFeatureDeselected(layerId)
 
     def onTimeframeChanged(self, timeframe):
         """Handle workspace timeframe changes."""

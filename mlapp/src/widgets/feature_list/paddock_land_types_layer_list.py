@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject
+
+from ...utils import qgsDebug
 from ...layers.fields import Timeframe
 from ...layers.paddock_land_types_popup_layer import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
 from ..paddock_land_type_details.paddock_land_type_details import PaddockLandTypeDetails
@@ -29,11 +32,10 @@ class PaddockLandTypesLayerList(PopupLayerList):
         self._featureLayer = value
         self.refreshList()
 
-    def onPopupLayerAdded(self, layer):
-        if type(layer) not in self.popupLayerTypes:
-            return
-        self.featureLayer = layer
-
+    def onPopupLayerAdded(self, layerId):
+        qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId})")
+        self.featureLayer = QgsProject.instance().mapLayer(layerId)        
+   
     def onPopupLayerRemoved(self):
         self.featureLayer = None
 

@@ -28,6 +28,10 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
                          dependentLayers)
 
     @property
+    def hasPopups(self):
+        return True
+
+    @property
     def popupLayerTypes(self):
         return [PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer]
 

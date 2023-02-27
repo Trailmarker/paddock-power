@@ -10,6 +10,22 @@ class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
     LAYER_NAME = "Waterpoints"
     STYLE = "waterpoint"
 
+    @classmethod
+    def getFeatureType(cls):
+        return Waterpoint
+
+    def __init__(self,
+                 workspaceFile,
+                 *dependentLayers):
+        """Create or open a Waterpoint layer."""
+        super().__init__(workspaceFile,
+                       layerName=WaterpointLayer.defaultName(),
+                       styleName=WaterpointLayer.defaultStyle())
+
+    @property
+    def hasPopups(self):
+        return True
+
     @property
     def popupLayerTypes(self):
         return [WaterpointPopupLayer]
@@ -23,16 +39,3 @@ class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
     def zoomPopupLayerOnLoad(self):
         """True for this becaus Waterpoints don't zoom nicely."""
         return True
-
-    @classmethod
-    def getFeatureType(cls):
-        return Waterpoint
-
-    def __init__(self,
-                 workspaceFile,
-                 *dependentLayers):
-        """Create or open a Waterpoint layer."""
-
-        super().__init__(workspaceFile,
-                         layerName=WaterpointLayer.defaultName(),
-                         styleName=WaterpointLayer.defaultStyle())
