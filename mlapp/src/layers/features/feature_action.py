@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from qgis.core import QgsApplication
 
-from ...models import Glitch, StateMachineAction, actionHandler
-from ..interfaces import IPersistedFeature
-from .persist_edits_task import PersistEditsTask, persistEdits
+from ...models import StateMachineAction, actionHandler
+from ...utils import qgsDebug
 
 
 class FeatureAction(StateMachineAction):
     def handle(self):
         return partial(actionHandler, self)
 
-    def handleAndPersist(self):
-        def withPersistedEdits(method):
-            def callWithPersistedEdits(feature, *args, **kwargs):
-                if not isinstance(feature, IPersistedFeature):
-                    raise Glitch(f"FeatureAction.handleAndPersist: {feature} is not an IPersistedFeature")
-                persistEdits(feature, partial(actionHandler, self)(method), *args, **kwargs)
+    # Result of @FeatureAction.action.handleAndPersist()
+    def handleAndPersist(action):
+        def withPersistedEdits(method):                                           # Resulting decorator
+            def callWithPersistedEdits(*args, **kwargs):                          # Resulting decorated method
+                edits = actionHandler(action, method)(*args, **kwargs)
 
+                edits.persist()
+                edits.notifyPersisted()
             return callWithPersistedEdits
         return withPersistedEdits
 

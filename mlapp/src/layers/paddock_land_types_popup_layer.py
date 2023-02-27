@@ -12,8 +12,8 @@ class PaddockLandTypesPopupLayer(PopupFeatureLayer):
     def getFeatureType(cls):
         return PaddockLandType
 
-    def prepareQuery(self, query, *dependentLayers):
-        [paddockLandTypesLayer] = self.names(*dependentLayers)
+    def prepareQuery(self, query, dependentLayers):
+        [paddockLandTypesLayer] = self.names(dependentLayers)
         [paddockId, timeframe] = [self.paddock.PADDOCK, self.layerTimeframe]
 
         query = f"""
@@ -23,7 +23,7 @@ where "{PADDOCK}" = {paddockId}
 and "{TIMEFRAME}" = '{timeframe.name}'
 order by "{LAND_TYPE_NAME}"
 """
-        return super().prepareQuery(query, *dependentLayers)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
                  paddock,
@@ -36,7 +36,7 @@ order by "{LAND_TYPE_NAME}"
             paddock,
             f"{paddock.NAME} {timeframe.name} Land Types",
             PaddockLandTypesPopupLayer.defaultStyle(),
-            self.paddock.paddockLandTypesLayer)
+            [self.paddock.paddockLandTypesLayer])
 
 
 class PaddockCurrentLandTypesPopupLayer(PaddockLandTypesPopupLayer):

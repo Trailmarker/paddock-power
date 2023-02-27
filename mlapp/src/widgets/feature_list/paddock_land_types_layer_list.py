@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from ...utils import qgsDebug
 from ...layers.fields import Timeframe
 from ...layers.paddock_land_types_popup_layer import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
 from ..paddock_land_type_details.paddock_land_type_details import PaddockLandTypeDetails

@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ...layers.features import FeatureAction, persistEdits
 from ...models import QtAbstractMeta, toStateMachine
-from ...utils import PLUGIN_FOLDER
+from ...utils import PLUGIN_FOLDER, qgsDebug
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
 from ..feature_status_label.feature_status_label import FeatureStatusLabel
@@ -171,8 +171,10 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
     @EditAction.save.handler()
     def saveItem(self):
-        # saveFeature returns an Edits …
-        return persistEdits(self.feature, lambda *_: self.featureEdit.saveFeature())
+        edits = self.featureEdit.saveFeature()
+        edits.persist()
+        self.refreshUi()
+        edits.notifyPersisted()
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):
@@ -184,6 +186,9 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
     def refreshUi(self):
         """Refresh the UI based on the current state of the fence."""
+
+        if self.hasDetails:
+            self.featureDetails.refreshUi()
 
         # Set title to Feature title
         self.collapse.setTitle(self.feature.TITLE)

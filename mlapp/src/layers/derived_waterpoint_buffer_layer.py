@@ -15,26 +15,22 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return WaterpointBuffer
 
-    def cleanDerivedFeatures(self, layer, edits):
-        """Remove the features within a target layer that depend on some edits."""
-        if not edits:
-            layer.dataProvider().truncate()
-        else:
-            [basePaddockLayer, waterpointLayer] = self.dependentLayers
-            fids = self.getDerivedFids(layer, self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
+    def getRederiveFeaturesRequest(self):
+        """Define which features must be removed from a target layer to be re-derived."""
+        if not self.changeset:
+            return None
 
-            # qgsDebug(f"{self}.cleanDerivedFeatures({layer}, {edits}): fids={fids})")
-
-            layer.dataProvider().deleteFeatures(fids)
+        [basePaddockLayer, waterpointLayer] = self.dependentLayers
+        return self.prepareRederiveFeaturesRequest(basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
 
     def prepareQuery(self, query, dependentLayers):
         [basePaddockLayer, waterpointLayer] = dependentLayers
         [basePaddocks, waterpoints] = self.names(dependentLayers)
-        
+
         # Set up clauses
-        inPaddocksClause = DerivedFeatureLayer.andAllKeyClauses(
-            self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
-        renamedWaterpointsClause = DerivedFeatureLayer.andAllKeyClauses(self.edits, waterpointLayer, FID)
+        inPaddocksClause = self.andAllKeyClauses(
+            self.changeset, basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
+        renamedWaterpointsClause = self.andAllKeyClauses(self.changeset, waterpointLayer, FID, FID)
 
         _BUFFERS = "Buffers"
         _FAR_BUFFER = "FarBuffer"
@@ -111,12 +107,10 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
 
     def __init__(self,
                  dependentLayers,
-                 edits):
+                 changeset):
 
         super().__init__(
             DerivedWaterpointBufferLayer.defaultName(),
             DerivedWaterpointBufferLayer.defaultStyle(),
             dependentLayers,
-            edits)
-        
-        # qgsDebug(f"{self}.__init__({dependentLayers}, {edits})")
+            changeset)

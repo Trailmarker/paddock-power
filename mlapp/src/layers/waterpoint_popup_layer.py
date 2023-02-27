@@ -12,8 +12,8 @@ class WaterpointPopupLayer(PopupFeatureLayer):
     def getFeatureType(self):
         return WaterpointBuffer
 
-    def prepareQuery(self, query, *dependentLayers):
-        [waterpointBufferLayer] = self.names(*dependentLayers)
+    def prepareQuery(self, query, dependentLayers):
+        [waterpointBufferLayer] = self.names(dependentLayers)
         waterpointId = self.waterpoint.FID
 
         query = f"""
@@ -22,7 +22,7 @@ from "{waterpointBufferLayer}"
 where "{WATERPOINT}" = {waterpointId}
 order by "{GRAZING_RADIUS_TYPE}"
 """
-        return super().prepareQuery(query, *dependentLayers)
+        return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
                  waterpoint):
@@ -32,4 +32,4 @@ order by "{GRAZING_RADIUS_TYPE}"
         super().__init__(waterpoint,
                          f"{waterpoint.WATERPOINT_TYPE.value} {waterpoint.FID} Watered Area",
                          WaterpointPopupLayer.defaultStyle(),
-                         self.waterpoint.waterpointBufferLayer)
+                         [self.waterpoint.waterpointBufferLayer])

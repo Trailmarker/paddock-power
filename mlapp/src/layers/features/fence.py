@@ -334,12 +334,12 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         for supersededPaddock in supersededPaddocks:
             edits = edits.editBefore(supersededPaddock.archiveFeature())
 
-        # # qgsDebug(f"Fence.buildFeature after archive Paddock processing: {edits.upserts}")
+        # qgsDebug(f"Fence.buildFeature after archive Paddock processing: {edits.upserts}")
 
         for plannedPaddock in plannedPaddocks:
             edits = edits.editBefore(plannedPaddock.buildFeature())
 
-        # # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
+        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
         return Edits.upsert(self).editAfter(edits)
 

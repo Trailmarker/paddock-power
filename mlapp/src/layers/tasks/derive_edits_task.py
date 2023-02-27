@@ -1,39 +1,35 @@
 # -*- coding: utf-8 -*-
-
-from qgis.core import QgsTask
-
-from ...models import WorkspaceMixin
+from ...layers import DerivedBoundaryLayer, DerivedWaterpointBufferLayer, DerivedMetricPaddockLayer, DerivedPaddockLandTypesLayer, DerivedWateredAreaLayer
+from ...models import SafeTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
+from .cleanup_layers_task import CleanupLayersTask
 from .derive_edits_single_task import DeriveEditsSingleTask
 
 
-class DeriveEditsTask(QgsTask, WorkspaceMixin):
+class DeriveEditsTask(SafeTask):
 
-    def __init__(self, layers, edits=None, onTaskCompleted=None):
+    def __init__(self, layers, changeset=None):
         """Input is a correctly ordered batch of layers."""
-        super().__init__(
-            f"deriving features for {len(layers)} layers",
-            flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
+        super().__init__(f"{PLUGIN_NAME} deriving features for {len(layers)} layers")
 
         self.layers = layers
-        self.edits = edits
-        # self.setDependentLayers([self.layers])
+        allLayerNames = ", ".join(layer.name() for layer in self.layers)
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} deriving {allLayerNames}")
 
-        predecessors = []
+        self.changeset = changeset  # Note—this is shared between all subtasks
+
         for layer in self.layers:
-            task = DeriveEditsSingleTask(layer, self.edits, onTaskCompleted=onTaskCompleted)
-            task.taskTerminated.connect(self.cancel)
+            self.safeAddSubTask(DeriveEditsSingleTask(layer, self.changeset))
 
-            self.addSubTask(
-                task, dependencies=predecessors,
-                subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
-            predecessors.append(task)
+        self.safeAddSubTask(CleanupLayersTask([
+            DerivedBoundaryLayer,
+            DerivedWaterpointBufferLayer,
+            DerivedMetricPaddockLayer,
+            DerivedPaddockLandTypesLayer,
+            DerivedWateredAreaLayer], delay=1))
 
-    def run(self):
-        """Derive features for all layers as specified in subtasks."""
-        return True
-
-    def finished(self, result):
+    def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
         if not result:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to fully derive the '{self.workspaceName}' workspace.")
+            guiStatusBarAndInfo(
+                f"{PLUGIN_NAME} failed to derive features for {len(self.layers)} layers.")

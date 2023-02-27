@@ -8,7 +8,6 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from qgis.core import QgsExpression, QgsProject
-from qgis.utils import plugins
 
 from .resources_rc import *
 
@@ -65,7 +64,7 @@ class PaddockPower(PluginStateMachine):
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.featureView)
 
         self._stateChanged.connect(self.refreshUi)
-  
+
     def addAction(self,
                   pluginAction,
                   icon,
@@ -113,8 +112,15 @@ class PaddockPower(PluginStateMachine):
         self.detectWorkspaceAction = self.addAction(
             PluginAction.detectWorkspace,
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
-            text=f"Refresh {PLUGIN_NAME} workspace …",
+            text=f"Detect {PLUGIN_NAME} workspace …",
             callback=lambda *_: self.detectWorkspace(),
+            parent=self.iface.mainWindow())
+
+        self.refreshWorkspaceAction = self.addAction(
+            PluginAction.refreshWorkspace,
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/refresh-paddock-power.png"),
+            text=f"Refresh {PLUGIN_NAME} workspace …",
+            callback=lambda *_: self.refreshWorkspace(),
             parent=self.iface.mainWindow())
 
         self.analyseWorkspaceAction = self.addAction(
@@ -139,7 +145,7 @@ class PaddockPower(PluginStateMachine):
             parent=self.iface.mainWindow())
 
         if self.status == PluginStatus.NoWorkspaceLoaded:
-            self.detectWorkspace()
+            self.detectWorkspace(False)
 
     # Override Glitch type exceptions application-wide
 
@@ -237,7 +243,6 @@ class PaddockPower(PluginStateMachine):
         self.workspace = workspace
         self.featureView.initGui()
         self.workspaceReady.emit()
-        guiStatusBarAndInfo("Workspace ready.")
 
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
@@ -247,25 +252,26 @@ class PaddockPower(PluginStateMachine):
             if projectFile is None:
                 if warning:
                     self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
-                raise PluginActionFailure()
+                return
             else:
                 workspaceFile = resolveWorkspaceFile(projectFilePath=projectFile)
                 if workspaceFile and os.path.exists(workspaceFile):
                     self.initWorkspace(workspaceFile)
-                    # self.__successMessage(
-                    #     f"{PLUGIN_NAME} loaded workspace (.gpkg) from {os.path.split(os.path.basename(workspaceFile))[1]}.")
                 else:
                     if warning:
                         self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
-                    raise PluginActionFailure()
-        except PluginActionFailure as e:
-            raise e
+                    return
         except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred detecting workspace …")
             qgsException()
             self.__failureMessage(
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
+    def refreshWorkspace(self):
+        f"""Refresh the {PLUGIN_NAME} workspace."""
+        if self.status == PluginStatus.WorkspaceLoaded:
+            self.doAction(PluginAction.unloadWorkspace)
+        self.detectWorkspace()
 
     def createWorkspace(self):
         f"""Create a new {PLUGIN_NAME} workspace in the current QGIS project."""
@@ -274,23 +280,18 @@ class PaddockPower(PluginStateMachine):
             projectFile = resolveProjectFile()
             if projectFile is None:
                 self.__failureMessage(f"{PLUGIN_NAME} no QGIS project file located …")
-                raise PluginActionFailure()
+                return
             else:
                 workspaceFile = resolveWorkspaceFile()
                 if workspaceFile is not None:
                     if os.path.exists(workspaceFile):
                         self.__failureMessage(
                             f"A {PLUGIN_NAME} workspace (.gpkg) file already exists. Stopping creation …")
-                        raise PluginActionFailure()
+                        return
                     else:
                         self.initWorkspace(workspaceFile)
-                        # qgsInfo(f"{PLUGIN_NAME} created workspace …")
-                        # self.__successMessage(
-                        #     f"A new {PLUGIN_NAME} workspace file, {os.path.split(os.path.basename(workspaceFile))[1]} has been created alongside your QGIS project file.")
                 else:
                     qgsInfo(f"No workspace {PLUGIN_NAME} (.gpkg) file was located …")
-        except PluginActionFailure as e:
-            raise e
         except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred creating workspace …")
             qgsException()
@@ -304,7 +305,7 @@ class PaddockPower(PluginStateMachine):
         if guiConfirm(
             f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock metrics.",
                 f"Analyse {PLUGIN_NAME} workspace?"):
-            self.workspace.recalculateLayers()
+            self.workspace.analyseWorkspace()
 
     @PluginAction.projectClosed.handler()
     def projectClosed(self):

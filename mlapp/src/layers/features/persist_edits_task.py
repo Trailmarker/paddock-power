@@ -1,43 +1,37 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsApplication
 
-from qgis.core import QgsApplication, QgsTask
-
-from ...utils import qgsInfo
+from ...models import SafeTask
+from ...utils import PLUGIN_NAME, qgsDebug, qgsInfo
 from .edits import Edits
 
 
-class PersistEditsTask(QgsTask):
+class PersistEditsTask(SafeTask):
 
-    def __init__(self, editFunction, *args, **kwargs):
+    def __init__(self, description, editFunction, *args, **kwargs):
         """Input is a closure over a FeatureAction handler for a given Feature."""
-        super().__init__(
-            f"PersistEditsTask",
-            flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)  # | QgsTask.Hidden) TODO not available in 3.22
+        super().__init__(description)
 
-        self._edits = None
+        self.edits = None
         self._editFunction = editFunction
         self._args = args
         self._kwargs = kwargs
 
-    def run(self):
+    def safeRun(self):
         """Carry out a function that generates Feature edit operations, and persist the edits."""
-
-        self._edits = self._editFunction(*self._args, **self._kwargs) or Edits()
-        self._edits.persist()
-
+        if self.isCanceled():
+            return False
+        self.edits = self._editFunction(*self._args, **self._kwargs) or Edits()
+        self.edits.persist()
         return True
 
-    def finished(self, result):
+    def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
-        if result:
-            self._edits.notifyPersisted()
-
-    def cancel(self):
-        qgsInfo(f"QGIS cancelling task: '{self.description()}' eg due to quitting or user intervention.")
-        super().cancel()
+        pass
 
 
-def persistEdits(feature, editFunction, *args, **kwargs):
+def persistEdits(editFunction, *args, **kwargs):
     """Utility function to queue an action returning edits to a PersistEditsTask."""
-    feature.currentTask = PersistEditsTask(editFunction, feature, *args, **kwargs)
-    QgsApplication.taskManager().addTask(feature.currentTask)
+    qgsDebug(f"persistEdits({editFunction}, {args}, {kwargs})")
+    currentTask = PersistEditsTask(f"{PLUGIN_NAME} saving your data …", editFunction, *args, **kwargs)
+    QgsApplication.taskManager().addTask(currentTask)

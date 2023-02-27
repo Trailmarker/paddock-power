@@ -13,9 +13,13 @@ from .map_layer_mixin import MapLayerMixin
 
 class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer, metaclass=QtAbstractMeta):
 
-    featuresChanged = pyqtSignal()
-    featureSelected = pyqtSignal(type)
-    featureDeselected = pyqtSignal(type)
+    layerTruncated = pyqtSignal()
+    featuresUpserted = pyqtSignal(list)
+    featuresDeleted = pyqtSignal(list)
+    featuresBulkAdded = pyqtSignal(list)
+
+    featureSelected = pyqtSignal(str)
+    featureDeselected = pyqtSignal(str)
 
     @classmethod
     def getFeatureType(cls):
@@ -55,21 +59,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.applyNamedStyle(styleName)
         self.addInBackground()
 
-        self.plugin.workspaceReady.connect(self.onWorkspaceReady)
-        qgsDebug(f"{type(self).__name__}.__init__(), workspaceReady is connected")
-
-    def onWorkspaceReady(self):
-        qgsDebug("FeatureLayer.onWorkspaceReady()")
-        self.selectionChanged.connect(self.onSelectionChanged)
-
-        self.workspace.featureLayerSelected.connect(self.onFeatureLayerSelected)
-        self.workspace.featureLayerDeselected.connect(self.onFeatureLayerDeselected)
-        self.workspace.timeframeChanged.connect(self.onTimeframeChanged)
-
-    @property
-    def hasPopups(self):
-        return False
-
     def __repr__(self):
         """Return a string representation of the Field."""
         return f"{type(self).__name__}(name={self.name()})"
@@ -77,6 +66,22 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def __str__(self):
         """Convert the Field to a string representation."""
         return repr(self)
+
+    def connectWorkspace(self, workspace):
+        self.workspace = workspace
+
+        self.selectionChanged.connect(lambda selection, *_: self.onSelectionChanged(selection, *_))
+
+        self.workspace.featureLayerSelected.connect(lambda id: self.onFeatureLayerSelected(id))
+        self.workspace.featureLayerDeselected.connect(lambda id: self.onFeatureLayerDeselected(id))
+        self.workspace.timeframeChanged.connect(lambda timeframe: self.onTimeframeChanged(timeframe))
+
+    @property
+    def hasPopups(self):
+        return False
+
+    def sameId(self, layerId):
+        return self.id() == layerId
 
     def applyNamedStyle(self, styleName):
         """Apply a style to the layer."""
@@ -139,41 +144,40 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         # Redraw the layer
         self.triggerRepaint()
 
-    def onFeatureLayerSelected(self, layerType):
+    def onFeatureLayerSelected(self, layerId):
         """Handle workspace feature selection."""
-        if isinstance(self, layerType):
-            feature = self.workspace.selectedFeature(layerType)
+        # qgsDebug(f"{type(self).__name__}.onFeatureLayerSelected({layerId})")
+        if self.sameId(layerId):
+            feature = self.workspace.selectedFeature(layerId)
             self.onSelectFeature(feature)
-            self.featureSelected.emit(layerType)
+            self.featureSelected.emit(layerId)
 
-    def onFeatureLayerDeselected(self, layerType):
+    def onFeatureLayerDeselected(self, layerId):
         """Handle workspace feature deselection."""
-        if isinstance(self, layerType):
+        # qgsDebug(f"{type(self).__name__}.onFeatureLayerDeselected({layerId})")
+        if self.sameId(layerId):
             # self.removeSelection()
             self.onDeselectFeature()
-            self.featureDeselected.emit(layerType)
+            self.featureDeselected.emit(layerId)
 
     def onTimeframeChanged(self, timeframe):
         """Handle workspace timeframe changes."""
         self.triggerRepaint()
 
     def onSelectFeature(self, feature):
-        qgsDebug(f"{type(self).__name__}.selectFeature({feature})")
+        # qgsDebug(f"{type(self).__name__}.onSelectFeature({feature})")
         feature.zoomFeature()
         pass
 
     def onDeselectFeature(self):
-        qgsDebug(f"{type(self).__name__}.onDeselectFeature()")
+        # qgsDebug(f"{type(self).__name__}.onDeselectFeature()")
         pass
 
     def onSelectionChanged(self, selection, *_):
         """Translate our own selectionChanged signal into a workspace selectFeature call."""
-        qgsDebug(f"{type(self).__name__}.onSelectionChanged({selection})")
+        # qgsDebug(f"{type(self).__name__}.onSelectionChanged({selection})")
+
         if len(selection) == 1:
             feature = next(self.getFeatures(QgsFeatureRequest().setFilterFids(selection)), None)
             if feature:
-                qgsDebug(f"Selecting a feature! selection={selection}, feature={feature}")
                 self.workspace.selectFeature(feature)
-            else:
-                qgsDebug(f"Not selecting a feature! selection={selection}")
-                

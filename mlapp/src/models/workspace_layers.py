@@ -51,12 +51,13 @@ class WorkspaceLayers(TypeDict):
         for layerType in list(self.keys()):
             self.unloadLayer(layerType)
 
-    def setWorkspaceLayerAttributes(self, workspace):
+    def addLayersToWorkspace(self, workspace):
         """Get all layers in the registry."""
         for layer in self.layers():
             name = type(layer).__name__
             attrName = name[:1].lower() + name[1:]
             setattr(workspace, attrName, layer)
+            layer.connectWorkspace(workspace)
 
     def __layerKey(self, layerType):
         if isinstance(layerType, type):

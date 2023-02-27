@@ -1,60 +1,31 @@
 # -*- coding: utf-8 -*-
-from time import sleep
-
-from qgis.core import QgsTask
-
-from ...utils import JOB_DELAY, PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
-from ...models import WorkspaceMixin
-from ..features import Edits
+from ...utils import PLUGIN_NAME, qgsDebug, guiStatusBarAndInfo
 from ..interfaces import IPersistedDerivedFeatureLayer
+from .changeset_task import ChangesetTask
 
 
-class DeriveEditsSingleTask(QgsTask, WorkspaceMixin):
+class DeriveEditsSingleTask(ChangesetTask):
 
-    def __init__(self, layer, edits, onTaskCompleted=None):
+    def __init__(self, layer, changeset):
         """Input is a correctly ordered batch of layers."""
-        super().__init__(
-            f"deriving {layer.name()}",
-            flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
+        self.layer = layer
+        super().__init__(f"{PLUGIN_NAME} deriving {layer.name()}", self.editFunction, changeset)
 
-        self._layer = layer
-        self._edits = edits
-        self._count = 0
-        self._total = 0
+    def __repr__(self):
+        return f"{type(self).__name__}(layer={self.layer}, changeset={self.changeset})"
 
-        if onTaskCompleted is not None:
-            self.taskCompleted.connect(lambda: onTaskCompleted(type(layer), True))
+    def __str__(self):
+        return repr(self)
 
-    def run(self):
-        """Derive features for a layer."""
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} deriving {self._layer.name()} …")
+    def editFunction(self):
+        assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
+        guiStatusBarAndInfo(self.description())
+        return self.layer.deriveFeatures(self.changeset)
 
-        assert isinstance(self._layer, IPersistedDerivedFeatureLayer)
-        readOnly = self._layer.readOnly()
-
-        try:
-            self._layer.setReadOnly(False)
-
-            if self.isCanceled():
-                return False
-
-            with Edits.editAndCommit([self._layer]):
-                self._layer.deriveFeatures(self._edits,
-                    featureProgressCallback=self.updateCount,
-                    cancelledCallback=self.isCanceled)
-        finally:
-            self._layer.setReadOnly(readOnly)
-        self.setProgress(100.0)
-        sleep(JOB_DELAY)
-        return True
-
-    def updateCount(self, featureCount, total):
-        self._count = featureCount
-        self._total = total
-        self.setProgress((featureCount * 100.0 / total) if total > 0 else 100.0)  # Watch for divzero …
-
-    def finished(self, result):
+    def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
-        if not result:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to derive {self._layer.name()} …")
-
+        super().safeFinished(result)
+        if result:
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} derived {self.layer.name()}.")
+        else:
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to derive {self.layer.name()}.")

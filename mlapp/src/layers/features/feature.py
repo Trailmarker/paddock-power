@@ -163,11 +163,12 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
 
     def selectFeature(self):
         """Select the Feature."""
-        # qgsDebug(f"{self.__class__.__name__}.selectFeature({self}), self.FID={self.FID}, self.id()={self.id()}")
-        self.featureLayer.selectByIds([self.id()], QgsVectorLayer.SetSelection)
+        # qgsDebug(f"{self}.selectFeature()")
+        self.featureLayer.selectByIds([self.FID], QgsVectorLayer.SetSelection)
 
     def zoomFeature(self):
         """Zoom to the Feature."""
+        # qgsDebug(f"{self}.zoomFeature()")
         iface = self.featureLayer and self.featureLayer.workspace and self.featureLayer.workspace.iface
         if self.GEOMETRY and iface:
             featureExtent = QgsRectangle(self.GEOMETRY.boundingBox())

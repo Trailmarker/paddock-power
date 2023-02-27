@@ -20,8 +20,7 @@ def testDeriveWateredAreas(): return testDeriveLayer(workspace().wateredAreaLaye
 
 def testDeriveSeveral():
     testTask = DeriveEditsTask([workspace().waterpointBufferLayer,
-                                  workspace().wateredAreaLayer, workspace().paddockLandTypesLayer])
+                                workspace().wateredAreaLayer, workspace().paddockLandTypesLayer])
     testTask.taskCompleted.connect(lambda: qgsDebug(f"{testTask.description()} completed"))
     testTask.taskTerminated.connect(lambda: qgsDebug(f"{testTask.description()} terminated"))
     QgsApplication.taskManager().addTask(testTask)
-

@@ -33,15 +33,10 @@ class ImportedFeatureLayer(PersistedFeatureLayer, IImportedFeatureLayer):
         """Import all Features from the specified layer, applying the given field map."""
         qgsInfo(f"Importing features for layer {self.name()} …")
 
-        wasReadOnly = self.readOnly()
-        self.setReadOnly(False)
-        try:
-            with Edits.editAndCommit([self]):
-                self.dataProvider().truncate()
-                features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
-                for feature in features:
-                    feature.upsert()
-                return features
-        finally:
-            self.setReadOnly(wasReadOnly)
-            self.triggerRepaint()
+        edits = Edits.truncate(self)
+        features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
+
+        for feature in features:
+            edits.editBefore(Edits.upsert(feature))
+
+        return edits

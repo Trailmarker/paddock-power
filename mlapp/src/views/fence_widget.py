@@ -60,8 +60,8 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         fence.draftFeature(sketchLine)
         self.workspace.selectFeature(fence)
 
-    def changeSelection(self, layerType):
-        feature = self.workspace.selectedFeature(layerType)
+    def changeSelection(self, layerId):
+        feature = self.workspace.selectedFeature(layerId)
 
         if isinstance(feature, Fence):
             self.fence = feature

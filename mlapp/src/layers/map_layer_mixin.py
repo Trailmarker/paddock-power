@@ -2,7 +2,7 @@
 from qgis.core import QgsMapLayer, QgsProject
 
 
-from ..utils import qgsDebug, qgsInfo, resolveStylePath
+from ..utils import PLUGIN_NAME, qgsInfo, resolveStylePath
 from .interfaces import IMapLayer
 
 
@@ -30,8 +30,8 @@ class MapLayerMixin(IMapLayer):
 
         layerIds = sameTypes.union(sameNames)
 
-        # qgsDebug(f"Cleaning up {len(layerIds)} layers of type {cls.__name__} …")
         for layerId in layerIds:
+            qgsInfo(f"{PLUGIN_NAME} Cleaning up {layerId} …")
             QgsProject.instance().removeMapLayer(layerId)
 
     def __init__(self):

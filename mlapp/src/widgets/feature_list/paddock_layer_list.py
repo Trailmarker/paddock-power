@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-from ...utils import qgsDebug
 from .feature_layer_list import FeatureLayerList
 from .paddock_list_item import PaddockListItem
 

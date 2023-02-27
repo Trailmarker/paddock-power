@@ -12,14 +12,16 @@ def testImportKidmanLandTypes():
     kidmanLandTypes = layerByName("c_Kidman_30k_land_units")
     fieldMap = FieldMap(kidmanLandTypes, workspace().landTypeLayer)
     fieldMap["Land Type Name"] = "LAND_UNIT"
-    workspace().landTypeLayer.importFeatures(kidmanLandTypes, fieldMap)
+    imports = workspace().landTypeLayer.importFeatures(kidmanLandTypes, fieldMap)
+    imports.persist()
 
 
 def testImportKidmanPaddocks():
     kidmanPaddocks = layerByName("b_Kidman_Paddocks")
     fieldMap = FieldMap(kidmanPaddocks, workspace().basePaddockLayer)
     fieldMap["Name"] = "Name"
-    basePaddockLayer.importFeatures(kidmanPaddocks, fieldMap)
+    imports = basePaddockLayer.importFeatures(kidmanPaddocks, fieldMap)
+    imports.persist()
 
 
 def testImportKidmanWaterpoints():
@@ -27,4 +29,5 @@ def testImportKidmanWaterpoints():
     fieldMap = FieldMap(kidmanWaterpoints, workspace().waterpointLayer)
     fieldMap["Name"] = "NAME"
     fieldMap["Waterpoint Type"] = "LAYER"
-    waterpointLayer.importFeatures(kidmanWaterpoints, fieldMap)
+    imports = waterpointLayer.importFeatures(kidmanWaterpoints, fieldMap)
+    imports.persist()

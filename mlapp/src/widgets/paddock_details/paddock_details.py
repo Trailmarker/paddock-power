@@ -17,7 +17,9 @@ class PaddockDetails(QWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.paddock = paddock
+        self.refreshUi()
 
+    def refreshUi(self):
         if self.paddock is not None:
             self.areaText.setValue(self.paddock.AREA, "{0:.2f}")
             self.wateredAreaText.setValue(self.paddock.WATERED_AREA, "{0:.2f}")

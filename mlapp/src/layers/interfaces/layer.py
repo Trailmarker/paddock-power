@@ -14,3 +14,6 @@ class Layer(ABC):
     def id(self):
         """Return the id of the layer."""
         pass
+
+    def connectWorkspace(self, workspace):
+        pass
