@@ -75,6 +75,13 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
         widget.layoutRefreshNeeded.connect(self.refreshLayout)
         # widget.stateChanged.connect(lambda: self.refreshListItem(feature.FID))
 
+    def removeListItem(self, fid):
+        if fid > 0:
+            for item in [self.item(i) for i in range(self.count())]:
+                widget = self.itemWidget(item)
+                if widget.feature.FID == fid:
+                    self.takeItem(self.row(item))
+
     def refreshListItem(self, fid):
         qgsDebug(f"{type(self).__name__}.refreshListItem(): fid = {fid}")
         
@@ -94,7 +101,7 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
 
     def refreshList(self):
         """Show the Feature List."""
-
+        qgsDebug(f"{type(self).__name__}.refreshList()")
         # Initially clear the list
         self.clear()
 
@@ -134,10 +141,12 @@ class FeatureListBase(QListWidget, IFeatureList, WorkspaceMixin, metaclass=QtAbs
         """Clear the selected Feature."""
         # if self._selectedItem:
         #     self.itemWidget(self._selectedItem).setSelected(False)
+        qgsDebug(f"{type(self).__name__}.removeSelection()")
         self._selectedItem = None
         self.clearSelection()
 
     def changeSelection(self, layerId):
         """Select the Feature."""
+        qgsDebug(f"{type(self).__name__}.changeSelection()")
         self._selectedFeature = self.workspace.selectedFeature(layerId)
         self.refreshList()

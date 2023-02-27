@@ -28,9 +28,6 @@ class PersistEditsTask(SafeTask):
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
         pass
-        # qgsDebug("PersistEditsTask.safeFinished")
-        # if result:
-        #     self.edits.notifyPersisted()
 
 
 def persistEdits(editFunction, *args, **kwargs):

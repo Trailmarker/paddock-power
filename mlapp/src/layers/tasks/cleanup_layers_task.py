@@ -1,31 +1,26 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject
+from time import sleep
 
-from ...layers import DerivedBoundaryLayer, DerivedWaterpointBufferLayer, DerivedMetricPaddockLayer, DerivedPaddockLandTypesLayer, DerivedWateredAreaLayer
 from ...models import SafeTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
-from ..interfaces import IDerivedFeatureLayer
+from ..interfaces import IMapLayer
 
 
 class CleanupLayersTask(SafeTask):
 
-    def __init__(self):
+    def __init__(self, layerTypes, delay=0):
         """Input is a correctly ordered batch of layers."""
-        super().__init__(f"{PLUGIN_NAME} cleaning up all derived layers …")
+        super().__init__(f"{PLUGIN_NAME} cleaning up layers …")
+        self.layerTypes = layerTypes
+        self.delay = delay
 
     def safeRun(self):
         """Derive features for a layer."""
+        # Sleep a configurable amount
+        sleep(self.delay)
 
-        mapLayers = QgsProject.instance().mapLayers().values()
-        layerTypes = [
-            DerivedBoundaryLayer,
-            DerivedWaterpointBufferLayer,
-            DerivedMetricPaddockLayer,
-            DerivedPaddockLandTypesLayer,
-            DerivedWateredAreaLayer]
-
-        for layerType in layerTypes:
-            if issubclass(layerType, IDerivedFeatureLayer):
+        for layerType in self.layerTypes:
+            if issubclass(layerType, IMapLayer):
                 layerType.detectAndRemoveAllOfType()
 
         return True

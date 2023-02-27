@@ -25,7 +25,6 @@ class Workspace(QObject):
     featureLayerSelected = pyqtSignal(str)
     featureLayerDeselected = pyqtSignal(str)
     timeframeChanged = pyqtSignal(Timeframe)
-    featuresChanged = pyqtSignal(list)
     workspaceLoaded = pyqtSignal()
 
     def __init__(self, iface, workspaceFile):
@@ -212,12 +211,4 @@ class Workspace(QObject):
         self._analyseWorkspaceTask = AnalyseWorkspaceTask()
         self._analyseWorkspaceTaskId = QgsApplication.taskManager().addTask(self._analyseWorkspaceTask)
 
-    def onPersistEdits(self, edits):
-        """Handle a change to the features of one or more layer."""
-
-        # Emit a signal to any layer subscribers that these features have changedinstance
-        for layer in edits.layers:
-            layer.featuresChanged.emit()
-
-        # Re-derive other features that depend on these features
-        self.deriveEdits(edits)
+  

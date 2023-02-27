@@ -32,21 +32,30 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
         [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = dependentLayers
         [landTypeConditions, basePaddocks, landTypes, wateredAreas] = self.names(dependentLayers)
 
-        _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
+        
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
         _WATERED_FACTOR = "WateredFactor"
 
         filterPaddocks = self.andAllKeyClauses(self.changeset, basePaddockLayer, FID, FID, wateredAreaLayer, FID, PADDOCK)
 
-
-        query = f"""
-with
+        if filterPaddocks:
+            _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
+            withFilteredPaddocks = f"""
   {_FILTERED_PADDOCKS} as
     (select * from "{basePaddocks}"
      where 1=1
-     {filterPaddocks})
-, {_PADDOCK_WATERED_AREAS} as
+     {filterPaddocks}),
+"""
+        else:
+            _FILTERED_PADDOCKS = basePaddocks
+            withFilteredPaddocks = ""
+
+
+        query = f"""
+with
+ {withFilteredPaddocks}
+ {_PADDOCK_WATERED_AREAS} as
 	(select
 		"{wateredAreas}".geometry as geometry,
 		"{_FILTERED_PADDOCKS}".{FID} as {PADDOCK},

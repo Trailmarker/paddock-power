@@ -13,7 +13,11 @@ from .map_layer_mixin import MapLayerMixin
 
 class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer, metaclass=QtAbstractMeta):
 
-    featuresChanged = pyqtSignal()
+    layerTruncated = pyqtSignal()
+    featuresUpserted = pyqtSignal(list)
+    featuresDeleted = pyqtSignal(list)
+    featuresBulkAdded = pyqtSignal(list)
+
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)
 

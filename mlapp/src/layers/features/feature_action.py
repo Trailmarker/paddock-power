@@ -2,10 +2,8 @@
 from functools import partial
 
 
-from ...models import Glitch, StateMachineAction, actionHandler
+from ...models import StateMachineAction, actionHandler
 from ...utils import qgsDebug
-from ..interfaces import IPersistedFeature
-from .persist_edits_task import persistEdits
 
 
 class FeatureAction(StateMachineAction):
@@ -15,13 +13,10 @@ class FeatureAction(StateMachineAction):
     def handleAndPersist(action):                                                 # Result of @FeatureAction.action.handleAndPersist()
         def withPersistedEdits(method):                                           # Resulting decorator
             def callWithPersistedEdits(*args, **kwargs):                          # Resulting decorated method
-                qgsDebug(f"callWithPersistedEdits({action}, {args}, {kwargs})")
                 edits = actionHandler(action, method)(*args, **kwargs)
-                qgsDebug(f"callWithPersistedEdits({action}, {args}, {kwargs}): edits={edits}")
+                
                 edits.persist()
                 edits.notifyPersisted()
-                qgsDebug("callWithPersistedEdits complete")                
-                # persistEdits(actionHandler(action, method), *args, **kwargs)
             return callWithPersistedEdits
         return withPersistedEdits
 

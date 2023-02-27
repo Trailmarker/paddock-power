@@ -36,8 +36,20 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
         _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
         _UNWATERED_PADDOCKS = f"UnwateredPaddocks{randomString()}"
 
+        if filterPaddocks:
+            _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
+            withFilteredPaddocks = f"""
+  {_FILTERED_PADDOCKS} as
+    (select * from "{basePaddocks}"
+     where 1=1
+     {filterPaddocks}),
+"""
+        else:
+            _FILTERED_PADDOCKS = basePaddocks
+            withFilteredPaddocks = ""
         query = f"""
 with
+  {withFilteredPaddocks}
   {_NEAR_WATERED_AREA} as
 	(select
 		st_union(geometry) as geometry,
@@ -46,8 +58,8 @@ with
 	 from "{waterpointBuffers}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Near.name}'
 	 {filterWaterpointBuffers}
-	 group by {PADDOCK}, {TIMEFRAME})
-, {_FAR_WATERED_AREA} as
+	 group by {PADDOCK}, {TIMEFRAME}),
+  {_FAR_WATERED_AREA} as
 	(select
 		st_union(geometry) as geometry,
 		{PADDOCK},
@@ -55,12 +67,8 @@ with
 	 from "{waterpointBuffers}"
 	 where "{GRAZING_RADIUS_TYPE}" = '{GrazingRadiusType.Far.name}'
      {filterWaterpointBuffers}
-	 group by {PADDOCK}, {TIMEFRAME})
-, {_FILTERED_PADDOCKS} as
-    (select * from "{basePaddocks}"
-     where 1=1
-     {filterPaddocks})
-, {_UNWATERED_PADDOCKS} as
+	 group by {PADDOCK}, {TIMEFRAME}),
+  {_UNWATERED_PADDOCKS} as
     (select
 		st_multi("{_FILTERED_PADDOCKS}".geometry) as geometry,
 		0 as {FID},

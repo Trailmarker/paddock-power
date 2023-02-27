@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from ...utils import qgsDebug
 from ...layers.fields import TIMEFRAME
 from .feature_list_base import FeatureListBase
 
@@ -7,6 +8,15 @@ from qgis.core import QgsFeatureRequest, QgsVectorLayerCache
 
 
 class FeatureLayerList(FeatureListBase):
+    
+    class FeatureCache(QgsVectorLayerCache):
+        def __init__(self, layer, count):
+            super().__init__(layer, count)
+            
+        def featureRemoved(self, fid):
+            super().featureRemoved(fid)
+            self.removeListItem(fid)
+    
     def __init__(self, listItemFactory, parent=None):
         """Constructor."""
         super().__init__(listItemFactory, parent)
@@ -38,40 +48,54 @@ class FeatureLayerList(FeatureListBase):
         return self._featureLayer
 
     @featureLayer.setter
-    def featureLayer(self, newVal):
-        oldVal = self._featureLayer
-        self._featureLayer = newVal
-        self.rewireFeatureLayer(oldVal, newVal)
+    def featureLayer(self, newLayer):
+        [oldLayer, self._featureLayer] = [self._featureLayer, newLayer]
+        self.rewireFeatureLayer(oldLayer, newLayer)
 
     def rewireFeatureLayer(self, oldLayer, newLayer):
         """Rewire the FeatureLayer."""
         # qgsDebug(f"{type(self).__name__}.rewireFeatureLayer({oldVal}, {newVal})")
         if oldLayer:
-            oldLayer.featuresChanged.disconnect(self.refreshList)
+            oldLayer.layerTruncated.disconnect(self.clearAndRefreshCache)
+            oldLayer.featuresUpserted.disconnect(self.refreshList)
+            oldLayer.featuresDeleted.disconnect(self.refreshList)
+            oldLayer.featuresBulkAdded.disconnect(self.clearAndRefreshCache)
+            
             oldLayer.featureSelected.disconnect(self.changeSelection)
             oldLayer.featureDeselected.disconnect(self.removeSelection)
+
             if self._layerCache:
                 del(self._layerCache)
+                self._layerCache = None
         if newLayer:
-            # newLayer.featuresChanged.connect(self.refreshList)
+            newLayer.layerTruncated.connect(self.clearAndRefreshCache)
+            newLayer.featuresUpserted.connect(self.clearAndRefreshCache)
+            newLayer.featuresDeleted.connect(self.removeListItems)
+            newLayer.featuresBulkAdded.connect(self.clearAndRefreshCache)
+                        
             newLayer.featureSelected.connect(self.changeSelection)
             newLayer.featureDeselected.connect(self.removeSelection)
             self._layerCache = QgsVectorLayerCache(newLayer, newLayer.featureCount())
-            self._layerCache.cachedLayerDeleted.connect(self.clear)
-            self._layerCache.attributeValueChanged.connect(lambda fid, *_: self.refreshListItem(fid))
-            self._layerCache.featureAdded.connect(lambda fid, *_: self.refreshListItem(fid))
+      
             self._layerCache.finished.connect(self.refreshList)
-            self._layerCache.invalidated.connect(self.refreshCache)
-            self.refreshCache()
+            self._layerCache.invalidated.connect(self.clearAndRefreshCache)            
+            self.clearAndRefreshCache()
 
     def listFeatures(self, request=None):
         """Get the items in the list."""
+        # return self.getFeatures(request)
         return self.getFeaturesInCurrentTimeframe(request)
 
-    def refreshCache(self):
+    def clearAndRefreshCache(self):
         """Refresh the cache."""
+        qgsDebug(f"{type(self).__name__}.clearAndRefreshCache()")
+        self.clear()
         if self._layerCache:
             self._layerCache.setFullCache(True)
+
+    def removeListItems(self, fids):
+        for fid in fids:
+            self.removeListItem(fid)
 
     def getFeatures(self, request=None):
         """Get the Features."""

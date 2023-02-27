@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ...models import SafeTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
+from .cleanup_layers_task import CleanupLayersTask
 from .load_layer_task import LoadLayerTask
 
 
@@ -11,7 +12,11 @@ class LoadWorkspaceTask(SafeTask):
 
         super().__init__(f"{PLUGIN_NAME} is loading the '{workspaceName}' workspace …")
 
-        for layerType in layerDependencyGraph.loadOrder():
+        loadOrder = layerDependencyGraph.loadOrder()
+        
+        self.safeAddSubTask(CleanupLayersTask(loadOrder))
+
+        for layerType in loadOrder:
             dependentLayerTypes = layerDependencyGraph.getDependencies(layerType)
             self.safeAddSubTask(LoadLayerTask(workspaceLayers, layerType, workspaceFile, dependentLayerTypes))
 

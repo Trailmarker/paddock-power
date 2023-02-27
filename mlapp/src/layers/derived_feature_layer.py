@@ -32,7 +32,7 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
             return None
 
         orClauses = self.allKeyClauses(self.changeset, *args)
-        return QgsFeatureRequest().setFilterExpression(orClauses)
+        return QgsFeatureRequest().setFilterExpression(orClauses) if orClauses else None
 
         # return QgsFeatureRequest().setNoAttributes().setFlags(
         #     QgsFeatureRequest.NoGeometry).setFilterExpression(orClauses)
