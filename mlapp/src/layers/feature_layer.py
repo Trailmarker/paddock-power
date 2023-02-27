@@ -57,7 +57,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         WorkspaceMixin.__init__(self)
 
         self.applyNamedStyle(styleName)
-        self.addInBackground()
 
     def __repr__(self):
         """Return a string representation of the Field."""

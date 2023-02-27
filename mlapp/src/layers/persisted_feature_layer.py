@@ -118,6 +118,8 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         # Apply editor widgets and other Field-specific layer setup
         for field in self.getSchema():
             field.setupLayer(self)
+            
+        self.addInBackground()
 
     @property
     def task(self):
