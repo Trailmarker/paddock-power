@@ -24,7 +24,6 @@ STYLESHEET = getComponentStyleSheet(__file__)
 class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
     closingView = pyqtSignal(type)
-    buildUiFinished = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -34,7 +33,6 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         self._pluginInitGui = False
         self._uiBuilt = False
-        self._buildUiTask = None
 
         self.setupUi(self)
         self.setStyleSheet(STYLESHEET)
@@ -64,13 +62,12 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
     def initGui(self):
         f"""Called when the {PLUGIN_NAME} plugin calls initGui()."""
         if not self._pluginInitGui:
-            self.buildUiFinished.connect(self.refreshUi)
             self.plugin.workspaceUnloading.connect(self.clearUi)
             self.plugin.workspaceReady.connect(self.buildUi)
             self._pluginInitGui = True
 
     def refreshUi(self):
-        # self.paddockTab.refreshUi()
+        self.paddockTab.refreshUi()
 
         if self.workspace:
             self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
