@@ -5,15 +5,16 @@ from qgis.core import QgsVectorLayer
 
 from ...models import Glitch, WorkspaceMixin
 from ...utils import ensureIterated, qgsException, qgsInfo
-from ..interfaces import IPersistedFeature, IPersistedDerivedFeatureLayer
+from ..interfaces import IPersistedDerivedFeatureLayer
 
 
 class Edits(WorkspaceMixin):
 
-    def __init__(self, truncates=[], upserts=[], deletes=[]):
+    def __init__(self, truncates=[], upserts=[], bulkAdds=[], deletes=[]):
         super().__init__()
         self.truncates = ensureIterated(truncates)
         self.upserts = ensureIterated(upserts)
+        self.bulkAdds = ensureIterated(bulkAdds)
         self.deletes = ensureIterated(deletes)
 
         # def _filter(features=[]):
@@ -30,6 +31,7 @@ class Edits(WorkspaceMixin):
         otherEdits = otherEdits or Edits()
         self.truncates = otherEdits.truncates + self.truncates
         self.upserts = otherEdits.upserts + self.upserts
+        self.bulkAdds = otherEdits.bulkAdds + self.bulkAdds
         self.deletes = otherEdits.deletes + self.deletes
         return self
 
@@ -37,6 +39,7 @@ class Edits(WorkspaceMixin):
         otherEdits = otherEdits or Edits()
         self.truncates = self.truncates + otherEdits.truncates
         self.upserts = self.upserts + otherEdits.upserts
+        self.bulkAdds = self.bulkAdds + otherEdits.bulkAdds
         self.deletes = self.deletes + otherEdits.deletes
         return self
 
@@ -51,21 +54,22 @@ class Edits(WorkspaceMixin):
     @staticmethod
     def delete(feature):
         return Edits(deletes=[feature])
+    
+    @staticmethod
+    def bulkAdd(bulkAdd):
+        return Edits(bulkAdds=[bulkAdd])
 
     @property
     def layers(self):
-        return set([f.featureLayer for f in (self.upserts + self.deletes)] + self.truncates)
+        return set([f.featureLayer for f in (self.upserts + self.deletes + [bulkAdd['features'] for bulkAdd in self.bulkAdds])] + self.truncates)
 
-    def layerUpsertFids(self, layer):
-        return [f.FID for f in self.upserts if f.featureLayer.id() == layer.id()]
+    def layerFeatures(self, layer):
+        return [f for f in self.upserts if f.featureLayer.id() == layer.id()] + \
+               [f for f in self.deletes if f.featureLayer.id() == layer.id()] + \
+               [f for f in self.bulkAdds if f.featureLayer.id() == layer.id()]
 
-    def layerDeleteFids(self, layer):
-        return [f.FID for f in self.deletes if f.featureLayer.id() == layer.id()]
-
-    def layerFids(self, layer):
-        fids = self.layerUpsertFids(layer) + self.layerDeleteFids(layer)
-        # qgsDebug(f"Edits.layerFids({layer}): fids: {fids}")
-        return fids
+    def layerKeyValues(self, layer, fieldName):
+        return set(f.attribute(fieldName) for f in self.layerFeatures(layer))
 
     def persist(self):
         """Persist these edits to their layers."""
@@ -78,6 +82,9 @@ class Edits(WorkspaceMixin):
 
             for feature in self.deletes:
                 feature.delete()
+
+            for bulkAdd in self.bulkAdds:
+                bulkAdd['layer'].dataProvider().addFeatures(bulkAdd['features'])
 
             for feature in self.upserts:
                 feature.upsert()

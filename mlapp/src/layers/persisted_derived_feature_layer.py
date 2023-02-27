@@ -20,43 +20,47 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
         self.setReadOnly(True)
 
-    def getDerivedLayerInstance(self, edits):
+    def getDerivedLayerInstance(self, changeset=None):
         """Return the derived layer for this layer."""
-        return self.derivedLayerType(self.dependentLayers, edits)
+        return self.derivedLayerType(self.dependentLayers, changeset)
 
-    def showDerivedLayerInstance(self):
+    def showDerivedLayerInstance(self, changeset=None):
         """Add an instance of the derived layer for this layer to the map."""
-        self.getDerivedLayerInstance(edits=None).addToMap()
+        self.getDerivedLayerInstance(changeset).addToMap()
 
-    def deriveFeatures(self, edits):
+    def deriveFeatures(self, changeset):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
         # Clean up any instances of the virtual source …
         # self.derivedLayerType.detectAndRemoveAllOfType()
-        derivedLayer = self.getDerivedLayerInstance(edits)
+        derivedLayer = self.getDerivedLayerInstance(changeset)
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
-        qgsInfo(f"Deriving {self.name()} …")
-
-        rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest(edits)
+        rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest()
         
         edits = Edits()
         if not rederiveFeaturesRequest:
+            qgsInfo(f"Removing and re-deriving the whole {self.name()} layer …")
             edits.editBefore(Edits.truncate(self))
         else:
-            rederiveFeatures = [f for f in self.getFeatures(rederiveFeaturesRequest)]
+            rederivedFeatures = [f for f in self.getFeatures(rederiveFeaturesRequest)]
+            qgsInfo(f"Removing {len(rederivedFeatures)} features in the {self.name()} layer …")
             
-            qgsDebug(f"rederiveFeaturesRequest.filterExpression={rederiveFeaturesRequest.filterExpression()}")
-            
-            qgsDebug(f"rederiveFeatures={[str(f) for f in rederiveFeatures]}")
-            
-            for derivedFeature in rederiveFeatures:
-                edits.editBefore(Edits.delete(derivedFeature))
+            for rederivedFeature in rederivedFeatures:
+                edits.editBefore(Edits.delete(rederivedFeature))
 
+        derivedFeatures = [self.copyFeature(f) for f in derivedLayer.getFeatures()] 
+        qgsInfo(f"Deriving {len(derivedFeatures)} features in the {self.name()} layer …")
+        
         # Get a second batch of edits that copies the new records to this layer …
-        for derivedFeature in derivedLayer.getFeatures():
-            edits.editBefore(Edits.upsert(self.copyFeature(derivedFeature)))
+        edits.editBefore(Edits.bulkAdd({
+            'layer': self,
+            'features': derivedFeatures
+            }))
+        
+        # for derivedFeature in derivedFeatures:
+        #     edits.editBefore(Edits.upsert(self.copyFeature(derivedFeature)))
         
         return edits
         

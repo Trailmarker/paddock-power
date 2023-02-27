@@ -159,6 +159,8 @@ def ensureIterated(seq):
     """Ensure that a generator is iterated and returned as a list."""
     if isinstance(seq, Generator):
         return [item for item in seq]
+    if isinstance(seq, tuple) or isinstance(seq, set):
+        return list(seq)
     return seq
 
 

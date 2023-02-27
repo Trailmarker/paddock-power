@@ -15,7 +15,6 @@ class RecalculateFeaturesSingleTask(ChangesetTask):
         assert isinstance(self.layer, IPersistedFeatureLayer)
         assert not isinstance(self.layer, IPersistedDerivedFeatureLayer)
         guiStatusBarAndInfo(self.description())
-
         return self.layer.recalculateFeatures()
 
     def safeFinished(self, result):

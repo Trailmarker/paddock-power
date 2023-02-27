@@ -21,9 +21,7 @@ class PersistEditsTask(SafeTask):
         """Carry out a function that generates Feature edit operations, and persist the edits."""
         if self.isCanceled():
             return False
-        qgsDebug(f"PersistEditsTask.safeRun: self._editFunction={self._editFunction}")
         self.edits = self._editFunction(*self._args, **self._kwargs) or Edits()
-        qgsDebug(f"PersistEditsTask.safeRun: self.edits={self.edits}")
         self.edits.persist()
         return True
 

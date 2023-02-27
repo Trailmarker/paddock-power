@@ -15,22 +15,21 @@ class AnalyseWorkspaceTask(SafeTask, WorkspaceMixin):
 
         self.changeset = None
 
-        # recalculateOrder = self.workspace.layerDependencyGraph.recalculateOrder()
-        # recalculateLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in recalculateOrder]
+        recalculateOrder = self.workspace.layerDependencyGraph.recalculateOrder()
+        recalculateLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in recalculateOrder]
 
-        # for layer in recalculateLayers:
-        #     self.safeAddSubTask(RecalculateFeaturesSingleTask(layer, self.changeset))
+        for layer in recalculateLayers:
+            self.safeAddSubTask(RecalculateFeaturesSingleTask(layer, self.changeset))
 
         deriveOrder = self.workspace.layerDependencyGraph.deriveOrder()
         deriveLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in deriveOrder]
 
-        self.safeAddSubTask(DeriveEditsSingleTask(deriveLayers[0], self.changeset))
+        # self.safeAddSubTask(DeriveEditsSingleTask(deriveLayers[0], self.changeset))
 
-
-        # for layer in deriveLayers:
-        #     self.safeAddSubTask(DeriveEditsSingleTask(layer, self.changeset))
+        for layer in deriveLayers:
+            self.safeAddSubTask(DeriveEditsSingleTask(layer, self.changeset))
             
-        self.safeAddSubTask(CleanupLayersTask())
+        # self.safeAddSubTask(CleanupLayersTask())
 
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""

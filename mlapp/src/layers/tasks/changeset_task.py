@@ -9,9 +9,11 @@ class ChangesetTask(PersistEditsTask):
         self.changeset = changeset or Edits()
         super().__init__(description, editFunction)
 
-    def safeFinished(self, result):
-        """Called when task completes (successfully or otherwise)."""
-        super().safeFinished(result)
+    def safeRun(self):
+        result = super().safeRun()
         if result:
             # Merge edits into accumulated changeset
             self.changeset.editBefore(self.edits)
+        return result
+
+    

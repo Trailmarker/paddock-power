@@ -20,10 +20,7 @@ class DeriveEditsSingleTask(ChangesetTask):
     def editFunction(self):
         assert isinstance(self.layer, IPersistedDerivedFeatureLayer)
         guiStatusBarAndInfo(self.description())
-        qgsDebug(f"{self}")
-        edits = self.layer.deriveFeatures(self.changeset)
-        qgsDebug(f"Derived edits={edits}")
-        return edits
+        return self.layer.deriveFeatures(self.changeset)
 
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""

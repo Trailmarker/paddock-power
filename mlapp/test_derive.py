@@ -7,13 +7,35 @@ from mlapp.dev import *
 
 wp = workspace().waterpointLayer
 wb = workspace().waterpointBufferLayer
+dw = workspace().wateredAreaLayer
+pl = workspace().paddockLandTypesLayer
 
 wpf = wp.getFeature(13)
-edits = Edits.upsert(wpf)
+changeset = Edits.upsert(wpf)
 
-derivedEdits = wb.deriveFeatures(edits)
+print(f"Changeset: {changeset}")
 
-print(f"derivedEdits={derivedEdits}")
+wbChangeset = wb.deriveFeatures(changeset)
+
+changeset.editBefore(wbChangeset)
+changeset.persist()
+
+print(f"Changeset after deriving Waterpoint Buffers: {changeset}")
+
+dwChangeset = dw.deriveFeatures(changeset)
+
+changeset.editBefore(dwChangeset)
+changeset.persist()
+
+print(f"Changeset after deriving Watered Areas: {changeset}")
+
+plChangeset = pl.deriveFeatures(changeset)
+
+changeset.editBefore(plChangeset)
+changeset.persist()
+
+print(f"Changeset after deriving Paddock Land Types: {changeset}")
+
 
 # wp = first(workspace().waterpointLayer)
 

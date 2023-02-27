@@ -4,50 +4,48 @@ from urllib.parse import quote
 from qgis.core import QgsFeatureRequest
 
 from ..utils import qgsDebug, qgsError
-from .features.edits import Edits
+from .features import Edits
 from .feature_layer import FeatureLayer
 from .interfaces import IDerivedFeatureLayer, IPersistedLayer
 
 
 class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
 
-    @classmethod
-    def keyClause(cls, edits, layer, fieldName):
-        fids = edits.layerFids(layer)
-        return (f'"{fieldName}" in ({",".join([str(fid) for fid in fids])})' if fids else "")
-
-    @classmethod
-    def allKeyClauses(cls, edits, *args):
-        keyClauses = [cls.keyClause(edits, layer, fieldName) for (layer, fieldName) in zip(*([iter(args)] * 2))]
+    def keyClause(self, changeset, dependentLayer, derivedKeyFieldName, dependentKeyFieldName):
+        keyValues = changeset.layerKeyValues(dependentLayer, dependentKeyFieldName)
+        return (f'{derivedKeyFieldName} in ({",".join([str(fid) for fid in keyValues])})' if keyValues else "")
+    
+    def allKeyClauses(self, changeset, *args):
+        keyClauses = [self.keyClause(changeset, layer, derivedKeyFieldName, dependentKeyFieldName) for (layer, derivedKeyFieldName, dependentKeyFieldName) in zip(*([iter(args)] * 3))]
         keyClauses = [clause for clause in keyClauses if clause]
         if not keyClauses:
             return ""
         return " or ".join(keyClauses)
 
-    @classmethod
-    def andAllKeyClauses(cls, edits, *args):
-        allKeyClauses = cls.allKeyClauses(edits, *args)
+    def andAllKeyClauses(self, changeset, *args):
+        allKeyClauses = self.allKeyClauses(changeset, *args)
         return f"and ({allKeyClauses})" if allKeyClauses else ""
 
-    @classmethod
-    def prepareRederiveFeaturesRequest(cls, edits, *args):
+    def prepareRederiveFeaturesRequest(self, *args):
         """Return a QgsFeatureRequest to figure out which featurs to rederive based on some edits."""
-        orClauses = cls.allKeyClauses(edits, *args)
-        qgsDebug(f"DerivedFeatureLayer.getRederiveFeaturesRequest({edits}, {args}): orClauses: {orClauses}")
+        if not self.changeset:
+            return None
 
+        orClauses = self.allKeyClauses(self.changeset, *args)
         return QgsFeatureRequest().setFilterExpression(orClauses)
+
         # return QgsFeatureRequest().setNoAttributes().setFlags(
         #     QgsFeatureRequest.NoGeometry).setFilterExpression(orClauses)
+  
 
-
-    def getRederiveFeaturesRequest(self, edits):
+    def getRederiveFeaturesRequest(self):
         """Given a layer, remove the features within it that depend on some edits."""
         return None
 
-    def __init__(self, layerName, styleName, dependentLayers, edits=None):
+    def __init__(self, layerName, styleName, dependentLayers, changeset=None):
 
         self.dependentLayers = dependentLayers
-        self.edits = edits or Edits()
+        self.changeset = changeset or Edits()
         virtualSource = self._makeDerivedFeatureLayerSource(dependentLayers)
 
         super().__init__(virtualSource, layerName, "virtual", styleName)

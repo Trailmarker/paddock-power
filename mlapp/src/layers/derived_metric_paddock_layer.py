@@ -43,9 +43,9 @@ group by "{basePaddockLayer}".{FID}, "{paddockLandTypesLayer}".{TIMEFRAME}
 
     def __init__(self,
                  dependentLayers,
-                 edits):
+                 changeset):
 
         super().__init__(DerivedMetricPaddockLayer.defaultName(),
                          DerivedMetricPaddockLayer.defaultStyle(),
                          dependentLayers,
-                         None) # Don't try to get fancy
+                         changeset)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..utils import qgsDebug
 from .calculator import Calculator
-from .features import Edits, WaterpointBuffer
+from .features import WaterpointBuffer
 from .fields import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NEAR_GRAZING_RADIUS, PADDOCK, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
 
@@ -15,22 +15,22 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return WaterpointBuffer
 
-    def getRederiveFeaturesRequest(self, edits):
+    def getRederiveFeaturesRequest(self):
         """Define which features must be removed from a target layer to be re-derived."""
-        if not edits:
+        if not self.changeset:
             return None
-        else:
-            [basePaddockLayer, waterpointLayer] = self.dependentLayers            
-            return self.prepareRederiveFeaturesRequest(self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)    
+        
+        [basePaddockLayer, waterpointLayer] = self.dependentLayers            
+        return self.prepareRederiveFeaturesRequest(basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)    
 
     def prepareQuery(self, query, dependentLayers):
         [basePaddockLayer, waterpointLayer] = dependentLayers
         [basePaddocks, waterpoints] = self.names(dependentLayers)
 
         # Set up clauses
-        inPaddocksClause = DerivedFeatureLayer.andAllKeyClauses(
-            self.edits, basePaddockLayer, PADDOCK, waterpointLayer, WATERPOINT)
-        renamedWaterpointsClause = DerivedFeatureLayer.andAllKeyClauses(self.edits, waterpointLayer, FID)
+        inPaddocksClause = self.andAllKeyClauses(
+            self.changeset, basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
+        renamedWaterpointsClause = self.andAllKeyClauses(self.changeset, waterpointLayer, FID, FID)
 
         _BUFFERS = "Buffers"
         _FAR_BUFFER = "FarBuffer"
@@ -107,12 +107,10 @@ and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BU
 
     def __init__(self,
                  dependentLayers,
-                 edits):
+                 changeset):
 
         super().__init__(
             DerivedWaterpointBufferLayer.defaultName(),
             DerivedWaterpointBufferLayer.defaultStyle(),
             dependentLayers,
-            edits)
-
-        # qgsDebug(f"{self}.__init__({dependentLayers}, {edits})")
+            changeset)
