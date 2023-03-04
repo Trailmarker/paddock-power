@@ -24,8 +24,6 @@ class AnalyseWorkspaceTask(SafeTask, WorkspaceMixin):
         deriveOrder = self.workspace.layerDependencyGraph.deriveOrder()
         deriveLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in deriveOrder]
 
-        # self.safeAddSubTask(DeriveEditsSingleTask(deriveLayers[0], self.changeset))
-
         for layer in deriveLayers:
             self.safeAddSubTask(DeriveEditsSingleTask(layer, self.changeset))
 
