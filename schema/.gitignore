@@ -1,2 +1,10 @@
+# Misc Python
+*__pycache__*
+
+# pytest stuf
+.pytest_cache
+.testmondata
+
+# Library data
 *.7z
 lib/spatialite-tools-5.0.1-win-amd64
