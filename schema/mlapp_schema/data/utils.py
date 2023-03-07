@@ -8,4 +8,4 @@ def fidForeignKey(keyName, referencedFeatureModel):
     return ForeignKeyConstraint(
         [keyName],
         [f"{referencedFeatureModel.__tablename__}.{FID}"],
-        use_alter=True, name=f"FK_{keyName}")
+        use_alter=False, name=f"FK_{keyName}")

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Float
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import declared_attr, mapped_column
 
 from ...names import ESTIMATED_CAPACITY, ESTIMATED_CAPACITY_PER_AREA, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, WATERED_AREA
 from .area_mixin import AreaMixin

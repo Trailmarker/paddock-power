@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import String
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import declared_attr, mapped_column
 
 from ...names import STATUS
 

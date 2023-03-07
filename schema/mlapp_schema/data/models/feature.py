@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from geoalchemy2 import Index
 from sqlalchemy import Integer
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import declared_attr, mapped_column
 
 from ..constants import PLUGIN_NAME
 from ..base import Base

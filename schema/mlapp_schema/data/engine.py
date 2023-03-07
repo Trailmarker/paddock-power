@@ -22,7 +22,7 @@ def extendedIncludeObject(obj, name, objectType, reflected, compareTo):
         or name.startswith("sqlite_sequence")
         or name.startswith("views_geometry_columns")
         or name.startswith("virts_geometry_columns")
-        or name.startswith("idx_")
+        # or name.startswith("idx_")
 
         # Additional clauses for more recent versions of SpatiaLite
         or name.startswith("ElementaryGeometries")

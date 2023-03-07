@@ -14,7 +14,9 @@ from sqlalchemy.event import listen
 from mlapp_schema.data import Base, enforceForeignKeys, extendedIncludeObject, installSpatiaLiteMetadata, loadSpatiaLite
 
 # Import all other models so that Alembic can detect them
-# from mlapp_schema.data.models import *
+
+# Initial migration: base features
+from mlapp_schema.data.models import *
 
 # This is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

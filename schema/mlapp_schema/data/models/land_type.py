@@ -1,6 +1,7 @@
 from sqlalchemy import Float, String
 # -*- coding: utf-8 -*-
-from sqlalchemy.orm import mapped_column
+from geoalchemy2 import Index
+from sqlalchemy.orm import declared_attr, mapped_column
 
 from .feature import Feature
 from .mixins import AreaMixin

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Integer
-from sqlalchemy.orm import mapped_column
+from geoalchemy2 import Index
+from sqlalchemy import Integer, ForeignKey
+from sqlalchemy.orm import declared_attr, mapped_column, relationship
 
 from .base_paddock import BasePaddock
+from .fence import Fence
 from .feature import Feature
 from .mixins import CapacityMixin, NameMixin, StatusMixin
 
-from ..names import BUILD_FENCE, PADDOCK
-from ..utils import fidForeignKey
+from ..names import FID, BUILD_FENCE, PADDOCK
 
 
 class Paddock(Feature, CapacityMixin, NameMixin, StatusMixin):
     __tablename__ = 'Paddocks'
 
-    paddock = mapped_column(PADDOCK, Integer, nullable=False)
-    buildFence = mapped_column(BUILD_FENCE, Integer, nullable=True)
+    paddock = mapped_column(PADDOCK, Integer, ForeignKey(f"{BasePaddock.__tablename__}.{FID}"), nullable=False)
+    buildFence = mapped_column(BUILD_FENCE, Integer, ForeignKey(f"{Fence.__tablename__}.{FID}"), nullable=True)
 
-    fkPaddock = fidForeignKey(PADDOCK, BasePaddock)
+    paddock_ = relationship(BasePaddock.__tablename__)
+    buildFence_ = relationship(Fence.__tablename__)
