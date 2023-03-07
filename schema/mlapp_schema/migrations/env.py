@@ -2,7 +2,7 @@
 
 from logging.config import fileConfig
 
-# the 'alembic_helpers' for GeoAlchemy 2 help us deal with various difficulties concerning GeoAlchemy
+# The 'alembic_helpers' for GeoAlchemy 2 help us deal with various difficulties concerning GeoAlchemy
 from alembic import context
 from geoalchemy2 import alembic_helpers as geoalchemy2_alembic_helpers
 # , load_spatialite
@@ -10,13 +10,13 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy.event import listen
 
-# import Base model and some SpatiaLite utilities
+# Import Base model and some SpatiaLite utilities
 from mlapp_schema.data import Base, installSpatiaLiteMetadata, loadSpatiaLite
 
-# import all other models so that Alembic can detect them
-# from mlapp_schema.data.models import *
+# Import all other models so that Alembic can detect them
+from mlapp_schema.data.models import *
 
-# this is the Alembic Config object, which provides
+# This is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
@@ -25,15 +25,14 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
+# Add your model's MetaData object here
 # for 'autogenerate' support
 target_metadata = Base.metadata
 
-# other values from the config, defined by the needs of env.py,
+# Other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -60,8 +59,8 @@ def run_migrations_offline() -> None:
         render_item=geoalchemy2_alembic_helpers.render_item,
     )
 
-    # with context.begin_transaction():
-    context.run_migrations()
+    with context.begin_transaction():
+        context.run_migrations()
 
 
 def run_migrations_online() -> None:
