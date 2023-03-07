@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column
 
 from .feature import Feature
 from .mixins import AreaMixin
-from .names import LAND_TYPE_NAME, OPTIMAL_CAPACITY_PER_AREA
+from ..names import LAND_TYPE_NAME, OPTIMAL_CAPACITY_PER_AREA
 
 
 class LandType(Feature, AreaMixin):

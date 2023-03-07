@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column
 
 from ..constants import PLUGIN_NAME
 from ..base import Base
-from .names import FID
+from ..names import FID
 
 
 class Feature(Base):

@@ -4,7 +4,7 @@ from sqlalchemy import Float
 from sqlalchemy.orm import mapped_column
 
 from ...constants import PLUGIN_EPSG
-from ..names import ELEVATION, GEOMETRY, LONGITUDE, LATITUDE
+from ...names import ELEVATION, GEOMETRY, LONGITUDE, LATITUDE
 
 
 class PointMixin:

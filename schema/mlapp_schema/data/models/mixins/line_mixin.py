@@ -4,7 +4,7 @@ from sqlalchemy import Float
 from sqlalchemy.orm import mapped_column
 
 from ...constants import PLUGIN_EPSG
-from ..names import GEOMETRY, LENGTH
+from ...names import GEOMETRY, LENGTH
 
 
 class LineMixin:

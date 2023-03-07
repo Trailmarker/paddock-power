@@ -1,4 +1,3 @@
 # -*- coding: utf-8 -*-
-from .engine import installSpatiaLiteMetadata, loadSpatiaLite
+from .engine import enforceForeignKeys, extendedIncludeObject, installSpatiaLiteMetadata, loadSpatiaLite
 from .base import Base
-

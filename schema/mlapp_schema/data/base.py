@@ -1,5 +1,5 @@
-from abc import ABC, ABCMeta
 # -*- coding: utf-8 -*-
+from abc import ABCMeta
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 
 

@@ -11,10 +11,10 @@ from sqlalchemy import pool
 from sqlalchemy.event import listen
 
 # Import Base model and some SpatiaLite utilities
-from mlapp_schema.data import Base, installSpatiaLiteMetadata, loadSpatiaLite
+from mlapp_schema.data import Base, enforceForeignKeys, extendedIncludeObject, installSpatiaLiteMetadata, loadSpatiaLite
 
 # Import all other models so that Alembic can detect them
-from mlapp_schema.data.models import *
+# from mlapp_schema.data.models import *
 
 # This is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -34,6 +34,7 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -47,6 +48,9 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
+
+    print(f"include_object: {geoalchemy2_alembic_helpers.include_object}")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -54,7 +58,7 @@ def run_migrations_offline() -> None:
         dialect_opts={"paramstyle": "named"},
 
         # Additional items to eg exclude SpatiaLite tables from autogeneration
-        include_object=geoalchemy2_alembic_helpers.include_object,
+        include_object=extendedIncludeObject,
         process_revision_directives=geoalchemy2_alembic_helpers.writer,
         render_item=geoalchemy2_alembic_helpers.render_item,
     )
@@ -80,6 +84,7 @@ def run_migrations_online() -> None:
 
     if connectable.dialect.name == "sqlite":
         # Load the SpatiaLite extension when the engine connects to the DB
+        listen(connectable, 'connect', enforceForeignKeys)
         listen(connectable, 'connect', loadSpatiaLite)
 
     # Important: the use of begin() instead of connect() here turns out to be
@@ -92,15 +97,15 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
 
             # Additional items to eg exclude SpatiaLite tables from autogeneration
-            include_object=geoalchemy2_alembic_helpers.include_object,
+            include_object=extendedIncludeObject,
             process_revision_directives=geoalchemy2_alembic_helpers.writer,
             render_item=geoalchemy2_alembic_helpers.render_item,
             transaction_per_migration=True,
         )
-        
+
         with context.begin_transaction():
             context.run_migrations()
-        
+
 
 if context.is_offline_mode():
     run_migrations_offline()

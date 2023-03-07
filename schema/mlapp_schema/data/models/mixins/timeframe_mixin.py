@@ -2,7 +2,7 @@
 from sqlalchemy import String
 from sqlalchemy.orm import mapped_column
 
-from ..names import TIMEFRAME
+from ...names import TIMEFRAME
 
 
 class TimeframeMixin:

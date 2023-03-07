@@ -4,7 +4,7 @@ from sqlalchemy import Float
 from sqlalchemy.orm import mapped_column
 
 from ...constants import PLUGIN_EPSG
-from ..names import AREA, GEOMETRY, PERIMETER
+from ...names import AREA, GEOMETRY, PERIMETER
 
 
 class AreaMixin:

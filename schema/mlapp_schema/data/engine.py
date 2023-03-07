@@ -4,6 +4,35 @@ from os import environ, path, pathsep, getcwd
 from sqlalchemy import text
 
 
+def enforceForeignKeys(connection, _):
+    """SQLite does not enforce foreign keys by default, but this pragma will enforce the behaviour."""
+    connection.execute('pragma foreign_keys=ON')
+
+
+def extendedIncludeObject(obj, name, objectType, reflected, compareTo):
+    """Updated version of `include_object` from the geoalchemy2.alembic_helpers module.
+    .. warning::
+        This function only checks the table names, so it might exclude tables that should not be.
+        In such case, you should create your own function to handle your specific table names.
+    """
+    if objectType == "table" and (
+        name.startswith("geometry_columns")
+        or name.startswith("spatial_ref_sys")
+        or name.startswith("spatialite_history")
+        or name.startswith("sqlite_sequence")
+        or name.startswith("views_geometry_columns")
+        or name.startswith("virts_geometry_columns")
+        or name.startswith("idx_")
+
+        # Additional clauses for more recent versions of SpatiaLite
+        or name.startswith("ElementaryGeometries")
+        or name.startswith("SpatialIndex")
+        or name.startswith("data_licenses")
+    ):
+        return False
+    return True
+
+
 def installSpatiaLiteMetadata(connection):
     """Install the SpatiaLite metadata structures for the database."""
     spatialRefSysExists = connection.execute(
@@ -18,7 +47,7 @@ def installSpatiaLiteMetadata(connection):
     connection.execute(text("begin;"))
     connection.execute(text("select InitSpatialMetadata();"))
     connection.execute(text("commit;"))
-    
+
     print("SpatiaLite metadata installed.")
 
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column
 
 from .mixins import NameMixin, PointMixin, StatusMixin
 
-from .names import WATERPOINT_TYPE, NEAR_GRAZING_RADIUS, FAR_GRAZING_RADIUS
+from ..names import WATERPOINT_TYPE, NEAR_GRAZING_RADIUS, FAR_GRAZING_RADIUS
 
 
 class Waterpoint(PointMixin, NameMixin, StatusMixin):

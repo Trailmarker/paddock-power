@@ -10,4 +10,3 @@ from .pipeline import Pipeline
 from .watered_area import WateredArea
 from .waterpoint_buffer import WaterpointBuffer
 from .waterpoint import Waterpoint
-
