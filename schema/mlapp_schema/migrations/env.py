@@ -14,7 +14,7 @@ from sqlalchemy.event import listen
 from mlapp_schema.data import Base, installSpatiaLiteMetadata, loadSpatiaLite
 
 # import all other models so that Alembic can detect them
-from mlapp_schema.data.models import *
+# from mlapp_schema.data.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -48,9 +48,6 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
-
-    print(f"URL: {url}")
-
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -63,8 +60,8 @@ def run_migrations_offline() -> None:
         render_item=geoalchemy2_alembic_helpers.render_item,
     )
 
-    with context.begin_transaction():
-        context.run_migrations()
+    # with context.begin_transaction():
+    context.run_migrations()
 
 
 def run_migrations_online() -> None:
@@ -74,21 +71,23 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    engine = engine_from_config(
+    connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        echo=True
+        echo=True,
+        # implicit_returning=False,
     )
 
-    if engine.dialect.name == "sqlite":
+    if connectable.dialect.name == "sqlite":
         # Load the SpatiaLite extension when the engine connects to the DB
-        listen(engine, 'connect', loadSpatiaLite)
+        listen(connectable, 'connect', loadSpatiaLite)
 
-    with engine.connect() as connection:
+    # Important: the use of begin() instead of connect() here turns out to be
+    # crucial to the transactional behaviour of the migrations
+    with connectable.begin() as connection:
 
         installSpatiaLiteMetadata(connection)
-
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
@@ -97,11 +96,12 @@ def run_migrations_online() -> None:
             include_object=geoalchemy2_alembic_helpers.include_object,
             process_revision_directives=geoalchemy2_alembic_helpers.writer,
             render_item=geoalchemy2_alembic_helpers.render_item,
+            transaction_per_migration=True,
         )
-
+        
         with context.begin_transaction():
             context.run_migrations()
-
+        
 
 if context.is_offline_mode():
     run_migrations_offline()
