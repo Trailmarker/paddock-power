@@ -1,14 +1,20 @@
+# -*- coding: utf-8 -*-
+
 from logging.config import fileConfig
 
+# the 'alembic_helpers' for GeoAlchemy 2 help us deal with various difficulties concerning GeoAlchemy
+from alembic import context
+from geoalchemy2 import alembic_helpers as geoalchemy2_alembic_helpers
+# , load_spatialite
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.event import listen
 
-from alembic import context
+# import Base model and some SpatiaLite utilities
+from mlapp_schema.data import Base, installSpatiaLiteMetadata, loadSpatiaLite
 
-# import items from the mlapp_schema SQLAlchemy schema
-
-# import mlapp_schema.models
-from mlapp_schema.models import SchemaMetadata
+# import all other models so that Alembic can detect them
+from mlapp_schema.data.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,9 +27,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-target_metadata = SchemaMetadata
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -44,11 +48,19 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
+
+    print(f"URL: {url}")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+
+        # Additional items to eg exclude SpatiaLite tables from autogeneration
+        include_object=geoalchemy2_alembic_helpers.include_object,
+        process_revision_directives=geoalchemy2_alembic_helpers.writer,
+        render_item=geoalchemy2_alembic_helpers.render_item,
     )
 
     with context.begin_transaction():
@@ -62,15 +74,29 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
+    engine = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        echo=True
     )
 
-    with connectable.connect() as connection:
+    if engine.dialect.name == "sqlite":
+        # Load the SpatiaLite extension when the engine connects to the DB
+        listen(engine, 'connect', loadSpatiaLite)
+
+    with engine.connect() as connection:
+
+        installSpatiaLiteMetadata(connection)
+
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+
+            # Additional items to eg exclude SpatiaLite tables from autogeneration
+            include_object=geoalchemy2_alembic_helpers.include_object,
+            process_revision_directives=geoalchemy2_alembic_helpers.writer,
+            render_item=geoalchemy2_alembic_helpers.render_item,
         )
 
         with context.begin_transaction():

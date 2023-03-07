@@ -5,8 +5,13 @@ Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 
 """
+# -*- coding: utf-8 -*-
 from alembic import op
 import sqlalchemy as sa
+import geoalchemy2
+import mlapp_schema.data
+import mlapp_schema.data.models 
+
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.

@@ -1,4 +1,14 @@
 {
+    "editor.folding": false,
     "explorer.excludeGitIgnore": true,
-    "python.pythonPath": "C:\\Users\\tom.lynch\\dev\\trm\\paddock-power\\schema\\.venv"
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 100,
+            "driver": "SQLite",
+            "name": "MLA Paddock Power Test Database",
+            "group": "MLA Paddock Power",
+            "database": "${workspaceFolder:schema}/test.sqlite",
+        }
+    ]
 }
