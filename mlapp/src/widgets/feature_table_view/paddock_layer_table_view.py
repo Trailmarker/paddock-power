@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .feature_table_view import FeatureTableView
+from .feature_layer_table_view import FeatureLayerTableView
 
-class PaddockTableView(FeatureTableView):
+class PaddockLayerTableView(FeatureLayerTableView):
 
     def __init__(self, parent=None):
         """Constructor."""

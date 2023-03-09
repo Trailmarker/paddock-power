@@ -10,7 +10,6 @@ from qgis.core import QgsProject
 
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
-from ...widgets.feature_table_view.paddock_table_view import PaddockTableView
 from ..fence_widget import FenceWidget
 from ..paddock_widget import PaddockWidget
 from ..pipeline_widget import PipelineWidget
@@ -68,7 +67,7 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
             self._pluginInitGui = True
 
     def refreshUi(self):
-        # self.paddockTab.refreshUi()
+        self.paddockTab.refreshUi()
 
         if self.workspace:
             self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
@@ -80,7 +79,7 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
 
-        self.paddockTab = PaddockTableView(self.tabWidget)
+        self.paddockTab = PaddockWidget(self.tabWidget)
         self.fenceTab = FenceWidget(self.tabWidget)
         self.pipelineTab = PipelineWidget(self.tabWidget)
         self.waterpointTab = WaterpointWidget(self.tabWidget)

@@ -29,7 +29,7 @@ from ...layers.fields import Timeframe
 # table_view.show()
 
 
-class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstractMeta):
+class FeatureLayerTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstractMeta):
     
     def __init__(self, parent=None):
         QgsAttributeTableView.__init__(self, parent)
