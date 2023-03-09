@@ -11,7 +11,7 @@ from sqlalchemy import pool
 from sqlalchemy.event import listen
 
 # Import Base model and some SpatiaLite utilities
-from mlapp_schema.data import Base, enforceForeignKeys, extendedIncludeObject, installSpatiaLiteMetadata, loadSpatiaLite
+from mlapp_schema.data import Base, enforceForeignKeys, extendedIncludeObject, installSpatiaLiteMetadata, loadSpatiaLite, renderItem
 
 # Import all other models so that Alembic can detect them
 
@@ -35,6 +35,16 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+
+def extendedRenderItem(objectType, obj, autogenContext):
+    """Updated version of `render_item` from the geoalchemy2.alembic_helpers module."""
+    handled = geoalchemy2_alembic_helpers.render_item(objectType, obj, autogenContext)
+    
+    if not handled:
+        handled = renderItem(objectType, obj, autogenContext)
+        
+    return handled
 
 
 def run_migrations_offline() -> None:
@@ -62,7 +72,7 @@ def run_migrations_offline() -> None:
         # Additional items to eg exclude SpatiaLite tables from autogeneration
         include_object=extendedIncludeObject,
         process_revision_directives=geoalchemy2_alembic_helpers.writer,
-        render_item=geoalchemy2_alembic_helpers.render_item,
+        render_item=extendedRenderItem
     )
 
     with context.begin_transaction():
@@ -101,7 +111,7 @@ def run_migrations_online() -> None:
             # Additional items to eg exclude SpatiaLite tables from autogeneration
             include_object=extendedIncludeObject,
             process_revision_directives=geoalchemy2_alembic_helpers.writer,
-            render_item=geoalchemy2_alembic_helpers.render_item,
+            render_item=extendedRenderItem,
             transaction_per_migration=True,
         )
 

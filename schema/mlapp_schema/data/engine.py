@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from os import environ, path, pathsep, getcwd
 
+from geoalchemy2 import Geometry, Geography, Raster
 from sqlalchemy import text
 
 
@@ -64,6 +65,15 @@ def loadSpatiaLite(connection, _):
     print(f"Loading SpatiaLite extension from {libPath}")
     connection.enable_load_extension(True)
     connection.execute(f"select load_extension('mod_spatialite');")
+
+def renderItem(objectType, obj, autogenContext):
+    """Apply custom rendering for selected items."""
+    if objectType == 'type' and isinstance(obj, (Geometry, Geography, Raster)):
+        import_name = obj.__class__.__name__
+        autogenContext.imports.add(f"from geoalchemy2 import {import_name}")
+        return "%r" % obj
+
+    return False
 
 # def createEngine():
 #     """Create a SQLite engine for the database and load the SpatiaLite extension."""
