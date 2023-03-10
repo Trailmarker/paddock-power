@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from abc import abstractproperty
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
 from qgis.utils import iface
@@ -38,6 +39,10 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         qgsDebug(f"Received click at index {index.row()}, {index.column()}")
         if self._tableModel.isToolBarIndex(index):
             self.onToolBarClicked(index)
+
+    @abstractproperty
+    def supportedFeatureTableActions(self):
+        pass
 
     @property
     def featureLayer(self):
@@ -107,7 +112,11 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
     def bumpCache(self):
         """Bump the cache."""
         qgsDebug(f"{type(self).__name__}.bumpCache()")
+
+        self._tableModel.resetModel()
+        self._tableModel.layer().triggerRepaint()
+
         if self._featureCache:
             # Re-cache all the data
-            self._tableModel.resetModel()
             self._featureCache.setFullCache(True)
+

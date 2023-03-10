@@ -2,6 +2,7 @@
 from ...layers.fields import Schema
 from ...layers.fields.fields import *
 from ..paddock_land_type_details import PaddockLandTypeDetailsEdit
+from .feature_table_action import FeatureTableAction
 from .feature_table_view import FeatureTableView
 
 PaddockLandTypesTableViewSchema = Schema([AreaTitle,
@@ -22,3 +23,7 @@ class PaddockLandTypesTableView(FeatureTableView):
 
         super().__init__(PaddockLandTypesTableViewSchema, PaddockLandTypeDetailsEdit, parent)
         self.featureLayer = self.workspace.paddockLayer
+
+    @property
+    def supportedFeatureTableActions(self):
+        return [FeatureTableAction.selectFeature, FeatureTableAction.editFeature]

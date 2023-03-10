@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from mlapp.src.widgets.feature_table_view.feature_table_action.feature_table_action import FeatureTableAction
 from ...layers.fields import Schema
 from ...layers.fields.fields import *
 from ..waterpoint_details import WaterpointDetailsEdit
@@ -21,3 +22,7 @@ class WaterpointTableView(FeatureTableView):
 
         super().__init__(WaterpointTableViewSchema, WaterpointDetailsEdit, parent)
         self.featureLayer = self.workspace.waterpointLayer
+
+    @property
+    def supportedFeatureTableActions(self):
+        return list(FeatureTableAction)

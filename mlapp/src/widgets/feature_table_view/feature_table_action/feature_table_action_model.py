@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod, abstractproperty
 
 from qgis.PyQt.QtCore import QObject
 
+from qgis.gui import QgsAttributeTableModel, QgsAttributeTableFilterModel
+
 from ....models import QtAbstractMeta
 
 
@@ -18,8 +20,16 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
 
     def getFeature(self, index):
         """The feature associated with the current index."""
-        fid = index.model().rowToId(index.row())
-        return index.model().layer().getFeature(fid)
+        model = index.model()
+        # Beware: the call signatures of rowToId are different for
+        # QgsAttributeTableModel and QgsAttributeTableFilterModel
+        if isinstance(model, QgsAttributeTableFilterModel):
+            # TODO check this
+            fid = model.rowToId(index)
+        elif isinstance(model, QgsAttributeTableModel):
+            fid = model.rowToId(index.row())
+
+        return model.layer().getFeature(fid)
 
     @abstractproperty
     def featureTableAction(self):
