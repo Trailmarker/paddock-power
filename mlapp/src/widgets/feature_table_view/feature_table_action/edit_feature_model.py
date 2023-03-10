@@ -16,7 +16,7 @@ class EditFeatureModel(FeatureTableActionModel):
 
     def __init__(self, editWidgetFactory, parent=None):
         super().__init__(parent)
-        
+
         self._editWidgetFactory = editWidgetFactory
 
     def doAction(self, index):

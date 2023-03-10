@@ -84,7 +84,7 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
 
         assert workspaceFile
         assert layerName
-        
+
         self._taskId = None
         self._task = None
 
@@ -118,7 +118,7 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         # Apply editor widgets and other Field-specific layer setup
         for field in self.getSchema():
             field.setupLayer(self)
-            
+
         self.addInBackground()
 
     @property

@@ -19,7 +19,7 @@ class ViewFeatureProfileModel(FeatureTableActionModel):
     def doAction(self, index):
         """View the profile for the feature at the given index."""
         self.feature = self.getFeature(index)
-        
+
         if not self.profileDetailsDialog:
             self.profileDetailsDialog = ProfileDetailsDialog(self.feature, self)
 

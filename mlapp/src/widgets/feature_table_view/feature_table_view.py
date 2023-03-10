@@ -19,7 +19,7 @@ STYLESHEET = getComponentStyleSheet(__file__)
 
 class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstractMeta):
 
-    def __init__(self, schema, editWidgetFactory = None, parent=None):
+    def __init__(self, schema, editWidgetFactory=None, parent=None):
         QgsAttributeTableView.__init__(self, parent)
         WorkspaceMixin.__init__(self)
 

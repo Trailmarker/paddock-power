@@ -13,8 +13,8 @@ class FeatureTableModel(QgsAttributeTableModel):
     def __init__(self, displaySchema, featureCache, editWidgetFactory=None):
         super().__init__(featureCache)
         self._displaySchema = displaySchema
-        self._tableActionModels = dict(zip(FeatureTableAction,
-                                           [FeatureTableActionModelFactory(editWidgetFactory).createModel(action) for action in FeatureTableAction]))
+        self._tableActionModels = dict(zip(FeatureTableAction, [FeatureTableActionModelFactory(
+            editWidgetFactory).createModel(action) for action in FeatureTableAction]))
 
     @property
     def featureTableActionCount(self):

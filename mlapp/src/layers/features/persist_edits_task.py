@@ -23,12 +23,10 @@ class PersistEditsTask(SafeTask):
         if self.isCanceled():
             return False
         self.edits = self._editFunction(*self._args, **self._kwargs) or Edits()
-        self.edits.persist()    
+        self.edits.persist()
         return True
 
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
         if result and self._notify:
             self.edits.notifyPersisted()
-
-

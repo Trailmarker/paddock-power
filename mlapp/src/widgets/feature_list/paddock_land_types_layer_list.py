@@ -21,7 +21,6 @@ class PaddockLandTypesLayerList(PopupLayerList):
 
         super().__init__(listItemFactory, parent)
 
-
     def getFeatures(self, request=None):
         """Get the current popup layer of the given type."""
         if not self._featureLayer:

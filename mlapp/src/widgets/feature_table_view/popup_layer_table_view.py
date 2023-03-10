@@ -8,7 +8,7 @@ from .feature_table_view import FeatureTableView
 
 
 class PopupLayerTableView(FeatureTableView, PopupLayerConsumerMixin):
-    
+
     @property
     def popupLayerType(self):
         pass

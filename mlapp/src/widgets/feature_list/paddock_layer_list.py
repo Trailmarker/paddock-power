@@ -10,7 +10,7 @@ class PaddockLayerList(FeatureLayerList):
 
         def listItemFactory(paddock):
             item = PaddockListItem(paddock, parent=parent)
-            # Hide status controls for Paddocks 
+            # Hide status controls for Paddocks
             item.hideStatusControls()
             return item
 

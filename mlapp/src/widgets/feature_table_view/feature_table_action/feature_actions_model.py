@@ -48,10 +48,9 @@ class FeatureActionsModel(FeatureTableActionModel):
         pass
 
     def featureAction(self, index):
-        """Get the FeatureAction currently available at the given index."""        
+        """Get the FeatureAction currently available at the given index."""
         if not self.feature:
             self.feature = self.getFeature(index)
 
         return next(
             (action for action in self.featureActionIcons if self.feature.machine.isPermitted(action)), None)
-

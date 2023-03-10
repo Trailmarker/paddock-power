@@ -122,7 +122,7 @@ class FeatureLayerList(FeatureListBase):
         if self.featureLayer:
             return self.getFeaturesByTimeframe(self.featureLayer.timeframe, request)
         return []
-    
+
     def getFeature(self, id):
         """Get a feature by its id, assumed to be the same as its FID."""
         feature = self._layerCache.getFeature(id)

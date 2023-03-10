@@ -19,8 +19,8 @@ class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
                  *dependentLayers):
         """Create or open a Waterpoint layer."""
         super().__init__(workspaceFile,
-                       layerName=WaterpointLayer.defaultName(),
-                       styleName=WaterpointLayer.defaultStyle())
+                         layerName=WaterpointLayer.defaultName(),
+                         styleName=WaterpointLayer.defaultStyle())
 
     @property
     def hasPopups(self):

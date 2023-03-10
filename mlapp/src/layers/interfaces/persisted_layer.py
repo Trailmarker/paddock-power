@@ -10,7 +10,7 @@ class PersistedLayer(Layer):
     def readOnly(self):
         """Return True if this layer is read-only, False otherwise."""
         pass
-    
+
     @abstractmethod
     def setReadOnly(self, readOnly):
         """Set this layer to read-only or not."""

@@ -6,6 +6,7 @@ from ...models import StateMachineAction, actionHandler
 from ...utils import PLUGIN_NAME
 from .persist_edits_task import PersistEditsTask
 
+
 class FeatureAction(StateMachineAction):
     def handle(self):
         return partial(actionHandler, self)
@@ -15,7 +16,7 @@ class FeatureAction(StateMachineAction):
         def withSave(method):
             def saveInBackground(feature, *args, **kwargs):
                 feature.featureLayer.task = PersistEditsTask(
-                    f"{PLUGIN_NAME} saving your data …", True, # notify=True 
+                    f"{PLUGIN_NAME} saving your data …", True,  # notify=True
                     actionHandler(action, method), feature, *args, **kwargs)
             return saveInBackground
         return withSave

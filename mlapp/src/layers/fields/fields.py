@@ -87,8 +87,6 @@ WaterpointTypeField = DomainField(
     defaultValue=WaterpointType.Trough)
 
 
-
-
 AreaTitle = AreaTitleField()
 DefaultTitle = DefaultTitleField()
 LengthTitle = LengthTitleField()

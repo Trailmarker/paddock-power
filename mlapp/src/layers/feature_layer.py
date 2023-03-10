@@ -149,7 +149,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
             feature = self.workspace.selectedFeature(layerId)
             self.onSelectFeature(feature)
             self.featureSelected.emit(layerId)
-            
+
             if self.hasPopups:
                 self.onPopupFeatureSelected(layerId)
 
@@ -158,7 +158,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         if self.sameId(layerId):
             self.onDeselectFeature()
             self.featureDeselected.emit(layerId)
-            
+
             if self.hasPopups:
                 self.onPopupFeatureDeselected(layerId)
 

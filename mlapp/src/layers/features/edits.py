@@ -235,7 +235,10 @@ class Edits(WorkspaceMixin):
                 qgsDebug(f"{layer}.layerTruncated.emit()")
                 layer.layerTruncated.emit()
 
-            upsertedFids = [edit.feature.FID for edit in edits if isinstance(edit, Edits.Upsert) and not isinstance(edit, Edits.UpsertTable)]
+            upsertedFids = [
+                edit.feature.FID for edit in edits if isinstance(
+                    edit, Edits.Upsert) and not isinstance(
+                    edit, Edits.UpsertTable)]
             if upsertedFids:
                 qgsDebug(f"{layer}.featuresUpserted.emit({upsertedFids})")
                 layer.featuresUpserted.emit(upsertedFids)
