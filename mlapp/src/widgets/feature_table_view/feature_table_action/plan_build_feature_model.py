@@ -13,7 +13,7 @@ class PlanBuildFeatureModel(FeatureActionsModel):
     _planIcon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/plan-feature.png'),
     _buildIcon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/build-feature.png')
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
     @property

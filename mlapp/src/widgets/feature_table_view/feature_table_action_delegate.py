@@ -2,27 +2,24 @@
 from math import floor
 from qgis.PyQt.QtWidgets import QStyledItemDelegate
 
-from .feature_table_action import FeatureTableActionModelFactory
-
 
 class FeatureTableActionDelegate(QStyledItemDelegate):
 
-    def __init__(self, featureTableAction, editWidgetFactory=None, parent=None):
+    def __init__(self, featureTableActionModel, parent=None):
         super().__init__(parent)
-        self._actionModel = FeatureTableActionModelFactory(editWidgetFactory).createModel(featureTableAction, parent)
+        self._actionModel = featureTableActionModel
 
     @property
-    def actionModel(self):
+    def featureTableActionModel(self):
         """The model for the action."""
         return self._actionModel
 
     def paint(self, painter, option, index):
         """Paint the cell."""
-        super().paint(painter, option, index)
 
-        # icon = self.actionModel.icon(index)
-        # if icon:
-        #     self.paintIcon(painter, option.rect, icon)
+        icon = self.featureTableActionModel.icon(index)
+        if icon:
+            self.paintIcon(painter, option.rect, icon)
 
     def paintIcon(self, painter, cellRect, icon):
         """Paint an icon in the model cell."""

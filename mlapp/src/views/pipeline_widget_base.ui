@@ -43,7 +43,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PipelineLayerList" name="pipelineList">
+        <widget class="PipelineTableView" name="pipelineTableView">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -68,9 +68,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PipelineLayerList</class>
-   <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/pipeline_layer_list</header>
+   <class>PipelineTableView</class>
+   <extends>QTableView</extends>
+   <header>mlapp/src/widgets/feature_table_view/pipeline_table_view</header>
   </customwidget>
  </customwidgets>
  <resources/>

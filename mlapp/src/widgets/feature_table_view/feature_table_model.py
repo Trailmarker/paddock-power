@@ -3,8 +3,10 @@ from qgis.PyQt.QtCore import Qt
 
 from qgis.gui import QgsAttributeTableModel
 
-from ...utils import PLUGIN_NAME
-from .feature_table_action import FeatureTableAction, FeatureTableActionModelFactory
+from ...layers.fields.names import TIMEFRAME
+from ...utils import PLUGIN_NAME, qgsDebug
+from .feature_table_action import FeatureTableAction, SelectFeatureModel, EditFeatureModel, UndoTrashFeatureModel, PlanBuildFeatureModel, ViewFeatureProfileModel
+from .feature_table_action import FeatureTableAction
 
 
 class FeatureTableModel(QgsAttributeTableModel):
@@ -13,8 +15,19 @@ class FeatureTableModel(QgsAttributeTableModel):
     def __init__(self, displaySchema, featureCache, editWidgetFactory=None):
         super().__init__(featureCache)
         self._displaySchema = displaySchema
-        self._tableActionModels = dict(zip(FeatureTableAction, [FeatureTableActionModelFactory(
-            editWidgetFactory).createModel(action) for action in FeatureTableAction]))
+
+        self._actionModels = [
+            SelectFeatureModel(self),
+            EditFeatureModel(editWidgetFactory, self),
+            UndoTrashFeatureModel(self),
+            PlanBuildFeatureModel(self),
+            ViewFeatureProfileModel(self)
+        ]
+
+    @property
+    def featureTableActionModels(self):
+        """The models for the feature table actions."""
+        return self._actionModels
 
     @property
     def featureTableActionCount(self):
@@ -33,7 +46,11 @@ class FeatureTableModel(QgsAttributeTableModel):
 
     def columnFromFieldName(self, name):
         """Get the column number for a field in the layer, accounting for the action columns."""
-        return self.layer().fields().indexFromName(name) + self.featureTableActionCount
+        baseIndex = self.layer().fields().indexFromName(name)
+        if baseIndex >= 0:
+            return baseIndex + self.featureTableActionCount
+        else:
+            return -1
 
     def rowCount(self, parent):
         """This model has the default row count."""
@@ -58,22 +75,23 @@ class FeatureTableModel(QgsAttributeTableModel):
     def data(self, index, role):
         """Get the data at the given index, accounting for the action columns."""
         if self.isToolBarIndex(index):
-            featureTableActionModel = self._actionModels[FeatureTableAction(index.column())]
 
-            if role == Qt.DisplayRole:
-                return featureTableActionModel.description(index)
-            elif role == Qt.ToolTipRole:
-                return featureTableActionModel.toolTip(index)
-            elif role == Qt.DecorationRole:
-                return featureTableActionModel.icon(index)
-            else:
-                return ""
+            actionModel = self._actionModels[index.column()]
+            # if role == Qt.DisplayRole:
+            #     return actionModel.description(index)
+            if role == Qt.ToolTipRole:
+                return actionModel.toolTip(index)
+            # elif role == Qt.DecorationRole:
+            #     return actionModel.icon(index)
+            # else:
+            #     return ""
 
         return super().data(self.createIndex(index.row(), index.column() - self.featureTableActionCount), role)
 
     def flags(self, index):
         """Get the flags for the given index, accounting for the action columns."""
+        # This really screws up selection on these rows
         if self.isToolBarIndex(index):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled # | Qt.ItemIsSelectable
         else:
             return super().flags(self.createIndex(index.row(), index.column() - self.featureTableActionCount))

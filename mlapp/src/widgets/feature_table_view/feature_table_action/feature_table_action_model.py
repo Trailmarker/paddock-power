@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import QObject
 from ....models import QtAbstractMeta
 
 
-class FeatureTableActionModel(ABC, QObject, metaclass=QtAbstractMeta):
+class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
 
     def __init__(self, parent=None):
         super().__init__(parent)

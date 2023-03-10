@@ -33,10 +33,6 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self._tableModel = None
         self._tableFilterModel = None
 
-        # Set up column item delegates for all Feature Table Actions
-        for fta in list(FeatureTableAction):
-            self.setItemDelegateForColumn(fta.value, FeatureTableActionDelegate(fta, self))
-
         self.clicked.connect(self.onClicked)
 
     def onClicked(self, index):
@@ -65,6 +61,15 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         self._featureCache = QgsVectorLayerCache(layer, layer.featureCount())
         self._tableModel = FeatureTableModel(self._schema, self._featureCache)
+        
+        # Set up column item delegates for all Feature Table Actions
+        for featureTableActionModel in self._tableModel.featureTableActionModels:
+            self.setItemDelegateForColumn(featureTableActionModel.featureTableAction.value, FeatureTableActionDelegate(featureTableActionModel, self))
+        
+        # for fta in list(FeatureTableAction):
+        #     self.setItemDelegateForColumn(fta.value, FeatureTableActionDelegate(fta, self))
+        
+        
         self._tableModel.modelReset.connect(self.onModelReset)
         self._tableModel.loadLayer()
 
@@ -77,6 +82,9 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
     def onModelReset(self):
         """Hide columns in the table that are not in the display schema."""
+        # Hide the numbers up the left side
+        self.verticalHeader().hide()
+        
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)
 

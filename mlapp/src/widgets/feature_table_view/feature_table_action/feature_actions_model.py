@@ -7,7 +7,7 @@ from .feature_table_action_model import FeatureTableActionModel
 
 class FeatureActionsModel(FeatureTableActionModel):
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
     def doAction(self, index):

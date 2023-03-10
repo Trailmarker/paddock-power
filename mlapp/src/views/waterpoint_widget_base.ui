@@ -43,7 +43,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="WaterpointLayerList" name="waterpointList">
+        <widget class="WaterpointTableView" name="waterpointTableView">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -68,9 +68,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WaterpointLayerList</class>
-   <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/waterpoint_layer_list</header>
+   <class>WaterpointTableView</class>
+   <extends>QTableView</extends>
+   <header>mlapp/src/widgets/feature_table_view/waterpoint_table_view</header>
   </customwidget>
  </customwidgets>
  <resources/>
