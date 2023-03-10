@@ -92,7 +92,14 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)
-
+            
+        # Hide unsupported actions         
+        for column in range(self._tableModel.featureTableActionCount):
+            if column not in [f.value for f in self.supportedFeatureTableActions]:
+                self.hideColumn(column)
+                
+            
+            self.resizeColumnToContents(column)
         self.setVisible(False)
         self.resizeColumnsToContents()
         self.setVisible(True)
