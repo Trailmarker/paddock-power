@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsWkbTypes
+from ...layers.fields.fields import *
+from ...layers.fields import Schema
 
-from .fields import *
-from .schema import Schema
-
-FenceTableViewSchema = Schema([LengthTitle,
-                               BuildOrder,
-                               Status,
-                               Length])
 # PaddockLandTypeSchema = Schema([Fid,
 #                                 Paddock,
 #                                 LandType,
@@ -22,15 +16,7 @@ FenceTableViewSchema = Schema([LengthTitle,
 #                                 EstimatedCapacity,
 #                                 PotentialCapacity],
 #                                wkbType=QgsWkbTypes.MultiPolygon)
-PaddockTableViewSchema = Schema([AreaTitle,
-                                 Status,
-                                 WateredArea,
-                                 EstimatedCapacityPerArea,
-                                 EstimatedCapacity,
-                                 PotentialCapacityPerArea,
-                                 PotentialCapacity])
-PipelineTableViewSchema = Schema([LengthTitle,
-                                  Status])
+
 WaterpointTableViewSchema = Schema([DefaultTitle,
                                     WaterpointTypeField,
                                     Status,

@@ -18,10 +18,11 @@ class FeatureTableActionDelegate(QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         """Paint the cell."""
+        super().paint(painter, option, index)
 
-        icon = self.actionModel.icon(index)
-        if icon:
-            self.paintIcon(painter, option.rect, icon)
+        # icon = self.actionModel.icon(index)
+        # if icon:
+        #     self.paintIcon(painter, option.rect, icon)
 
     def paintIcon(self, painter, cellRect, icon):
         """Paint an icon in the model cell."""

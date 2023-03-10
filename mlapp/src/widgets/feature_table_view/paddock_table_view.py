@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
-from ...layers.fields.table_view_schemas import PaddockTableViewSchema
-from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
+from ...layers.fields import Schema
+from ...layers.fields.fields import *
+from ..paddock_details import PaddockDetailsEdit
 from .feature_table_view import FeatureTableView
+
+PaddockTableViewSchema = Schema([AreaTitle,
+                                 Status,
+                                 WateredArea,
+                                 EstimatedCapacityPerArea,
+                                 EstimatedCapacity,
+                                 PotentialCapacityPerArea,
+                                 PotentialCapacity])
 
 
 class PaddockTableView(FeatureTableView):
