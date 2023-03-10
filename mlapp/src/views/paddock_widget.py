@@ -28,15 +28,15 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.currentPaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
         self.futurePaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
 
-        self.paddockFilterLineEdit.textChanged.connect(
-            self.onPaddockFilterChanged)
-        self.clearPaddockFilterButton.clicked.connect(
-            self.paddockFilterLineEdit.clear)
+        # self.paddockFilterLineEdit.textChanged.connect(
+        #     self.onPaddockFilterChanged)
+        # self.clearPaddockFilterButton.clicked.connect(
+        #     self.paddockFilterLineEdit.clear)
 
-    def onPaddockFilterChanged(self, text):
-        self.paddockList.filterByName(text)
+    # def onPaddockFilterChanged(self, text):
+    #     self.paddockList.filterByName(text)
 
     def refreshUi(self):
-        self.paddockList.clearAndRefreshCache()
+        # self.paddockList.clearAndRefreshCache()
         self.currentPaddockLandTypesList.clearAndRefreshCache()
         self.futurePaddockLandTypesList.clearAndRefreshCache()

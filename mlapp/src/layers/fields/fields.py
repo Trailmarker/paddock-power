@@ -3,7 +3,7 @@ from .names import *
 
 from .condition_type import ConditionType
 from .feature_status import FeatureStatus
-from .field import CalculatedField, DomainField, IdField, MeasureField, StringField
+from .field import AreaTitleField, CalculatedField, DefaultTitleField, DomainField, IdField, LengthTitleField, MeasureField, StringField
 from .timeframe import Timeframe
 from .watered_type import WateredType
 from .grazing_radius_type import GrazingRadiusType
@@ -85,3 +85,10 @@ WaterpointTypeField = DomainField(
     name=WATERPOINT_TYPE,
     domainType=WaterpointType,
     defaultValue=WaterpointType.Trough)
+
+
+
+
+AreaTitle = AreaTitleField()
+DefaultTitle = DefaultTitleField()
+LengthTitle = LengthTitleField()

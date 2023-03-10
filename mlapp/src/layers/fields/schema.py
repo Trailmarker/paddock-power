@@ -43,3 +43,6 @@ class Schema(list):
         """Check that the given Feature is compatible with this Schema."""
         extra = [field for field in otherSchema if field.name() not in [f.name() for f in self]]
         return not bool(extra) and self.wkbType == otherSchema.wkbType
+    
+    def displayFieldNames(self):
+        return [f.displayFieldName() for f in self]

@@ -1,34 +1,29 @@
-FeatureTableView::item {
-  border: 0px;
-  padding: 5px;
-}
-
-QListWidget::item { 
-    selection-background-color: green;
+QListWidget::item {
+  selection-background-color: green;
 }
 
 QGroupBox {
-    background-color: #fcfcfc;
+  background-color: #fcfcfc;
 }
 
 ProfileDetails {
-    background-color: #fcfcfc;
+  background-color: #fcfcfc;
 }
 
 ProfileDetails QLabel.form-left {
-    background-color: #fcfcfc;
-    padding: 3px;
-    padding-right: 6px;
+  background-color: #fcfcfc;
+  padding: 3px;
+  padding-right: 6px;
 }
 
 ProfileDetails QLabel.form-right {
-    background-color: #fcfcfc;
-    padding: 3px;
-    padding-left: 6px;
+  background-color: #fcfcfc;
+  padding: 3px;
+  padding-left: 6px;
 }
 
 FencePaddockChanges {
-    background-color: #fcfcfc;
+  background-color: #fcfcfc;
 }
 
 /* QSplitter::handle { 
@@ -36,10 +31,9 @@ FencePaddockChanges {
 } */
 
 QSplitter::handle:horizontal {
-    width: 14px;
-
+  width: 14px;
 }
 
-QToolButton.no-border { 
-    border: none; 
+QToolButton.no-border {
+  border: none;
 }

@@ -7,7 +7,7 @@ from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsFiel
 
 from ...models import Glitch
 from .field_domain import FieldDomain
-from .names import FID
+from .names import AREA, LENGTH, NAME, FID, TITLE
 
 
 class Field(QgsField):
@@ -195,6 +195,9 @@ class Field(QgsField):
         layer.setEditorWidgetSetup(fieldIndex, self.editorWidgetSetup())
         layer.setDefaultValueDefinition(fieldIndex, self.defaultValueDefinition())
 
+    def displayFieldName(self):
+        return self.name()
+
 
 class MeasureField(Field):
     def __init__(self, propertyName, name, dps=2, *args, **kwargs):
@@ -209,7 +212,7 @@ class MeasureField(Field):
         super().setupLayer(layer)
 
         # Create a separate, rounded expression field and add that as an expression field
-        roundedField = QgsField(f"Rounded {self.name()}", QVariant.Double)
+        roundedField = QgsField(self.displayFieldName(), QVariant.Double)
         roundedField.setAlias(self.name())
         layer.addExpressionField(f"round(\"{self.name()}\", {self._dps})", roundedField)
 
@@ -222,6 +225,37 @@ class MeasureField(Field):
             column.hidden = True
             config.setColumns(columns)
             layer.setAttributeTableConfig(config)
+
+    def displayFieldName(self):
+        return f"Rounded {self.name()}"
+
+
+class TitleField(Field):
+    def __init__(self, expressionFactory, *args, **kwargs):
+        super().__init__(propertyName="TITLE", name=TITLE, type=QVariant.String, *args, **kwargs)
+
+        self._expressionFactory = expressionFactory
+
+    def setupLayer(self, layer):
+        """Set up this Field in a FeatureLayer."""
+
+        expression = self._expressionFactory(layer)
+        layer.addExpressionField(expression, self)
+
+
+class DefaultTitleField(TitleField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(lambda layer: f"{layer.getFeatureType().displayName()} \"{FID}\"", *args, **kwargs)
+
+
+class AreaTitleField(TitleField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(lambda _: f"\"{NAME}\" (round(\"{AREA}\", 2) km²)", *args, **kwargs)
+
+
+class LengthTitleField(TitleField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(lambda _: f"\"{NAME}\" (round(\"{LENGTH}\", 1) km)", *args, **kwargs)
 
 
 class CalculatedField(MeasureField):

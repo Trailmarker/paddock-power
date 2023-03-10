@@ -16,7 +16,7 @@ class LoadWorkspaceTask(SafeTask):
         loadOrder = layerDependencyGraph.loadOrder()
 
         # self.safeAddSubTask(CleanupDerivedLayersTask())
-        self.safeAddSubTask(CleanupLayersTask(loadOrder))
+        # self.safeAddSubTask(CleanupLayersTask(loadOrder))
 
         for layerType in loadOrder:
             dependentLayerTypes = layerDependencyGraph.getDependencies(layerType)
