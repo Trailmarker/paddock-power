@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..waterpoint_details.waterpoint_details import WaterpointDetails
-from ..waterpoint_details.waterpoint_details_edit import WaterpointDetailsEdit
+from ..waterpoint_details import WaterpointDetails, WaterpointDetailsEdit
 from .feature_list_item import FeatureListItem
 from .feature_layer_list import FeatureLayerList
 
