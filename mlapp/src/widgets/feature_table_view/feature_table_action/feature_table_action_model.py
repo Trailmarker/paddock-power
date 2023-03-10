@@ -10,7 +10,6 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
 
     def __init__(self):
         QObject.__init__(self)
-        self.feature = None
 
     @abstractmethod
     def doAction(self, index):
@@ -19,18 +18,15 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
 
     def getFeature(self, index):
         """The feature associated with the current index."""
-        fid = index.model().rowToId(index)
-
-        # This value gets stored here so that we can use it again when the user clicks on the cell.
-        self.feature = index.model().layer().getFeature(fid)
-        return self.feature
+        fid = index.model().rowToId(index.row())
+        return index.model().layer().getFeature(fid)
 
     @abstractproperty
     def featureTableAction(self):
         """The feature table action."""
         pass
-    
-    @property
+
+    @classmethod
     def bumpCacheAfterAction(self):
         """Invalidate the cache after a call to doAction."""
         return False

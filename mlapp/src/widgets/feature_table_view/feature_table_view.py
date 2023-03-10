@@ -101,7 +101,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         featureTableActionModel = delegate.featureTableActionModel
         featureTableActionModel.doAction(index)
         
-        if featureTableActionModel.bumpCacheAfterAction:
+        if featureTableActionModel.bumpCacheAfterAction():
             self.bumpCache()
             
     def bumpCache(self):

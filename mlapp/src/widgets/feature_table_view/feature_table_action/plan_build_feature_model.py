@@ -21,7 +21,7 @@ class PlanBuildFeatureModel(FeatureActionsModel):
         """The table action associated with this delegate"""
         return FeatureTableAction.planBuildFeature
 
-    @property
+    @classmethod
     def bumpCacheAfterAction(self):
         """Invalidate the cache after a call to doAction."""
         return True

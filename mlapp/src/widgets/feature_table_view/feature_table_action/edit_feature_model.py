@@ -23,8 +23,8 @@ class EditFeatureModel(FeatureTableActionModel):
         """Select the feature at the given index."""
         qgsDebug("Edit feature …")
 
-        self.feature = self.getFeature(index)
-        editDialog = EditDialog(self.feature, self._editWidgetFactory)
+        feature = self.getFeature(index)
+        editDialog = EditDialog(feature, self._editWidgetFactory)
         editDialog.exec_()
 
     @property
@@ -32,7 +32,7 @@ class EditFeatureModel(FeatureTableActionModel):
         """The table action associated with this delegate"""
         return FeatureTableAction.editFeature
 
-    @property
+    @classmethod
     def bumpCacheAfterAction(self):
         """Invalidate the cache after a call to doAction."""
         return True

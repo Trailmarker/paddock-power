@@ -17,18 +17,18 @@ class FeatureActionsModel(FeatureTableActionModel):
             return
 
         name = featureAction.name
-        self.feature = self.getFeature(index)
+        feature = self.getFeature(index)
 
         if FeatureAction[name] == FeatureAction.undoPlan:
-            self.feature.undoPlanFeature()
+            feature.undoPlanFeature()
         elif FeatureAction[name] == FeatureAction.plan:
-            self.feature.planFeature()
+            feature.planFeature()
         elif FeatureAction[name] == FeatureAction.undoBuild:
-            self.feature.undoBuildFeature()
+            feature.undoBuildFeature()
         elif FeatureAction[name] == FeatureAction.build:
-            self.feature.buildFeature()
+            feature.buildFeature()
         elif FeatureAction[name] == FeatureAction.trash:
-            self.feature.trashFeature()
+            feature.trashFeature()
 
     def icon(self, index):
         """The icon to paint in the cell."""
@@ -47,8 +47,7 @@ class FeatureActionsModel(FeatureTableActionModel):
 
     def featureAction(self, index):
         """Get the FeatureAction currently available at the given index."""
-        if not self.feature:
-            self.feature = self.getFeature(index)
+        feature = self.getFeature(index)
 
         return next(
-            (action for action in self.featureActionIcons if self.feature.machine.isPermitted(action)), None)
+            (action for action in self.featureActionIcons if feature.machine.isPermitted(action)), None)

@@ -22,7 +22,7 @@ class UndoTrashFeatureModel(FeatureActionsModel):
         """The table action associated with this delegate"""
         return FeatureTableAction.undoTrashFeature
 
-    @property
+    @classmethod
     def bumpCacheAfterAction(self):
         """Invalidate the cache after a call to doAction."""
         return True
