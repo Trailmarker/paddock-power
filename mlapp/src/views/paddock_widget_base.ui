@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>886</width>
-    <height>327</height>
+    <width>878</width>
+    <height>298</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -55,7 +55,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockLayerTableView" name="paddockLayerTableView"/>
+        <widget class="PaddockTableView" name="paddockTableView"/>
        </item>
       </layout>
      </widget>
@@ -139,9 +139,9 @@
    <header>mlapp/src/widgets/feature_list/paddock_land_types_layer_list</header>
   </customwidget>
   <customwidget>
-   <class>PaddockLayerTableView</class>
+   <class>PaddockTableView</class>
    <extends>QTableView</extends>
-   <header>mlapp/src/widgets/feature_layer_table_view/paddock_layer_table_view</header>
+   <header>mlapp/src/widgets/feature_table_view/paddock_table_view</header>
   </customwidget>
  </customwidgets>
  <resources/>

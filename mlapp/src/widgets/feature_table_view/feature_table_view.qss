@@ -1,7 +1,12 @@
 QHeaderView {
   font-size: 18px;
   font-weight: bold;
-}                           
+  border: none;
+}
+
+QHeaderView::item {
+  border: none;
+}
                          
 QTableView {
   text-align: top;
@@ -12,6 +17,7 @@ QTableView {
 }
 
 QTableView::item {
+  border: none;
   font-size: 18px;
   font-weight: bold;
 }   

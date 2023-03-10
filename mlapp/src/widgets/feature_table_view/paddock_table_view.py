@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields.table_view_schemas import PaddockTableViewSchema
 from ..paddock_details.paddock_details_edit import PaddockDetailsEdit
-from .feature_layer_table_view import FeatureLayerTableView
+from .feature_table_view import FeatureTableView
 
 
-class PaddockLayerTableView(FeatureLayerTableView):
+class PaddockTableView(FeatureTableView):
 
     def __init__(self, parent=None):
         """Constructor."""
