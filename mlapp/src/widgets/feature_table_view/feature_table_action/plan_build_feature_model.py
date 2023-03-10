@@ -10,11 +10,11 @@ from .feature_actions_model import FeatureActionsModel
 class PlanBuildFeatureModel(FeatureActionsModel):
     """An item model that configures moving forward the progress on planning, building, etc, a feature."""
 
-    _planIcon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/plan-feature.png'),
+    _planIcon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/plan-feature.png')
     _buildIcon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/build-feature.png')
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
 
     @property
     def featureTableAction(self):

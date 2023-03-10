@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtGui import QIcon
 
+from qgis.utils import iface
+
 from ....utils import PLUGIN_FOLDER
 from ....widgets.profile_details.profile_details_dialog import ProfileDetailsDialog
 from .feature_table_action import FeatureTableAction
@@ -12,8 +14,8 @@ class ViewFeatureProfileModel(FeatureTableActionModel):
 
     _icon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/elevation.png')
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.profileDetailsDialog = None
 
     def doAction(self, index):
@@ -21,7 +23,7 @@ class ViewFeatureProfileModel(FeatureTableActionModel):
         self.feature = self.getFeature(index)
 
         if not self.profileDetailsDialog:
-            self.profileDetailsDialog = ProfileDetailsDialog(self.feature, self)
+            self.profileDetailsDialog = ProfileDetailsDialog(self.feature, iface.mainWindow())
 
         self.profileDetailsDialog.show()
 

@@ -7,8 +7,8 @@ from .feature_table_action_model import FeatureTableActionModel
 
 class FeatureActionsModel(FeatureTableActionModel):
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
 
     def doAction(self, index):
         """Do the current feature action at the given index."""
@@ -30,13 +30,11 @@ class FeatureActionsModel(FeatureTableActionModel):
         elif FeatureAction[name] == FeatureAction.trash:
             self.feature.trashFeature()
 
-    @property
     def icon(self, index):
         """The icon to paint in the cell."""
         featureAction = self.featureAction(index)
         return self.featureActionIcons[featureAction] if featureAction else None
 
-    @property
     def description(self, index):
         """Return the description of the current FeatureAction."""
         featureAction = self.featureAction(index)

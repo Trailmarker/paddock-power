@@ -14,9 +14,8 @@ class EditFeatureModel(FeatureTableActionModel):
 
     _icon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png')
 
-    def __init__(self, editWidgetFactory, parent=None):
-        super().__init__(parent)
-
+    def __init__(self, editWidgetFactory):
+        super().__init__()
         self._editWidgetFactory = editWidgetFactory
 
     def doAction(self, index):

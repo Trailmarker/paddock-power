@@ -12,16 +12,16 @@ from .feature_table_action import FeatureTableAction
 class FeatureTableModel(QgsAttributeTableModel):
     f"""Customisation of the QGIS attribute table model for ${PLUGIN_NAME} features."""
 
-    def __init__(self, displaySchema, featureCache, editWidgetFactory=None):
+    def __init__(self, displaySchema, featureCache, editWidgetFactory):
         super().__init__(featureCache)
         self._displaySchema = displaySchema
 
         self._actionModels = [
-            SelectFeatureModel(self),
-            EditFeatureModel(editWidgetFactory, self),
-            UndoTrashFeatureModel(self),
-            PlanBuildFeatureModel(self),
-            ViewFeatureProfileModel(self)
+            SelectFeatureModel(),
+            EditFeatureModel(editWidgetFactory),
+            UndoTrashFeatureModel(),
+            PlanBuildFeatureModel(),
+            ViewFeatureProfileModel()
         ]
 
     @property

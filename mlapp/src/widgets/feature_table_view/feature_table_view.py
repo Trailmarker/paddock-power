@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout
-
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
 from qgis.utils import iface
 
+from ...layers.fields import STATUS
 from ...models import QtAbstractMeta, WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsDebug
 
-from .feature_table_action import FeatureTableAction
+from .feature_status_delegate import FeatureStatusDelegate
 from .feature_table_action_delegate import FeatureTableActionDelegate
 from .feature_table_model import FeatureTableModel
 from .feature_table_view_filter_model import FeatureTableViewFilterModel
@@ -60,16 +59,17 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self._featureLayer.setAttributeTableConfig(config)
 
         self._featureCache = QgsVectorLayerCache(layer, layer.featureCount())
-        self._tableModel = FeatureTableModel(self._schema, self._featureCache)
-        
+        self._tableModel = FeatureTableModel(self._schema, self._featureCache, self._editWidgetFactory)
+
         # Set up column item delegates for all Feature Table Actions
         for featureTableActionModel in self._tableModel.featureTableActionModels:
-            self.setItemDelegateForColumn(featureTableActionModel.featureTableAction.value, FeatureTableActionDelegate(featureTableActionModel, self))
-        
-        # for fta in list(FeatureTableAction):
-        #     self.setItemDelegateForColumn(fta.value, FeatureTableActionDelegate(fta, self))
-        
-        
+            self.setItemDelegateForColumn(
+                featureTableActionModel.featureTableAction.value,
+                FeatureTableActionDelegate(featureTableActionModel, self))
+
+        # Set up a column item delegate for the "Status" field
+        self.setItemDelegateForColumn(self._tableModel.columnFromFieldName(STATUS), FeatureStatusDelegate(self))
+
         self._tableModel.modelReset.connect(self.onModelReset)
         self._tableModel.loadLayer()
 
@@ -84,18 +84,26 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         """Hide columns in the table that are not in the display schema."""
         # Hide the numbers up the left side
         self.verticalHeader().hide()
-        
+
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)
 
-        for column in range(self._tableModel.featureTableActionCount):
-            self.setColumnWidth(column, 30)
+        # for column in range(self._tableModel.featureTableActionCount):
+        #     self.setColumnWidth(column, 30)
+
+        self.setVisible(False)
+        self.resizeColumnsToContents()
+        self.setVisible(True)
 
     def indexToFeature(self, index):
         fid = self._tableModel.rowToId(index.row())
         return self._tableModel.layer().getFeature(fid)
 
     def onToolBarClicked(self, index):
+        qgsDebug(f"{type(self).__name__}.onToolBarClicked({index})")
         delegate = self.itemDelegateForColumn(index.column())
-        actionModel = delegate.actionModel
-        actionModel.doAction(index)
+        qgsDebug(f"delegate == {delegate}")
+        qgsDebug(f"type(delegate) == {type(delegate).__name__}")
+
+        featureTableActionModel = delegate.featureTableActionModel
+        featureTableActionModel.doAction(index)

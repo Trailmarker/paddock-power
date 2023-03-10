@@ -16,16 +16,18 @@ class FeatureTableActionDelegate(QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         """Paint the cell."""
-
-        icon = self.featureTableActionModel.icon(index)
-        if icon:
-            self.paintIcon(painter, option.rect, icon)
+        try:
+            icon = self.featureTableActionModel.icon(index)
+            if icon:
+                self.paintIcon(painter, option.rect, icon)
+        except BaseException:
+            pass
 
     def paintIcon(self, painter, cellRect, icon):
         """Paint an icon in the model cell."""
 
         # Work in fifths-ish
-        dim = min(cellRect.width(), cellRect.height()) * 0.4
+        dim = round(min(cellRect.width(), cellRect.height()) * 0.4)
 
         pixmap = icon.pixmap(dim, dim)
         painter.drawPixmap(floor(cellRect.x() + (cellRect.width() - dim) / 2),
