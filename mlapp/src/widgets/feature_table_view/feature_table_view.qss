@@ -10,18 +10,13 @@ QHeaderView::item {
                          
 QTableView {
   text-align: top;
-  padding: 3px;
-  background: white;
-  width: 15px;
-  font-size: 18px;
+  padding: 10px;
+  /* background: white; */
+  /* width: 15px; */
+  /* font-size: 18px; */
 }
 
 QTableView::item {
   border: none;
-  font-size: 18px;
-  font-weight: bold;
 }   
 
-QTableView::item:selected {
-  selection-background-color: yellow;
-}

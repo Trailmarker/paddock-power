@@ -58,6 +58,8 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
     def onSketchFenceFinished(self, sketchLine):
         fence = self.workspace.fenceLayer.makeFeature()
         fence.draftFeature(sketchLine)
+        # Bump the cache … 
+        self.plugin.featureView.fenceTab.fenceTableView.bumpCache()
         self.workspace.selectFeature(fence)
 
     def changeSelection(self, layerId):

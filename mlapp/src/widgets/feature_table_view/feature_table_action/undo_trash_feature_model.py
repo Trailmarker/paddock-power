@@ -23,6 +23,11 @@ class UndoTrashFeatureModel(FeatureActionsModel):
         return FeatureTableAction.undoTrashFeature
 
     @property
+    def bumpCacheAfterAction(self):
+        """Invalidate the cache after a call to doAction."""
+        return True
+
+    @property
     def featureActionIcons(self):
         """A dictionary of FeatureAction objects and their associated icons."""
 

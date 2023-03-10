@@ -29,6 +29,11 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
     def featureTableAction(self):
         """The feature table action."""
         pass
+    
+    @property
+    def bumpCacheAfterAction(self):
+        """Invalidate the cache after a call to doAction."""
+        return False
 
     @abstractmethod
     def icon(self, index):

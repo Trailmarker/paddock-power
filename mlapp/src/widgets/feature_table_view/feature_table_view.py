@@ -88,9 +88,6 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)
 
-        # for column in range(self._tableModel.featureTableActionCount):
-        #     self.setColumnWidth(column, 30)
-
         self.setVisible(False)
         self.resizeColumnsToContents()
         self.setVisible(True)
@@ -100,10 +97,17 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         return self._tableModel.layer().getFeature(fid)
 
     def onToolBarClicked(self, index):
-        qgsDebug(f"{type(self).__name__}.onToolBarClicked({index})")
         delegate = self.itemDelegateForColumn(index.column())
-        qgsDebug(f"delegate == {delegate}")
-        qgsDebug(f"type(delegate) == {type(delegate).__name__}")
-
         featureTableActionModel = delegate.featureTableActionModel
         featureTableActionModel.doAction(index)
+        
+        if featureTableActionModel.bumpCacheAfterAction:
+            self.bumpCache()
+            
+    def bumpCache(self):
+        """Bump the cache."""
+        qgsDebug(f"{type(self).__name__}.bumpCache()")
+        if self._featureCache:
+            # Re-cache all the data
+            self._tableModel.resetModel()
+            self._featureCache.setFullCache(True)
