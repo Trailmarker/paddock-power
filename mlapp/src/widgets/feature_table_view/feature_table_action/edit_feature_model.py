@@ -21,8 +21,6 @@ class EditFeatureModel(FeatureTableActionModel):
 
     def doAction(self, index):
         """Select the feature at the given index."""
-        qgsDebug("Edit feature …")
-
         feature = self.getFeature(index)
         editDialog = EditDialog(feature, self._editWidgetFactory)
         editDialog.exec_()

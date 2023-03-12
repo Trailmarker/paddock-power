@@ -6,6 +6,7 @@ from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import qgsDebug, resolveStylePath, PLUGIN_NAME
+from .features import Edits
 from .fields import TIMEFRAME
 from .interfaces import IFeatureLayer
 from .map_layer_mixin import MapLayerMixin
@@ -13,10 +14,7 @@ from .map_layer_mixin import MapLayerMixin
 
 class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer, metaclass=QtAbstractMeta):
 
-    layerTruncated = pyqtSignal()
-    featuresUpserted = pyqtSignal(list)
-    featuresDeleted = pyqtSignal(list)
-    featuresBulkAdded = pyqtSignal(list)
+    editsPersisted = pyqtSignal(Edits)
 
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)

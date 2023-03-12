@@ -183,6 +183,12 @@ class Edits(WorkspaceMixin):
     def allEdits(self):
         return [edit for edits in self.edits.values() for edit in edits]
 
+    def editsForLayer(self, layer):
+        """Return only the edits in this structure for a given layer."""
+        layerEdits = Edits()
+        layerEdits.edits[layer.id()] = self.edits[layer.id()]
+        return layerEdits
+
     def getFeatures(self, edits):
         for edit in edits:
             if isinstance(edit, Edits.Upsert):
@@ -217,7 +223,7 @@ class Edits(WorkspaceMixin):
                 for edit in sortedEdits:
                     edit.persist()
 
-            qgsDebug(f"{self}.persist()")
+            # qgsDebug(f"{self}.persist()")
 
             # Return a response …
             return self
@@ -225,35 +231,11 @@ class Edits(WorkspaceMixin):
     def notifyPersisted(self):
         """Called when edits are persisted."""
         # Start deriving updates in the background …
-        # self.workspace.deriveEdits(self)
+        self.workspace.deriveEdits(self)
 
         for layer in self.layers:
-            edits = self.edits[layer.id()]
-
-            truncates = [edit for edit in edits if isinstance(edit, Edits.Truncate)]
-            if truncates:
-                qgsDebug(f"{layer}.layerTruncated.emit()")
-                layer.layerTruncated.emit()
-
-            upsertedFids = [
-                edit.feature.FID for edit in edits if isinstance(
-                    edit, Edits.Upsert) and not isinstance(
-                    edit, Edits.UpsertTable)]
-            if upsertedFids:
-                qgsDebug(f"{layer}.featuresUpserted.emit({upsertedFids})")
-                layer.featuresUpserted.emit(upsertedFids)
-
-            deletedFids = [edit.feature.FID for edit in edits if isinstance(edit, Edits.Delete)]
-            if deletedFids:
-                qgsDebug(f"{layer}.featuresDeleted.emit({deletedFids})")
-                layer.featuresDeleted.emit(deletedFids)
-
-            bulkAddedFids = [
-                feature.FID for edit in edits if isinstance(
-                    edit, Edits.BulkAdd) for feature in edit.features]
-            if bulkAddedFids:
-                qgsDebug(f"{layer}.featuresBulkAdded.emit({bulkAddedFids})")
-                layer.featuresBulkAdded.emit(bulkAddedFids)
+            layerEdits = self.editsForLayer(layer)
+            layer.editsPersisted.emit(layerEdits)
 
     @staticmethod
     @contextmanager

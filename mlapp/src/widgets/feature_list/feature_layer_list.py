@@ -56,27 +56,18 @@ class FeatureLayerList(FeatureListBase):
         """Rewire the FeatureLayer."""
         # qgsDebug(f"{type(self).__name__}.rewireFeatureLayer({oldVal}, {newVal})")
         if oldLayer:
-            oldLayer.layerTruncated.disconnect(self.clearAndRefreshCache)
-            oldLayer.featuresUpserted.disconnect(self.refreshList)
-            oldLayer.featuresDeleted.disconnect(self.refreshList)
-            oldLayer.featuresBulkAdded.disconnect(self.clearAndRefreshCache)
-
+            oldLayer.editsPersisted.disconnect(self.clearAndRefreshCache)
             oldLayer.featureSelected.disconnect(self.changeSelection)
             oldLayer.featureDeselected.disconnect(self.removeSelection)
-
             if self._layerCache:
                 del(self._layerCache)
                 self._layerCache = None
+                
         if newLayer:
-            newLayer.layerTruncated.connect(self.clearAndRefreshCache)
-            newLayer.featuresUpserted.connect(self.clearAndRefreshCache)
-            newLayer.featuresDeleted.connect(self.removeListItems)
-            newLayer.featuresBulkAdded.connect(self.clearAndRefreshCache)
-
+            newLayer.editsPersisted.connect(self.clearAndRefreshCache)
             newLayer.featureSelected.connect(self.changeSelection)
             newLayer.featureDeselected.connect(self.removeSelection)
             self._layerCache = QgsVectorLayerCache(newLayer, newLayer.featureCount())
-
             self._layerCache.finished.connect(self.refreshList)
             self._layerCache.invalidated.connect(self.clearAndRefreshCache)
             self.clearAndRefreshCache()
