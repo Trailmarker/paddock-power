@@ -8,7 +8,7 @@ from ..utils import qgsInfo
 
 class SafeTask(QgsTask):
 
-    TASK_DELAY = 0.2
+    TASK_DELAY = 0.1
 
     def __init__(self, description):
         """Input is a closure over a FeatureAction handler for a given Feature."""
@@ -34,6 +34,7 @@ class SafeTask(QgsTask):
 
     def finished(self, result):
         """Called when task completes (successfully or otherwise)."""
+        sleep(self.TASK_DELAY)
         self.safeFinished(result)
         sleep(self.TASK_DELAY)
 

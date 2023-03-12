@@ -40,17 +40,6 @@ class WorkspaceLayers(TypeDict):
         """Get all layers in the registry."""
         return [l for l in self.layers() if isinstance(l, IFeatureLayer)]
 
-    def unloadLayer(self, layerType):
-        """Unload the layer of the given type."""
-        layer = self.valueToObject(self.pop(self.__layerKey(layerType), None))
-        if isinstance(layer, QgsMapLayer):
-            QgsProject.instance().removeMapLayer(layer.id())
-
-    def unloadByName(self, name):
-        """Unload all layers in the registry."""
-        for layerType in list(self.keys()):
-            self.unloadLayer(layerType)
-
     def addLayersToWorkspace(self, workspace):
         """Get all layers in the registry."""
         for layer in self.layers():

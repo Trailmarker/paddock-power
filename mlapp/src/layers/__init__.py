@@ -13,6 +13,7 @@ from .fence_layer import FenceLayer
 from .land_type_condition_table import LandTypeConditionTable
 from .land_type_layer import LandTypeLayer
 from .paddock_land_types_layer import PaddockLandTypesLayer
+from .paddock_land_types_popup_layer import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
 from .paddock_layer import PaddockLayer
 from .pipeline_layer import PipelineLayer
 from .watered_area_layer import WateredAreaLayer

@@ -25,7 +25,7 @@ class FeatureTableViewFilterModel(QgsAttributeTableFilterModel):
         # The ersult when there is no 'Timeframe' column at all
         if self._timeframeColumn < 0:
             return True
-        
+
         timeframeData = str(
             self.sourceModel().data(
                 self.sourceModel().index(

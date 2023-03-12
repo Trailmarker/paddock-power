@@ -14,7 +14,7 @@ class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass
 
     LAYER_NAME = "Land Type Condition Table"
 
-    editsPersisted = pyqtSignal(Edits)
+    editsPersisted = pyqtSignal()
 
     @classmethod
     def defaultName(cls):

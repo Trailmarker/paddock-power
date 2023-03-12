@@ -67,7 +67,7 @@ class PopupLayerSourceMixin(IMapLayer):
             return
 
         # Remove any existing popup layers of this type - they don't play nice together
-        layerType.detectAndRemoveAllOfType()
+        layerType.removeAllOfType()
 
         popupLayer = layerType(feature)
         self.__popupLayers[self.__key(layerType)] = popupLayer.id()
@@ -94,7 +94,7 @@ class PopupLayerSourceMixin(IMapLayer):
                 node = QgsProject.instance().layerTreeRoot().findLayer(popupLayer)
                 if node:
                     node.setItemVisibilityChecked(False)
-                    popupLayer.triggerRepaint()
+                    popupLayer.triggerRepaint(True)
                     node.parent().removeChildNode(node)
                     QgsProject.instance().removeMapLayer(popupLayer.id())
             except BaseException:

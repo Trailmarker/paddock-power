@@ -26,10 +26,10 @@ class FeatureTableActionDelegate(QStyledItemDelegate):
 
             cellColor = option.palette.highlight().color() if cellSelected else Qt.transparent
             painter.fillRect(option.rect, QBrush(cellColor))
-            
+
             icon = self.featureTableActionModel.icon(index)
             self.paintIcon(painter, option.rect, icon)
-            
+
             # Restore brush
             painter.setBrush(brush)
         except BaseException:

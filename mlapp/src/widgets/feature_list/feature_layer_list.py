@@ -62,7 +62,7 @@ class FeatureLayerList(FeatureListBase):
             if self._layerCache:
                 del(self._layerCache)
                 self._layerCache = None
-                
+
         if newLayer:
             newLayer.editsPersisted.connect(self.clearAndRefreshCache)
             newLayer.featureSelected.connect(self.changeSelection)

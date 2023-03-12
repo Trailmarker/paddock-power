@@ -6,7 +6,7 @@ from .persisted_feature_layer import PersistedFeatureLayer
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer):
 
     @abstractmethod
-    def deriveFeatures(self, edits):
+    def deriveFeatures(self, changeset=None):
         """Re-derive the upstream features in this layer."""
         pass
 

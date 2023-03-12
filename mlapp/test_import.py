@@ -4,6 +4,7 @@ from .dev import *
 from .src.layers.fields.field_map import FieldMap
 from .src.layers.fields import *
 
+
 def layerByName(layerName):
     return next((l for l in QgsProject.instance().mapLayers().values() if l.name() == layerName), None)
 
@@ -32,12 +33,13 @@ def testImportKidmanWaterpoints():
     imports = waterpointLayer.importFeatures(kidmanWaterpoints, fieldMap)
     imports.persist()
 
+
 def testImportKidman():
     testImportKidmanLandTypes()
     testImportKidmanPaddocks()
     testImportKidmanWaterpoints()
-    
-    
+
+
 def testImportMathisonLandTypes():
     kidmanLandTypes = layerByName("Land Systems")
     fieldMap = FieldMap(kidmanLandTypes, workspace().landTypeLayer)
@@ -62,6 +64,7 @@ def testImportMathisonWaterpoints():
     fieldMap["Waterpoint Type"] = "Waterpoint Type"
     imports = waterpointLayer.importFeatures(kidmanWaterpoints, fieldMap)
     imports.persist()
+
 
 def testImportMathison():
     testImportMathisonLandTypes()

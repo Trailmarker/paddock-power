@@ -14,7 +14,7 @@ from .map_layer_mixin import MapLayerMixin
 
 class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer, metaclass=QtAbstractMeta):
 
-    editsPersisted = pyqtSignal(Edits)
+    editsPersisted = pyqtSignal()
 
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)
@@ -46,16 +46,12 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
                  styleName=None,
                  *args, **kwargs):
         f"""Create a new {PLUGIN_NAME} vector layer."""
-        # Clear out any unwanted friends from the map … (classmethod defined in LayerMixin)
-        # TODO - does not work
-        # self.detectAndRemoveAllOfType()
 
         super().__init__(path, layerName, providerLib, *args, **kwargs)
         MapLayerMixin.__init__(self)
         WorkspaceMixin.__init__(self)
 
         self.applyNamedStyle(styleName)
-        self.editsPersisted.connect(lambda _: self.triggerRepaint())
 
     def __repr__(self):
         """Return a string representation of the Field."""
@@ -74,20 +70,14 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.workspace.featureLayerDeselected.connect(lambda id: self.onFeatureLayerDeselected(id))
         self.workspace.timeframeChanged.connect(lambda timeframe: self.onTimeframeChanged(timeframe))
 
+        self.editsPersisted.connect(self.onEditsPersisted)
+
     @property
     def hasPopups(self):
         return False
 
     def sameId(self, layerId):
         return self.id() == layerId
-
-    def applyNamedStyle(self, styleName):
-        """Apply a style to the layer."""
-        # Optionally apply a style to the layer
-        if styleName:
-            stylePath = resolveStylePath(styleName)
-            self.loadNamedStyle(stylePath)
-        self.triggerRepaint()
 
     # Feature interface
     def wrapFeature(self, feature):
@@ -137,11 +127,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         """Get the number of Features in the layer."""
         return len([f for f in self.getFeatures()])
 
-    def onFeaturesChanged(self):
-        """Handle our own featuresChanged signal."""
-        # Redraw the layer
-        self.triggerRepaint()
-
     def onFeatureLayerSelected(self, layerId):
         """Handle workspace feature selection."""
         if self.sameId(layerId):
@@ -163,7 +148,12 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
 
     def onTimeframeChanged(self, timeframe):
         """Handle workspace timeframe changes."""
-        self.triggerRepaint()
+        self.triggerRepaint(True)
+
+    def onEditsPersisted(self):
+        """Handle a batch of edits being persisted on the underyling layer."""
+        # At the moment, we just invalidate the cache and reload the layer
+        self.triggerRepaint(True)
 
     def onSelectFeature(self, feature):
         # qgsDebug(f"{type(self).__name__}.onSelectFeature({feature})")

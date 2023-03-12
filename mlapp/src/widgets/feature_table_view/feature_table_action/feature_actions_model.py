@@ -18,7 +18,7 @@ class FeatureActionsModel(FeatureTableActionModel):
 
         name = featureAction.name
         feature = self.getFeature(index)
-        
+
         if feature:
             if FeatureAction[name] == FeatureAction.undoPlan:
                 feature.undoPlanFeature()
@@ -30,9 +30,8 @@ class FeatureActionsModel(FeatureTableActionModel):
                 feature.buildFeature()
             elif FeatureAction[name] == FeatureAction.trash:
                 feature.trashFeature()
-        
+
         return feature
-        
 
     def icon(self, index):
         """The icon to paint in the cell."""

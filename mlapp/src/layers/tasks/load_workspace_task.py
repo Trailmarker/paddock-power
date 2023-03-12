@@ -1,28 +1,40 @@
 # -*- coding: utf-8 -*-
 from ...models import SafeTask
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
-from .cleanup_derived_layers_task import CleanupDerivedLayersTask
-from .cleanup_layers_task import CleanupLayersTask
-from .load_layer_task import LoadLayerTask
+from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 
 
 class LoadWorkspaceTask(SafeTask):
 
-    def __init__(self, layerDependencyGraph, workspaceLayers, workspaceFile, workspaceName):
+    def __init__(self, workspace):
         """Input is a Workspace."""
 
-        super().__init__(f"{PLUGIN_NAME} is loading the '{workspaceName}' workspace …")
+        super().__init__(f"{PLUGIN_NAME} is loading the '{workspace.workspaceName}' workspace …")
+        self.workspace = workspace
 
-        loadOrder = layerDependencyGraph.loadOrder()
+    def safeRun(self):
+        try:
+            loadOrder = self.workspace.layerDependencyGraph.loadOrder()
 
-        # self.safeAddSubTask(CleanupDerivedLayersTask())
-        # self.safeAddSubTask(CleanupLayersTask(loadOrder))
+            for layerType in loadOrder:
+                if self.isCanceled():
+                    return False
+                dependentLayerTypes = self.workspace.layerDependencyGraph.getDependencies(layerType)
+                dependentLayers = [self.workspace.workspaceLayers.layer(dependentLayerType)
+                                   for dependentLayerType in dependentLayerTypes]
 
-        for layerType in loadOrder:
-            dependentLayerTypes = layerDependencyGraph.getDependencies(layerType)
-            self.safeAddSubTask(LoadLayerTask(workspaceLayers, layerType, workspaceFile, dependentLayerTypes))
+                layer = layerType(self.workspace.workspaceFile, *dependentLayers)
+                self.workspace.workspaceLayers.addLayer(layerType, layer)
 
-    def safeFinished(self, result):
+                guiStatusBarAndInfo(f"{PLUGIN_NAME} {layer.name()} loaded.")
+
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} loaded the '{self.workspace.workspaceName}' workspace.")
+            return True
+
+        except Exception:
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to load workspace.")
+            qgsException()
+            return False
+
+    def safeFinished(self, _):
         """Called when task completes (successfully or otherwise)."""
-        if not result:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to load the workspace.")
+        pass

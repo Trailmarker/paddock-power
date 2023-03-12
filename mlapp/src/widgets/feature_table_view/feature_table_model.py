@@ -53,8 +53,8 @@ class FeatureTableModel(QgsAttributeTableModel):
 
     def rowCount(self, _):
         """This model has the default row count."""
-        return super().rowCount(_) # + self.featureTableActionCount
-        
+        return super().rowCount(_)  # + self.featureTableActionCount
+
     def columnCount(self, parent):
         """This model has the default column count plus the action count."""
         return super().columnCount(parent) + self.featureTableActionCount
@@ -94,4 +94,3 @@ class FeatureTableModel(QgsAttributeTableModel):
         #     return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         # else:
         #     return super().flags(self.createIndex(index.row(), index.column() - self.featureTableActionCount))
-     

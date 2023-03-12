@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import QSize, pyqtSignal
 from qgis.PyQt.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from ...layers.features import FeatureAction
-from ...models import QtAbstractMeta, toStateMachine
+from ...models import QtAbstractMeta, WorkspaceMixin, toStateMachine
 from ...utils import PLUGIN_FOLDER
 from ..collapse.collapse import Collapse
 from ..edit_state_machine import EditAction, EditStateMachine, EditStatus
@@ -12,13 +12,14 @@ from ..state_machine_tool_bar.state_machine_tool_bar import StateMachineToolBar
 from .status_feature_tool_bar import StatusFeatureToolBar
 
 
-class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
+class FeatureListItem(QWidget, EditStateMachine, WorkspaceMixin, metaclass=QtAbstractMeta):
     _stateChanged = pyqtSignal()
     layoutRefreshNeeded = pyqtSignal()
 
     def __init__(self, feature, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
         QWidget.__init__(self, parent)
         EditStateMachine.__init__(self)
+        WorkspaceMixin.__init__(self)
 
         self.feature = feature
 
@@ -171,10 +172,8 @@ class FeatureListItem(QWidget, EditStateMachine, metaclass=QtAbstractMeta):
 
     @EditAction.save.handler()
     def saveItem(self):
-        edits = self.featureEdit.saveFeature()
-        edits.persist()
+        self.workspace.saveEditsAndDerive(self.featureEdit.saveFeature)
         self.refreshUi()
-        edits.notifyPersisted()
 
     @EditAction.cancelEdit.handler()
     def cancelEditItem(self):

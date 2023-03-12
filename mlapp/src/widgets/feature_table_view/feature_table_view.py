@@ -80,7 +80,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self.setModel(self._tableFilterModel)
 
         self.onLoadLayer()
-        
+
         # Weird glitch
         # self.selectRow(-1)
         # self.selectionModel().clearSelection()
@@ -132,20 +132,19 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         fid = self._tableModel.rowToId(index.row())
         return self._tableModel.layer().getFeature(fid)
 
-    def onEditsPersisted(self, edits):
+    def onEditsPersisted(self):
         """Handle a batch of edits being persisted on the underyling layer."""
-
         # At the moment, we just invalidate the cache and reload the layer
         self.invalidateCache()
 
     def onFeatureDeselected(self, _):
         """Handle a feature being deselected on the underlying layer."""
         self.selectionModel().clearSelection()
-        
+
     def onFeatureSelected(self, layerId):
         """Handle a feature being selected on the underlying layer."""
-        feature = self.workspace.selectedFeature(layerId)  
-        if feature:   
+        feature = self.workspace.selectedFeature(layerId)
+        if feature:
             self.selectRow(self._tableModel.idToRow(feature.FID))
 
     def onFeatureTableActionClicked(self, index):

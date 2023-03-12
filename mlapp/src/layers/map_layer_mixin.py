@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayer, QgsProject
+from qgis.core import QgsApplication, QgsMapLayer, QgsProject
 
 
 from ..utils import PLUGIN_NAME, qgsInfo, resolveStylePath
@@ -19,16 +19,14 @@ class MapLayerMixin(IMapLayer):
         return cls.STYLE
 
     @classmethod
-    def detectAndRemoveAllOfType(cls):
+    def detectAllOfType(cls):
         """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
         allLayers = QgsProject.instance().mapLayers().values()
+        return list(set(l.id() for l in allLayers if type(l).__name__ == cls.__name__))
 
-        defaultName = cls.defaultName()
-
-        sameTypes = set(l.id() for l in allLayers if type(l).__name__ == cls.__name__)
-        sameNames = set(l.id() for l in allLayers if defaultName == l.name())
-
-        layerIds = sameTypes.union(sameNames)
+    @classmethod
+    def removeAllOfType(cls):
+        layerIds = cls.detectAllOfType()
 
         for layerId in layerIds:
             qgsInfo(f"{PLUGIN_NAME} Cleaning up {layerId} …")
@@ -36,6 +34,8 @@ class MapLayerMixin(IMapLayer):
 
     def __init__(self):
         super().__init__()
+        self._tasks = []
+        self._taskIds = []
 
         assert isinstance(self, QgsMapLayer)
 
@@ -77,7 +77,7 @@ class MapLayerMixin(IMapLayer):
         if styleName:
             stylePath = resolveStylePath(styleName)
             self.loadNamedStyle(stylePath)
-        self.triggerRepaint()
+        self.triggerRepaint(True)
 
     def zoomLayer(self):
         """Zoom to this layer."""

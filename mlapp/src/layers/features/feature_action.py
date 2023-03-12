@@ -1,25 +1,20 @@
 # -*- coding: utf-8 -*-
 from functools import partial
 
-
 from ...models import StateMachineAction, actionHandler
-from ...utils import PLUGIN_NAME
-from .persist_edits_task import PersistEditsTask
 
 
 class FeatureAction(StateMachineAction):
-    def handle(self):
-        return partial(actionHandler, self)
+    def handle(selfAsFeatureAction):
+        return partial(actionHandler, selfAsFeatureAction)
 
-    # Result of @FeatureAction.action.save()
-    def handleWithSave(action):
-        def withSave(method):
-            def saveInBackground(feature, *args, **kwargs):
-                feature.featureLayer.task = PersistEditsTask(
-                    f"{PLUGIN_NAME} saving your data …", True,  # notify=True
-                    actionHandler(action, method), feature, *args, **kwargs)
-            return saveInBackground
-        return withSave
+    def handleWithSave(selfAsFeatureAction):
+        def withActionHandler(method):
+            def withSaveEditsAndDeriveTask(feature, *args, **kwargs):
+                editFunction = actionHandler(selfAsFeatureAction, method)
+                return feature.featureLayer.workspace.saveEditsAndDerive(editFunction, feature, *args, **kwargs)
+            return withSaveEditsAndDeriveTask
+        return withActionHandler
 
     """Allowed transitions for a StatusFeature."""
     draft = "Draft"

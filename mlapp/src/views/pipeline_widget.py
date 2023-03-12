@@ -36,6 +36,6 @@ class PipelineWidget(QWidget, FORM_CLASS, WorkspaceMixin):
     def onSketchPipelineFinished(self, sketchLine):
         pipeline = self.workspace.pipelineLayer.makeFeature()
         pipeline.draftFeature(sketchLine)
-        # Bump the cache … 
+        # Bump the cache …
         # self.plugin.featureView.pipelineTab.pipelineTableView.bumpCache()
         self.workspace.selectFeature(pipeline)

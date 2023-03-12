@@ -11,7 +11,7 @@ class FeatureStatusDelegate(QStyledItemDelegate):
 
     def __init__(self, tableView, parent=None):
         super().__init__(parent)
-        
+
         # Cheeky! But couldn't get the selection otherwise
         # option.state & QStyle.State_Selected does not work
         self._tableView = tableView

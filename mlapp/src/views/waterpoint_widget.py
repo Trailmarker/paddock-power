@@ -36,6 +36,6 @@ class WaterpointWidget(QWidget, FORM_CLASS, WorkspaceMixin):
     def onSketchWaterpointFinished(self, sketchPoint):
         waterpoint = self.workspace.waterpointLayer.makeFeature()
         waterpoint.draftFeature(sketchPoint)
-        # Bump the cache … 
+        # Bump the cache …
         # self.plugin.featureView.waterpointTab.waterpointTableView.bumpCache()
         self.workspace.selectFeature(waterpoint)

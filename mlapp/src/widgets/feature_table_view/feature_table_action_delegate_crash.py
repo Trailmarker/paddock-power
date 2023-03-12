@@ -1,7 +1,7 @@
 # # -*- coding: utf-8 -*-
 # from math import floor
 
-# from qgis.PyQt.QtCore import Qt 
+# from qgis.PyQt.QtCore import Qt
 # from qgis.PyQt.QtGui import QColor, QIcon, QPainter
 # from qgis.PyQt.QtWidgets import QStyledItemDelegate
 
@@ -24,20 +24,20 @@
 #             icon = self.featureTableActionModel.icon(index)
 #             if icon:
 #                 painter.save()
-            
+
 #                 # If cell is selected, we 'negative' the icon (or try to)
-#                 cellSelected = (self._tableView.selectionModel().currentIndex().row() == index.row())            
-#                 if cellSelected:                
+#                 cellSelected = (self._tableView.selectionModel().currentIndex().row() == index.row())
+#                 if cellSelected:
 #                     painter.setBrush(option.palette.highlight())
 #                     painter.fillRect(option.rect, painter.brush())
 #                     # self.paintInvertedIcon(painter, option.rect, icon)
 #                 # else:
 #                 self.paintIcon(painter, option.rect, icon)
-            
+
 #                 painter.restore()
 #         except BaseException:
 #             pass
-        
+
 #     def paintIcon(self, painter, cellRect, icon):
 #         """Paint an icon in the model cell."""
 #         # Work in fifths-ish

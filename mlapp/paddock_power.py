@@ -26,8 +26,6 @@ class PaddockPower(PluginStateMachine):
     __GLITCH_HOOK_WRAPPER = "__glitchHookWrapper"
 
     caughtGlitch = pyqtSignal(Glitch)
-    workspaceReady = pyqtSignal()
-    workspaceUnloading = pyqtSignal()
 
     def __init__(self, iface):
         super().__init__()
@@ -233,7 +231,7 @@ class PaddockPower(PluginStateMachine):
 
     def initWorkspace(self, workspaceFile):
         if self.workspace:
-            self.workspaceUnloading.emit()
+            self.unloadWorkspace()
         workspace = Workspace(self.iface, workspaceFile)
         workspace.workspaceLoaded.connect(lambda: self.onWorkspaceLoaded(workspace))
 
@@ -241,8 +239,7 @@ class PaddockPower(PluginStateMachine):
     def onWorkspaceLoaded(self, workspace):
         guiStatusBarAndInfo(f"{PLUGIN_NAME} workspace loaded: {workspace.workspaceName}")
         self.workspace = workspace
-        self.featureView.initGui()
-        self.workspaceReady.emit()
+        self.featureView.buildUi()
 
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
@@ -318,8 +315,9 @@ class PaddockPower(PluginStateMachine):
     def unloadWorkspace(self):
         f"""Unloads the {PLUGIN_NAME} workspace."""
         if self.workspace is not None:
-            self.workspaceUnloading.emit()
             qgsInfo(f"{PLUGIN_NAME} unloading workspace …")
+            if self.featureView:
+                self.featureView.clearUi()
             self.workspace.unload()
             self.workspace = None
 

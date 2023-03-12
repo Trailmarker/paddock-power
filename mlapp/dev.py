@@ -103,7 +103,7 @@ if workspace():
      elevationLayer, fenceLayer, landTypeLayer,
      basePaddockLayer, paddockLandTypeLayer, pipelineLayer,
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
-    
+
 fv = plugin().featureView
 paddockTableView = fv.paddockTab.paddockTableView
 pipelineTableView = fv.pipelineTab.pipelineTableView

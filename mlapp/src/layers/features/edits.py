@@ -6,8 +6,7 @@ from contextlib import contextmanager
 from qgis.core import QgsVectorLayer
 
 from ...models import Glitch, WorkspaceMixin
-from ...utils import qgsDebug, qgsException, qgsInfo
-from ..interfaces import IPersistedDerivedFeatureLayer
+from ...utils import qgsException, qgsInfo
 from .land_type_condition import LandTypeCondition
 
 
@@ -217,25 +216,18 @@ class Edits(WorkspaceMixin):
         """Persist these edits to their layers."""
         with Edits.editAndCommit(self.layers):
 
-            for _, edits in self.edits.items():
-                # Order matters here, eg we don't want to truncate at the end
-                sortedEdits = sorted(edits, key=lambda e: e.order)
-                for edit in sortedEdits:
-                    edit.persist()
+            for layer in self.layers:
+                layerEdits = self.editsForLayer(layer)
 
-            # qgsDebug(f"{self}.persist()")
+                for edits in layerEdits.edits.values():
+                    # Order matters here, eg we don't want to truncate at the end
+                    sortedEdits = sorted(edits, key=lambda e: e.order)
+                    for edit in sortedEdits:
+                        edit.persist()
 
-            # Return a response …
+                layer.editsPersisted.emit()
+
             return self
-
-    def notifyPersisted(self):
-        """Called when edits are persisted."""
-        # Start deriving updates in the background …
-        self.workspace.deriveEdits(self)
-
-        for layer in self.layers:
-            layerEdits = self.editsForLayer(layer)
-            layer.editsPersisted.emit(layerEdits)
 
     @staticmethod
     @contextmanager

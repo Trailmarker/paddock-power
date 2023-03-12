@@ -17,7 +17,12 @@ class MapLayer(Layer):
         pass
 
     @abstractclassmethod
-    def detectAndRemoveAllOfType(cls):
+    def detectAllOfType(cls):
+        """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
+        pass
+
+    @abstractclassmethod
+    def removeAllOfType(cls):
         """Detect if any layers of the same type are already in the map, and if so, remove them. Use with care."""
         pass
 

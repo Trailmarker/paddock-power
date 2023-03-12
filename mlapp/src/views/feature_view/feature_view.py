@@ -31,7 +31,6 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         FORM_CLASS.__init__(self)
         WorkspaceMixin.__init__(self)
 
-        self._pluginInitGui = False
         self._uiBuilt = False
 
         self.setupUi(self)
@@ -58,13 +57,6 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.timeframeButtonGroup = QButtonGroup(exclusive=True)
         self.timeframeButtonGroup.addButton(self.currentTimeframeButton)
         self.timeframeButtonGroup.addButton(self.futureTimeframeButton)
-
-    def initGui(self):
-        f"""Called when the {PLUGIN_NAME} plugin calls initGui()."""
-        if not self._pluginInitGui:
-            self.plugin.workspaceUnloading.connect(self.clearUi)
-            self.plugin.workspaceReady.connect(self.buildUi)
-            self._pluginInitGui = True
 
     def refreshUi(self):
         self.paddockTab.refreshUi()
