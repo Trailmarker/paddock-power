@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QStyledItemDelegate
 
+from qgis.gui import QgsAttributeTableDelegate
 
 from ...layers.fields import FeatureStatus
 
 
-class FeatureStatusDelegate(QStyledItemDelegate):
+class FeatureStatusDelegate(QgsAttributeTableDelegate):
 
     def __init__(self, tableView, parent=None):
         super().__init__(parent)
