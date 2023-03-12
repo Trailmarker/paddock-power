@@ -73,7 +73,12 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         # Wire the feature cache to the feature layer, and the cache to the model
         self._featureCache = QgsVectorLayerCache(self._featureLayer, self._featureLayer.featureCount())
-        self._tableModel = FeatureTableModel(self._schema, self._featureCache, self._detailsWidgetFactory, self._editWidgetFactory, self)
+        self._tableModel = FeatureTableModel(
+            self._schema,
+            self._featureCache,
+            self._detailsWidgetFactory,
+            self._editWidgetFactory,
+            self)
 
         # Hide the numbers up the left side
         self.verticalHeader().hide()
@@ -103,6 +108,10 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self.shrinkToColumns()
 
         self.show()
+
+    def setFilteredFeatures(self, fids):
+        """Filter the table to show only the features with the given FIDs."""
+        self._tableFilterModel.setFilteredFeatures(fids)
 
     def shrinkToColumns(self):
         """Shrink the view down to the minimum size needed to show its columns."""
@@ -158,7 +167,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
                 delegate = self.itemDelegateForColumn(column)
                 actionModel = delegate.featureTableActionModel
                 if not actionModel.isValid:
-                    self.hideColumn(column)                
+                    self.hideColumn(column)
             # self.setColumnWidth(column, 100)
 
     def invalidateCache(self):

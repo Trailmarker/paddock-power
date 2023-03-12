@@ -10,8 +10,9 @@ from qgis.core import QgsGeometry
 from ..layers.features import Fence
 from ..layers.fields import FeatureStatus
 from ..models import WorkspaceMixin
-from ..utils import qgsDebug
 from ..tools.sketch_line_tool import SketchLineTool
+from ..utils import qgsDebug
+
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'fence_widget_base.ui')))
@@ -32,9 +33,6 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, False)
         self.splitter.setCollapsible(3, True)
-
-        self.affectedPaddocksMiniList.basePaddockLayer = self.basePaddockLayer
-        self.resultingPaddocksMiniList.basePaddockLayer = self.basePaddockLayer
 
         self.fenceLayer.featureSelected.connect(self.changeSelection)
         self.fenceLayer.featureDeselected.connect(self.removeSelection)
@@ -58,8 +56,6 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
     def onSketchFenceFinished(self, sketchLine):
         fence = self.workspace.fenceLayer.makeFeature()
         fence.draftFeature(sketchLine)
-        # Bump the cache …
-        # self.plugin.featureView.fenceTab.fenceTableView.bumpCache()
         self.workspace.selectFeature(fence)
 
     def changeSelection(self, layerId):
@@ -75,11 +71,13 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
 
     def refreshUi(self):
         """Show the Paddock View."""
+
+        self.affectedPaddocksGroupBox.setVisible(False)
+        self.resultingPaddocksGroupBox.setVisible(False)
+
         if self.fence is None:
             self.affectedPaddocksGroupBox.setVisible(False)
             self.resultingPaddocksGroupBox.setVisible(False)
-            self.affectedPaddocksMiniList.clear()
-            self.resultingPaddocksMiniList.clear()
         else:
             affectedPaddocks, resultingPaddocks = self.fence.getRelatedPaddocks()
 
@@ -96,5 +94,11 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
             # Hide these Paddock group boxes if there's no content
             self.affectedPaddocksGroupBox.setVisible(bool(affectedPaddocks))
             self.resultingPaddocksGroupBox.setVisible(bool(resultingPaddocks))
-            self.affectedPaddocksMiniList.setFeatures(affectedPaddocks)
-            self.resultingPaddocksMiniList.setFeatures(resultingPaddocks)
+
+            affectedFids = [p.FID for p in affectedPaddocks]
+            qgsDebug(f"affectedFids = {affectedFids}")
+            resultingFids = [p.FID for p in resultingPaddocks]
+            qgsDebug(f"resultingFids = {resultingFids}")
+
+            self.affectedPaddocksTableView.setFilteredFeatures([p.FID for p in affectedPaddocks])
+            self.resultingPaddocksTableView.setFilteredFeatures([p.FID for p in resultingPaddocks])

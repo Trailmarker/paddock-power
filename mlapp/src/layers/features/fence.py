@@ -188,7 +188,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def _getRelatedPaddocks(self, *statuses):
         """Get the Paddocks with the specified Build Order and group them by STATUS."""
         if self.matchStatus(FeatureStatus.Drafted):
-            return self.getCrossedPaddocks(), []
+            return self.getCrossedBasePaddocks(), []
 
         if self.BUILD_ORDER <= 0:
             raise Glitch(
@@ -196,7 +196,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {self.BUILD_ORDER}')
 
-        relatedPaddocks = self.paddockLayer.getFeatures(request=buildFenceRequest)
+        relatedPaddocks = self.basePaddockLayer.getFeatures(request=buildFenceRequest)
 
         groupedRelatedPaddocks = defaultdict(list)
 
@@ -212,7 +212,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         affectedPaddocks, resultingPaddocks = [], []
 
         if self.matchStatus(FeatureStatus.Drafted):
-            _, crossedPaddocks = self.getCrossedPaddocks()
+            _, crossedPaddocks = self.getCrossedBasePaddocks()
             affectedPaddocks, resultingPaddocks = crossedPaddocks, []
         elif self.matchStatus(FeatureStatus.Planned):
             plannedSupersededPaddocks, builtSupersededPaddocks, plannedPaddocks = self._getRelatedPaddocks(
@@ -225,9 +225,6 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         affectedPaddocks = [p for p in affectedPaddocks if p.matchTimeframe(Timeframe.Current)]
         resultingPaddocks = [p for p in resultingPaddocks if p.matchTimeframe(Timeframe.Future)]
-
-        # qgsDebug(f"Affected paddocks = {str([format(p) for p in affectedPaddocks])}")
-        # qgsDebug(f"Resulting paddocks = {str([format(p) for p in resultingPaddocks])}")
 
         return affectedPaddocks, resultingPaddocks
 
