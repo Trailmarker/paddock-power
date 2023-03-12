@@ -61,8 +61,6 @@ class PaddockPower(PluginStateMachine):
         self.featureView.setVisible(False)
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.featureView)
 
-        self._stateChanged.connect(self.refreshUi)
-
     def addAction(self,
                   pluginAction,
                   icon,
@@ -142,12 +140,13 @@ class PaddockPower(PluginStateMachine):
             callback=lambda *_: self.openImportDialog(),
             parent=self.iface.mainWindow())
 
+        self._stateChanged.connect(self.refreshUi)
+
         if self.status == PluginStatus.NoWorkspaceLoaded:
             self.detectWorkspace(False)
 
-    # Override Glitch type exceptions application-wide
-
     def setupGlitchHook(self):
+        """Set up a global exception hook to catch Glitch exceptions and process them."""
         if hasattr(sys.excepthook, PaddockPower.__GLITCH_HOOK_WRAPPER):
             qgsInfo("GlitchHook: Glitch hook already set.")
             return

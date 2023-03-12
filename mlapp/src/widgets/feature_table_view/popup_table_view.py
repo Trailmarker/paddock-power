@@ -7,15 +7,17 @@ from ...layers.popup_layer_consumer_mixin import PopupLayerConsumerMixin
 from .feature_table_view import FeatureTableView
 
 
-class PopupLayerTableView(FeatureTableView, PopupLayerConsumerMixin):
+class PopupTableView(FeatureTableView, PopupLayerConsumerMixin):
+    """Use the PopupLayerConsumeMixin to do a better job of handling change in
+    lists of features that belong to rapidly changing popup layers."""
 
     @property
     def popupLayerType(self):
         pass
 
-    def __init__(self, parent=None):
+    def __init__(self, schema, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
         """Constructor."""
-        FeatureTableView.__init__(self, parent)
+        FeatureTableView.__init__(self, schema, detailsWidgetFactory, editWidgetFactory, parent)
         PopupLayerConsumerMixin.__init__(self)
 
     @property
@@ -35,10 +37,9 @@ class PopupLayerTableView(FeatureTableView, PopupLayerConsumerMixin):
         featureLayer = QgsProject.instance().mapLayer(layerId)
 
         if type(featureLayer) in self.popupLayerTypes:
+            qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId}) - found layer")
             self.featureLayer = featureLayer
-            self.refreshList()
 
     def onPopupLayerRemoved(self):
         qgsDebug(f"{type(self).__name__}.onPopupLayerRemoved()")
         self.featureLayer = None
-        self.refreshList()

@@ -436,7 +436,7 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Watered Area (km²)">
+    <field configurationFlags="None" name="Watered (km²)">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -478,7 +478,7 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Rounded Watered Area (km²)">
+    <field configurationFlags="None" name="Rounded Watered (km²)">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -523,13 +523,13 @@
     <alias field="Condition" name="" index="5"/>
     <alias field="Timeframe" name="" index="6"/>
     <alias field="Area (km²)" name="" index="7"/>
-    <alias field="Watered Area (km²)" name="" index="8"/>
+    <alias field="Watered (km²)" name="" index="8"/>
     <alias field="AE/km²" name="" index="9"/>
     <alias field="Potential AE/km²" name="" index="10"/>
     <alias field="AE" name="" index="11"/>
     <alias field="Potential AE" name="" index="12"/>
     <alias field="Rounded Area (km²)" name="Area (km²)" index="13"/>
-    <alias field="Rounded Watered Area (km²)" name="Watered Area (km²)" index="14"/>
+    <alias field="Rounded Watered (km²)" name="Watered (km²)" index="14"/>
     <alias field="Rounded AE/km²" name="AE/km²" index="15"/>
     <alias field="Rounded Potential AE/km²" name="Potential AE/km²" index="16"/>
     <alias field="Rounded AE" name="AE" index="17"/>
@@ -544,13 +544,13 @@
     <default field="Condition" expression="'A'" applyOnUpdate="0"/>
     <default field="Timeframe" expression="'Undefined'" applyOnUpdate="0"/>
     <default field="Area (km²)" expression="" applyOnUpdate="0"/>
-    <default field="Watered Area (km²)" expression="" applyOnUpdate="0"/>
+    <default field="Watered (km²)" expression="" applyOnUpdate="0"/>
     <default field="AE/km²" expression="" applyOnUpdate="0"/>
     <default field="Potential AE/km²" expression="" applyOnUpdate="0"/>
     <default field="AE" expression="" applyOnUpdate="0"/>
     <default field="Potential AE" expression="" applyOnUpdate="0"/>
     <default field="Rounded Area (km²)" expression="" applyOnUpdate="0"/>
-    <default field="Rounded Watered Area (km²)" expression="" applyOnUpdate="0"/>
+    <default field="Rounded Watered (km²)" expression="" applyOnUpdate="0"/>
     <default field="Rounded AE/km²" expression="" applyOnUpdate="0"/>
     <default field="Rounded Potential AE/km²" expression="" applyOnUpdate="0"/>
     <default field="Rounded AE" expression="" applyOnUpdate="0"/>
@@ -565,13 +565,13 @@
     <constraint field="Condition" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Timeframe" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="Watered Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Watered (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Potential AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="AE" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Potential AE" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Rounded Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="Rounded Watered Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Rounded Watered (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Rounded AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Rounded Potential AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Rounded AE" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
@@ -586,13 +586,13 @@
     <constraint field="Condition" exp="" desc=""/>
     <constraint field="Timeframe" exp="" desc=""/>
     <constraint field="Area (km²)" exp="" desc=""/>
-    <constraint field="Watered Area (km²)" exp="" desc=""/>
+    <constraint field="Watered (km²)" exp="" desc=""/>
     <constraint field="AE/km²" exp="" desc=""/>
     <constraint field="Potential AE/km²" exp="" desc=""/>
     <constraint field="AE" exp="" desc=""/>
     <constraint field="Potential AE" exp="" desc=""/>
     <constraint field="Rounded Area (km²)" exp="" desc=""/>
-    <constraint field="Rounded Watered Area (km²)" exp="" desc=""/>
+    <constraint field="Rounded Watered (km²)" exp="" desc=""/>
     <constraint field="Rounded AE/km²" exp="" desc=""/>
     <constraint field="Rounded Potential AE/km²" exp="" desc=""/>
     <constraint field="Rounded AE" exp="" desc=""/>
@@ -600,13 +600,13 @@
   </constraintExpressions>
   <expressionfields>
     <field subType="0" name="Rounded Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Area (km²)&quot;, 2)" comment=""/>
-    <field subType="0" name="Rounded Watered Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Watered Area (km²)&quot;, 2)" comment=""/>
+    <field subType="0" name="Rounded Watered (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Watered (km²)&quot;, 2)" comment=""/>
     <field subType="0" name="Rounded AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE/km²&quot;, 1)" comment=""/>
     <field subType="0" name="Rounded Potential AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;Potential AE/km²&quot;, 1)" comment=""/>
     <field subType="0" name="Rounded AE" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE&quot;, 0)" comment=""/>
     <field subType="0" name="Rounded Potential AE" type="6" length="0" typeName="" precision="0" expression="round(&quot;Potential AE&quot;, 0)" comment=""/>
     <field subType="0" name="Rounded Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Area (km²)&quot;, 2)" comment=""/>
-    <field subType="0" name="Rounded Watered Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Watered Area (km²)&quot;, 2)" comment=""/>
+    <field subType="0" name="Rounded Watered (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Watered (km²)&quot;, 2)" comment=""/>
     <field subType="0" name="Rounded AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE/km²&quot;, 1)" comment=""/>
     <field subType="0" name="Rounded Potential AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;Potential AE/km²&quot;, 1)" comment=""/>
     <field subType="0" name="Rounded AE" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE&quot;, 0)" comment=""/>
@@ -622,13 +622,13 @@
       <column name="Condition" hidden="0" type="field" width="111"/>
       <column name="Timeframe" hidden="0" type="field" width="258"/>
       <column name="Area (km²)" hidden="1" type="field" width="-1"/>
-      <column name="Watered Area (km²)" hidden="1" type="field" width="-1"/>
+      <column name="Watered (km²)" hidden="1" type="field" width="-1"/>
       <column name="AE/km²" hidden="1" type="field" width="280"/>
       <column name="Potential AE/km²" hidden="1" type="field" width="-1"/>
       <column name="AE" hidden="1" type="field" width="-1"/>
       <column name="Potential AE" hidden="1" type="field" width="-1"/>
       <column name="Rounded Area (km²)" hidden="0" type="field" width="-1"/>
-      <column name="Rounded Watered Area (km²)" hidden="0" type="field" width="312"/>
+      <column name="Rounded Watered (km²)" hidden="0" type="field" width="312"/>
       <column name="Rounded AE/km²" hidden="0" type="field" width="199"/>
       <column name="Rounded Potential AE/km²" hidden="0" type="field" width="223"/>
       <column name="Rounded AE" hidden="0" type="field" width="118"/>
@@ -682,10 +682,10 @@ def my_form_open(dialog, layer, feature):
     <field name="Rounded Area (km²)" editable="0"/>
     <field name="Rounded Potential AE" editable="0"/>
     <field name="Rounded Potential AE/km²" editable="0"/>
-    <field name="Rounded Watered Area (km²)" editable="0"/>
+    <field name="Rounded Watered (km²)" editable="0"/>
     <field name="Timeframe" editable="1"/>
     <field name="Watered" editable="1"/>
-    <field name="Watered Area (km²)" editable="1"/>
+    <field name="Watered (km²)" editable="1"/>
     <field name="Watered Area Status" editable="1"/>
     <field name="fid" editable="1"/>
   </editable>
@@ -707,10 +707,10 @@ def my_form_open(dialog, layer, feature):
     <field name="Rounded Area (km²)" labelOnTop="0"/>
     <field name="Rounded Potential AE" labelOnTop="0"/>
     <field name="Rounded Potential AE/km²" labelOnTop="0"/>
-    <field name="Rounded Watered Area (km²)" labelOnTop="0"/>
+    <field name="Rounded Watered (km²)" labelOnTop="0"/>
     <field name="Timeframe" labelOnTop="0"/>
     <field name="Watered" labelOnTop="0"/>
-    <field name="Watered Area (km²)" labelOnTop="0"/>
+    <field name="Watered (km²)" labelOnTop="0"/>
     <field name="Watered Area Status" labelOnTop="0"/>
     <field name="fid" labelOnTop="0"/>
   </labelOnTop>
@@ -732,10 +732,10 @@ def my_form_open(dialog, layer, feature):
     <field name="Rounded Area (km²)" reuseLastValue="0"/>
     <field name="Rounded Potential AE" reuseLastValue="0"/>
     <field name="Rounded Potential AE/km²" reuseLastValue="0"/>
-    <field name="Rounded Watered Area (km²)" reuseLastValue="0"/>
+    <field name="Rounded Watered (km²)" reuseLastValue="0"/>
     <field name="Timeframe" reuseLastValue="0"/>
     <field name="Watered" reuseLastValue="0"/>
-    <field name="Watered Area (km²)" reuseLastValue="0"/>
+    <field name="Watered (km²)" reuseLastValue="0"/>
     <field name="Watered Area Status" reuseLastValue="0"/>
     <field name="fid" reuseLastValue="0"/>
   </reuseLastValue>

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
 
-from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtCore import QModelIndex, QSize
 from qgis.PyQt.QtWidgets import QHeaderView
 
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
-from qgis.utils import iface
 
 from ...layers.fields import STATUS
 from ...models import QtAbstractMeta, WorkspaceMixin
@@ -23,13 +22,14 @@ STYLESHEET = getComponentStyleSheet(__file__)
 
 class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstractMeta):
 
-    def __init__(self, schema, editWidgetFactory=None, parent=None):
+    def __init__(self, schema, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
         QgsAttributeTableView.__init__(self, parent)
         WorkspaceMixin.__init__(self)
 
         self.setStyleSheet(STYLESHEET)
 
         self._schema = schema
+        self._detailsWidgetFactory = detailsWidgetFactory
         self._editWidgetFactory = editWidgetFactory
 
         self._featureLayer = None
@@ -49,16 +49,31 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         pass
 
     @property
+    def timeframe(self):
+        return self.workspace.timeframe
+
+    @property
     def featureLayer(self):
         return self._featureLayer
 
     @featureLayer.setter
     def featureLayer(self, layer):
+
+        # Clear everything if the new layer is falsy
+        if not layer:
+            self._featureLayer = None
+            self._featureCache = None
+            self._tableModel = None
+            self._tableFilterModel = None
+            self.setModel(None)
+            # self.setVisible(False)
+            return
+
         self._featureLayer = layer
 
         # Wire the feature cache to the feature layer, and the cache to the model
         self._featureCache = QgsVectorLayerCache(self._featureLayer, self._featureLayer.featureCount())
-        self._tableModel = FeatureTableModel(self._schema, self._featureCache, self._editWidgetFactory)
+        self._tableModel = FeatureTableModel(self._schema, self._featureCache, self._detailsWidgetFactory, self._editWidgetFactory, self)
 
         # Hide the numbers up the left side
         self.verticalHeader().hide()
@@ -79,21 +94,34 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableViewFilterModel(
-            self.workspace, self._schema, iface.mapCanvas(), self._tableModel)
-
+            self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
+        self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
         # Set our model
         self.setModel(self._tableFilterModel)
 
         self.onLoadLayer()
+        self.shrinkToColumns()
+
         self.show()
 
-    def sizeHint(self):
-        """Return a sensible size hint."""
-        sizeHint = super().sizeHint()
-        
-        return QSize(sizeHint.width() - 20, sizeHint.height())
+    def shrinkToColumns(self):
+        """Shrink the view down to the minimum size needed to show its columns."""
+        self.setVisible(False)
+        self.resizeColumnsToContents()
+        self.setVisible(True)
 
-        # return self._tableModel.sizeHint()
+        # Get a suitable width for this thing now we've resized the columns
+        width = sum(self.horizontalHeader().sectionSize(i) for i in range(self._tableModel.columnCount(QModelIndex())))
+        width = width + self.verticalScrollBar().geometry().width()
+        self.setMaximumWidth(max(width, self.width()))
+
+    def sizeHint(self):
+        hint = super().sizeHint()
+        if not self._tableModel:
+            return hint
+        width = sum(self.horizontalHeader().sectionSize(i) for i in range(self._tableModel.columnCount(QModelIndex())))
+        width = width + self.verticalScrollBar().geometry().width()
+        return QSize(width, hint.height())
 
     def onLoadLayer(self):
         """Called when the layer is loaded."""
@@ -126,6 +154,12 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         for column in range(self._tableModel.featureTableActionCount):
             if column not in [f.value for f in self.supportedFeatureTableActions]:
                 self.hideColumn(column)
+            else:
+                delegate = self.itemDelegateForColumn(column)
+                actionModel = delegate.featureTableActionModel
+                if not actionModel.isValid:
+                    self.hideColumn(column)                
+            # self.setColumnWidth(column, 100)
 
     def invalidateCache(self):
         """Invalidate the underlying QgsVectorLayerCache (causes the view to be re-loaded)."""
@@ -134,6 +168,10 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
     def indexToFeature(self, index):
         fid = self._tableModel.rowToId(index.row())
         return self._tableModel.layer().getFeature(fid)
+
+    def onTimeframeChanged(self, timeframe):
+        """Handle the timeframe being changed."""
+        self._tableFilterModel.onTimeframeChanged(timeframe)
 
     def onEditsPersisted(self):
         """Handle a batch of edits being persisted on the underyling layer."""

@@ -31,9 +31,9 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QGroupBox" name="paddockListGroupBox">
+     <widget class="QGroupBox" name="paddockTableViewGroupBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -59,9 +59,9 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="currentPaddockLandTypeListGroupBox">
+     <widget class="QGroupBox" name="currentPaddockLandTypesTableViewGroupBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -83,13 +83,13 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="CurrentPaddockLandTypesLayerList" name="currentPaddockLandTypesList"/>
+        <widget class="CurrentPaddockLandTypesTableView" name="currentPaddockLandTypesTableView"/>
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="futurePaddockLandTypeListGroupBox">
+     <widget class="QGroupBox" name="futurePaddockLandTypesTableViewGroupBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -111,7 +111,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="FuturePaddockLandTypesLayerList" name="futurePaddockLandTypesList"/>
+        <widget class="FuturePaddockLandTypesTableView" name="futurePaddockLandTypesTableView"/>
        </item>
       </layout>
      </widget>
@@ -129,19 +129,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CurrentPaddockLandTypesLayerList</class>
-   <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/paddock_land_types_layer_list</header>
-  </customwidget>
-  <customwidget>
-   <class>FuturePaddockLandTypesLayerList</class>
-   <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/paddock_land_types_layer_list</header>
-  </customwidget>
-  <customwidget>
    <class>PaddockTableView</class>
    <extends>QTableView</extends>
    <header>mlapp/src/widgets/feature_table_view/paddock_table_view</header>
+  </customwidget>
+  <customwidget>
+   <class>CurrentPaddockLandTypesTableView</class>
+   <extends>QTableView</extends>
+   <header>mlapp/src/widgets/feature_table_view/paddock_land_types_table_view</header>
+  </customwidget>
+  <customwidget>
+   <class>FuturePaddockLandTypesTableView</class>
+   <extends>QTableView</extends>
+   <header>mlapp/src/widgets/feature_table_view/paddock_land_types_table_view</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -25,9 +25,9 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.splitter.setCollapsible(2, False)
         self.splitter.setCollapsible(3, True)
 
-        self.currentPaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
-        self.futurePaddockLandTypesList.popupLayerSource = self.workspace.paddockLayer
-
+        self.currentPaddockLandTypesTableView.popupLayerSource = self.workspace.paddockLayer
+        self.futurePaddockLandTypesTableView.popupLayerSource = self.workspace.paddockLayer
+                
         # self.paddockFilterLineEdit.textChanged.connect(
         #     self.onPaddockFilterChanged)
         # self.clearPaddockFilterButton.clicked.connect(
@@ -37,6 +37,4 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin):
     #     self.paddockList.filterByName(text)
 
     def refreshUi(self):
-        # self.paddockList.clearAndRefreshCache()
-        self.currentPaddockLandTypesList.clearAndRefreshCache()
-        self.futurePaddockLandTypesList.clearAndRefreshCache()
+        pass

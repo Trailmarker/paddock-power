@@ -10,11 +10,16 @@ class FeatureTableViewFilterModel(QgsAttributeTableFilterModel):
     """A customisation of the QGIS attribute table filter model to filter features
     by their timeframe, if present."""
 
-    def __init__(self, workspace, schema, canvas, sourceModel, parent=None):
+    def __init__(self, timeframe, canvas, sourceModel, parent=None):
         QgsAttributeTableFilterModel.__init__(self, canvas, sourceModel, parent)
 
-        self._workspace = workspace
+        self._timeframe = timeframe
         self._timeframeColumn = self.sourceModel().columnFromFieldName(TIMEFRAME)
+
+    def onTimeframeChanged(self, timeframe):
+        """Handle the timeframe changing."""
+        self._timeframe = timeframe
+        self.invalidateFilter()
 
     def filterAcceptsRow(self, sourceModelRow, sourceParent):
         accept = super().filterAcceptsRow(sourceModelRow, sourceParent)
@@ -34,4 +39,4 @@ class FeatureTableViewFilterModel(QgsAttributeTableFilterModel):
                     sourceParent),
                 Qt.DisplayRole))
 
-        return accept and (Timeframe[timeframeData] == Timeframe[self._workspace.timeframe.name])
+        return accept and (Timeframe[timeframeData] == Timeframe[self._timeframe.name])

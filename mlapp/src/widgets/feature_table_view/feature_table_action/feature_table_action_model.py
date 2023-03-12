@@ -36,6 +36,11 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
         """The feature table action."""
         pass
 
+    @property
+    def isValid(self):
+        """Whether the action is validly configurad."""
+        return True
+
     @classmethod
     def actionInvalidatesCache(self):
         """Invalidate the cache after a call to doAction."""
