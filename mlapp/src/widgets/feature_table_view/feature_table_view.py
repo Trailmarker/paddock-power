@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtWidgets import QHeaderView
 
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
@@ -9,10 +10,9 @@ from qgis.utils import iface
 
 from ...layers.fields import STATUS
 from ...models import QtAbstractMeta, WorkspaceMixin
-from ...utils import getComponentStyleSheet, qgsDebug
+from ...utils import getComponentStyleSheet
 
 from .feature_status_delegate import FeatureStatusDelegate
-from .feature_table_action import FeatureTableAction
 from .feature_table_action_delegate import FeatureTableActionDelegate
 from .feature_table_model import FeatureTableModel
 from .feature_table_view_filter_model import FeatureTableViewFilterModel
@@ -63,6 +63,11 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         # Hide the numbers up the left side
         self.verticalHeader().hide()
 
+        # Try to make the columns resize a bit nicer too
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        # self.horizontalHeader().setStretchLastSection(True)
+        # self.horizontalHeader().setDefaultAlignment(Qt.AlignCenter | Qt.Alignment(Qt.TextWordWrap))
+
         # Set "whole row only" selection mode
         # self.setSelectionMode(FeatureTableView.SingleSelection)
         self.setSelectionBehavior(FeatureTableView.SelectRows)
@@ -80,17 +85,15 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self.setModel(self._tableFilterModel)
 
         self.onLoadLayer()
-
-        # Weird glitch
-        # self.selectRow(-1)
-        # self.selectionModel().clearSelection()
-
-        # Resize columns based on contents
-        self.setVisible(False)
-        self.resizeColumnsToContents()
-        self.setVisible(True)
-
         self.show()
+
+    def sizeHint(self):
+        """Return a sensible size hint."""
+        sizeHint = super().sizeHint()
+        
+        return QSize(sizeHint.width() - 20, sizeHint.height())
+
+        # return self._tableModel.sizeHint()
 
     def onLoadLayer(self):
         """Called when the layer is loaded."""
