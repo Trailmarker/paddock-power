@@ -1,22 +1,22 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis readOnly="0" version="3.22.14-Białowieża" labelsEnabled="0" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable">
+<qgis version="3.22.14-Białowieża" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Forms|AttributeTable" readOnly="0" labelsEnabled="0">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <renderer-v2 graduatedMethod="GraduatedColor" attr="case&#xd;&#xa;when matchCurrentTimeframe(&quot;Timeframe&quot;) then &quot;AE/km²&quot;&#xd;&#xa;else 'Ignored'&#xd;&#xa;end&#xd;&#xa;" referencescale="-1" forceraster="0" symbollevels="0" type="graduatedSymbol" enableorderby="0">
+  <renderer-v2 attr="Rounded AE/km²" type="graduatedSymbol" referencescale="-1" graduatedMethod="GraduatedColor" forceraster="0" enableorderby="0" symbollevels="0">
     <ranges>
-      <range render="true" symbol="0" lower="0.000000000000000" upper="0.000000000000000" label="Non-producing"/>
-      <range render="true" symbol="1" lower="0.000000000000000" upper="5.000000000000000" label="0 – 5 AE/km²"/>
-      <range render="true" symbol="2" lower="5.000000000000000" upper="10.000000000000000" label="5 – 10 AE/km²"/>
-      <range render="true" symbol="3" lower="10.000000000000000" upper="15.000000000000000" label="10 – 15 AE/km²"/>
-      <range render="true" symbol="4" lower="15.000000000000000" upper="20.000000000000000" label="15 – 20 AE/km²"/>
-      <range render="true" symbol="5" lower="20.000000000000000" upper="100.000000000000000" label="Over 20 AE/km²"/>
+      <range symbol="0" lower="0.000000000000000" label="Non-producing" upper="0.000000000000000" render="true"/>
+      <range symbol="1" lower="0.000000000000000" label="0 – 5 AE/km²" upper="5.000000000000000" render="true"/>
+      <range symbol="2" lower="5.000000000000000" label="5 – 10 AE/km²" upper="10.000000000000000" render="true"/>
+      <range symbol="3" lower="10.000000000000000" label="10 – 15 AE/km²" upper="15.000000000000000" render="true"/>
+      <range symbol="4" lower="15.000000000000000" label="15 – 20 AE/km²" upper="20.000000000000000" render="true"/>
+      <range symbol="5" lower="20.000000000000000" label="Over 20 AE/km²" upper="100.000000000000000" render="true"/>
     </ranges>
     <symbols>
-      <symbol clip_to_extent="1" alpha="1" name="0" force_rhr="0" type="fill">
+      <symbol alpha="1" name="0" type="fill" force_rhr="0" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option value="" name="name" type="QString"/>
@@ -24,7 +24,7 @@
             <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
+        <layer pass="0" class="SimpleFill" enabled="1" locked="0">
           <Option type="Map">
             <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
             <Option value="255,103,0,255" name="color" type="QString"/>
@@ -58,7 +58,7 @@
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" alpha="1" name="1" force_rhr="0" type="fill">
+      <symbol alpha="1" name="1" type="fill" force_rhr="0" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option value="" name="name" type="QString"/>
@@ -66,7 +66,7 @@
             <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
+        <layer pass="0" class="SimpleFill" enabled="1" locked="0">
           <Option type="Map">
             <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
             <Option value="161,217,155,255" name="color" type="QString"/>
@@ -100,7 +100,7 @@
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" alpha="1" name="2" force_rhr="0" type="fill">
+      <symbol alpha="1" name="2" type="fill" force_rhr="0" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option value="" name="name" type="QString"/>
@@ -108,7 +108,7 @@
             <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
+        <layer pass="0" class="SimpleFill" enabled="1" locked="0">
           <Option type="Map">
             <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
             <Option value="116,196,118,255" name="color" type="QString"/>
@@ -142,7 +142,7 @@
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" alpha="1" name="3" force_rhr="0" type="fill">
+      <symbol alpha="1" name="3" type="fill" force_rhr="0" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option value="" name="name" type="QString"/>
@@ -150,7 +150,7 @@
             <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
+        <layer pass="0" class="SimpleFill" enabled="1" locked="0">
           <Option type="Map">
             <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
             <Option value="65,171,93,255" name="color" type="QString"/>
@@ -184,7 +184,7 @@
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" alpha="1" name="4" force_rhr="0" type="fill">
+      <symbol alpha="1" name="4" type="fill" force_rhr="0" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option value="" name="name" type="QString"/>
@@ -192,7 +192,7 @@
             <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
+        <layer pass="0" class="SimpleFill" enabled="1" locked="0">
           <Option type="Map">
             <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
             <Option value="35,139,69,255" name="color" type="QString"/>
@@ -226,7 +226,7 @@
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" alpha="1" name="5" force_rhr="0" type="fill">
+      <symbol alpha="1" name="5" type="fill" force_rhr="0" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option value="" name="name" type="QString"/>
@@ -234,7 +234,7 @@
             <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
+        <layer pass="0" class="SimpleFill" enabled="1" locked="0">
           <Option type="Map">
             <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
             <Option value="0,109,44,255" name="color" type="QString"/>
@@ -270,7 +270,7 @@
       </symbol>
     </symbols>
     <source-symbol>
-      <symbol clip_to_extent="1" alpha="1" name="0" force_rhr="0" type="fill">
+      <symbol alpha="1" name="0" type="fill" force_rhr="0" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option value="" name="name" type="QString"/>
@@ -278,7 +278,7 @@
             <Option value="collection" name="type" type="QString"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" locked="0" class="SimpleFill">
+        <layer pass="0" class="SimpleFill" enabled="1" locked="0">
           <Option type="Map">
             <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
             <Option value="125,139,143,255" name="color" type="QString"/>
@@ -340,8 +340,8 @@
       <prop k="rampType" v="preset"/>
     </colorramp>
     <classificationMethod id="Quantile">
-      <symmetricMode enabled="0" symmetrypoint="0" astride="0"/>
-      <labelFormat format="%1 - %2" trimtrailingzeroes="1" labelprecision="4"/>
+      <symmetricMode astride="0" enabled="0" symmetrypoint="0"/>
+      <labelFormat trimtrailingzeroes="1" labelprecision="4" format="%1 - %2"/>
       <parameters>
         <Option/>
       </parameters>
@@ -536,104 +536,104 @@
     <alias field="Rounded Potential AE" name="Potential AE" index="18"/>
   </aliases>
   <defaults>
-    <default expression="" field="fid" applyOnUpdate="0"/>
-    <default expression="" field="Paddock" applyOnUpdate="0"/>
-    <default expression="" field="Land Type" applyOnUpdate="0"/>
-    <default expression="" field="Paddock Name" applyOnUpdate="0"/>
-    <default expression="" field="Land Type Name" applyOnUpdate="0"/>
-    <default expression="'A'" field="Condition" applyOnUpdate="0"/>
-    <default expression="'Undefined'" field="Timeframe" applyOnUpdate="0"/>
-    <default expression="" field="Area (km²)" applyOnUpdate="0"/>
-    <default expression="" field="Watered Area (km²)" applyOnUpdate="0"/>
-    <default expression="" field="AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="Potential AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="AE" applyOnUpdate="0"/>
-    <default expression="" field="Potential AE" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Area (km²)" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Watered Area (km²)" applyOnUpdate="0"/>
-    <default expression="" field="Rounded AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Potential AE/km²" applyOnUpdate="0"/>
-    <default expression="" field="Rounded AE" applyOnUpdate="0"/>
-    <default expression="" field="Rounded Potential AE" applyOnUpdate="0"/>
+    <default field="fid" expression="" applyOnUpdate="0"/>
+    <default field="Paddock" expression="" applyOnUpdate="0"/>
+    <default field="Land Type" expression="" applyOnUpdate="0"/>
+    <default field="Paddock Name" expression="" applyOnUpdate="0"/>
+    <default field="Land Type Name" expression="" applyOnUpdate="0"/>
+    <default field="Condition" expression="'A'" applyOnUpdate="0"/>
+    <default field="Timeframe" expression="'Undefined'" applyOnUpdate="0"/>
+    <default field="Area (km²)" expression="" applyOnUpdate="0"/>
+    <default field="Watered Area (km²)" expression="" applyOnUpdate="0"/>
+    <default field="AE/km²" expression="" applyOnUpdate="0"/>
+    <default field="Potential AE/km²" expression="" applyOnUpdate="0"/>
+    <default field="AE" expression="" applyOnUpdate="0"/>
+    <default field="Potential AE" expression="" applyOnUpdate="0"/>
+    <default field="Rounded Area (km²)" expression="" applyOnUpdate="0"/>
+    <default field="Rounded Watered Area (km²)" expression="" applyOnUpdate="0"/>
+    <default field="Rounded AE/km²" expression="" applyOnUpdate="0"/>
+    <default field="Rounded Potential AE/km²" expression="" applyOnUpdate="0"/>
+    <default field="Rounded AE" expression="" applyOnUpdate="0"/>
+    <default field="Rounded Potential AE" expression="" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" constraints="3" field="fid" exp_strength="0" unique_strength="1"/>
-    <constraint notnull_strength="0" constraints="0" field="Paddock" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Land Type" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Paddock Name" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Land Type Name" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Condition" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Timeframe" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Area (km²)" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Watered Area (km²)" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="AE/km²" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Potential AE/km²" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="AE" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Potential AE" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Rounded Area (km²)" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Rounded Watered Area (km²)" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Rounded AE/km²" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Rounded Potential AE/km²" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Rounded AE" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" constraints="0" field="Rounded Potential AE" exp_strength="0" unique_strength="0"/>
+    <constraint field="fid" constraints="3" unique_strength="1" notnull_strength="1" exp_strength="0"/>
+    <constraint field="Paddock" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Land Type" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Paddock Name" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Land Type Name" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Condition" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Timeframe" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Watered Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Potential AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="AE" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Potential AE" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Rounded Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Rounded Watered Area (km²)" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Rounded AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Rounded Potential AE/km²" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Rounded AE" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+    <constraint field="Rounded Potential AE" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint desc="" exp="" field="fid"/>
-    <constraint desc="" exp="" field="Paddock"/>
-    <constraint desc="" exp="" field="Land Type"/>
-    <constraint desc="" exp="" field="Paddock Name"/>
-    <constraint desc="" exp="" field="Land Type Name"/>
-    <constraint desc="" exp="" field="Condition"/>
-    <constraint desc="" exp="" field="Timeframe"/>
-    <constraint desc="" exp="" field="Area (km²)"/>
-    <constraint desc="" exp="" field="Watered Area (km²)"/>
-    <constraint desc="" exp="" field="AE/km²"/>
-    <constraint desc="" exp="" field="Potential AE/km²"/>
-    <constraint desc="" exp="" field="AE"/>
-    <constraint desc="" exp="" field="Potential AE"/>
-    <constraint desc="" exp="" field="Rounded Area (km²)"/>
-    <constraint desc="" exp="" field="Rounded Watered Area (km²)"/>
-    <constraint desc="" exp="" field="Rounded AE/km²"/>
-    <constraint desc="" exp="" field="Rounded Potential AE/km²"/>
-    <constraint desc="" exp="" field="Rounded AE"/>
-    <constraint desc="" exp="" field="Rounded Potential AE"/>
+    <constraint field="fid" exp="" desc=""/>
+    <constraint field="Paddock" exp="" desc=""/>
+    <constraint field="Land Type" exp="" desc=""/>
+    <constraint field="Paddock Name" exp="" desc=""/>
+    <constraint field="Land Type Name" exp="" desc=""/>
+    <constraint field="Condition" exp="" desc=""/>
+    <constraint field="Timeframe" exp="" desc=""/>
+    <constraint field="Area (km²)" exp="" desc=""/>
+    <constraint field="Watered Area (km²)" exp="" desc=""/>
+    <constraint field="AE/km²" exp="" desc=""/>
+    <constraint field="Potential AE/km²" exp="" desc=""/>
+    <constraint field="AE" exp="" desc=""/>
+    <constraint field="Potential AE" exp="" desc=""/>
+    <constraint field="Rounded Area (km²)" exp="" desc=""/>
+    <constraint field="Rounded Watered Area (km²)" exp="" desc=""/>
+    <constraint field="Rounded AE/km²" exp="" desc=""/>
+    <constraint field="Rounded Potential AE/km²" exp="" desc=""/>
+    <constraint field="Rounded AE" exp="" desc=""/>
+    <constraint field="Rounded Potential AE" exp="" desc=""/>
   </constraintExpressions>
   <expressionfields>
-    <field expression="round(&quot;Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Area (km²)" length="0" type="6" comment=""/>
-    <field expression="round(&quot;Watered Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Watered Area (km²)" length="0" type="6" comment=""/>
-    <field expression="round(&quot;AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded AE/km²" length="0" type="6" comment=""/>
-    <field expression="round(&quot;Potential AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded Potential AE/km²" length="0" type="6" comment=""/>
-    <field expression="round(&quot;AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded AE" length="0" type="6" comment=""/>
-    <field expression="round(&quot;Potential AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded Potential AE" length="0" type="6" comment=""/>
-    <field expression="round(&quot;Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Area (km²)" length="0" type="6" comment=""/>
-    <field expression="round(&quot;Watered Area (km²)&quot;, 2)" precision="0" typeName="" subType="0" name="Rounded Watered Area (km²)" length="0" type="6" comment=""/>
-    <field expression="round(&quot;AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded AE/km²" length="0" type="6" comment=""/>
-    <field expression="round(&quot;Potential AE/km²&quot;, 1)" precision="0" typeName="" subType="0" name="Rounded Potential AE/km²" length="0" type="6" comment=""/>
-    <field expression="round(&quot;AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded AE" length="0" type="6" comment=""/>
-    <field expression="round(&quot;Potential AE&quot;, 0)" precision="0" typeName="" subType="0" name="Rounded Potential AE" length="0" type="6" comment=""/>
+    <field subType="0" name="Rounded Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Area (km²)&quot;, 2)" comment=""/>
+    <field subType="0" name="Rounded Watered Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Watered Area (km²)&quot;, 2)" comment=""/>
+    <field subType="0" name="Rounded AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE/km²&quot;, 1)" comment=""/>
+    <field subType="0" name="Rounded Potential AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;Potential AE/km²&quot;, 1)" comment=""/>
+    <field subType="0" name="Rounded AE" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE&quot;, 0)" comment=""/>
+    <field subType="0" name="Rounded Potential AE" type="6" length="0" typeName="" precision="0" expression="round(&quot;Potential AE&quot;, 0)" comment=""/>
+    <field subType="0" name="Rounded Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Area (km²)&quot;, 2)" comment=""/>
+    <field subType="0" name="Rounded Watered Area (km²)" type="6" length="0" typeName="" precision="0" expression="round(&quot;Watered Area (km²)&quot;, 2)" comment=""/>
+    <field subType="0" name="Rounded AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE/km²&quot;, 1)" comment=""/>
+    <field subType="0" name="Rounded Potential AE/km²" type="6" length="0" typeName="" precision="0" expression="round(&quot;Potential AE/km²&quot;, 1)" comment=""/>
+    <field subType="0" name="Rounded AE" type="6" length="0" typeName="" precision="0" expression="round(&quot;AE&quot;, 0)" comment=""/>
+    <field subType="0" name="Rounded Potential AE" type="6" length="0" typeName="" precision="0" expression="round(&quot;Potential AE&quot;, 0)" comment=""/>
   </expressionfields>
-  <attributetableconfig sortOrder="1" actionWidgetStyle="dropDown" sortExpression="&quot;fid&quot;">
+  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="&quot;Rounded AE&quot;" sortOrder="1">
     <columns>
-      <column hidden="0" name="fid" width="53" type="field"/>
-      <column hidden="0" name="Paddock" width="100" type="field"/>
-      <column hidden="0" name="Land Type" width="138" type="field"/>
-      <column hidden="0" name="Paddock Name" width="163" type="field"/>
-      <column hidden="0" name="Land Type Name" width="183" type="field"/>
-      <column hidden="0" name="Condition" width="111" type="field"/>
-      <column hidden="0" name="Timeframe" width="122" type="field"/>
-      <column hidden="1" name="Area (km²)" width="-1" type="field"/>
-      <column hidden="1" name="Watered Area (km²)" width="-1" type="field"/>
-      <column hidden="1" name="AE/km²" width="280" type="field"/>
-      <column hidden="1" name="Potential AE/km²" width="-1" type="field"/>
-      <column hidden="1" name="AE" width="-1" type="field"/>
-      <column hidden="1" name="Potential AE" width="-1" type="field"/>
-      <column hidden="0" name="Rounded Area (km²)" width="-1" type="field"/>
-      <column hidden="0" name="Rounded Watered Area (km²)" width="213" type="field"/>
-      <column hidden="0" name="Rounded AE/km²" width="92" type="field"/>
-      <column hidden="0" name="Rounded Potential AE/km²" width="172" type="field"/>
-      <column hidden="0" name="Rounded AE" width="54" type="field"/>
-      <column hidden="0" name="Rounded Potential AE" width="168" type="field"/>
-      <column hidden="1" width="-1" type="actions"/>
+      <column name="fid" hidden="0" type="field" width="228"/>
+      <column name="Paddock" hidden="0" type="field" width="189"/>
+      <column name="Land Type" hidden="1" type="field" width="138"/>
+      <column name="Paddock Name" hidden="0" type="field" width="260"/>
+      <column name="Land Type Name" hidden="0" type="field" width="228"/>
+      <column name="Condition" hidden="0" type="field" width="111"/>
+      <column name="Timeframe" hidden="0" type="field" width="258"/>
+      <column name="Area (km²)" hidden="1" type="field" width="-1"/>
+      <column name="Watered Area (km²)" hidden="1" type="field" width="-1"/>
+      <column name="AE/km²" hidden="1" type="field" width="280"/>
+      <column name="Potential AE/km²" hidden="1" type="field" width="-1"/>
+      <column name="AE" hidden="1" type="field" width="-1"/>
+      <column name="Potential AE" hidden="1" type="field" width="-1"/>
+      <column name="Rounded Area (km²)" hidden="0" type="field" width="-1"/>
+      <column name="Rounded Watered Area (km²)" hidden="0" type="field" width="312"/>
+      <column name="Rounded AE/km²" hidden="0" type="field" width="199"/>
+      <column name="Rounded Potential AE/km²" hidden="0" type="field" width="223"/>
+      <column name="Rounded AE" hidden="0" type="field" width="118"/>
+      <column name="Rounded Potential AE" hidden="0" type="field" width="168"/>
+      <column hidden="1" type="actions" width="-1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -665,29 +665,29 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
-    <field editable="1" name="AE"/>
-    <field editable="1" name="AE/km²"/>
-    <field editable="1" name="Area (km²)"/>
-    <field editable="1" name="Condition"/>
-    <field editable="1" name="Grazing Radius Type"/>
-    <field editable="1" name="Land Type"/>
-    <field editable="1" name="Land Type Name"/>
-    <field editable="1" name="Paddock"/>
-    <field editable="1" name="Paddock Name"/>
-    <field editable="1" name="Paddock Status"/>
-    <field editable="1" name="Potential AE"/>
-    <field editable="1" name="Potential AE/km²"/>
-    <field editable="0" name="Rounded AE"/>
-    <field editable="0" name="Rounded AE/km²"/>
-    <field editable="0" name="Rounded Area (km²)"/>
-    <field editable="0" name="Rounded Potential AE"/>
-    <field editable="0" name="Rounded Potential AE/km²"/>
-    <field editable="0" name="Rounded Watered Area (km²)"/>
-    <field editable="1" name="Timeframe"/>
-    <field editable="1" name="Watered"/>
-    <field editable="1" name="Watered Area (km²)"/>
-    <field editable="1" name="Watered Area Status"/>
-    <field editable="1" name="fid"/>
+    <field name="AE" editable="1"/>
+    <field name="AE/km²" editable="1"/>
+    <field name="Area (km²)" editable="1"/>
+    <field name="Condition" editable="1"/>
+    <field name="Grazing Radius Type" editable="1"/>
+    <field name="Land Type" editable="1"/>
+    <field name="Land Type Name" editable="1"/>
+    <field name="Paddock" editable="1"/>
+    <field name="Paddock Name" editable="1"/>
+    <field name="Paddock Status" editable="1"/>
+    <field name="Potential AE" editable="1"/>
+    <field name="Potential AE/km²" editable="1"/>
+    <field name="Rounded AE" editable="0"/>
+    <field name="Rounded AE/km²" editable="0"/>
+    <field name="Rounded Area (km²)" editable="0"/>
+    <field name="Rounded Potential AE" editable="0"/>
+    <field name="Rounded Potential AE/km²" editable="0"/>
+    <field name="Rounded Watered Area (km²)" editable="0"/>
+    <field name="Timeframe" editable="1"/>
+    <field name="Watered" editable="1"/>
+    <field name="Watered Area (km²)" editable="1"/>
+    <field name="Watered Area Status" editable="1"/>
+    <field name="fid" editable="1"/>
   </editable>
   <labelOnTop>
     <field name="AE" labelOnTop="0"/>
@@ -715,29 +715,29 @@ def my_form_open(dialog, layer, feature):
     <field name="fid" labelOnTop="0"/>
   </labelOnTop>
   <reuseLastValue>
-    <field reuseLastValue="0" name="AE"/>
-    <field reuseLastValue="0" name="AE/km²"/>
-    <field reuseLastValue="0" name="Area (km²)"/>
-    <field reuseLastValue="0" name="Condition"/>
-    <field reuseLastValue="0" name="Grazing Radius Type"/>
-    <field reuseLastValue="0" name="Land Type"/>
-    <field reuseLastValue="0" name="Land Type Name"/>
-    <field reuseLastValue="0" name="Paddock"/>
-    <field reuseLastValue="0" name="Paddock Name"/>
-    <field reuseLastValue="0" name="Paddock Status"/>
-    <field reuseLastValue="0" name="Potential AE"/>
-    <field reuseLastValue="0" name="Potential AE/km²"/>
-    <field reuseLastValue="0" name="Rounded AE"/>
-    <field reuseLastValue="0" name="Rounded AE/km²"/>
-    <field reuseLastValue="0" name="Rounded Area (km²)"/>
-    <field reuseLastValue="0" name="Rounded Potential AE"/>
-    <field reuseLastValue="0" name="Rounded Potential AE/km²"/>
-    <field reuseLastValue="0" name="Rounded Watered Area (km²)"/>
-    <field reuseLastValue="0" name="Timeframe"/>
-    <field reuseLastValue="0" name="Watered"/>
-    <field reuseLastValue="0" name="Watered Area (km²)"/>
-    <field reuseLastValue="0" name="Watered Area Status"/>
-    <field reuseLastValue="0" name="fid"/>
+    <field name="AE" reuseLastValue="0"/>
+    <field name="AE/km²" reuseLastValue="0"/>
+    <field name="Area (km²)" reuseLastValue="0"/>
+    <field name="Condition" reuseLastValue="0"/>
+    <field name="Grazing Radius Type" reuseLastValue="0"/>
+    <field name="Land Type" reuseLastValue="0"/>
+    <field name="Land Type Name" reuseLastValue="0"/>
+    <field name="Paddock" reuseLastValue="0"/>
+    <field name="Paddock Name" reuseLastValue="0"/>
+    <field name="Paddock Status" reuseLastValue="0"/>
+    <field name="Potential AE" reuseLastValue="0"/>
+    <field name="Potential AE/km²" reuseLastValue="0"/>
+    <field name="Rounded AE" reuseLastValue="0"/>
+    <field name="Rounded AE/km²" reuseLastValue="0"/>
+    <field name="Rounded Area (km²)" reuseLastValue="0"/>
+    <field name="Rounded Potential AE" reuseLastValue="0"/>
+    <field name="Rounded Potential AE/km²" reuseLastValue="0"/>
+    <field name="Rounded Watered Area (km²)" reuseLastValue="0"/>
+    <field name="Timeframe" reuseLastValue="0"/>
+    <field name="Watered" reuseLastValue="0"/>
+    <field name="Watered Area (km²)" reuseLastValue="0"/>
+    <field name="Watered Area Status" reuseLastValue="0"/>
+    <field name="fid" reuseLastValue="0"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>

@@ -20,9 +20,10 @@ class ViewFeatureProfileModel(FeatureTableActionModel, WorkspaceMixin):
     def doAction(self, index):
         """View the profile for the feature at the given index."""
         feature = self.getFeature(index)
-
-        profileDetailsDialog = ProfileDetailsDialog(feature, self.plugin.featureView) # Not iface.mainWindow() as it messed with the styles
-        profileDetailsDialog.show()
+        if feature:
+            profileDetailsDialog = ProfileDetailsDialog(feature, self.plugin.featureView) # Not iface.mainWindow() as it messed with the styles
+            profileDetailsDialog.show()
+        return feature
 
     @property
     def featureTableAction(self):

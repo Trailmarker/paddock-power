@@ -26,6 +26,7 @@ class LoadLayerTask(SafeTask):
     def safeFinished(self, result):
         """Called when task completes (successfully or otherwise)."""
         if result:
+            # self._layer.editsPersisted.emit(None)
             self._workspaceLayers.addLayer(self._layerType, self._layer)
             guiStatusBarAndInfo(f"{PLUGIN_NAME} {self._layer.name()} loaded.")
         else:

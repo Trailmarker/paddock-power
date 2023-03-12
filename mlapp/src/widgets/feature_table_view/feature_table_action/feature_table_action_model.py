@@ -30,6 +30,7 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
             fid = model.rowToId(index.row())
 
         return model.layer().getFeature(fid)
+        
 
     @abstractproperty
     def featureTableAction(self):

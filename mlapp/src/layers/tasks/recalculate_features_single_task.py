@@ -21,6 +21,7 @@ class RecalculateFeaturesSingleTask(ChangesetTask):
         """Called when task completes (successfully or otherwise)."""
         super().safeFinished(result)
         if result:
+            self.layer.editsPersisted.emit(self.edits)
             guiStatusBarAndInfo(f"{PLUGIN_NAME} recalculated {self.layer.name()}.")
         else:
             guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to recalculate {self.layer.name()} …")

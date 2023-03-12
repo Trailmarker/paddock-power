@@ -26,4 +26,4 @@ class PaddockLandType(DerivedFeature):
 
     @property
     def TITLE(self):
-        return f"{self.LAND_TYPE_NAME} ({self.AREA:.2f} km², {self.ESTIMATED_CAPACITY:.1f} AE)"
+        return f"{self.LAND_TYPE_NAME} ({self.CONDITION_TYPE.value}, {self.AREA:.2f} km², {self.ESTIMATED_CAPACITY:.1f} AE)"

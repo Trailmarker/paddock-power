@@ -42,9 +42,9 @@ class Edits(WorkspaceMixin):
             return repr(self)
 
         def persist(self):
-            if not isinstance(self._layer, IPersistedDerivedFeatureLayer):
-                raise Glitch(
-                    f"Cannot truncate layer {self._layer.id()} because it is not an IPersistedDerivedFeatureLayer")
+            # if not isinstance(self._layer, IPersistedDerivedFeatureLayer):
+            #     raise Glitch(
+            #         f"Cannot truncate layer {self._layer.id()} because it is not an IPersistedDerivedFeatureLayer")
             self.layer.dataProvider().truncate()
 
         @property

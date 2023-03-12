@@ -18,17 +18,21 @@ class FeatureActionsModel(FeatureTableActionModel):
 
         name = featureAction.name
         feature = self.getFeature(index)
-
-        if FeatureAction[name] == FeatureAction.undoPlan:
-            feature.undoPlanFeature()
-        elif FeatureAction[name] == FeatureAction.plan:
-            feature.planFeature()
-        elif FeatureAction[name] == FeatureAction.undoBuild:
-            feature.undoBuildFeature()
-        elif FeatureAction[name] == FeatureAction.build:
-            feature.buildFeature()
-        elif FeatureAction[name] == FeatureAction.trash:
-            feature.trashFeature()
+        
+        if feature:
+            if FeatureAction[name] == FeatureAction.undoPlan:
+                feature.undoPlanFeature()
+            elif FeatureAction[name] == FeatureAction.plan:
+                feature.planFeature()
+            elif FeatureAction[name] == FeatureAction.undoBuild:
+                feature.undoBuildFeature()
+            elif FeatureAction[name] == FeatureAction.build:
+                feature.buildFeature()
+            elif FeatureAction[name] == FeatureAction.trash:
+                feature.trashFeature()
+        
+        return feature
+        
 
     def icon(self, index):
         """The icon to paint in the cell."""

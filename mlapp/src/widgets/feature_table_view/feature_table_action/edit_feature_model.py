@@ -7,10 +7,10 @@ from qgis.utils import iface
 from ....utils import PLUGIN_FOLDER, qgsDebug
 from ....widgets.edit_dialog import EditDialog
 from .feature_table_action import FeatureTableAction
-from .feature_table_action_model import FeatureTableActionModel
+from .select_feature_model import SelectFeatureModel
 
 
-class EditFeatureModel(FeatureTableActionModel):
+class EditFeatureModel(SelectFeatureModel):
     """A feature table action model that configures editing a feature."""
 
     _icon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png')
@@ -21,9 +21,11 @@ class EditFeatureModel(FeatureTableActionModel):
 
     def doAction(self, index):
         """Select the feature at the given index."""
-        feature = self.getFeature(index)
-        editDialog = EditDialog(feature, self._editWidgetFactory)
-        editDialog.exec_()
+        feature = super().doAction(index)
+        if feature:
+            editDialog = EditDialog(feature, self._editWidgetFactory)
+            editDialog.exec_()
+        return feature
 
     @property
     def featureTableAction(self):

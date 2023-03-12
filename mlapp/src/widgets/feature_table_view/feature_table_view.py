@@ -64,12 +64,13 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self.verticalHeader().hide()
 
         # Set "whole row only" selection mode
-        self.setSelectionMode(FeatureTableView.SingleSelection)
+        # self.setSelectionMode(FeatureTableView.SingleSelection)
         self.setSelectionBehavior(FeatureTableView.SelectRows)
 
         # Load the layer - important that this is prior to setting up the proxy/filter model
         self._tableModel.modelReset.connect(self.onLoadLayer)
         self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
+        self._featureLayer.featureDeselected.connect(self.onFeatureDeselected)
 
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableViewFilterModel(
@@ -79,6 +80,10 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self.setModel(self._tableFilterModel)
 
         self.onLoadLayer()
+        
+        # Weird glitch
+        # self.selectRow(-1)
+        # self.selectionModel().clearSelection()
 
         # Resize columns based on contents
         self.setVisible(False)
@@ -133,10 +138,20 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         # At the moment, we just invalidate the cache and reload the layer
         self.invalidateCache()
 
+    def onFeatureDeselected(self, _):
+        """Handle a feature being deselected on the underlying layer."""
+        self.selectionModel().clearSelection()
+        
+    def onFeatureSelected(self, layerId):
+        """Handle a feature being selected on the underlying layer."""
+        feature = self.workspace.selectedFeature(layerId)  
+        if feature:   
+            self.selectRow(self._tableModel.idToRow(feature.FID))
+
     def onFeatureTableActionClicked(self, index):
         """Handle a feature table action being clicked."""
         delegate = self.itemDelegateForColumn(index.column())
-        delegate.featureTableActionModel.doAction(index)
+        feature = delegate.featureTableActionModel.doAction(index)
 
-        if delegate.featureTableActionModel.actionInvalidatesCache():
+        if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
             self.invalidateCache()

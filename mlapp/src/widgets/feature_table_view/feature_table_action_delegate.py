@@ -2,7 +2,7 @@
 from math import floor
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QPainter
+from qgis.PyQt.QtGui import QBrush, QPainter
 from qgis.PyQt.QtWidgets import QStyledItemDelegate
 
 
@@ -21,27 +21,17 @@ class FeatureTableActionDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
         """Paint the cell."""
         try:
-            painter.save()
-            icon = self.featureTableActionModel.icon(index)
-
+            brush = painter.brush()
             cellSelected = (self._tableView.selectionModel().currentIndex().row() == index.row())
 
-            if cellSelected:
-                painter.setPen(Qt.white)
-                painter.setBrush(option.palette.highlight())
-
-            painter.fillRect(option.rect, painter.brush())
-
-            # if icon:
-            #     if cellSelected:
-            #         painter.setPen(Qt.white)
-            #         painter.setBrush(Qt.white)
-            #     else:
-            #         painter.setPen(Qt.black)
-            #         painter.setBrush(Qt.black)
+            cellColor = option.palette.highlight().color() if cellSelected else Qt.transparent
+            painter.fillRect(option.rect, QBrush(cellColor))
+            
+            icon = self.featureTableActionModel.icon(index)
             self.paintIcon(painter, option.rect, icon)
-
-            painter.restore()
+            
+            # Restore brush
+            painter.setBrush(brush)
         except BaseException:
             pass
 

@@ -17,7 +17,9 @@ class SelectFeatureModel(FeatureTableActionModel):
     def doAction(self, index):
         """Select the feature at the given index."""
         feature = self.getFeature(index)
-        feature.selectFeature()
+        if feature:
+            feature.selectFeature()
+        return feature
 
     @property
     def featureTableAction(self):

@@ -26,6 +26,7 @@ class DeriveEditsSingleTask(ChangesetTask):
         """Called when task completes (successfully or otherwise)."""
         super().safeFinished(result)
         if result:
+            self.layer.editsPersisted.emit(self.edits)
             guiStatusBarAndInfo(f"{PLUGIN_NAME} derived {self.layer.name()}.")
         else:
             guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to derive {self.layer.name()}.")
