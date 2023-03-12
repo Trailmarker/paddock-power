@@ -9,12 +9,8 @@ from ...layers.fields import FeatureStatus
 
 class FeatureStatusDelegate(QgsAttributeTableDelegate):
 
-    def __init__(self, tableView, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-
-        # Cheeky! But couldn't get the selection otherwise
-        # option.state & QStyle.State_Selected does not work
-        self._tableView = tableView
 
     def paint(self, painter, option, index):
         """Paint the cell."""
@@ -22,18 +18,20 @@ class FeatureStatusDelegate(QgsAttributeTableDelegate):
             painter.save()
 
             statusText = index.data(role=Qt.DisplayRole)
-            featureStatus = FeatureStatus[statusText]
+            featureStatus = FeatureStatus(statusText)
 
-            cellSelected = (self._tableView.selectionModel().currentIndex().row() == index.row())
+            # cellSelected = (self._tableView.selectionModel().currentIndex().row() == index.row())
 
-            if cellSelected:
-                painter.setPen(Qt.white)
-                painter.setBrush(option.palette.highlight())
-            else:
-                painter.setPen(QColor(*featureStatus.toForegroundColour()))
-                painter.setBrush(QColor(*featureStatus.toColour()))
-
+            painter.setPen(Qt.NoPen)
+            # if cellSelected:
+            # painter.setBrush(option.palette.highlight())
+            # else:
+            painter.setBrush(QColor(*featureStatus.toColour()))
             painter.fillRect(option.rect, painter.brush())
+            # if cellSelected:
+            #     painter.setPen(option.palette.highlightedText().color())
+            # else:
+            painter.setPen(QColor(*featureStatus.toForegroundColour()))
             painter.drawText(option.rect, Qt.AlignCenter, statusText)
 
             painter.restore()

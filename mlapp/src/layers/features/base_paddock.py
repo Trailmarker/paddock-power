@@ -14,6 +14,11 @@ class BasePaddock(PersistedFeature, StatusFeatureMixin):
         """Return the display name of the Base Paddock."""
         return "Paddock"
 
+    @classmethod
+    def focusOnSelect(cls):
+        """Return True if the app should focus on this type of Feature when selected."""
+        return False
+
     def __init__(self,
                  featureLayer,
                  existingFeature=None):
