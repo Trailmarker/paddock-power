@@ -14,6 +14,8 @@ class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass
 
     LAYER_NAME = "Land Type Condition Table"
 
+    editsPersisted = pyqtSignal(Edits)
+
     @classmethod
     def defaultName(cls):
         """Return the default name for this layer."""

@@ -103,7 +103,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         for featureTableActionModel in self._tableModel.featureTableActionModels:
             self.setItemDelegateForColumn(
                 featureTableActionModel.featureTableAction.value,
-                FeatureTableActionDelegate(featureTableActionModel, self))
+                FeatureTableActionDelegate(self, featureTableActionModel, self))
 
         # Set up a column item delegate for the "Status" field
         statusColumn = self._tableModel.columnFromFieldName(STATUS)

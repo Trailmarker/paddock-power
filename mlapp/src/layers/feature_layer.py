@@ -55,6 +55,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         WorkspaceMixin.__init__(self)
 
         self.applyNamedStyle(styleName)
+        self.editsPersisted.connect(lambda _: self.triggerRepaint())
 
     def __repr__(self):
         """Return a string representation of the Field."""
