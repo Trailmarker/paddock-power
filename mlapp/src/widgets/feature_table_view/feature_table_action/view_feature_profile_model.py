@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtGui import QIcon
 
-from qgis.utils import iface
-
+from ....models import WorkspaceMixin
 from ....utils import PLUGIN_FOLDER
 from ....widgets.profile_details.profile_details_dialog import ProfileDetailsDialog
 from .feature_table_action import FeatureTableAction
 from .feature_table_action_model import FeatureTableActionModel
 
 
-class ViewFeatureProfileModel(FeatureTableActionModel):
+class ViewFeatureProfileModel(FeatureTableActionModel, WorkspaceMixin):
     """A feature table action model that configures viewing the profile of a feature."""
 
     _icon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/elevation.png')
@@ -22,7 +21,7 @@ class ViewFeatureProfileModel(FeatureTableActionModel):
         """View the profile for the feature at the given index."""
         feature = self.getFeature(index)
 
-        profileDetailsDialog = ProfileDetailsDialog(feature, iface.mainWindow())
+        profileDetailsDialog = ProfileDetailsDialog(feature, self.plugin.featureView) # Not iface.mainWindow() as it messed with the styles
         profileDetailsDialog.show()
 
     @property

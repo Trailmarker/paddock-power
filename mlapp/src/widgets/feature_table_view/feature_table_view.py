@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
+
+from qgis.PyQt.QtCore import Qt
+
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
 from qgis.utils import iface
@@ -9,6 +12,7 @@ from ...models import QtAbstractMeta, WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsDebug
 
 from .feature_status_delegate import FeatureStatusDelegate
+from .feature_table_action import FeatureTableAction
 from .feature_table_action_delegate import FeatureTableActionDelegate
 from .feature_table_model import FeatureTableModel
 from .feature_table_view_filter_model import FeatureTableViewFilterModel
@@ -32,13 +36,14 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self._featureCache = None
         self._tableModel = None
         self._tableFilterModel = None
+        self._statusColumn = None
 
         self.clicked.connect(self.onClicked)
 
     def onClicked(self, index):
         qgsDebug(f"Received click at index {index.row()}, {index.column()}")
         if self._tableModel.isToolBarIndex(index):
-            self.onToolBarClicked(index)
+            self.featureActionClicked(index)
 
     @abstractproperty
     def supportedFeatureTableActions(self):
@@ -52,7 +57,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
     def featureLayer(self, layer):
         self._featureLayer = layer
 
-        config = self._featureLayer.attributeTableConfig()
+        config = self.featureLayer.attributeTableConfig()
         columns = config.columns()
 
         for column in columns:
@@ -61,9 +66,10 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
                 column.hidden = True
 
         config.setColumns(columns)
-        self._featureLayer.setAttributeTableConfig(config)
+        self.featureLayer.setAttributeTableConfig(config)
 
-        self._featureCache = QgsVectorLayerCache(layer, layer.featureCount())
+        # Wire the feature cache to the feature layer, and the cache to the model
+        self._featureCache = QgsVectorLayerCache(self.featureLayer, self.featureLayer.featureCount())
         self._tableModel = FeatureTableModel(self._schema, self._featureCache, self._editWidgetFactory)
 
         # Set up column item delegates for all Feature Table Actions
@@ -73,57 +79,52 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
                 FeatureTableActionDelegate(featureTableActionModel, self))
 
         # Set up a column item delegate for the "Status" field
-        self.setItemDelegateForColumn(self._tableModel.columnFromFieldName(STATUS), FeatureStatusDelegate(self))
+        statusColumn = self._tableModel.columnFromFieldName(STATUS)
+        if statusColumn >= 0:
+            self._statusColumn = statusColumn
+            self.setItemDelegateForColumn(self._statusColumn, FeatureStatusDelegate(self))
 
-        self._tableModel.modelReset.connect(self.onModelReset)
-        self._tableModel.loadLayer()
-
-        self._tableFilterModel = FeatureTableViewFilterModel(
-            self.workspace, self._schema, iface.mapCanvas(), self._tableModel)
-
-        self.setModel(self._tableFilterModel)
-        self.onModelReset()
-        self.show()
-
-    def onModelReset(self):
-        """Hide columns in the table that are not in the display schema."""
         # Hide the numbers up the left side
         self.verticalHeader().hide()
 
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)
-            
-        # Hide unsupported actions         
+
+        # Hide unsupported actions
         for column in range(self._tableModel.featureTableActionCount):
             if column not in [f.value for f in self.supportedFeatureTableActions]:
                 self.hideColumn(column)
-                
-            
-            self.resizeColumnToContents(column)
+
+        # Set "whole row only" selection mode
+        self.setSelectionMode(FeatureTableView.SingleSelection)
+        self.setSelectionBehavior(FeatureTableView.SelectRows)
+
+        # Load the layer - important that this is prior to setting up the proxy/filter model
+        self._tableModel.loadLayer()
+        self._tableFilterModel = FeatureTableViewFilterModel(
+            self.workspace, self._schema, iface.mapCanvas(), self._tableModel)
+
+        # Set our model
+        self.setModel(self._tableFilterModel)
+
+        # Resize columns based on contents
         self.setVisible(False)
         self.resizeColumnsToContents()
         self.setVisible(True)
+
+        self.show()
+
+    def invalidateCache(self):
+        """Invalidate the underlying QgsVectorLayerCache (causes the view to be re-loaded)."""
+        self._featureCache.invalidate()
 
     def indexToFeature(self, index):
         fid = self._tableModel.rowToId(index.row())
         return self._tableModel.layer().getFeature(fid)
 
-    def onToolBarClicked(self, index):
+    def featureActionClicked(self, index):
         delegate = self.itemDelegateForColumn(index.column())
-        featureTableActionModel = delegate.featureTableActionModel
-        featureTableActionModel.doAction(index)
-        
-        if featureTableActionModel.bumpCacheAfterAction():
-            self.bumpCache()
-            
-    def bumpCache(self):
-        """Bump the cache."""
-        qgsDebug(f"{type(self).__name__}.bumpCache()")
+        delegate.featureTableActionModel.doAction(index)
 
-        self._tableModel.resetModel()
-        self._tableModel.layer().triggerRepaint()
-
-        if self._featureCache:
-            # Re-cache all the data
-            self._featureCache.setFullCache(True)
-
+        if delegate.featureTableActionModel.actionInvalidatesCache():
+            self.invalidateCache()

@@ -3,7 +3,6 @@ from qgis.PyQt.QtCore import Qt
 
 from qgis.gui import QgsAttributeTableModel
 
-from ...layers.fields.names import TIMEFRAME
 from ...utils import PLUGIN_NAME, qgsDebug
 from .feature_table_action import FeatureTableAction, SelectFeatureModel, EditFeatureModel, UndoTrashFeatureModel, PlanBuildFeatureModel, ViewFeatureProfileModel
 from .feature_table_action import FeatureTableAction
@@ -52,10 +51,10 @@ class FeatureTableModel(QgsAttributeTableModel):
         else:
             return -1
 
-    def rowCount(self, parent):
+    def rowCount(self, _):
         """This model has the default row count."""
-        return super().rowCount(parent)
-
+        return super().rowCount(_) # + self.featureTableActionCount
+        
     def columnCount(self, parent):
         """This model has the default column count plus the action count."""
         return super().columnCount(parent) + self.featureTableActionCount
@@ -90,8 +89,9 @@ class FeatureTableModel(QgsAttributeTableModel):
 
     def flags(self, index):
         """Get the flags for the given index, accounting for the action columns."""
-        # This really screws up selection on these rows
-        if self.isToolBarIndex(index):
-            return Qt.ItemIsEnabled # | Qt.ItemIsSelectable
-        else:
-            return super().flags(self.createIndex(index.row(), index.column() - self.featureTableActionCount))
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        # if self.isToolBarIndex(index) or index.column() == self.columnFromFieldName(STATUS):
+        #     return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        # else:
+        #     return super().flags(self.createIndex(index.row(), index.column() - self.featureTableActionCount))
+     

@@ -225,7 +225,7 @@ class Edits(WorkspaceMixin):
     def notifyPersisted(self):
         """Called when edits are persisted."""
         # Start deriving updates in the background …
-        self.workspace.deriveEdits(self)
+        # self.workspace.deriveEdits(self)
 
         for layer in self.layers:
             edits = self.edits[layer.id()]

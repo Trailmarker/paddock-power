@@ -33,7 +33,7 @@ class EditFeatureModel(FeatureTableActionModel):
         return FeatureTableAction.editFeature
 
     @classmethod
-    def bumpCacheAfterAction(self):
+    def actionInvalidatesCache(self):
         """Invalidate the cache after a call to doAction."""
         return True
 

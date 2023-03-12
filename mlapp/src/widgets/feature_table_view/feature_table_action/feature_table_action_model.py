@@ -37,7 +37,7 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
         pass
 
     @classmethod
-    def bumpCacheAfterAction(self):
+    def actionInvalidatesCache(self):
         """Invalidate the cache after a call to doAction."""
         return False
 

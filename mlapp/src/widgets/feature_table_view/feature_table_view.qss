@@ -1,22 +1,30 @@
 QHeaderView {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 6pt;
+  font-weight: normal;
   border: none;
 }
 
 QHeaderView::item {
   border: none;
 }
-                         
+
 QTableView {
+  padding: 0px;
+
   text-align: top;
-  padding: 10px;
+  border: none;
   /* background: white; */
   /* width: 15px; */
   /* font-size: 18px; */
 }
 
 QTableView::item {
+  padding: 5px;
   border: none;
-}   
+}
 
+QTableView::item:selected {
+  background: rgb(0, 119, 75);
+  color: white;
+  border: none;
+}

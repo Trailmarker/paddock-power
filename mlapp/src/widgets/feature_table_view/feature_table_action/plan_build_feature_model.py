@@ -22,7 +22,7 @@ class PlanBuildFeatureModel(FeatureActionsModel):
         return FeatureTableAction.planBuildFeature
 
     @classmethod
-    def bumpCacheAfterAction(self):
+    def actionInvalidatesCache(self):
         """Invalidate the cache after a call to doAction."""
         return True
 
