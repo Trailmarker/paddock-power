@@ -22,7 +22,6 @@ from ...resources_rc import *
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
     featureLayerSelected = pyqtSignal(str)
-    featureLayerDeselected = pyqtSignal(str)
     timeframeChanged = pyqtSignal(Timeframe)
     workspaceLoaded = pyqtSignal()
 
@@ -108,9 +107,10 @@ class Workspace(QObject):
     def deselectLayers(self, selectedLayerId=None):
         """Deselect any currently selected Feature."""
         for layerId in [l for l in self.selectedFeatures.keys() if l != selectedLayerId]:
-            # qgsInfo(f"Workspace.deselectLayers({layerType.__name__})")
+            qgsInfo(f"Workspace.deselectLayers({selectedLayerId}")
+            layer = QgsProject.instance().mapLayer(layerId)
+            layer.removeSelection()
             del self.selectedFeatures[layerId]
-            self.featureLayerDeselected.emit(layerId)
 
     def selectFeature(self, feature):
         """Select a feature."""
@@ -120,13 +120,12 @@ class Workspace(QObject):
         self.selectedFeatures[selectedLayerId] = feature
 
         # If we are going to focus on the new feature, deselect the old layers
-        if feature.featureLayer.focusOnSelect():
+        if feature.focusOnSelect():
             qgsInfo(f"Workspace.selectFeature({feature}): focusOnSelect, deselecting other layers")
             self.deselectLayers(selectedLayerId)
 
-        # Select on the new layer either way
+        # This is kinda legacy now
         self.featureLayerSelected.emit(selectedLayerId)
-        # qgsInfo(f"Workspace.featureLayerSelected.emit({selectedLayerId})")
 
     def selectedFeature(self, layerId):
         """Return the selected feature for the given layer type."""

@@ -34,12 +34,13 @@ class PopupTableView(FeatureTableView, PopupLayerConsumerMixin):
 
     def onPopupLayerAdded(self, layerId):
         qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId})")
-        featureLayer = QgsProject.instance().mapLayer(layerId)
+        # featureLayer = QgsProject.instance().mapLayer(layerId)
 
-        if type(featureLayer) in self.popupLayerTypes:
-            qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId}) - found layer")
-            self.featureLayer = featureLayer
+        # if type(featureLayer) in self.popupLayerTypes:
+        #     qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId}) - found layer")
+        #     self.featureLayer = featureLayer
 
     def onPopupLayerRemoved(self):
         qgsDebug(f"{type(self).__name__}.onPopupLayerRemoved()")
-        self.featureLayer = None
+        # self.featureLayer = None
+        # pass

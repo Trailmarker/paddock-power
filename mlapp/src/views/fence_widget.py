@@ -59,11 +59,13 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
         self.workspace.selectFeature(fence)
 
     def changeSelection(self, layerId):
-        feature = self.workspace.selectedFeature(layerId)
-
-        if isinstance(feature, Fence):
-            self.fence = feature
-            self.refreshUi()
+        selectedFids = self.fenceLayer.selectedFeatureIds()
+        
+        if len(selectedFids) == 1:
+            feature = self.fenceLayer.getFeature(selectedFids[0])
+            if isinstance(feature, Fence):
+                self.fence = feature
+                self.refreshUi()
 
     def removeSelection(self):
         self.fence = None

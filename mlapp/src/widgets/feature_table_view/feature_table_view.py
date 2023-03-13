@@ -61,15 +61,13 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         # Clear everything if the new layer is falsy
         if not layer:
-            self._featureLayer = None
-            self._featureCache = None
-            self._tableModel = None
-            self._tableFilterModel = None
-            self.setModel(None)
-            # self.setVisible(False)
+            self.setVisible(False)
+            self.clearFeatureLayer()
             return
 
+        # Set the new layer
         self._featureLayer = layer
+        self._featureLayer.willBeDeleted.connect(self.clearFeatureLayer)
 
         # Wire the feature cache to the feature layer, and the cache to the model
         self._featureCache = QgsVectorLayerCache(self._featureLayer, self._featureLayer.featureCount())
@@ -107,7 +105,21 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self.onLoadLayer()
         self.shrinkToColumns()
 
+        self.setUpdatesEnabled(True)
+        self.setVisible(True)
         self.show()
+
+    def clearFeatureLayer(self):
+        self.setUpdatesEnabled(False)
+        
+        # Clear everything if the new layer is falsy
+        self.setModel(None)
+        self._tableFilterModel = None
+        self._tableModel = None
+        self._featureCache = None
+        self._featureLayer = None
+     
+        return
 
     def setFilteredFeatures(self, fids):
         """Filter the table to show only the features with the given FIDs."""
