@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
+from math import floor
 
-from qgis.PyQt.QtCore import QModelIndex, QSize
+from qgis.PyQt.QtCore import QModelIndex, QSize, QTimer
 from qgis.PyQt.QtWidgets import QHeaderView
 
 from qgis.core import QgsVectorLayerCache
@@ -9,7 +10,7 @@ from qgis.gui import QgsAttributeTableView
 
 from ...layers.fields import STATUS
 from ...models import QtAbstractMeta, WorkspaceMixin
-from ...utils import getComponentStyleSheet
+from ...utils import getComponentStyleSheet, qgsDebug
 
 from .feature_status_delegate import FeatureStatusDelegate
 from .feature_table_action_delegate import FeatureTableActionDelegate
@@ -22,11 +23,19 @@ STYLESHEET = getComponentStyleSheet(__file__)
 
 class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstractMeta):
 
+    UNIT = 10
+    PADDING = 5 * UNIT
+
     def __init__(self, schema, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
         QgsAttributeTableView.__init__(self, parent)
         WorkspaceMixin.__init__(self)
 
         self.setStyleSheet(STYLESHEET)
+
+        self._fitColumnsTimer = QTimer()
+        self._fitColumnsTimer.setSingleShot(True)
+        self._fitColumnsTimer.setInterval(100)
+        self._fitColumnsTimer.timeout.connect(self.fitColumns)
 
         self._schema = schema
         self._detailsWidgetFactory = detailsWidgetFactory
@@ -37,6 +46,8 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self._tableModel = None
         self._tableFilterModel = None
         self._statusColumn = None
+
+        self._columnMetrics = None
 
         self.clicked.connect(self.onClicked)
 
@@ -81,13 +92,14 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         # Hide the numbers up the left side
         self.verticalHeader().hide()
 
-        # Try to make the columns resize a bit nicer too
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        # self.horizontalHeader().setStretchLastSection(True)
-        # self.horizontalHeader().setDefaultAlignment(Qt.AlignCenter | Qt.Alignment(Qt.TextWordWrap))
+        # Prevent word wrap
+        self.setWordWrap(False)
 
+        # Try to make the columns resize a bit nicer too
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+   
         # Set "whole row only" selection mode
-        # self.setSelectionMode(FeatureTableView.SingleSelection)
+        self.setSelectionMode(FeatureTableView.SingleSelection)
         self.setSelectionBehavior(FeatureTableView.SelectRows)
 
         # Load the layer - important that this is prior to setting up the proxy/filter model
@@ -103,46 +115,94 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self.setModel(self._tableFilterModel)
 
         self.onLoadLayer()
-        self.shrinkToColumns()
+        self.updateColumnMetrics()
 
-        self.setUpdatesEnabled(True)
         self.setVisible(True)
         self.show()
 
     def clearFeatureLayer(self):
-        self.setUpdatesEnabled(False)
-        
         # Clear everything if the new layer is falsy
         self.setModel(None)
         self._tableFilterModel = None
         self._tableModel = None
         self._featureCache = None
         self._featureLayer = None
-     
+
         return
 
     def setFilteredFeatures(self, fids):
         """Filter the table to show only the features with the given FIDs."""
         self._tableFilterModel.setFilteredFeatures(fids)
 
-    def shrinkToColumns(self):
-        """Shrink the view down to the minimum size needed to show its columns."""
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+
+        # Re-start the timeout while we're resizing
+        self._fitColumnsTimer.stop()
+        self._fitColumnsTimer.start()
+
+    def updateColumnMetrics(self):
+
+        # First resize all columns to their contents, nice and snug
         self.setVisible(False)
         self.resizeColumnsToContents()
         self.setVisible(True)
 
-        # Get a suitable width for this thing now we've resized the columns
-        width = sum(self.horizontalHeader().sectionSize(i) for i in range(self._tableModel.columnCount(QModelIndex())))
-        width = width + self.verticalScrollBar().geometry().width()
-        self.setMaximumWidth(max(width, self.width()))
+        # Preferred section padding
+        unit = self.UNIT
+        padding = self.PADDING
+
+        # Figure out the metrics of our resized columns
+        header = self.horizontalHeader()
+        baseSectionSizes = [header.sectionSize(i) for i in range(header.count())]
+
+        # Allow all our columns except the action buttons to grow
+        sectionsToResize = [
+            i for i in range(
+                self._tableModel.featureTableActionCount,
+                header.count()) if header.sectionSize(i) > 0]
+
+        self._columnMetrics = (padding, baseSectionSizes, sectionsToResize)
+        return self._columnMetrics
+
+    def fitColumns(self):
+        """Shrink the view down to the minimum size needed to show its columns."""
+
+        # We don't do this algebra when no one's looking
+        if not self.isVisible():
+            return
+
+        (padding, baseSectionSizes, sectionsToResize) = self._columnMetrics
+
+        scrollBarWidth = self.verticalScrollBar().geometry().width() if self.verticalScrollBar().isVisible() else 0
+
+        neededWidth = sum(baseSectionSizes) + scrollBarWidth
+        preferredWidth = neededWidth + len(sectionsToResize) * padding
+
+        # If we have our preferred width available within our parent, expand into it
+        if preferredWidth < (self.parent().width() - 6) and self.width() < preferredWidth:
+            self.resize(preferredWidth, self.height())
+            return
+
+        # Section change can be negative? Nah …
+        sectionChange = min(round(max(self.width() - neededWidth, 0) / len(sectionsToResize)), padding)
+
+        for i in sectionsToResize:
+            self.horizontalHeader().resizeSection(i, baseSectionSizes[i] + sectionChange)
 
     def sizeHint(self):
         hint = super().sizeHint()
-        if not self._tableModel:
+        
+        if not self._columnMetrics:
             return hint
-        width = sum(self.horizontalHeader().sectionSize(i) for i in range(self._tableModel.columnCount(QModelIndex())))
-        width = width + self.verticalScrollBar().geometry().width()
-        return QSize(width, hint.height())
+
+        (padding, baseSectionSizes, sectionsToResize) = self._columnMetrics
+
+        scrollBarWidth = self.verticalScrollBar().geometry().width() if self.verticalScrollBar().isVisible() else 0
+
+        neededWidth = sum(baseSectionSizes) + scrollBarWidth
+
+        return QSize(neededWidth, hint.height())
 
     def onLoadLayer(self):
         """Called when the layer is loaded."""
