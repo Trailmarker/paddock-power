@@ -59,8 +59,6 @@ class FeatureView(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.timeframeButtonGroup.addButton(self.futureTimeframeButton)
 
     def refreshUi(self):
-        self.paddockTab.refreshUi()
-
         if self.workspace:
             self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
             self.futureTimeframeButton.setChecked(self.workspace.timeframe.name == 'Future')

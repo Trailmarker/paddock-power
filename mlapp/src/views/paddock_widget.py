@@ -33,17 +33,6 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
         self.currentPaddockLandTypesTableView = None
         self.futurePaddockLandTypesTableView = None
 
-        # self.currentPaddockLandTypesTableView.popupLayerSource = self.workspace.paddockLayer
-        # self.futurePaddockLandTypesTableView.popupLayerSource = self.workspace.paddockLayer
-
-        # self.paddockFilterLineEdit.textChanged.connect(
-        #     self.onPaddockFilterChanged)
-        # self.clearPaddockFilterButton.clicked.connect(
-        #     self.paddockFilterLineEdit.clear)
-
-    # def onPaddockFilterChanged(self, text):
-    #     self.paddockList.filterByName(text)
-
     @property
     def popupLayerTypes(self):
         """Popup layer types that this layer can consume."""
@@ -55,9 +44,6 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
         if layerType != self.popupLayerType:
             raise Glitch("Unexpected layer type: %s" % layerType)
 
-    def refreshUi(self):
-        pass
-
     def onPopupLayerAdded(self, layerId):
         """Override in subclass to handle popup layer added."""
         featureLayer = self.workspace.mapLayer(layerId)
@@ -65,16 +51,16 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
         if type(featureLayer) not in self.popupLayerTypes:
             qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId}) - not supported")
             return
-        
-        if type(featureLayer) == PaddockCurrentLandTypesPopupLayer:
+
+        if isinstance(featureLayer, PaddockCurrentLandTypesPopupLayer):
             self.currentPaddockLandTypesTableView = CurrentPaddockLandTypesTableView(self)
             self.currentPaddockLandTypesTableViewGroupBox.layout().addWidget(self.currentPaddockLandTypesTableView)
             self.currentPaddockLandTypesTableView.featureLayer = featureLayer
 
-        if type(featureLayer) == PaddockFutureLandTypesPopupLayer:
+        if isinstance(featureLayer, PaddockFutureLandTypesPopupLayer):
             self.futurePaddockLandTypesTableView = FuturePaddockLandTypesTableView(self)
             self.futurePaddockLandTypesTableViewGroupBox.layout().addWidget(self.futurePaddockLandTypesTableView)
-            self.futurePaddockLandTypesTableView.featureLayer = featureLayer         
+            self.futurePaddockLandTypesTableView.featureLayer = featureLayer
 
     def onPopupLayerRemoved(self):
         """Override in subclass to handle popup layer removed."""
@@ -86,4 +72,3 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
             self.futurePaddockLandTypesTableViewGroupBox.layout().removeWidget(self.futurePaddockLandTypesTableView)
             self.futurePaddockLandTypesTableView.deleteLater()
             self.futurePaddockLandTypesTableView = None
-
