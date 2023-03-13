@@ -28,7 +28,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         """Add an instance of the derived layer for this layer to the map."""
         self.getDerivedLayerInstance(changeset).addToMap()
 
-    def deriveFeatures(self, changeset=None):
+    def deriveFeatures(self, changeset=None, RAISE_IF_CANCELLED=None):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
         # Clean up any instances of the virtual source …
@@ -36,24 +36,31 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
+        RAISE_IF_CANCELLED()
+
         rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest()
+
+        RAISE_IF_CANCELLED()
 
         edits = Edits()
         if not rederiveFeaturesRequest:
             qgsInfo(f"Removing and re-deriving the whole {self.name()} layer …")
             edits.editBefore(Edits.truncate(self))
         else:
-            # qgsInfo(
-            # f"Filter expression for re-deriving features:
-            # {rederiveFeaturesRequest.filterExpression().expression()}")
-
             rederivedFeatures = [f for f in self.getFeatures(rederiveFeaturesRequest)]
             qgsInfo(f"Removing {len(rederivedFeatures)} features in the {self.name()} layer …")
+
+            RAISE_IF_CANCELLED()
 
             for rederivedFeature in rederivedFeatures:
                 edits.editBefore(Edits.delete(rederivedFeature))
 
-        derivedFeatures = [self.copyFeature(f) for f in derivedLayer.getFeatures()]
+        derivedFeatures = []
+        
+        for f in derivedLayer.getFeatures():
+            RAISE_IF_CANCELLED()
+            derivedFeatures.append(self.copyFeature(f))
+
         qgsInfo(f"Deriving {len(derivedFeatures)} features in the {self.name()} layer …")
 
         # Get a second batch of edits that copies the new records to this layer …

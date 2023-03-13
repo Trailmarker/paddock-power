@@ -67,6 +67,6 @@ class PersistedLayer(Layer):
         pass
 
     @abstractmethod
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, RAISE_IF_CANCELLED=None):
         """Recalculate features in this layer."""
         pass

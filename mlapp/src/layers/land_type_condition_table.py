@@ -251,6 +251,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
         for feature in features:
             self.addFeature(feature)
 
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, RAISE_IF_CANCELLED=None):
         """Recalculate features in this layer."""
         return Edits()

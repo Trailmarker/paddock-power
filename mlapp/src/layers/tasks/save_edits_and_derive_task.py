@@ -32,10 +32,10 @@ class SaveEditsAndDeriveTask(SaveEditsTask):
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} deriving {layer.name()} ({i + 1} of {len(layers)}) …")
                 if self.isCanceled():
                     return False
-                derivedEdits = layer.deriveFeatures(changeset)
+                derivedEdits = layer.deriveFeatures(changeset, RAISE_IF_CANCELLED=self.raiseIfCancelled)
                 if self.isCanceled():
                     return False
-                derivedEdits.persist()
+                derivedEdits.persist(RAISE_IF_CANCELLED=self.raiseIfCancelled)
                 if self.isCanceled():
                     return False
 

@@ -3,12 +3,17 @@ from time import sleep
 
 from qgis.core import QgsTask
 
-from ..utils import qgsInfo
+from ..utils import PLUGIN_NAME, qgsInfo
+
+
+class SafeTaskCancelledException(Exception):
+    """Custom exceptiopn type for emergency task management."""
+    pass
 
 
 class SafeTask(QgsTask):
 
-    TASK_DELAY = 0.1
+    TASK_DELAY = 0.2
 
     def __init__(self, description):
         """Input is a closure over a FeatureAction handler for a given Feature."""
@@ -25,8 +30,16 @@ class SafeTask(QgsTask):
 
     def run(self):
         """Carry out a function that generates Feature edit operations, and persist the edits."""
-        result = self.safeRun()
-        sleep(self.TASK_DELAY)
+        result = False
+        
+        try:
+            result = self.safeRun()
+        except SafeTaskCancelledException:
+            qgsInfo(f"{PLUGIN_NAME} User successfully cancelled {self.description()}")
+            result = False
+        finally:
+            sleep(self.TASK_DELAY)
+        
         return result
 
     def safeRun(self):
@@ -41,7 +54,11 @@ class SafeTask(QgsTask):
     def safeFinished(self, result):
         pass
 
+    def raiseIfCancelled(self):
+        if self.isCanceled():
+            raise SafeTaskCancelledException()
+
     def cancel(self):
-        qgsInfo(f"User cancelled: {self.description()}")
+        qgsInfo(f"{PLUGIN_NAME} User started cancelling: {self.description()}")
         super().cancel()
         sleep(self.TASK_DELAY)

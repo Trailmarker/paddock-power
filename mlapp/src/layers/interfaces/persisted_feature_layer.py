@@ -26,6 +26,6 @@ class PersistedFeatureLayer(FeatureLayer, PersistedLayer):
         pass
 
     @abstractmethod
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, RAISE_IF_CANCELLED=None):
         """Re-derive the upstream features in this layer."""
         pass
