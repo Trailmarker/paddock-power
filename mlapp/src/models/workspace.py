@@ -152,15 +152,9 @@ class Workspace(QObject):
                 guiStatusBarAndInfo(
                     f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
 
-    def cleanupAllLayers(self):
+    def cleanupAllLayers(self, workspaceFile=None):
         for layerType in self.layerDependencyGraph.cleanupOrder():
-            if issubclass(layerType, IMapLayer):
-                layerType.removeAllOfType()
-
-    def cleanupDerivedLayers(self):
-        for layerType in self.layerDependencyGraph.cleanupOrder():
-            if issubclass(layerType, IDerivedFeatureLayer):
-                layerType.removeDerivedOfType()
+            layerType.removeAllOfType(workspaceFile)
 
     def loadWorkspace(self):
         self.loadWorkspaceTask.run(self)

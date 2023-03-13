@@ -75,8 +75,9 @@ class LayerDependencyGraph(TypeDependencyGraph):
                 DerivedWaterpointBufferLayer,
                 WaterpointLayer,
                 BasePaddockLayer,
-                ElevationLayer,
-                LandTypeConditionTable]
+                LandTypeLayer,
+                ElevationLayer]
+                # LandTypeConditionTable]
 
     def displayOrder(self):
         return [WaterpointLayer,
