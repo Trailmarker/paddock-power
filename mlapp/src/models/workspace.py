@@ -50,7 +50,7 @@ class Workspace(QObject):
         self.layerDependencyGraph = LayerDependencyGraph()
         self.workspaceLayers = WorkspaceLayers()
 
-        self.cleanupAllLayers()
+        self.cleanupAllLayers(workspaceFile)
         self.loadWorkspace()
 
     def findGroup(self):
