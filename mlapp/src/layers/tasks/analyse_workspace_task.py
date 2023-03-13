@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 from time import sleep
 
-from ...models import SafeTask
+from ...models import WorkspaceTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 from ..interfaces import IPersistedDerivedFeatureLayer, IPersistedFeatureLayer
 
 
-class AnalyseWorkspaceTask(SafeTask):
+class AnalyseWorkspaceTask(WorkspaceTask):
 
     def __init__(self, workspace):
         """Input is a batch of layers (order not important)."""
-        SafeTask.__init__(self, f"{PLUGIN_NAME} analysing the workspace …")
-
-        self.workspace = workspace
+        WorkspaceTask.__init__(self, f"{PLUGIN_NAME} analysing the workspace …", workspace)
 
     def safeRun(self):
         """Input is a correctly ordered batch of layers."""

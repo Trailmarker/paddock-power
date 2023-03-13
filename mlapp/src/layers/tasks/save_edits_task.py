@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-from ...models import SafeTask
+from ...models import WorkspaceTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 from ..features import Edits
 
 
-class SaveEditsTask(SafeTask):
+class SaveEditsTask(WorkspaceTask):
 
     def __init__(self, description, workspace, editFunction, *args, **kwargs):
         """Input is a closure over a FeatureAction handler for a given Feature."""
-        super().__init__(description)
+        super().__init__(description, workspace)
 
-        self.workspace = workspace
         self.editFunction = editFunction
         self.args = args
         self.kwargs = kwargs

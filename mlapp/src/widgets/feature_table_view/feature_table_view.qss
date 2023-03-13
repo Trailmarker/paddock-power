@@ -1,5 +1,5 @@
 QHeaderView {
-  font-size: 6pt;
+  font-size: 8pt;
   font-weight: normal;
   border: none;
 }
@@ -20,6 +20,7 @@ QTableView {
 
 QTableView::item {
   padding: 5px;
+  font-size: 12pt;
   border: none;
 }
 

@@ -6,10 +6,14 @@ from qgis.PyQt.QtGui import QBrush
 
 from qgis.gui import QgsAttributeTableDelegate
 
+from ...models import WorkspaceMixin
+
+
 class FeatureTableActionDelegate(QgsAttributeTableDelegate):
 
     def __init__(self, featureTableActionModel, parent=None):
         super().__init__(parent)
+        
         self._actionModel = featureTableActionModel
 
     @property
@@ -27,7 +31,11 @@ class FeatureTableActionDelegate(QgsAttributeTableDelegate):
             cellColor = Qt.white
             painter.fillRect(option.rect, QBrush(cellColor))
 
-            icon = self.featureTableActionModel.icon(index)
+            if self.featureTableActionModel.locked:
+                icon = self.featureTableActionModel.lockedIcon
+            else:
+                icon = self.featureTableActionModel.icon(index)
+
             self.paintIcon(painter, option.rect, icon)
 
             # Restore brush

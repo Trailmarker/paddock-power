@@ -37,7 +37,7 @@ class ViewFeatureDetailsModel(SelectFeatureModel):
     @classmethod
     def actionInvalidatesCache(self):
         """Invalidate the cache after a call to doAction."""
-        return True
+        return False
 
     def icon(self, _):
         """The icon to paint in the cell."""

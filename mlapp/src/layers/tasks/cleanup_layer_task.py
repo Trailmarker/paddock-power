@@ -3,15 +3,15 @@ from time import sleep
 
 from qgis.core import QgsProject
 
-from ...models import SafeTask
+from ...models import WorkspaceTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
 
 
-class CleanupLayerTask(SafeTask):
+class CleanupLayerTask(WorkspaceTask):
 
-    def __init__(self, layerId, delay=5):
+    def __init__(self, workspace, layerId, delay=5):
         """Input is a correctly ordered batch of layers."""
-        super().__init__(f"{PLUGIN_NAME} cleaning up layer {layerId} …")
+        super().__init__(f"{PLUGIN_NAME} cleaning up layer {layerId} …", workspace)
         self.layerId = layerId
         self.delay = delay
 

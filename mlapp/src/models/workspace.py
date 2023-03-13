@@ -3,10 +3,9 @@ from os.path import basename
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsSnappingConfig
 
 from ..layers.fields import Timeframe
-from ..layers.interfaces import IDerivedFeatureLayer
 from ..layers.tasks import AnalyseWorkspaceTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
@@ -22,6 +21,7 @@ from ...resources_rc import *
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
     featureLayerSelected = pyqtSignal(str)
+    lockChanged = pyqtSignal(bool)
     timeframeChanged = pyqtSignal(Timeframe)
     workspaceLoaded = pyqtSignal()
 
@@ -29,12 +29,14 @@ class Workspace(QObject):
 
         super().__init__(iface.mainWindow())
 
-        self.loadWorkspaceTask = TaskHandle(LoadWorkspaceTask)
+        self._locked = False
+
+        self.loadWorkspaceTask = TaskHandle(LoadWorkspaceTask, self)
         self.loadWorkspaceTask.taskCompleted.connect(self.onLoadWorkspaceTaskCompleted)
 
-        self.analyseWorkspaceTask = TaskHandle(AnalyseWorkspaceTask)
+        self.analyseWorkspaceTask = TaskHandle(AnalyseWorkspaceTask, self)
         self.analyseWorkspaceTask.taskCompleted.connect(self.onAnalyseWorkspaceTaskCompleted)
-        self.saveEditsTask = TaskHandle(SaveEditsAndDeriveTask)
+        self.saveEditsTask = TaskHandle(SaveEditsAndDeriveTask, self)
 
         self.selectedFeatures = {}
 
@@ -60,6 +62,21 @@ class Workspace(QObject):
 
         # Load workspace async        
         self.loadWorkspace()
+
+    def locked(self):
+        """Return True if the workspace is locked."""
+        return self._locked
+    
+    def lock(self):
+        """Lock the workspace."""
+        self._locked = True
+        self.lockChanged.emit(True)
+        
+    def unlock(self):
+        """Unlock the workspace."""
+        self._locked = False
+        self.lockChanged.emit(False)
+    
 
     def findGroup(self):
         """Find this workspace's group in the Layers panel."""
@@ -166,6 +183,12 @@ class Workspace(QObject):
     def onLoadWorkspaceTaskCompleted(self):
         self.workspaceLayers.addLayersToWorkspace(self)
         self.addToMap()
+        
+        # TODO this is a bit of a bizarre hack. Without this line, our project 
+        # ends up loaded with corrupt snapping configuration (from a QGIS 3 bug, perhaps)
+        # that causes QGIS to crash instead of saving the project file.
+        QgsProject.instance().setSnappingConfig(QgsSnappingConfig())
+        
         self.workspaceLoaded.emit()
 
     def analyseWorkspace(self):

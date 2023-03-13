@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-from ...models import SafeTask
+from ...models import WorkspaceTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 
 
-class LoadWorkspaceTask(SafeTask):
+class LoadWorkspaceTask(WorkspaceTask):
 
     def __init__(self, workspace):
         """Input is a Workspace."""
-
-        super().__init__(f"{PLUGIN_NAME} is loading the '{workspace.workspaceName}' workspace …")
-        self.workspace = workspace
+        super().__init__(f"{PLUGIN_NAME} is loading the '{workspace.workspaceName}' workspace …", workspace)
 
     def safeRun(self):
         try:

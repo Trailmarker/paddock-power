@@ -130,6 +130,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def onEditsPersisted(self):
         """Handle a batch of edits being persisted on the underyling layer."""
         # At the moment, we just invalidate the cache and reload the layer
+        # self.plugin.iface.mapCanvas().refreshAllLayers()
         self.triggerRepaint(True)
 
     def onSelectFeature(self, feature):

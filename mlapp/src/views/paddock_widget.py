@@ -2,6 +2,7 @@
 import os
 
 from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget
 
 from ..layers import PopupLayerConsumerMixin, PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
@@ -23,6 +24,11 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
 
         self.setupUi(self)
 
+        self.layoutTimer = QTimer()
+        self.layoutTimer.setSingleShot(True)
+        self.layoutTimer.setInterval(100)
+        self.layoutTimer.timeout.connect(lambda: self.relayout())
+
         self.splitter.setCollapsible(0, False)
         self.splitter.setCollapsible(1, False)
         self.splitter.setCollapsible(2, False)
@@ -32,6 +38,20 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
 
         self.currentPaddockLandTypesTableView = None
         self.futurePaddockLandTypesTableView = None
+
+    def resizeEvent(self, event):
+        """Override in subclass to handle resize event."""
+        super().resizeEvent(event)
+
+        # Re-start the timeout while we're resizing
+        self.layoutTimer.stop()
+        self.layoutTimer.start()
+
+    def relayout(self):
+        self.splitter.setSizes([self.paddockTableViewGroupBox.sizeHint().width(),
+                                self.currentPaddockLandTypesTableViewGroupBox.sizeHint().width(),
+                                self.futurePaddockLandTypesTableViewGroupBox.sizeHint().width(),
+                                self.spacerWidget.sizeHint().width()])
 
     @property
     def popupLayerTypes(self):

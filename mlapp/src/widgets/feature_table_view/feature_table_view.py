@@ -2,15 +2,15 @@
 from abc import abstractproperty
 from math import floor
 
-from qgis.PyQt.QtCore import QModelIndex, QSize, QTimer
-from qgis.PyQt.QtWidgets import QHeaderView
+from qgis.PyQt.QtCore import QSize, QTimer
+from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
 
 from ...layers.fields import STATUS
 from ...models import QtAbstractMeta, WorkspaceMixin
-from ...utils import getComponentStyleSheet, qgsDebug
+from ...utils import PLUGIN_NAME, getComponentStyleSheet, guiWarning
 
 from .feature_status_delegate import FeatureStatusDelegate
 from .feature_table_action_delegate import FeatureTableActionDelegate
@@ -31,11 +31,12 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         WorkspaceMixin.__init__(self)
 
         self.setStyleSheet(STYLESHEET)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
-        self._fitColumnsTimer = QTimer()
-        self._fitColumnsTimer.setSingleShot(True)
-        self._fitColumnsTimer.setInterval(100)
-        self._fitColumnsTimer.timeout.connect(self.fitColumns)
+        self.layoutTimer = QTimer()
+        self.layoutTimer.setSingleShot(True)
+        self.layoutTimer.setInterval(100)
+        self.layoutTimer.timeout.connect(lambda: self.relayout())
 
         self._schema = schema
         self._detailsWidgetFactory = detailsWidgetFactory
@@ -97,7 +98,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         # Try to make the columns resize a bit nicer too
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.horizontalHeader().setStretchLastSection(True)
+        # self.horizontalHeader().setStretchLastSection(True)
    
         # Set "whole row only" selection mode
         self.setSelectionMode(FeatureTableView.SingleSelection)
@@ -112,6 +113,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self._tableFilterModel = FeatureTableViewFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
         self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
+        self.workspace.lockChanged.connect(self.invalidateCache)
         # Set our model
         self.setModel(self._tableFilterModel)
 
@@ -136,10 +138,10 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         super().resizeEvent(event)
 
         # Re-start the timeout while we're resizing
-        self._fitColumnsTimer.stop()
-        self._fitColumnsTimer.start()
+        self.layoutTimer.stop()
+        self.layoutTimer.start()
 
-    def fitColumns(self):
+    def relayout(self):
         """Shrink the view down to the minimum size needed to show its columns."""
 
         # We don't do this algebra when no one's looking
@@ -277,6 +279,14 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
     def onFeatureTableActionClicked(self, index):
         """Handle a feature table action being clicked."""
         delegate = self.itemDelegateForColumn(index.column())
+        
+        if not delegate or not delegate.featureTableActionModel:
+            return
+        
+        if delegate.featureTableActionModel.locked:
+            guiWarning(f"Please wait while {PLUGIN_NAME} finishes processing.")
+            return
+        
         feature = delegate.featureTableActionModel.doAction(index)
 
         if not feature or delegate.featureTableActionModel.actionInvalidatesCache():

@@ -2,16 +2,21 @@
 from abc import ABC, abstractmethod, abstractproperty
 
 from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtGui import QIcon
 
 from qgis.gui import QgsAttributeTableModel, QgsAttributeTableFilterModel
 
-from ....models import QtAbstractMeta
+from ....models import QtAbstractMeta, WorkspaceMixin
+from ....utils import PLUGIN_FOLDER
 
 
-class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
+class FeatureTableActionModel(QObject, WorkspaceMixin, ABC, metaclass=QtAbstractMeta):
+
+    _lockedIcon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/locked.png')
 
     def __init__(self):
         QObject.__init__(self)
+        WorkspaceMixin.__init__(self)
 
     @abstractmethod
     def doAction(self, index):
@@ -50,6 +55,16 @@ class FeatureTableActionModel(QObject, ABC, metaclass=QtAbstractMeta):
     def icon(self, index):
         """The icon to paint for the action."""
         pass
+
+    @property
+    def lockedIcon(self):
+        """The default 'locked' icon for locked actions."""
+        return self._lockedIcon
+
+    @property
+    def locked(self):
+        """Whether the action is locked."""
+        return self.workspace.locked() and self.actionInvalidatesCache()
 
     @abstractmethod
     def description(self, index):

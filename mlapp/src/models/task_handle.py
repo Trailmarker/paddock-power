@@ -8,7 +8,7 @@ class TaskHandle(QObject):
 
     taskCompleted = pyqtSignal()
 
-    def __init__(self, taskType):
+    def __init__(self, taskType, lockObject=None):
         """Handle to contain everything needed to manage a pipeline of auto-cancelling tasks of the same type."""
         super().__init__()
 

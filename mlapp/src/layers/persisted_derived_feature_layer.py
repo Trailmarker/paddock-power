@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject
-
 from ..layers.features import Edits
 from ..models import Glitch
 from ..utils import PLUGIN_NAME, qgsInfo
@@ -21,6 +19,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
     def getDerivedLayerInstance(self, changeset=None):
         """Return the derived layer for this layer."""
+        self.derivedLayerType.removeAllOfType()
         return self.derivedLayerType(self.dependentLayers, changeset)
 
     def showDerivedLayerInstance(self, changeset=None):
@@ -65,7 +64,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         # Get a second batch of edits that copies the new records to this layer …
         edits.editBefore(Edits.bulkAdd(self, derivedFeatures))
 
-        # Get rid of the derived layer …
-        QgsProject.instance().removeMapLayer(derivedLayer.id())
+        # Get rid of the derived layer … does not work
+        # QgsProject.instance().removeMapLayer(derivedLayer.id())
         return edits
 
