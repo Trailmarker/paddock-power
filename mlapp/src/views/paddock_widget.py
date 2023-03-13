@@ -48,9 +48,9 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
         self.layoutTimer.start()
 
     def relayout(self):
-        self.splitter.setSizes([self.paddockTableViewGroupBox.sizeHint().width(),
-                                self.currentPaddockLandTypesTableViewGroupBox.sizeHint().width(),
-                                self.futurePaddockLandTypesTableViewGroupBox.sizeHint().width(),
+        self.splitter.setSizes([self.paddockTableView.sizeHint().width() +6,
+                                self.currentPaddockLandTypesTableView.sizeHint().width() + 6 if self.currentPaddockLandTypesTableView else 0,
+                                self.futurePaddockLandTypesTableView.sizeHint().width() + 6 if self.futurePaddockLandTypesTableView else 0,
                                 self.spacerWidget.sizeHint().width()])
 
     @property
