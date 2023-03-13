@@ -3,10 +3,10 @@ from os.path import basename
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from qgis.core import QgsApplication, QgsProject
+from qgis.core import QgsProject
 
 from ..layers.fields import Timeframe
-from ..layers.interfaces import IDerivedFeatureLayer, IMapLayer
+from ..layers.interfaces import IDerivedFeatureLayer
 from ..layers.tasks import AnalyseWorkspaceTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
@@ -33,6 +33,7 @@ class Workspace(QObject):
         self.loadWorkspaceTask.taskCompleted.connect(self.onLoadWorkspaceTaskCompleted)
 
         self.analyseWorkspaceTask = TaskHandle(AnalyseWorkspaceTask)
+        self.analyseWorkspaceTask.taskCompleted.connect(self.onAnalyseWorkspaceTaskCompleted)
         self.saveEditsTask = TaskHandle(SaveEditsAndDeriveTask)
 
         self.selectedFeatures = {}
@@ -46,11 +47,18 @@ class Workspace(QObject):
 
         self.timeframeChanged.connect(self.deselectLayers)
 
-        # Load workspace
         self.layerDependencyGraph = LayerDependencyGraph()
         self.workspaceLayers = WorkspaceLayers()
 
-        self.cleanupAllLayers(workspaceFile)
+        # Clean up all layers
+        cleanupIds = [layerId for layerType in self.layerDependencyGraph.cleanupOrder() 
+                              for layerId in layerType.detectAllOfType(workspaceFile)]
+        QgsProject.instance().removeMapLayers(cleanupIds)
+        
+        for layerType in self.layerDependencyGraph.cleanupOrder():
+            layerType.removeAllOfType(workspaceFile)
+
+        # Load workspace async        
         self.loadWorkspace()
 
     def findGroup(self):
@@ -152,10 +160,6 @@ class Workspace(QObject):
                 guiStatusBarAndInfo(
                     f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
 
-    def cleanupAllLayers(self, workspaceFile=None):
-        for layerType in self.layerDependencyGraph.cleanupOrder():
-            layerType.removeAllOfType(workspaceFile)
-
     def loadWorkspace(self):
         self.loadWorkspaceTask.run(self)
 
@@ -168,6 +172,10 @@ class Workspace(QObject):
         """Winnow and re-analyse a batch of updated layers."""
         self.analyseWorkspaceTask.run(self)
 
+    def onAnalyseWorkspaceTaskCompleted(self):
+        """Clean up all the derived layers."""
+        pass
+    
     def saveEditsAndDerive(self, editFunction, *args, **kwargs):
         """Persist this feature and also queue up all required derivation."""
 

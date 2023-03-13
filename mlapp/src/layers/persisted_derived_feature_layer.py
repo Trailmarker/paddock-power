@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from functools import partial
+from qgis.core import QgsProject
 
-from mlapp.src.layers.features.edits import Edits
-
+from ..layers.features import Edits
 from ..models import Glitch
-from ..utils import PLUGIN_NAME, qgsDebug, qgsInfo
+from ..utils import PLUGIN_NAME, qgsInfo
 from .interfaces import IPersistedDerivedFeatureLayer
 from .persisted_feature_layer import PersistedFeatureLayer
 
@@ -66,4 +65,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         # Get a second batch of edits that copies the new records to this layer …
         edits.editBefore(Edits.bulkAdd(self, derivedFeatures))
 
+        # Get rid of the derived layer …
+        QgsProject.instance().removeMapLayer(derivedLayer.id())
         return edits
+
