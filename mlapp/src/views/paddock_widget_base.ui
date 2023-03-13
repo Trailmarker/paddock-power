@@ -82,9 +82,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="CurrentPaddockLandTypesTableView" name="currentPaddockLandTypesTableView"/>
-       </item>
       </layout>
      </widget>
      <widget class="QGroupBox" name="futurePaddockLandTypesTableViewGroupBox">
@@ -110,9 +107,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="FuturePaddockLandTypesTableView" name="futurePaddockLandTypesTableView"/>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="spacerWidget" native="true">
@@ -132,16 +126,6 @@
    <class>PaddockTableView</class>
    <extends>QTableView</extends>
    <header>mlapp/src/widgets/feature_table_view/paddock_table_view</header>
-  </customwidget>
-  <customwidget>
-   <class>CurrentPaddockLandTypesTableView</class>
-   <extends>QTableView</extends>
-   <header>mlapp/src/widgets/feature_table_view/paddock_land_types_table_view</header>
-  </customwidget>
-  <customwidget>
-   <class>FuturePaddockLandTypesTableView</class>
-   <extends>QTableView</extends>
-   <header>mlapp/src/widgets/feature_table_view/paddock_land_types_table_view</header>
   </customwidget>
  </customwidgets>
  <resources/>

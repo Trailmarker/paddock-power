@@ -5,7 +5,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
-from ..utils import qgsDebug, resolveStylePath, PLUGIN_NAME
+from ..utils import PLUGIN_NAME
 from .features import Edits
 from .fields import TIMEFRAME
 from .interfaces import IFeatureLayer
@@ -133,7 +133,6 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.triggerRepaint(True)
 
     def onSelectFeature(self, feature):
-        qgsDebug(f"{type(self).__name__}.onSelectFeature({feature})")
         feature.zoomFeature()
         self.featureSelected.emit(self.id())
         
@@ -141,20 +140,14 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
             self.onSelectPopupFeature(feature)
 
     def onDeselectFeatures(self, fids):
-        qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]})")
         self.featureDeselected.emit(self.id())
         
-        qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]}) - featureDeselected emitted")
         if self.hasPopups:
-            qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]}) - calling onDeselectPopupFeatures")
             self.onDeselectPopupFeatures()
-            qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]}) - called onDeselectPopupFeatures")
             
 
     def onSelectionChanged(self, selection, deselection, *_):
         """Translate our own selectionChanged signal into a workspace selectFeature call."""
-        qgsDebug(f"{type(self).__name__}.onSelectionChanged({selection}, {deselection}, {[str(s) for s in _]})")
-
         self.onDeselectFeatures(deselection)
 
         if len(selection) == 1:

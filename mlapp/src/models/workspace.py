@@ -114,9 +114,7 @@ class Workspace(QObject):
 
     def selectFeature(self, feature):
         """Select a feature."""
-        # qgsInfo(f"Workspace.selectFeature({feature})")
         selectedLayerId = feature.featureLayer.id()
-        # qgsInfo(f"Workspace.selectFeature({feature}): selectedLayerId={selectedLayerId}")
         self.selectedFeatures[selectedLayerId] = feature
 
         # If we are going to focus on the new feature, deselect the old layers

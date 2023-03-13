@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..utils import PLUGIN_NAME, qgsDebug
+from ..utils import PLUGIN_NAME
 from .features import Paddock
 from .derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from .paddock_land_types_popup_layer import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from time import sleep
+
 from qgis.core import QgsProject
 
 from ...models import Glitch
-from ...utils import qgsDebug
 from ...layers.popup_layer_consumer_mixin import PopupLayerConsumerMixin
 from .feature_table_view import FeatureTableView
 
@@ -36,10 +37,10 @@ class PopupTableView(FeatureTableView, PopupLayerConsumerMixin):
         featureLayer = QgsProject.instance().mapLayer(layerId)
 
         if type(featureLayer) in self.popupLayerTypes:
-            qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId}) - would add")
-        #     self.featureLayer = featureLayer
+            # qgsDebug(f"{type(self).__name__}.onPopupLayerAdded({layerId}) - would add")
+            self.featureLayer = featureLayer
+        pass
 
     def onPopupLayerRemoved(self):
-        qgsDebug(f"{type(self).__name__}.onPopupLayerRemoved()")
-        # self.featureLayer = None
-        # pass
+        # qgsDebug(f"{type(self).__name__}.onPopupLayerRemoved()")
+        self.featureLayer = None

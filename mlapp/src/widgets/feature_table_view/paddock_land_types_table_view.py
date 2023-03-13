@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields import *
-from ...layers.paddock_land_types_popup_layer import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
 from ..paddock_land_type_details import PaddockLandTypeDetails, PaddockLandTypeDetailsEdit
 from .feature_table_action import FeatureTableAction
-from .popup_table_view import PopupTableView
+from .feature_table_view import FeatureTableView
 
 
 PaddockLandTypesTableViewSchema = Schema([AreaTitle,
@@ -17,7 +16,7 @@ PaddockLandTypesTableViewSchema = Schema([AreaTitle,
                                           PotentialCapacity])
 
 
-class PaddockLandTypesTableView(PopupTableView):
+class PaddockLandTypesTableView(FeatureTableView):
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -37,10 +36,6 @@ class CurrentPaddockLandTypesTableView(PaddockLandTypesTableView):
         super().__init__(parent)
 
     @property
-    def popupLayerType(self):
-        return PaddockCurrentLandTypesPopupLayer
-
-    @property
     def timeframe(self):
         return Timeframe.Current
     
@@ -55,10 +50,6 @@ class FuturePaddockLandTypesTableView(PaddockLandTypesTableView):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-
-    @property
-    def popupLayerType(self):
-        return PaddockFutureLandTypesPopupLayer
 
     @property
     def timeframe(self):

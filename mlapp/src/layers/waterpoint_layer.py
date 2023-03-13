@@ -5,8 +5,6 @@ from .imported_feature_layer import ImportedFeatureLayer
 from .waterpoint_popup_layer import WaterpointPopupLayer
 
 
-from ..utils import qgsDebug
-
 class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
 
     LAYER_NAME = "Waterpoints"
@@ -21,8 +19,8 @@ class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
                  *dependentLayers):
         """Create or open a Waterpoint layer."""
         ImportedFeatureLayer.__init__(self, workspaceFile,
-                         layerName=WaterpointLayer.defaultName(),
-                         styleName=WaterpointLayer.defaultStyle())
+                                      layerName=WaterpointLayer.defaultName(),
+                                      styleName=WaterpointLayer.defaultStyle())
         PopupLayerSourceMixin.__init__(self)
         self.connectPopups()
 
