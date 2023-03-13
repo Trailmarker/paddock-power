@@ -20,7 +20,7 @@ class WaterpointTableView(FeatureTableView):
     def __init__(self, parent=None):
         """Constructor."""
 
-        super().__init__(WaterpointTableViewSchema, WaterpointDetailsEdit, parent)
+        super().__init__(WaterpointTableViewSchema, None, WaterpointDetailsEdit, parent)
         self.featureLayer = self.workspace.waterpointLayer
 
     @property

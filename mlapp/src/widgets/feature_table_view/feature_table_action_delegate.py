@@ -2,15 +2,14 @@
 from math import floor
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QBrush, QPainter
-from qgis.PyQt.QtWidgets import QStyledItemDelegate
+from qgis.PyQt.QtGui import QBrush
 
+from qgis.gui import QgsAttributeTableDelegate
 
-class FeatureTableActionDelegate(QStyledItemDelegate):
+class FeatureTableActionDelegate(QgsAttributeTableDelegate):
 
-    def __init__(self, tableView, featureTableActionModel, parent=None):
+    def __init__(self, featureTableActionModel, parent=None):
         super().__init__(parent)
-        self._tableView = tableView
         self._actionModel = featureTableActionModel
 
     @property
@@ -22,9 +21,10 @@ class FeatureTableActionDelegate(QStyledItemDelegate):
         """Paint the cell."""
         try:
             brush = painter.brush()
-            cellSelected = (self._tableView.selectionModel().currentIndex().row() == index.row())
+            # cellSelected = (self._tableView.selectionModel().currentIndex().row() == index.row())
 
-            cellColor = option.palette.highlight().color() if cellSelected else Qt.transparent
+            # cellColor = option.palette.highlight().color() if cellSelected else Qt.transparent
+            cellColor = Qt.white
             painter.fillRect(option.rect, QBrush(cellColor))
 
             icon = self.featureTableActionModel.icon(index)

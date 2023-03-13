@@ -1,41 +1,38 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout
 
-from qgis.utils import iface
-
-from ....utils import PLUGIN_FOLDER, qgsDebug
-from ....widgets.dialogs import EditDialog
+from ....utils import PLUGIN_FOLDER
+from ...dialogs import DetailsDialog
 from .feature_table_action import FeatureTableAction
 from .select_feature_model import SelectFeatureModel
 
 
-class EditFeatureModel(SelectFeatureModel):
+class ViewFeatureDetailsModel(SelectFeatureModel):
     """A feature table action model that configures editing a feature."""
 
-    _icon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/edit-item.png')
+    _icon = QIcon(f':/plugins/{PLUGIN_FOLDER}/images/view-item.png')
 
-    def __init__(self, editWidgetFactory):
+    def __init__(self, detailsWidgetFactory):
         super().__init__()
-        self._editWidgetFactory = editWidgetFactory
+        self._detailsWidgetFactory = detailsWidgetFactory
 
     def doAction(self, index):
         """Select the feature at the given index."""
         feature = super().doAction(index)
         if feature:
-            editDialog = EditDialog(feature, self._editWidgetFactory)
-            editDialog.exec_()
+            detailsDialog = DetailsDialog(feature, self._detailsWidgetFactory)
+            detailsDialog.exec_()
         return feature
 
     @property
     def featureTableAction(self):
         """The table action associated with this delegate"""
-        return FeatureTableAction.editFeature
+        return FeatureTableAction.viewFeatureDetails
 
     @property
     def isValid(self):
         """Can't use this action without an edit form."""
-        return self._editWidgetFactory is not None
+        return self._detailsWidgetFactory is not None
 
     @classmethod
     def actionInvalidatesCache(self):

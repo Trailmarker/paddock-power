@@ -105,7 +105,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockMiniList" name="affectedPaddocksMiniList">
+        <widget class="BasePaddockTableView" name="affectedPaddocksTableView">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -140,7 +140,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockMiniList" name="resultingPaddocksMiniList">
+        <widget class="BasePaddockTableView" name="resultingPaddocksTableView">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -165,14 +165,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PaddockMiniList</class>
-   <extends>QListWidget</extends>
-   <header>mlapp/src/widgets/feature_list/paddock_mini_list</header>
-  </customwidget>
-  <customwidget>
    <class>FenceTableView</class>
    <extends>QTableView</extends>
    <header>mlapp/src/widgets/feature_table_view/fence_table_view</header>
+  </customwidget>
+  <customwidget>
+   <class>BasePaddockTableView</class>
+   <extends>QTableView</extends>
+   <header>mlapp/src/widgets/feature_table_view/base_paddock_table_view</header>
   </customwidget>
  </customwidgets>
  <resources/>

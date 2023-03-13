@@ -14,7 +14,7 @@ class PipelineTableView(FeatureTableView):
     def __init__(self, parent=None):
         """Constructor."""
 
-        super().__init__(PipelineTableViewSchema, PipelineDetailsEdit, parent)
+        super().__init__(PipelineTableViewSchema, None, PipelineDetailsEdit, parent)
         self.featureLayer = self.workspace.pipelineLayer
 
     @property

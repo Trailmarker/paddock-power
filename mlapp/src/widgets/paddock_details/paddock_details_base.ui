@@ -228,7 +228,7 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Watered Area (km²)</string>
+        <string notr="true">Watered (km²)</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

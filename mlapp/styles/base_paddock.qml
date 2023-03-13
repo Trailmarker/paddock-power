@@ -410,10 +410,10 @@ def my_form_open(dialog, layer, feature):
     <field editable="0" name="Rounded Perimeter (km)"/>
     <field editable="0" name="Rounded Potential AE"/>
     <field editable="0" name="Rounded Potential AE/km²"/>
-    <field editable="0" name="Rounded Watered Area (km²)"/>
+    <field editable="0" name="Rounded Watered (km²)"/>
     <field editable="1" name="Status"/>
     <field editable="1" name="Timeframe"/>
-    <field editable="1" name="Watered Area (km²)"/>
+    <field editable="1" name="Watered (km²)"/>
     <field editable="1" name="fid"/>
   </editable>
   <labelOnTop>
@@ -434,10 +434,10 @@ def my_form_open(dialog, layer, feature):
     <field name="Rounded Perimeter (km)" labelOnTop="0"/>
     <field name="Rounded Potential AE" labelOnTop="0"/>
     <field name="Rounded Potential AE/km²" labelOnTop="0"/>
-    <field name="Rounded Watered Area (km²)" labelOnTop="0"/>
+    <field name="Rounded Watered (km²)" labelOnTop="0"/>
     <field name="Status" labelOnTop="1"/>
     <field name="Timeframe" labelOnTop="0"/>
-    <field name="Watered Area (km²)" labelOnTop="0"/>
+    <field name="Watered (km²)" labelOnTop="0"/>
     <field name="fid" labelOnTop="0"/>
   </labelOnTop>
   <reuseLastValue>
@@ -459,10 +459,10 @@ def my_form_open(dialog, layer, feature):
     <field reuseLastValue="0" name="Rounded Perimeter (km)"/>
     <field reuseLastValue="0" name="Rounded Potential AE"/>
     <field reuseLastValue="0" name="Rounded Potential AE/km²"/>
-    <field reuseLastValue="0" name="Rounded Watered Area (km²)"/>
+    <field reuseLastValue="0" name="Rounded Watered (km²)"/>
     <field reuseLastValue="0" name="Status"/>
     <field reuseLastValue="0" name="Timeframe"/>
-    <field reuseLastValue="0" name="Watered Area (km²)"/>
+    <field reuseLastValue="0" name="Watered (km²)"/>
     <field reuseLastValue="0" name="fid"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>

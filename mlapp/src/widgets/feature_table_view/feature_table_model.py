@@ -3,25 +3,26 @@ from qgis.PyQt.QtCore import Qt
 
 from qgis.gui import QgsAttributeTableModel
 
-from ...utils import PLUGIN_NAME, qgsDebug
-from .feature_table_action import FeatureTableAction, SelectFeatureModel, EditFeatureModel, UndoTrashFeatureModel, PlanBuildFeatureModel, ViewFeatureProfileModel
-from .feature_table_action import FeatureTableAction
+from ...utils import PLUGIN_NAME
+from .feature_table_action import *
 
 
 class FeatureTableModel(QgsAttributeTableModel):
     f"""Customisation of the QGIS attribute table model for ${PLUGIN_NAME} features."""
 
-    def __init__(self, displaySchema, featureCache, editWidgetFactory):
-        super().__init__(featureCache)
+    def __init__(self, displaySchema, featureCache, detailsWidgetFactory, editWidgetFactory, parent=None):
+        super().__init__(featureCache, parent)
         self._displaySchema = displaySchema
 
         self._actionModels = [
             SelectFeatureModel(),
+            ViewFeatureDetailsModel(detailsWidgetFactory),
             EditFeatureModel(editWidgetFactory),
             UndoTrashFeatureModel(),
             PlanBuildFeatureModel(),
             ViewFeatureProfileModel()
         ]
+        
 
     @property
     def featureTableActionModels(self):
@@ -31,7 +32,7 @@ class FeatureTableModel(QgsAttributeTableModel):
     @property
     def featureTableActionCount(self):
         """The number of actions in the model."""
-        return len(FeatureTableAction)
+        return len(self._actionModels)
 
     @property
     def hiddenColumns(self):
@@ -76,14 +77,15 @@ class FeatureTableModel(QgsAttributeTableModel):
         if self.isToolBarIndex(index):
 
             actionModel = self._actionModels[index.column()]
-            # if role == Qt.DisplayRole:
-            #     return actionModel.description(index)
-            if role == Qt.ToolTipRole:
-                return actionModel.toolTip(index)
-            # elif role == Qt.DecorationRole:
-            #     return actionModel.icon(index)
-            # else:
-            #     return ""
+            if actionModel:
+                # if role == Qt.DisplayRole:
+                #     return actionModel.description(index)
+                if role == Qt.ToolTipRole:
+                    return actionModel.toolTip(index)
+                # elif role == Qt.DecorationRole:
+                #     return actionModel.icon(index)
+                # else:
+                #     return ""
 
         return super().data(self.createIndex(index.row(), index.column() - self.featureTableActionCount), role)
 

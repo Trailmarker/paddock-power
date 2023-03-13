@@ -22,10 +22,6 @@ ProfileDetails QLabel.form-right {
   padding-left: 6px;
 }
 
-FencePaddockChanges {
-  background-color: #fcfcfc;
-}
-
 /* QSplitter::handle { 
     image: url(:/plugins/{PLUGIN_FOLDER}/images/splitter.png);
 } */

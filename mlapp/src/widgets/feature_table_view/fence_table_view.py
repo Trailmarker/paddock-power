@@ -17,7 +17,7 @@ class FenceTableView(FeatureTableView):
     def __init__(self, parent=None):
         """Constructor."""
 
-        super().__init__(FenceTableViewSchema, FenceDetailsEdit, parent)
+        super().__init__(FenceTableViewSchema, None, FenceDetailsEdit, parent)
         self.featureLayer = self.workspace.fenceLayer
 
     @property
