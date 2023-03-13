@@ -97,13 +97,14 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         # Try to make the columns resize a bit nicer too
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.horizontalHeader().setStretchLastSection(True)
    
         # Set "whole row only" selection mode
         self.setSelectionMode(FeatureTableView.SingleSelection)
         self.setSelectionBehavior(FeatureTableView.SelectRows)
 
         # Load the layer - important that this is prior to setting up the proxy/filter model
-        self._tableModel.modelReset.connect(self.onLoadLayer)
+        self._tableModel.modelReset.connect(self.onFeatureLayerLoaded)
         self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
         self._featureLayer.featureDeselected.connect(self.onFeatureDeselected)
 
@@ -114,11 +115,8 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         # Set our model
         self.setModel(self._tableFilterModel)
 
-        self.onLoadLayer()
-        self.updateColumnMetrics()
+        self.onFeatureLayerLoaded()
 
-        self.setVisible(True)
-        self.show()
 
     def clearFeatureLayer(self):
         # Clear everything if the new layer is falsy
@@ -141,35 +139,14 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         self._fitColumnsTimer.stop()
         self._fitColumnsTimer.start()
 
-    def updateColumnMetrics(self):
-
-        # First resize all columns to their contents, nice and snug
-        self.setVisible(False)
-        self.resizeColumnsToContents()
-        self.setVisible(True)
-
-        # Preferred section padding
-        unit = self.UNIT
-        padding = self.PADDING
-
-        # Figure out the metrics of our resized columns
-        header = self.horizontalHeader()
-        baseSectionSizes = [header.sectionSize(i) for i in range(header.count())]
-
-        # Allow all our columns except the action buttons to grow
-        sectionsToResize = [
-            i for i in range(
-                self._tableModel.featureTableActionCount,
-                header.count()) if header.sectionSize(i) > 0]
-
-        self._columnMetrics = (padding, baseSectionSizes, sectionsToResize)
-        return self._columnMetrics
-
     def fitColumns(self):
         """Shrink the view down to the minimum size needed to show its columns."""
 
         # We don't do this algebra when no one's looking
         if not self.isVisible():
+            return
+
+        if not self._columnMetrics:
             return
 
         (padding, baseSectionSizes, sectionsToResize) = self._columnMetrics
@@ -204,7 +181,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         return QSize(neededWidth, hint.height())
 
-    def onLoadLayer(self):
+    def onFeatureLayerLoaded(self):
         """Called when the layer is loaded."""
         config = self.featureLayer.attributeTableConfig()
         columns = config.columns()
@@ -241,6 +218,33 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
                 if not actionModel.isValid:
                     self.hideColumn(column)
             # self.setColumnWidth(column, 100)
+            
+        self.updateColumnMetrics()
+        self.setVisible(True)
+        self.show()
+
+    def updateColumnMetrics(self):
+
+        # First resize all columns to their contents, nice and snug
+        self.setVisible(False)
+        self.resizeColumnsToContents()
+        self.setVisible(True)
+
+        # Preferred section padding
+        padding = self.PADDING
+
+        # Figure out the metrics of our resized columns
+        header = self.horizontalHeader()
+        baseSectionSizes = [header.sectionSize(i) for i in range(header.count())]
+
+        # Allow all our columns except the action buttons to grow
+        sectionsToResize = [
+            i for i in range(
+                self._tableModel.featureTableActionCount,
+                header.count()) if header.sectionSize(i) > 0]
+
+        self._columnMetrics = (padding, baseSectionSizes, sectionsToResize)
+        return self._columnMetrics
 
     def invalidateCache(self):
         """Invalidate the underlying QgsVectorLayerCache (causes the view to be re-loaded)."""
@@ -258,6 +262,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         """Handle a batch of edits being persisted on the underyling layer."""
         # At the moment, we just invalidate the cache and reload the layer
         self.invalidateCache()
+        self.updateColumnMetrics()
 
     def onFeatureDeselected(self, _):
         """Handle a feature being deselected on the underlying layer."""
