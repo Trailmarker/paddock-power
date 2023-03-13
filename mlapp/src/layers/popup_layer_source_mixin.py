@@ -78,23 +78,38 @@ class PopupLayerSourceMixin(IFeatureLayer):
             except BaseException:
                 pass
             finally:
-                self.popupLayerRemoved.emit()
-                self.popupLayer = None
+                # self.popupLayerRemoved.emit()
+                popupLayer = None
 
     def removeAllPopupLayers(self):
         """Remove all popup layers associated with this source."""
-        for layerType in self.popupLayerTypes:
-            layerType.removeAllOfType()
+        layerIds = [self.__popupLayers[self.__key(layerType)] for layerType in self.__popupLayers]
 
+        for layerId in layerIds:
+            try:
+                qgsDebug(f"{self}.removeAllPopupLayers(): Removing popup layer {layerId}")
+                if layerId in QgsProject.instance().mapLayers():
+                    self.removePopupLayer(QgsProject.instance().mapLayer(layerId))
+                qgsDebug(f"{self}.removeAllPopupLayers(): Popup layer removed {layerId}")
+            except:
+                pass
+            finally:
+                self.popupLayerRemoved.emit()
+        
+        
+        # try:
+        #     for layerType in self.popupLayerTypes:
+        #         layerType.removeAllOfType()
+        
     def onSelectPopupFeature(self, feature):
         """To be overridden and called when the popup layer source selects a popup feature."""
 
-        qgsDebug(f"{self}.onSelectPopupFeature({feature})")
+        # qgsDebug(f"{self}.onSelectPopupFeature({feature})")
         self.addAllPopupLayers(feature)
 
     def onDeselectPopupFeatures(self):
         """To be overridden and called when the popup layer source deselects a popup feature."""
-        qgsDebug(f"{self}.onDeselectPopupFeatures()")
+        # qgsDebug(f"{self}.onDeselectPopupFeatures()")
         self.removeAllPopupLayers()
 
     def onPopupLayerAdded(self, layerId):

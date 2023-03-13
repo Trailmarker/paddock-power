@@ -144,8 +144,12 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]})")
         self.featureDeselected.emit(self.id())
         
+        qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]}) - featureDeselected emitted")
         if self.hasPopups:
+            qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]}) - calling onDeselectPopupFeatures")
             self.onDeselectPopupFeatures()
+            qgsDebug(f"{type(self).__name__}.onDeselectFeatures({[str(f) for f in fids]}) - called onDeselectPopupFeatures")
+            
 
     def onSelectionChanged(self, selection, deselection, *_):
         """Translate our own selectionChanged signal into a workspace selectFeature call."""
