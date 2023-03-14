@@ -196,7 +196,12 @@ class Field(QgsField):
         layer.setDefaultValueDefinition(fieldIndex, self.defaultValueDefinition())
 
     def displayFieldName(self):
+        """Name of the Field that should be displayed to represent this Field."""
         return self.name()
+
+    def hiddenFieldNames(self):
+        """Names of any Fields that should be hidden from the attribute table."""
+        return []
 
 
 class MeasureField(Field):
@@ -227,39 +232,15 @@ class MeasureField(Field):
             layer.setAttributeTableConfig(config)
 
     def displayFieldName(self):
+        """Name of the Field that should be displayed to represent this Field."""
         return f"Rounded {self.name()}"
 
-
-class TitleField(Field):
-    def __init__(self, expressionFactory, *args, **kwargs):
-        super().__init__(propertyName="TITLE", name=TITLE, type=QVariant.String, *args, **kwargs)
-
-        self._expressionFactory = expressionFactory
-
-    def setupLayer(self, layer):
-        """Set up this Field in a FeatureLayer."""
-
-        expression = self._expressionFactory(layer)
-        layer.addExpressionField(expression, self)
-
-
-class DefaultTitleField(TitleField):
-    def __init__(self, *args, **kwargs):
-        super().__init__(lambda layer: f"{layer.getFeatureType().displayName()} \"{FID}\"", *args, **kwargs)
-
-
-class AreaTitleField(TitleField):
-    def __init__(self, *args, **kwargs):
-        super().__init__(lambda _: f"\"{NAME}\" (round(\"{AREA}\", 2) km²)", *args, **kwargs)
-
-
-class LengthTitleField(TitleField):
-    def __init__(self, *args, **kwargs):
-        super().__init__(lambda _: f"\"{NAME}\" (round(\"{LENGTH}\", 1) km)", *args, **kwargs)
+    def hiddenFieldNames(self):
+        """Names of any Fields that should be hidden from the attribute table."""
+        return [self.name()]
 
 
 class CalculatedField(MeasureField):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

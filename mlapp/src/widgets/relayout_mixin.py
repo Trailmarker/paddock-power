@@ -20,10 +20,11 @@ class RelayoutMixin(ABC, metaclass=QtAbstractMeta):
         self.relayoutTimer = QTimer()
         self.relayoutTimer.setSingleShot(True)
         self.relayoutTimer.setInterval(100)
-        self.relayoutTimer.timeout.connect(lambda: self.__deleteSafeRelayout())
+        self.relayoutTimer.timeout.connect(lambda: self.__niceRelayout())
 
-    def __deleteSafeRelayout(self):
-        """Use SIP utility to check if the widget has been deleted before re-laying out."""
+    def __niceRelayout(self):
+        """Use SIP utility to check if the widget has been deleted before re-laying out,
+           and disable visual updates during the re-layout to avoid flickering."""
         if not sip.isdeleted(self):
             self.relayout()
 

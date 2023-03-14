@@ -4,9 +4,6 @@ from ..details import PipelineDetailsEdit
 from .feature_table import FeatureTable
 from .feature_table_action import FeatureTableAction
 
-# PipelineTableSchema = Schema([LengthTitle,
-#                                   Status])
-
 
 class PipelineTable(FeatureTable):
 

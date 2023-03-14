@@ -5,17 +5,6 @@ from .feature_table import FeatureTable
 from .feature_table_action import FeatureTableAction
 
 
-# PaddockLandTypesTableSchema = Schema([AreaTitle,
-#                                           # PaddockName,
-#                                           LandTypeName,
-#                                           ConditionTypeField,
-#                                           WateredArea,
-#                                           # EstimatedCapacityPerArea,
-#                                           # PotentialCapacityPerArea,
-#                                           EstimatedCapacity,
-#                                           PotentialCapacity])
-
-
 class PaddockLandTypesTable(FeatureTable):
 
     def __init__(self, parent=None):

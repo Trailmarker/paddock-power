@@ -5,12 +5,6 @@ from .feature_table_action import FeatureTableAction
 from .feature_table import FeatureTable
 
 
-# FenceTableSchema = Schema([LengthTitle,
-#                                BuildOrder,
-#                                Status,
-#                                Length])
-
-
 class FenceTable(FeatureTable):
 
     def __init__(self, parent=None):

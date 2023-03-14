@@ -7,12 +7,12 @@ from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
 
-from ...layers.fields import STATUS
+from ...layers.fields import CONDITION_TYPE, STATUS, ConditionType, FeatureStatus
 from ...models import WorkspaceMixin
 from ...utils import PLUGIN_NAME, getComponentStyleSheet, guiWarning
 
 from .. import RelayoutMixin
-from .feature_status_delegate import FeatureStatusDelegate
+from ..delegates.field_domain_delegate import FieldDomainDelegate
 from .feature_table_action_delegate import FeatureTableActionDelegate
 from .feature_table_model import FeatureTableModel
 from .feature_table_filter_model import FeatureTableFilterModel
@@ -54,10 +54,11 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self.verticalHeader().hide()
 
         # Allow the table to be reduced in width and height, but also make it use what it gets
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
         # The section sizes in the table are handled in self.relayout below
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.horizontalHeader().setStretchLastSection(True)
 
         self.setWordWrap(False)
 
@@ -144,7 +145,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         (padding, baseSectionSizes, sectionsToResize) = self._columnMetrics
 
-        scrollBarWidth = self.verticalScrollBar().geometry().width() if self.verticalScrollBar().isVisible() else 0
+        scrollBarWidth = self.verticalScrollBar().geometry().width()  # if self.verticalScrollBar().isVisible() else 0
 
         neededWidth = sum(baseSectionSizes) + scrollBarWidth
         preferredWidth = neededWidth + len(sectionsToResize) * padding
@@ -155,10 +156,11 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
             return
 
         # Section change can be negative? Nah …
-        sectionChange = min(round(max(self.width() - neededWidth, 0) / len(sectionsToResize)), padding)
+        sectionIncrease = min(max(self.width() - neededWidth, 0) // len(sectionsToResize), padding)
+        fineModulus = 0 if sectionIncrease >= padding else (max(self.width() - neededWidth, 0) % len(sectionsToResize))
 
         for i in sectionsToResize:
-            self.horizontalHeader().resizeSection(i, baseSectionSizes[i] + sectionChange)
+            self.horizontalHeader().resizeSection(i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
 
     def sizeHint(self):
         hint = super().sizeHint()
@@ -168,11 +170,17 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         (padding, baseSectionSizes, sectionsToResize) = self._columnMetrics
 
-        scrollBarWidth = self.verticalScrollBar().geometry().width() if self.verticalScrollBar().isVisible() else 0
+        scrollBarWidth = self.verticalScrollBar().geometry().width()  # if self.verticalScrollBar().isVisible() else 0
 
         neededWidth = sum(baseSectionSizes) + scrollBarWidth
 
         return QSize(neededWidth, hint.height())
+
+    def setFeatureFieldDomainDelegate(self, fieldName, fieldDomainType):
+        """Set up a column item delegate for the given field name and domain type."""
+        column = self._tableModel.columnFromFieldName(fieldName)
+        if column >= 0:
+            self.setItemDelegateForColumn(column, FieldDomainDelegate(fieldDomainType, self))
 
     def onFeatureLayerLoaded(self):
         """Called when the layer is loaded."""
@@ -180,7 +188,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         columns = config.columns()
 
         for column in columns:
-            if column.name not in self._schema.displayFieldNames():
+            if column.name in self._schema.hiddenFieldNames():
                 column.hidden = True
 
         config.setColumns(columns)
@@ -192,10 +200,9 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
                 featureTableActionModel.featureTableAction.value,
                 FeatureTableActionDelegate(featureTableActionModel, self))
 
-        # Set up a column item delegate for the "Status" field
-        statusColumn = self._tableModel.columnFromFieldName(STATUS)
-        if statusColumn >= 0:
-            self.setItemDelegateForColumn(statusColumn, FeatureStatusDelegate())
+        # Set up a column item delegate for the "Status" and "Condition Type" fields
+        self.setFeatureFieldDomainDelegate(STATUS, FeatureStatus)
+        self.setFeatureFieldDomainDelegate(CONDITION_TYPE, ConditionType)
 
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>77</height>
+    <width>582</width>
+    <height>52</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit feature</string>
+   <string>MLA Paddock Power | Edit</string>
   </property>
   <property name="toolTip">
    <string>Edit this feature using the provided form</string>
@@ -39,7 +39,7 @@
     <number>9</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="editLayout" stretch=""/>
+    <layout class="QVBoxLayout" name="editLayout"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">

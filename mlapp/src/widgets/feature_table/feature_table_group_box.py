@@ -71,7 +71,7 @@ class FeatureTableGroupBox(WorkspaceMixin, PopupLayerConsumerMixin, QGroupBox):
         elif self.featureTable:
             # Pump for our QGroupBox margins
             hint = self.featureTable.sizeHint()
-            return QSize(hint.width() + 6, hint.height() + 20)
+            return QSize(hint.width() + 10, hint.height() + 20)
         else:
             return super().sizeHint()
 

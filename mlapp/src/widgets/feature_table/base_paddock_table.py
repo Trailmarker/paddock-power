@@ -4,9 +4,6 @@ from .feature_table_action import FeatureTableAction
 from .feature_table import FeatureTable
 
 
-# BasePaddockTableSchema = Schema([AreaTitle, Status])
-
-
 class BasePaddockTable(FeatureTable):
 
     def __init__(self, parent=None):

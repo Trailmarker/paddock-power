@@ -106,7 +106,3 @@ if workspace():
 
 
 pdw = plugin().pluginDockWidget
-paddockTable = pdw.paddockTab.paddockTable
-pipelineTable = pdw.pipelineTab.pipelineTable
-fenceTable = pdw.fenceTab.fenceTable
-waterpointTable = pdw.waterpointTab.waterpointTable

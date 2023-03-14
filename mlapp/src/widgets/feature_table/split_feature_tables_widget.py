@@ -34,7 +34,6 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
 
         groupBox.setVisible(visible)
         self.splitter.addWidget(groupBox)
-        self.splitter.setCollapsible(self.splitter.count() - 1, False)
 
         self.relayout()
 
@@ -54,6 +53,16 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
         """Show or hide a feature table."""
         self.splitter.widget(index).setVisible(visible)
 
+    def hideEvent(self, event):
+        """Re-lay out when the widget is hidden."""
+        self.relayout()
+        super().hideEvent(event)
+
+    def showEvent(self, event):
+        """Re-lay out when the widget is shown."""
+        self.relayout()
+        super().showEvent(event)
+
     def relayout(self):
         """Get the hint widths of all the splitter items and try to balance them out."""
 
@@ -62,3 +71,5 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
         availableWidth = self.width() - self.splitter.handleWidth() * (self.splitter.count() - 1)
         adjustedSizes = [floor(availableWidth * hint / neededWidth) for hint in hints]
         self.splitter.setSizes(adjustedSizes)
+        # for i in range(self.splitter.count()):
+        #     self.splitter.setCollapsible(i, i > 0)

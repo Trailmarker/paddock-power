@@ -246,7 +246,7 @@ class PaddockPower(PluginStateMachine):
             projectFile = resolveProjectFile()
             if projectFile is None:
                 if warning:
-                    self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
+                    self.failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
                 return
             else:
                 workspaceFile = resolveWorkspaceFile(projectFilePath=projectFile)
@@ -254,12 +254,12 @@ class PaddockPower(PluginStateMachine):
                     self.initWorkspace(workspaceFile)
                 else:
                     if warning:
-                        self.__failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
+                        self.failureMessage(f"No {PLUGIN_NAME} workspace (.gpkg) file was located …")
                     return
         except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred detecting workspace …")
             qgsException()
-            self.__failureMessage(
+            self.failureMessage(
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
     def refreshWorkspace(self):
@@ -274,13 +274,13 @@ class PaddockPower(PluginStateMachine):
         try:
             projectFile = resolveProjectFile()
             if projectFile is None:
-                self.__failureMessage(f"{PLUGIN_NAME} no QGIS project file located …")
+                self.failureMessage(f"{PLUGIN_NAME} no QGIS project file located …")
                 return
             else:
                 workspaceFile = resolveWorkspaceFile()
                 if workspaceFile is not None:
                     if os.path.exists(workspaceFile):
-                        self.__failureMessage(
+                        self.failureMessage(
                             f"A {PLUGIN_NAME} workspace (.gpkg) file already exists. Stopping creation …")
                         return
                     else:
@@ -290,7 +290,7 @@ class PaddockPower(PluginStateMachine):
         except BaseException:
             qgsInfo(f"{PLUGIN_NAME} exception occurred creating workspace …")
             qgsException()
-            self.__failureMessage(
+            self.failureMessage(
                 f"An unexpected error occurred creating your {PLUGIN_NAME} workspace. Please check the QGIS logs for details …")
 
     @PluginAction.analyseWorkspace.handler()
@@ -330,16 +330,16 @@ class PaddockPower(PluginStateMachine):
     @PluginAction.openImportDialog.handler()
     def openImportDialog(self):
         if self.workspace:
-            self.importDialog = ImportDialog(self, self.iface.mainWindow())
+            self.importDialog = ImportDialog(self.iface.mainWindow())
             self.importDialog.show()
         else:
-            self.__failureMessage(f"{PLUGIN_NAME} no workspace loaded …")
+            self.failureMessage(f"{PLUGIN_NAME} no workspace loaded …")
             raise PluginActionFailure()
 
-    def __successMessage(self, message):
+    def successMessage(self, message):
         guiStatusBar(message)
 
-    def __failureMessage(self, message):
+    def failureMessage(self, message):
         guiWarning(message)
 
     def refreshUi(self):

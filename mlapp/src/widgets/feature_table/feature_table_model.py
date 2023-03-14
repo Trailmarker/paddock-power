@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from functools import cached_property
+
 from qgis.PyQt.QtCore import Qt
 
 from qgis.gui import QgsAttributeTableModel
@@ -10,9 +12,9 @@ from .feature_table_action import *
 class FeatureTableModel(QgsAttributeTableModel):
     f"""Customisation of the QGIS attribute table model for ${PLUGIN_NAME} features."""
 
-    def __init__(self, displaySchema, featureCache, detailsWidgetFactory, editWidgetFactory, parent=None):
+    def __init__(self, schema, featureCache, detailsWidgetFactory, editWidgetFactory, parent=None):
         super().__init__(featureCache, parent)
-        self._displaySchema = displaySchema
+        self._schema = schema
 
         self._actionModels = [
             SelectFeatureModel(),
@@ -33,23 +35,20 @@ class FeatureTableModel(QgsAttributeTableModel):
         """The number of actions in the model."""
         return len(self._actionModels)
 
-    @property
+    @cached_property
     def hiddenColumns(self):
         """Hide columns in the model that are not in the display schema."""
 
+        hiddenNames = self._schema.hiddenFieldNames()
         hiddenColumns = [self.columnFromFieldName(f.name())
                          for f in self.layer().fields()
-                         if (f.name() not in self._displaySchema.displayFieldNames())]
-
+                         if f.name() in hiddenNames]
         return hiddenColumns
 
     def columnFromFieldName(self, name):
         """Get the column number for a field in the layer, accounting for the action columns."""
         baseIndex = self.layer().fields().indexFromName(name)
-        if baseIndex >= 0:
-            return baseIndex + self.featureTableActionCount
-        else:
-            return -1
+        return baseIndex + self.featureTableActionCount if (baseIndex >= 0) else -1
 
     def rowCount(self, _):
         """This model has the default row count."""

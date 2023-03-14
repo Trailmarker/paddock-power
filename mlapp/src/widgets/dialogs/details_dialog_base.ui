@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DetailsDialogBase</class>
+ <class>EditDialogBase</class>
  <widget class="QDialog" name="EditDialogBase">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>77</height>
+    <width>585</width>
+    <height>51</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>View feature</string>
+   <string>MLA Paddock Power | Details</string>
   </property>
   <property name="toolTip">
    <string>View the details of this feature</string>
@@ -39,10 +39,10 @@
     <number>9</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="detailsLayout" stretch=""/>
+    <layout class="QVBoxLayout" name="detailsLayout"/>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -57,12 +57,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="cancelButton">
+      <widget class="QPushButton" name="dismissButton">
        <property name="text">
         <string>Dismiss</string>
        </property>
       </widget>
-      </item>
+     </item>
     </layout>
    </item>
   </layout>

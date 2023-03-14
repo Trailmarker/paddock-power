@@ -2,31 +2,34 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog
+
+from .dialog import Dialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'details_dialog_base.ui')))
 
 
-class DetailsDialog(QDialog, FORM_CLASS):
+class DetailsDialog(Dialog, FORM_CLASS):
     """A dialog for editing a feature."""
 
     def __init__(self, feature, detailsWidgetFactory, parent=None):
         """Constructor."""
-        QDialog.__init__(self, parent)
+        Dialog.__init__(self, parent)
         FORM_CLASS.__init__(self)
 
-        self.feature = feature
         self.setupUi(self)
+
+        self.feature = feature
 
         self.detailsWidget = detailsWidgetFactory(self.feature, self)
         self.detailsLayout.addWidget(self.detailsWidget)
 
         self.setWindowTitle(f"{self.feature.TITLE}")
-        self.cancelButton.clicked.connect(self.reject)
+        self.dismissButton.clicked.connect(self.reject)
 
-    def showEvent(self, event):
-        super().showEvent(event)
+    @property
+    def dialogRole(self):
+        return "Details"
 
     def reject(self):
         self.feature = None

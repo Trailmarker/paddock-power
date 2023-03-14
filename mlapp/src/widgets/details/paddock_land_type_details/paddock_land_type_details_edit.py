@@ -7,6 +7,8 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from ....layers.features import Edits
 from ....layers.fields import ConditionType
+from ...delegates import FieldDomainDelegate
+
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'paddock_land_type_details_edit_base.ui')))
@@ -23,6 +25,7 @@ class PaddockLandTypeDetailsEdit(QWidget, FORM_CLASS):
         self.paddockLandType = paddockLandType
         self._conditionType = paddockLandType.CONDITION_TYPE
 
+        self.conditionTypeComboBox.setItemDelegate(FieldDomainDelegate(ConditionType, self))
         for conditionType in ConditionType:
             self.conditionTypeComboBox.addItem(conditionType.value, conditionType)
 

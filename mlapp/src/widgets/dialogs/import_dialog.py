@@ -2,22 +2,24 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog
+
+from .dialog import Dialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'import_dialog_base.ui')))
 
 
-class ImportDialog(QDialog, FORM_CLASS):
-    def __init__(self, plugin, parent=None):
+class ImportDialog(Dialog, FORM_CLASS):
+    def __init__(self, parent=None):
         """Constructor."""
-        QDialog.__init__(self, parent)
+        Dialog.__init__(self, parent)
         FORM_CLASS.__init__(self)
 
         self.setupUi(self)
 
-        self.plugin = plugin
+    @property
+    def dialogRole(self):
+        return "Import"
 
-    # def closeEvent(self, event):
-    #     self.
-    #     event.accept()
+    def reject(self):
+        super().reject()
