@@ -36,7 +36,9 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
 
         self.popupLayerSource = self.workspace.paddockLayer
 
+        self.showingCurrentPopup = False
         self.currentPaddockLandTypesTableView = None
+        self.showingFuturePopup = False
         self.futurePaddockLandTypesTableView = None
 
     def resizeEvent(self, event):
@@ -49,8 +51,8 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
 
     def relayout(self):
         self.splitter.setSizes([self.paddockTableView.sizeHint().width() +6,
-                                self.currentPaddockLandTypesTableView.sizeHint().width() + 6 if self.currentPaddockLandTypesTableView else 0,
-                                self.futurePaddockLandTypesTableView.sizeHint().width() + 6 if self.futurePaddockLandTypesTableView else 0,
+                                self.currentPaddockLandTypesTableView.sizeHint().width() + 6 if self.showingCurrentPopup else 0,
+                                self.futurePaddockLandTypesTableView.sizeHint().width() + 6 if self.showingFuturePopup else 0,
                                 self.spacerWidget.sizeHint().width()])
 
     @property
@@ -76,19 +78,25 @@ class PaddockWidget(QWidget, FORM_CLASS, WorkspaceMixin, PopupLayerConsumerMixin
             self.currentPaddockLandTypesTableView = CurrentPaddockLandTypesTableView(self)
             self.currentPaddockLandTypesTableViewGroupBox.layout().addWidget(self.currentPaddockLandTypesTableView)
             self.currentPaddockLandTypesTableView.featureLayer = featureLayer
+            self.showingCurrentPopup = True
 
         if isinstance(featureLayer, PaddockFutureLandTypesPopupLayer):
             self.futurePaddockLandTypesTableView = FuturePaddockLandTypesTableView(self)
             self.futurePaddockLandTypesTableViewGroupBox.layout().addWidget(self.futurePaddockLandTypesTableView)
             self.futurePaddockLandTypesTableView.featureLayer = featureLayer
+            self.showingFuturePopup = True
+            
+        self.relayout()
 
     def onPopupLayerRemoved(self):
         """Override in subclass to handle popup layer removed."""
         if self.currentPaddockLandTypesTableView:
+            self.showingCurrentPopup = False
             self.currentPaddockLandTypesTableViewGroupBox.layout().removeWidget(self.currentPaddockLandTypesTableView)
             self.currentPaddockLandTypesTableView.deleteLater()
             self.currentPaddockLandTypesTableView = None
         if self.futurePaddockLandTypesTableView:
+            self.showingFuturePoup = False
             self.futurePaddockLandTypesTableViewGroupBox.layout().removeWidget(self.futurePaddockLandTypesTableView)
             self.futurePaddockLandTypesTableView.deleteLater()
             self.futurePaddockLandTypesTableView = None
