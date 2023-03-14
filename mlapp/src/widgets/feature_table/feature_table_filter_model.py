@@ -7,7 +7,7 @@ from ...layers.fields import Timeframe, TIMEFRAME
 from ...utils import qgsDebug
 
 
-class FeatureTableViewFilterModel(QgsAttributeTableFilterModel):
+class FeatureTableFilterModel(QgsAttributeTableFilterModel):
     """A customisation of the QGIS attribute table filter model to filter features
     by their timeframe, if present."""
 

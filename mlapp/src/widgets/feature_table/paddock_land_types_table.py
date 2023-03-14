@@ -2,10 +2,10 @@
 from ...layers.fields import PaddockLandTypeSchema, Timeframe
 from ..paddock_land_type_details import PaddockLandTypeDetails, PaddockLandTypeDetailsEdit
 from .feature_table_action import FeatureTableAction
-from .feature_table_view import FeatureTableView
+from .feature_table import FeatureTable
 
 
-# PaddockLandTypesTableViewSchema = Schema([AreaTitle,
+# PaddockLandTypesTableSchema = Schema([AreaTitle,
 #                                           # PaddockName,
 #                                           LandTypeName,
 #                                           ConditionTypeField,
@@ -16,7 +16,7 @@ from .feature_table_view import FeatureTableView
 #                                           PotentialCapacity])
 
 
-class PaddockLandTypesTableView(FeatureTableView):
+class PaddockLandTypesTable(FeatureTable):
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -28,7 +28,7 @@ class PaddockLandTypesTableView(FeatureTableView):
         return [FeatureTableAction.selectFeature, FeatureTableAction.editFeature]
     
 
-class CurrentPaddockLandTypesTableView(PaddockLandTypesTableView):
+class CurrentPaddockLandTypesTable(PaddockLandTypesTable):
     """A popup table view for collections of PaddockLandTypes
     in the Current timeframe only."""
 
@@ -44,7 +44,7 @@ class CurrentPaddockLandTypesTableView(PaddockLandTypesTableView):
 
 
 
-class FuturePaddockLandTypesTableView(PaddockLandTypesTableView):
+class FuturePaddockLandTypesTable(PaddockLandTypesTable):
     """A popup table view for collections of PaddockLandTypes
     in the Future timeframe only."""
 

@@ -31,7 +31,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QGroupBox" name="paddockTableViewGroupBox">
+     <widget class="QGroupBox" name="paddockTableGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
         <horstretch>4</horstretch>
@@ -55,7 +55,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="PaddockTableView" name="paddockTableView">
+        <widget class="PaddockTable" name="paddockTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -66,7 +66,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="currentPaddockLandTypesTableViewGroupBox">
+     <widget class="QGroupBox" name="currentPaddockLandTypesTableGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
         <horstretch>3</horstretch>
@@ -91,7 +91,7 @@
        </property>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="futurePaddockLandTypesTableViewGroupBox">
+     <widget class="QGroupBox" name="futurePaddockLandTypesTableGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
         <horstretch>3</horstretch>
@@ -130,9 +130,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PaddockTableView</class>
+   <class>PaddockTable</class>
    <extends>QTableView</extends>
-   <header>mlapp/src/widgets/feature_table_view/paddock_table_view</header>
+   <header>mlapp/src/widgets/feature_table/paddock_table</header>
   </customwidget>
  </customwidgets>
  <resources/>

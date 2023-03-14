@@ -102,5 +102,5 @@ class FenceWidget(QWidget, FORM_CLASS, WorkspaceMixin):
             resultingFids = [p.FID for p in resultingPaddocks]
             qgsDebug(f"resultingFids = {resultingFids}")
 
-            self.affectedPaddocksTableView.setFilteredFeatures([p.FID for p in affectedPaddocks])
-            self.resultingPaddocksTableView.setFilteredFeatures([p.FID for p in resultingPaddocks])
+            self.affectedPaddocksTable.setFilteredFeatures([p.FID for p in affectedPaddocks])
+            self.resultingPaddocksTable.setFilteredFeatures([p.FID for p in resultingPaddocks])

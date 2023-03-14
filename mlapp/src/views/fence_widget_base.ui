@@ -70,7 +70,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="FenceTableView" name="fenceTableView">
+        <widget class="FenceTable" name="fenceTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -105,7 +105,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="BasePaddockTableView" name="affectedPaddocksTableView">
+        <widget class="BasePaddockTable" name="affectedPaddocksTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -140,7 +140,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="BasePaddockTableView" name="resultingPaddocksTableView">
+        <widget class="BasePaddockTable" name="resultingPaddocksTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -165,14 +165,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FenceTableView</class>
+   <class>FenceTable</class>
    <extends>QTableView</extends>
-   <header>mlapp/src/widgets/feature_table_view/fence_table_view</header>
+   <header>mlapp/src/widgets/feature_table/fence_table</header>
   </customwidget>
   <customwidget>
-   <class>BasePaddockTableView</class>
+   <class>BasePaddockTable</class>
    <extends>QTableView</extends>
-   <header>mlapp/src/widgets/feature_table_view/base_paddock_table_view</header>
+   <header>mlapp/src/widgets/feature_table/base_paddock_table</header>
   </customwidget>
  </customwidgets>
  <resources/>

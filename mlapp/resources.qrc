@@ -39,6 +39,6 @@
         <file>src/widgets/feature_status_label/feature_status_label.qss</file>
         <file>src/widgets/state_machine_tool_bar/state_machine_tool_bar.qss</file>
 
-        <file>src/widgets/feature_table_view/feature_table_view.qss</file>
+        <file>src/widgets/feature_table/feature_table.qss</file>
     </qresource>
 </RCC>

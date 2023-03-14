@@ -3,10 +3,10 @@ from ...layers.fields import MetricPaddockSchema
 from ...layers.fields.fields import *
 from ..paddock_details import PaddockDetails, PaddockDetailsEdit
 from .feature_table_action import FeatureTableAction
-from .feature_table_view import FeatureTableView
+from .feature_table import FeatureTable
 
 
-# PaddockTableViewSchema = Schema([AreaTitle,
+# PaddockTableSchema = Schema([AreaTitle,
 #                                  Status,
 #                                  WateredArea,
 #                                  EstimatedCapacityPerArea,
@@ -15,7 +15,7 @@ from .feature_table_view import FeatureTableView
 #                                  PotentialCapacity])
 
 
-class PaddockTableView(FeatureTableView):
+class PaddockTable(FeatureTable):
 
     def __init__(self, parent=None):
         """Constructor."""

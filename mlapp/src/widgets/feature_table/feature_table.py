@@ -15,13 +15,13 @@ from .. import RelayoutMixin
 from .feature_status_delegate import FeatureStatusDelegate
 from .feature_table_action_delegate import FeatureTableActionDelegate
 from .feature_table_model import FeatureTableModel
-from .feature_table_view_filter_model import FeatureTableViewFilterModel
+from .feature_table_filter_model import FeatureTableFilterModel
 
 
 STYLESHEET = getComponentStyleSheet(__file__)
 
 
-class FeatureTableView(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView, metaclass=QtAbstractMeta):
+class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView, metaclass=QtAbstractMeta):
 
     UNIT = 10
     PADDING = 5 * UNIT
@@ -62,8 +62,8 @@ class FeatureTableView(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView, met
         self.setWordWrap(False)
         
         # Set "whole row only" selection mode
-        self.setSelectionMode(FeatureTableView.SingleSelection)
-        self.setSelectionBehavior(FeatureTableView.SelectRows)
+        self.setSelectionMode(FeatureTable.SingleSelection)
+        self.setSelectionBehavior(FeatureTable.SelectRows)
 
 
     def onClicked(self, index):
@@ -110,7 +110,7 @@ class FeatureTableView(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView, met
         self._featureLayer.featureDeselected.connect(self.onFeatureDeselected)
 
         self._tableModel.loadLayer()
-        self._tableFilterModel = FeatureTableViewFilterModel(
+        self._tableFilterModel = FeatureTableFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
         self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
         self.workspace.lockChanged.connect(self.invalidateCache)

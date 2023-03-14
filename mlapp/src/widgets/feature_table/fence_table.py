@@ -3,16 +3,16 @@ from ...layers.fields import FenceSchema
 from ...layers.fields.fields import *
 from ..fence_details import FenceDetailsEdit
 from .feature_table_action import FeatureTableAction
-from .feature_table_view import FeatureTableView
+from .feature_table import FeatureTable
 
 
-# FenceTableViewSchema = Schema([LengthTitle,
+# FenceTableSchema = Schema([LengthTitle,
 #                                BuildOrder,
 #                                Status,
 #                                Length])
 
 
-class FenceTableView(FeatureTableView):
+class FenceTable(FeatureTable):
 
     def __init__(self, parent=None):
         """Constructor."""

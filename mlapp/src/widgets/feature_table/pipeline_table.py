@@ -3,13 +3,13 @@ from ...layers.fields import PipelineSchema
 from ...layers.fields.fields import *
 from ..pipeline_details import PipelineDetailsEdit
 from .feature_table_action import FeatureTableAction
-from .feature_table_view import FeatureTableView
+from .feature_table import FeatureTable
 
-# PipelineTableViewSchema = Schema([LengthTitle,
+# PipelineTableSchema = Schema([LengthTitle,
 #                                   Status])
 
 
-class PipelineTableView(FeatureTableView):
+class PipelineTable(FeatureTable):
 
     def __init__(self, parent=None):
         """Constructor."""

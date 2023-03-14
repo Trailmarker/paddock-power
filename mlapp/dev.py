@@ -105,7 +105,7 @@ if workspace():
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
 
 fv = plugin().featureView
-paddockTableView = fv.paddockTab.paddockTableView
-pipelineTableView = fv.pipelineTab.pipelineTableView
-fenceTableView = fv.fenceTab.fenceTableView
-waterpointTableView = fv.waterpointTab.waterpointTableView
+paddockTable = fv.paddockTab.paddockTable
+pipelineTable = fv.pipelineTab.pipelineTable
+fenceTable = fv.fenceTab.fenceTable
+waterpointTable = fv.waterpointTab.waterpointTable

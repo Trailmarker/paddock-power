@@ -6,14 +6,12 @@ from qgis.PyQt.QtGui import QBrush
 
 from qgis.gui import QgsAttributeTableDelegate
 
-from ...models import WorkspaceMixin
-
 
 class FeatureTableActionDelegate(QgsAttributeTableDelegate):
 
     def __init__(self, featureTableActionModel, parent=None):
         super().__init__(parent)
-        
+
         self._actionModel = featureTableActionModel
 
     @property

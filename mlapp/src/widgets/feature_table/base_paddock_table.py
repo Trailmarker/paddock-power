@@ -2,13 +2,13 @@
 from ...layers.fields import BasePaddockSchema
 from ...layers.fields.fields import *
 from .feature_table_action import FeatureTableAction
-from .feature_table_view import FeatureTableView
+from .feature_table import FeatureTable
 
 
-# BasePaddockTableViewSchema = Schema([AreaTitle, Status])
+# BasePaddockTableSchema = Schema([AreaTitle, Status])
 
 
-class BasePaddockTableView(FeatureTableView):
+class BasePaddockTable(FeatureTable):
 
     def __init__(self, parent=None):
         """Constructor."""
