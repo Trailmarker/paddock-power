@@ -83,7 +83,9 @@ StatusFeatureSchema = Schema([Fid,
                               Status])
 WaterpointBufferSchema = Schema([Fid,
                                  Waterpoint,
+                                 WaterpointName,
                                  Paddock,
+                                 PaddockName,
                                  GrazingRadiusTypeField,
                                  GrazingRadius,
                                  Status,
@@ -91,6 +93,7 @@ WaterpointBufferSchema = Schema([Fid,
                                 wkbType=QgsWkbTypes.MultiPolygon)
 WateredAreaSchema = Schema([Fid,
                             Paddock,
+                            PaddockName,
                             WateredTypeField,
                             TimeframeField], wkbType=QgsWkbTypes.MultiPolygon)
 WaterpointSchema = Schema([Fid,

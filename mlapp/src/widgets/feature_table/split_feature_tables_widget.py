@@ -70,13 +70,13 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
         sizes = [self.splitter.widget(i).width() for i in range(count)]
         hints = [self.splitter.widget(i).sizeHint().width() for i in range(count)]
 
-        qgsDebug(f"SplitFeatureTablesWidget.relayout: sizes = {sizes}, hints = {hints}")
+        # qgsDebug(f"SplitFeatureTablesWidget.relayout: sizes = {sizes}, hints = {hints}")
 
         available = self.width() - self.splitter.handleWidth() * (count - 1)
         current = sum(sizes)
         needed = sum(hints)
 
-        qgsDebug(f"SplitFeatureTablesWidget.relayout: available = {available}, current = {current}, needed = {needed}")
+        # qgsDebug(f"SplitFeatureTablesWidget.relayout: available = {available}, current = {current}, needed = {needed}")
 
         # If we have room, try to make everything at least the hint
         if needed <= available and current < available:
@@ -86,7 +86,7 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
             sizes[0] = hints[0]
 
         current = sum(sizes)
-        qgsDebug(f"SplitFeatureTablesWidget.relayout: after expanding, sizes = {sizes}, current = {current}, available = {available}")
+        # qgsDebug(f"SplitFeatureTablesWidget.relayout: after expanding, sizes = {sizes}, current = {current}, available = {available}")
 
         # If we've got too much, bring everything down to the hint at maximum,
         # shrinking from the right first
@@ -97,7 +97,7 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
                 sizes[i] = hints[i]
                 current = sum(sizes)
 
-        qgsDebug(f"SplitFeatureTablesWidget.relayout: after shrinking from the right, sizes = {sizes}, current = {current}, available = {available}")
+        # qgsDebug(f"SplitFeatureTablesWidget.relayout: after shrinking from the right, sizes = {sizes}, current = {current}, available = {available}")
 
         # If we've still got too much, accept that we're going to have to shrink,
         # but favour the first item
@@ -110,12 +110,12 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
 
         current = sum(sizes)
 
-        qgsDebug(f"SplitFeatureTablesWidget.relayout: after forced shrink, sizes = {sizes}, current = {current}, available = {available}")
+        # qgsDebug(f"SplitFeatureTablesWidget.relayout: after forced shrink, sizes = {sizes}, current = {current}, available = {available}")
 
         # If we've still got too much, squash the first item too
         if current > available:
             sizes = [max(sizes[0] - (current - available), 0)] + [0 for s in sizes[1:]]
 
-        qgsDebug(f"SplitFeatureTablesWidget.relayout: after final shrink, sizes = {sizes}, current = {current}")
+        # qgsDebug(f"SplitFeatureTablesWidget.relayout: after final shrink, sizes = {sizes}, current = {current}")
 
         self.splitter.setSizes(sizes)

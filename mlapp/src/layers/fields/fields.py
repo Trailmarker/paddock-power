@@ -74,6 +74,7 @@ WateredTypeField = DomainField(
     domainType=WateredType,
     defaultValue=WateredType.Unwatered)
 Waterpoint = IdField(propertyName="WATERPOINT", name=WATERPOINT)
+WaterpointName = StringField(propertyName="WATERPOINT_NAME", name=WATERPOINT_NAME)
 GrazingRadiusTypeField = DomainField(
     propertyName="GRAZING_RADIUS_TYPE",
     name=GRAZING_RADIUS_TYPE,
