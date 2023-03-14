@@ -68,6 +68,6 @@ class WorkspaceTask(QgsTask):
             raise WorkspaceTaskCancelledException()
 
     def cancel(self):
-        qgsInfo(f"{PLUGIN_NAME} User started cancelling: {self.description()}")
+        qgsInfo(f"{PLUGIN_NAME} User requested to cancel: {self.description()}")
         super().cancel()
         sleep(self.TASK_DELAY)

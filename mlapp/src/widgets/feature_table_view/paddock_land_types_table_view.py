@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-from ...layers.fields import *
+from ...layers.fields import PaddockLandTypeSchema, Timeframe
 from ..paddock_land_type_details import PaddockLandTypeDetails, PaddockLandTypeDetailsEdit
 from .feature_table_action import FeatureTableAction
 from .feature_table_view import FeatureTableView
 
 
-PaddockLandTypesTableViewSchema = Schema([AreaTitle,
-                                          # PaddockName,
-                                          LandTypeName,
-                                          ConditionTypeField,
-                                          WateredArea,
-                                          # EstimatedCapacityPerArea,
-                                          # PotentialCapacityPerArea,
-                                          EstimatedCapacity,
-                                          PotentialCapacity])
+# PaddockLandTypesTableViewSchema = Schema([AreaTitle,
+#                                           # PaddockName,
+#                                           LandTypeName,
+#                                           ConditionTypeField,
+#                                           WateredArea,
+#                                           # EstimatedCapacityPerArea,
+#                                           # PotentialCapacityPerArea,
+#                                           EstimatedCapacity,
+#                                           PotentialCapacity])
 
 
 class PaddockLandTypesTableView(FeatureTableView):
@@ -21,7 +21,7 @@ class PaddockLandTypesTableView(FeatureTableView):
     def __init__(self, parent=None):
         """Constructor."""
 
-        super().__init__(PaddockLandTypesTableViewSchema, PaddockLandTypeDetails, PaddockLandTypeDetailsEdit, parent)
+        super().__init__(PaddockLandTypeSchema, PaddockLandTypeDetails, PaddockLandTypeDetailsEdit, parent)
 
     @property
     def supportedFeatureTableActions(self):
