@@ -16,4 +16,4 @@ class PaddockTable(FeatureTable):
 
     @property
     def supportedFeatureTableActions(self):
-        return [FeatureTableAction.selectFeature, FeatureTableAction.editFeature]
+        return [FeatureTableAction.selectFeature, FeatureTableAction.viewFeatureDetails, FeatureTableAction.editFeature]

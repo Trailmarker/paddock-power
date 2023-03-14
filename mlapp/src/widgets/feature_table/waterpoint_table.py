@@ -15,5 +15,5 @@ class WaterpointTable(FeatureTable):
 
     @property
     def supportedFeatureTableActions(self):
-        return [FeatureTableAction.selectFeature, FeatureTableAction.editFeature,
+        return [FeatureTableAction.selectFeature, FeatureTableAction.viewFeatureDetails, FeatureTableAction.editFeature,
                 FeatureTableAction.undoTrashFeature, FeatureTableAction.planBuildFeature]

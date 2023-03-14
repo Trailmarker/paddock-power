@@ -14,7 +14,7 @@ class PaddockLandTypesTable(FeatureTable):
 
     @property
     def supportedFeatureTableActions(self):
-        return [FeatureTableAction.selectFeature, FeatureTableAction.editFeature]
+        return [FeatureTableAction.selectFeature, FeatureTableAction.viewFeatureDetails, FeatureTableAction.editFeature]
 
 
 class CurrentPaddockLandTypesTable(PaddockLandTypesTable):

@@ -20,7 +20,7 @@ class ViewFeatureDetailsModel(SelectFeatureModel):
         """Select the feature at the given index."""
         feature = super().doAction(index)
         if feature:
-            detailsDialog = DetailsDialog(feature, self._detailsWidgetFactory)
+            detailsDialog = DetailsDialog(feature, self._detailsWidgetFactory, self.plugin.pluginDockWidget)
             detailsDialog.exec_()
         return feature
 

@@ -15,7 +15,6 @@ class PaddockDetails(QWidget, FORM_CLASS):
         super().__init__(parent)
 
         self.setupUi(self)
-
         self.paddock = paddock
         self.refreshUi()
 

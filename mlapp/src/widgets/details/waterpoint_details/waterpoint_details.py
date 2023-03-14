@@ -15,7 +15,6 @@ class WaterpointDetails(QWidget, FORM_CLASS):
         super().__init__(parent)
 
         self.setupUi(self)
-
         self.waterpoint = waterpoint
         self.refreshUi()
 
