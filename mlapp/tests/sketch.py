@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
+
 from qgis.core import QgsGeometry
 
 
-from .dev import *
-from mlapp.src.tools.sketch_line_tool import SketchLineTool
+from ..dev import *
+from mlapp.src.widgets import SketchLineTool
 
 p1 = workspace().pipelineLayer.makeFeature()
 p2 = workspace().pipelineLayer.makeFeature()

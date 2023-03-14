@@ -22,7 +22,6 @@ class FeatureTableModel(QgsAttributeTableModel):
             PlanBuildFeatureModel(),
             ViewFeatureProfileModel()
         ]
-        
 
     @property
     def featureTableActionModels(self):

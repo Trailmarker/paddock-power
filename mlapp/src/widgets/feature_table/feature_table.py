@@ -8,7 +8,7 @@ from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
 
 from ...layers.fields import STATUS
-from ...models import QtAbstractMeta, WorkspaceMixin
+from ...models import WorkspaceMixin
 from ...utils import PLUGIN_NAME, getComponentStyleSheet, guiWarning
 
 from .. import RelayoutMixin
@@ -49,22 +49,21 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         # Base appearance
         self.setStyleSheet(STYLESHEET)
-        
+
         # Hide QGIS's default row numbers up the left side
         self.verticalHeader().hide()
 
-        # Allow the table to be reduced in width and height, but also make it use what it gets    
+        # Allow the table to be reduced in width and height, but also make it use what it gets
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        
+
         # The section sizes in the table are handled in self.relayout below
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
         self.setWordWrap(False)
-        
+
         # Set "whole row only" selection mode
         self.setSelectionMode(FeatureTable.SingleSelection)
         self.setSelectionBehavior(FeatureTable.SelectRows)
-
 
     def onClicked(self, index):
         if self._tableModel and self._tableModel.isToolBarIndex(index):
@@ -163,7 +162,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
     def sizeHint(self):
         hint = super().sizeHint()
-        
+
         if not self._columnMetrics:
             return hint
 
@@ -211,7 +210,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
                 if not actionModel.isValid:
                     self.hideColumn(column)
             # self.setColumnWidth(column, 100)
-            
+
         self.updateColumnMetrics()
         self.setVisible(True)
         self.show()
@@ -270,14 +269,14 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
     def onFeatureTableActionClicked(self, index):
         """Handle a feature table action being clicked."""
         delegate = self.itemDelegateForColumn(index.column())
-        
+
         if not delegate or not delegate.featureTableActionModel:
             return
-        
+
         if delegate.featureTableActionModel.locked:
             guiWarning(f"Please wait while {PLUGIN_NAME} finishes processing.")
             return
-        
+
         feature = delegate.featureTableActionModel.doAction(index)
 
         if not feature or delegate.featureTableActionModel.actionInvalidatesCache():

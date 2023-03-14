@@ -17,7 +17,7 @@ class SketchPointTool(MapTool):
 
         # The point we'll sketch
         self.point = None
-        
+
         # The points in a sketch
         self.points = []
 

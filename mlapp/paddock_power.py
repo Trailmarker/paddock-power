@@ -15,8 +15,7 @@ from .src.models import Glitch, Workspace
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus
 from .src.utils import guiConfirm, guiStatusBar, guiStatusBarAndInfo, guiWarning, qgsDebug, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
-from .src.widgets.plugin_dock_widget import PluginDockWidget
-from .src.widgets.dialogs.import_dialog import ImportDialog
+from .src.widgets import ImportDialog, PluginDockWidget
 
 
 class PaddockPower(PluginStateMachine):
@@ -100,10 +99,10 @@ class PaddockPower(PluginStateMachine):
         self.toolbar.setObjectName(u"PaddockPower")
 
         self.openPluginDockWidgetAction = self.addAction(PluginAction.openPluginDockWidget,
-                                                    QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock-power.png"),
-                                                    text=f"Open {PLUGIN_NAME} …",
-                                                    callback=lambda *_: self.openPluginDockWidget(),
-                                                    parent=self.iface.mainWindow())
+                                                         QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock-power.png"),
+                                                         text=f"Open {PLUGIN_NAME} …",
+                                                         callback=lambda *_: self.openPluginDockWidget(),
+                                                         parent=self.iface.mainWindow())
 
         self.detectWorkspaceAction = self.addAction(
             PluginAction.detectWorkspace,

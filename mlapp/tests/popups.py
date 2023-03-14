@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 
-from .dev import *
+from ..dev import *
 
 
 def testPaddocks():

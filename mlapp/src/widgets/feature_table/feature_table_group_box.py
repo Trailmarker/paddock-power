@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sip # type: ignore
+import sip  # type: ignore
 
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QGroupBox, QSizePolicy, QVBoxLayout
@@ -22,7 +22,7 @@ class FeatureTableGroupBox(WorkspaceMixin, PopupLayerConsumerMixin, QGroupBox):
         self.verticalLayout.setContentsMargins(0, 1, 0, 0)
         self.setLayout(self.verticalLayout)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        
+
         self._featureTableFactory = None
         self._featureTable = None
         self._popupLayerTypes = []

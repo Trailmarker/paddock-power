@@ -23,5 +23,3 @@ class FeatureLayer(MapLayer):
     def focusOnSelect(self):
         """Return True if this layer should be focused when a feature is selected."""
         return self.getFeatureType().focusOnSelect()
-    
- 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayer, QgsProject
 
-
 from ..utils import PLUGIN_NAME, qgsInfo, resolveStylePath
 from .interfaces import IDerivedFeatureLayer, IMapLayer, IPersistedFeatureLayer
 
@@ -34,8 +33,9 @@ class MapLayerMixin(IMapLayer):
 
         # Match by provider and name for derived layers
         if issubclass(cls, IDerivedFeatureLayer):
-            sameProviderAndName = [l.id() for l in allLayers if l.providerType() == "virtual" and l.name() == cls.defaultName()]
- 
+            sameProviderAndName = [l.id() for l in allLayers if l.providerType() ==
+                                   "virtual" and l.name() == cls.defaultName()]
+
             matches = list(set(matches + sameProviderAndName))
 
         return matches

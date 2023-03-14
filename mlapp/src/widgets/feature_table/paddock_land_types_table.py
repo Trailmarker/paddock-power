@@ -26,7 +26,7 @@ class PaddockLandTypesTable(FeatureTable):
     @property
     def supportedFeatureTableActions(self):
         return [FeatureTableAction.selectFeature, FeatureTableAction.editFeature]
-    
+
 
 class CurrentPaddockLandTypesTable(PaddockLandTypesTable):
     """A popup table view for collections of PaddockLandTypes
@@ -38,10 +38,9 @@ class CurrentPaddockLandTypesTable(PaddockLandTypesTable):
     @property
     def timeframe(self):
         return Timeframe.Current
-    
+
     def onTimeframeChanged(self, timeframe):
         pass
-
 
 
 class FuturePaddockLandTypesTable(PaddockLandTypesTable):
@@ -54,7 +53,6 @@ class FuturePaddockLandTypesTable(PaddockLandTypesTable):
     @property
     def timeframe(self):
         return Timeframe.Future
-    
+
     def onTimeframeChanged(self, timeframe):
         pass
-

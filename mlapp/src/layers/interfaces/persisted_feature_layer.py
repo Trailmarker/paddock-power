@@ -8,8 +8,8 @@ class PersistedFeatureLayer(FeatureLayer, PersistedLayer):
     @classmethod
     def workspaceUrl(cls, workspaceFile):
         """Return the expected GeoPackage URL for this layer for a given workspace GeoPackage."""
-        return f"{workspaceFile}|layername={cls.defaultName()}"    
-    
+        return f"{workspaceFile}|layername={cls.defaultName()}"
+
     @abstractmethod
     def detectInStore(self, workspaceFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""

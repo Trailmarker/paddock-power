@@ -4,7 +4,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.gui import QgsAttributeTableFilterModel
 
 from ...layers.fields import Timeframe, TIMEFRAME
-from ...utils import qgsDebug
 
 
 class FeatureTableFilterModel(QgsAttributeTableFilterModel):
@@ -24,11 +23,9 @@ class FeatureTableFilterModel(QgsAttributeTableFilterModel):
 
     def filterAcceptsRow(self, sourceModelRow, sourceParent):
         # Timeframe filtering only applies when no filteredFeatures have been set
-        # qgsDebug(f"self.filterModee) == {self.filterMode()}")
-        
         if self.filterMode() == QgsAttributeTableFilterModel.ShowFilteredList:
             return super().filterAcceptsRow(sourceModelRow, sourceParent)
-      
+
         # The result when there is no 'Timeframe' column at all
         if self._timeframeColumn < 0:
             return True

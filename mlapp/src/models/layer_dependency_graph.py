@@ -77,7 +77,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
                 BasePaddockLayer,
                 LandTypeLayer,
                 ElevationLayer]
-                # LandTypeConditionTable]
+        # LandTypeConditionTable]
 
     def displayOrder(self):
         return [WaterpointLayer,

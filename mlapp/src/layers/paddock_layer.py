@@ -26,7 +26,7 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
                                               PaddockLayer.defaultStyle(),
                                               DerivedMetricPaddockLayer,
                                               dependentLayers)
-       
+
         PopupLayerSourceMixin.__init__(self)
         self.connectPopups()
 

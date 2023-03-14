@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+
 from shapely.ops import split
 
 from qgis.core import QgsGeometry
 
-from .dev import *
+from ..dev import *
 
 # import sqlite3
 # conn = sqlite3.connect('C:/Users/tom.lynch/dev/trm/paddock-power-data/Kidman-0.38/Kidman.gpkg')

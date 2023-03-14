@@ -14,5 +14,3 @@ class Boundary(PersistedFeature):
     def __init__(self, featureLayer, existingFeature):
         """Create a new AreaFeature."""
         super().__init__(featureLayer, existingFeature)
-
-

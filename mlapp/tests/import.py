@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .dev import *
-from .src.layers.fields.field_map import FieldMap
-from .src.layers.fields import *
+from ..dev import *
+from ..src.layers.fields.field_map import FieldMap
+from ..src.layers.fields import *
 
 
 def layerByName(layerName):

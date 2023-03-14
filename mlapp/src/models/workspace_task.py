@@ -43,7 +43,7 @@ class WorkspaceTask(QgsTask):
             result = False
         finally:
             sleep(self.TASK_DELAY)
-        
+
         return result
 
     def safeRun(self):
@@ -59,7 +59,7 @@ class WorkspaceTask(QgsTask):
             qgsException()
         finally:
             sleep(self.TASK_DELAY)
-        
+
     def safeFinished(self, result):
         pass
 

@@ -1,4 +1,6 @@
 
+# -*- coding: utf-8 -*-
+
 # # from qgis.core import QgsApplication
 
 # from mlapp.dev import *

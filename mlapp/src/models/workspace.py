@@ -53,30 +53,29 @@ class Workspace(QObject):
         self.workspaceLayers = WorkspaceLayers()
 
         # Clean up all layers
-        cleanupIds = [layerId for layerType in self.layerDependencyGraph.cleanupOrder() 
-                              for layerId in layerType.detectAllOfType(workspaceFile)]
+        cleanupIds = [layerId for layerType in self.layerDependencyGraph.cleanupOrder()
+                      for layerId in layerType.detectAllOfType(workspaceFile)]
         QgsProject.instance().removeMapLayers(cleanupIds)
-        
+
         for layerType in self.layerDependencyGraph.cleanupOrder():
             layerType.removeAllOfType(workspaceFile)
 
-        # Load workspace async        
+        # Load workspace async
         self.loadWorkspace()
 
     def locked(self):
         """Return True if the workspace is locked."""
         return self._locked
-    
+
     def lock(self):
         """Lock the workspace."""
         self._locked = True
         self.lockChanged.emit(True)
-        
+
     def unlock(self):
         """Unlock the workspace."""
         self._locked = False
         self.lockChanged.emit(False)
-    
 
     def findGroup(self):
         """Find this workspace's group in the Layers panel."""
@@ -179,12 +178,12 @@ class Workspace(QObject):
     def onLoadWorkspaceTaskCompleted(self):
         self.workspaceLayers.addLayersToWorkspace(self)
         self.addToMap()
-        
-        # TODO this is a bit of a bizarre hack. Without this line, our project 
+
+        # TODO this is a bit of a bizarre hack. Without this line, our project
         # ends up loaded with corrupt snapping configuration (from a QGIS 3 bug, perhaps)
         # that causes QGIS to crash instead of saving the project file.
         QgsProject.instance().setSnappingConfig(QgsSnappingConfig())
-        
+
         self.workspaceLoaded.emit()
 
     def analyseWorkspace(self):
@@ -194,7 +193,7 @@ class Workspace(QObject):
     def onAnalyseWorkspaceTaskCompleted(self):
         """Clean up all the derived layers."""
         pass
-    
+
     def saveEditsAndDerive(self, editFunction, *args, **kwargs):
         """Persist this feature and also queue up all required derivation."""
 

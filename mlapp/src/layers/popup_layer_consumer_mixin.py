@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from abc import abstractmethod
 
-from ..utils import qgsDebug
 
 class PopupLayerConsumerMixin:
 
@@ -34,15 +33,18 @@ class PopupLayerConsumerMixin:
     def rewirePopupLayerSource(self, oldVal, newVal):
         """Rewire the PopupLayerSource."""
         if oldVal:
-            try: oldVal.popupLayerAdded.disconnect()
-            except Exception: pass
-            try: oldVal.popupLayerRemoved.disconnect()
-            except Exception: pass
+            try:
+                oldVal.popupLayerAdded.disconnect()
+            except Exception:
+                pass
+            try:
+                oldVal.popupLayerRemoved.disconnect()
+            except Exception:
+                pass
         if newVal:
-            qgsDebug(f"{type(self).__name__}.rewirePopupLayerSource({oldVal}, {newVal})")
             newVal.popupLayerAdded.connect(lambda layerId: self.onPopupLayerAdded(layerId))
             newVal.popupLayerRemoved.connect(lambda: self.onPopupLayerRemoved())
-            
+
     def onPopupLayerAdded(self, layerId):
         """Override in subclass to handle popup layer added."""
         pass

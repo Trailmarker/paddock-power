@@ -10,7 +10,7 @@ from .feature_table_group_box import FeatureTableGroupBox
 
 class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
     """A widget that displays adjacent (and possibly interacting) feature tables."""
-    
+
     def __init__(self, parent=None):
         """Set up the container then use addFeatureTable to add the feature tables."""
         RelayoutMixin.__init__(self)

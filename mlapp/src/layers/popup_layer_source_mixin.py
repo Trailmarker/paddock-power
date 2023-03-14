@@ -3,7 +3,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsProject
 
-from ..utils import qgsDebug
 from .interfaces import IFeature, IFeatureLayer
 from .popup_feature_layer import PopupFeatureLayer
 
@@ -86,18 +85,13 @@ class PopupLayerSourceMixin(IFeatureLayer):
 
         for layerId in layerIds:
             try:
-                qgsDebug(f"{self}.removeAllPopupLayers(): Removing popup layer {layerId}")
                 if layerId in QgsProject.instance().mapLayers():
                     self.removePopupLayer(QgsProject.instance().mapLayer(layerId))
-                qgsDebug(f"{self}.removeAllPopupLayers(): Popup layer removed {layerId}")
-            except:
+            except BaseException:
                 pass
             finally:
                 self.popupLayerRemoved.emit()
-        # try:
-        #     for layerType in self.popupLayerTypes:
-        #         layerType.removeAllOfType()
-        
+
     def onSelectPopupFeature(self, feature):
         """To be overridden and called when the popup layer source selects a popup feature."""
         self.addAllPopupLayers(feature)

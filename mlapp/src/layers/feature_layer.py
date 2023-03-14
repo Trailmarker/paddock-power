@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import PLUGIN_NAME
-from .features import Edits
 from .fields import TIMEFRAME
 from .interfaces import IFeatureLayer
 from .map_layer_mixin import MapLayerMixin
@@ -15,7 +13,6 @@ from .map_layer_mixin import MapLayerMixin
 class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer, metaclass=QtAbstractMeta):
 
     editsPersisted = pyqtSignal()
-
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)
 
@@ -136,16 +133,15 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def onSelectFeature(self, feature):
         feature.zoomFeature()
         self.featureSelected.emit(self.id())
-        
+
         if self.hasPopups:
             self.onSelectPopupFeature(feature)
 
     def onDeselectFeatures(self, fids):
         self.featureDeselected.emit(self.id())
-        
+
         if self.hasPopups:
             self.onDeselectPopupFeatures()
-            
 
     def onSelectionChanged(self, selection, deselection, *_):
         """Translate our own selectionChanged signal into a workspace selectFeature call."""
@@ -156,5 +152,3 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
             if feature:
                 self.onSelectFeature(feature)
                 self.workspace.selectFeature(feature)
-        
-        

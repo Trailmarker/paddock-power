@@ -54,7 +54,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
                 edits.editBefore(Edits.delete(rederivedFeature))
 
         derivedFeatures = []
-        
+
         for f in derivedLayer.getFeatures():
             RAISE_IF_CANCELLED()
             derivedFeatures.append(self.copyFeature(f))
@@ -67,4 +67,3 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         # Get rid of the derived layer … does not work
         # QgsProject.instance().removeMapLayer(derivedLayer.id())
         return edits
-
