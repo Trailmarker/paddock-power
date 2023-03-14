@@ -2,7 +2,7 @@
 from ..utils import qgsDebug
 from .calculator import Calculator
 from .features import WaterpointBuffer
-from .fields import FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NAME, NEAR_GRAZING_RADIUS, PADDOCK, PADDOCK_NAME, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_NAME, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
+from .fields import AREA, FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NAME, NEAR_GRAZING_RADIUS, PADDOCK, PADDOCK_NAME, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_NAME, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -105,7 +105,8 @@ select
     {_BUFFERS}."{GRAZING_RADIUS_TYPE}",
     {_BUFFERS}."{GRAZING_RADIUS}",
     {_BUFFERS}.{STATUS},
-    {_IN_PADDOCKS}.{TIMEFRAME}
+    {_IN_PADDOCKS}.{TIMEFRAME},
+    st_area(st_intersection({_BUFFERS}.geometry, {_IN_PADDOCKS}.geometry)) as "{AREA}"
 from {_BUFFERS}
 inner join {_IN_PADDOCKS}
 on {_BUFFERS}."{WATERPOINT}" = {_IN_PADDOCKS}."{WATERPOINT}"

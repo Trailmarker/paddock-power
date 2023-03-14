@@ -8,13 +8,13 @@ from .names import FID
 
 
 class Schema(list):
-    def __init__(self, fields, wkbType=None, hideFields=[]):
+    def __init__(self, fields, wkbType=None, hiddenFields=[]):
         assert isinstance(fields, list)
         assert all(isinstance(f, Field) for f in fields)
 
         super().__init__(fields)
         self.wkbType = wkbType
-        self.hideFields = hideFields
+        self.hiddenFields = hiddenFields
 
     def hasField(self, field):
         return any(field == f.name() for f in self)
@@ -56,6 +56,6 @@ class Schema(list):
     def hiddenFieldNames(self):
         """Get all names of Fields that are hidden at either the Field or Schema level."""
         hiddenFieldNames = sum((f.hiddenFieldNames() for f in self), [])
-        hiddenFieldNames += [f.displayFieldName() for f in self.hideFields]
+        hiddenFieldNames += [f.displayFieldName() for f in self.hiddenFields]
 
         return hiddenFieldNames

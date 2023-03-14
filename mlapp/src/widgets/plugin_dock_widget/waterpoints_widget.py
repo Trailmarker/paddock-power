@@ -3,8 +3,9 @@ from qgis.PyQt.QtCore import pyqtSlot
 
 from qgis.core import QgsGeometry
 
+from ...layers import WaterpointBufferPopupLayer
 from ...models import WorkspaceMixin
-from ..feature_table import SplitFeatureTablesWidget, WaterpointTable
+from ..feature_table import SplitFeatureTablesWidget, WaterpointTable, WaterpointBufferTable
 from ..tools import SketchPointTool
 
 
@@ -16,6 +17,11 @@ class WaterpointsWidget(WorkspaceMixin, SplitFeatureTablesWidget):
         SplitFeatureTablesWidget.__init__(self, parent)
 
         self.addFeatureTable("Waterpoints", WaterpointTable)
+
+        self.addFeatureTable("Waterpoint Buffers",
+                             WaterpointBufferTable,
+                             [WaterpointBufferPopupLayer],
+                             self.workspace.waterpointLayer)
 
     def sketchWaterpoint(self):
         """Sketch a new Waterpoint."""

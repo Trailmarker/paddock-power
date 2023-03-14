@@ -60,7 +60,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
     def cleanupOrder(self):
         return [PaddockCurrentLandTypesPopupLayer,
                 PaddockFutureLandTypesPopupLayer,
-                WaterpointPopupLayer,
+                WaterpointBufferPopupLayer,
                 BoundaryLayer,
                 DerivedBoundaryLayer,
                 PipelineLayer,

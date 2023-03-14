@@ -19,5 +19,5 @@ from .pipeline_layer import PipelineLayer
 from .popup_layer_consumer_mixin import PopupLayerConsumerMixin
 from .watered_area_layer import WateredAreaLayer
 from .waterpoint_buffer_layer import WaterpointBufferLayer
+from .waterpoint_buffer_popup_layer import WaterpointBufferPopupLayer
 from .waterpoint_layer import WaterpointLayer
-from .waterpoint_popup_layer import WaterpointPopupLayer

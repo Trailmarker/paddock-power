@@ -27,4 +27,4 @@ def testWaterpoints():
 
     assert isinstance(w, Waterpoint)
 
-    w.addPopupLayer(WaterpointPopupLayer)
+    w.addPopupLayer(WaterpointBufferPopupLayer)

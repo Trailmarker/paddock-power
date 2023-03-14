@@ -4,9 +4,9 @@ from .fields import GRAZING_RADIUS_TYPE, WATERPOINT
 from .popup_feature_layer import PopupFeatureLayer
 
 
-class WaterpointPopupLayer(PopupFeatureLayer):
+class WaterpointBufferPopupLayer(PopupFeatureLayer):
 
-    STYLE = "waterpoint_popup"
+    STYLE = "waterpoint_buffer_popup"
 
     @classmethod
     def getFeatureType(self):
@@ -31,5 +31,5 @@ order by "{GRAZING_RADIUS_TYPE}"
 
         super().__init__(waterpoint,
                          f"{waterpoint.WATERPOINT_TYPE.value} {waterpoint.FID} Watered Area",
-                         WaterpointPopupLayer.defaultStyle(),
+                         WaterpointBufferPopupLayer.defaultStyle(),
                          [self.waterpoint.waterpointBufferLayer])

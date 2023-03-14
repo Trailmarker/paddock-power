@@ -2,7 +2,7 @@
 from .features import Waterpoint
 from .popup_layer_source_mixin import PopupLayerSourceMixin
 from .imported_feature_layer import ImportedFeatureLayer
-from .waterpoint_popup_layer import WaterpointPopupLayer
+from .waterpoint_buffer_popup_layer import WaterpointBufferPopupLayer
 
 
 class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
@@ -30,7 +30,7 @@ class WaterpointLayer(ImportedFeatureLayer, PopupLayerSourceMixin):
 
     @property
     def popupLayerTypes(self):
-        return [WaterpointPopupLayer]
+        return [WaterpointBufferPopupLayer]
 
     @property
     def relativeLayerPosition(self):

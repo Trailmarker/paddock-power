@@ -9,3 +9,4 @@ from .paddock_table import PaddockTable
 from .pipeline_table import PipelineTable
 from .split_feature_tables_widget import SplitFeatureTablesWidget
 from .waterpoint_table import WaterpointTable
+from .waterpoint_buffer_table import WaterpointBufferTable
