@@ -34,11 +34,9 @@
         <file>images/waterpoint.png</file>
         <file>images/zoom-item.png</file>
 
-        <file>src/views/feature_view/feature_view.qss</file>
-        <file>src/widgets/condition_type_label/condition_type_label.qss</file>
-        <file>src/widgets/feature_status_label/feature_status_label.qss</file>
-        <file>src/widgets/state_machine_tool_bar/state_machine_tool_bar.qss</file>
-
+        <file>src/widgets/details/condition_type_label.qss</file>
+        <file>src/widgets/details/feature_status_label.qss</file>
         <file>src/widgets/feature_table/feature_table.qss</file>
+        <file>src/widgets/plugin_dock_widget/plugin_dock_widget.qss</file>
     </qresource>
 </RCC>

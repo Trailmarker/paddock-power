@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout
 
-from qgis.utils import iface
-
-from ....utils import PLUGIN_FOLDER, qgsDebug
+from ....utils import PLUGIN_FOLDER
 from ....widgets.dialogs import EditDialog
 from .feature_table_action import FeatureTableAction
 from .select_feature_model import SelectFeatureModel
@@ -23,7 +20,7 @@ class EditFeatureModel(SelectFeatureModel):
         """Select the feature at the given index."""
         feature = super().doAction(index)
         if feature:
-            editDialog = EditDialog(feature, self._editWidgetFactory)
+            editDialog = EditDialog(feature, self._editWidgetFactory, self.plugin.pluginDockWidget)
             editDialog.exec_()
         return feature
 

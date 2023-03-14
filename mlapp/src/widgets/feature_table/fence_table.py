@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields import FenceSchema
-from ...layers.fields.fields import *
-from ..fence_details import FenceDetailsEdit
+from ..details import FenceDetailsEdit
 from .feature_table_action import FeatureTableAction
 from .feature_table import FeatureTable
 

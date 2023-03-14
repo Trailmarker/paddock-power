@@ -21,7 +21,7 @@ from .feature_table_filter_model import FeatureTableFilterModel
 STYLESHEET = getComponentStyleSheet(__file__)
 
 
-class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView, metaclass=QtAbstractMeta):
+class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
     UNIT = 10
     PADDING = 5 * UNIT

@@ -15,8 +15,8 @@ from .src.models import Glitch, Workspace
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus
 from .src.utils import guiConfirm, guiStatusBar, guiStatusBarAndInfo, guiWarning, qgsDebug, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
-from .src.views.feature_view.feature_view import FeatureView
-from .src.widgets.import_dialog.import_dialog import ImportDialog
+from .src.widgets.plugin_dock_widget import PluginDockWidget
+from .src.widgets.dialogs.import_dialog import ImportDialog
 
 
 class PaddockPower(PluginStateMachine):
@@ -57,9 +57,9 @@ class PaddockPower(PluginStateMachine):
         QgsProject.instance().cleared.connect(self.projectClosed)
         QgsProject.instance().readProject.connect(self.detectWorkspace)
 
-        self.featureView = FeatureView(self.iface.mainWindow())
-        self.featureView.setVisible(False)
-        self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.featureView)
+        self.pluginDockWidget = PluginDockWidget(self.iface.mainWindow())
+        self.pluginDockWidget.setVisible(False)
+        self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.pluginDockWidget)
 
     def addAction(self,
                   pluginAction,
@@ -99,10 +99,10 @@ class PaddockPower(PluginStateMachine):
         self.toolbar = self.iface.addToolBar(u"PaddockPower")
         self.toolbar.setObjectName(u"PaddockPower")
 
-        self.openFeatureViewAction = self.addAction(PluginAction.openFeatureView,
+        self.openPluginDockWidgetAction = self.addAction(PluginAction.openPluginDockWidget,
                                                     QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock-power.png"),
                                                     text=f"Open {PLUGIN_NAME} …",
-                                                    callback=lambda *_: self.openFeatureView(),
+                                                    callback=lambda *_: self.openPluginDockWidget(),
                                                     parent=self.iface.mainWindow())
 
         self.detectWorkspaceAction = self.addAction(
@@ -183,13 +183,13 @@ class PaddockPower(PluginStateMachine):
         except BaseException:
             qgsException()
         try:
-            self.featureView.clearUi()
-            self.featureView.setVisible(False)
-            self.featureView.setParent(None)
-            self.iface.removeDockWidget(self.featureView)
-            self.featureView.deleteLater()
-            self.featureView = None
-            qgsInfo(f"Feature View destroyed …")
+            self.pluginDockWidget.clearUi()
+            self.pluginDockWidget.setVisible(False)
+            self.pluginDockWidget.setParent(None)
+            self.iface.removeDockWidget(self.pluginDockWidget)
+            self.pluginDockWidget.deleteLater()
+            self.pluginDockWidget = None
+            qgsInfo(f"Dock widget destroyed …")
         except BaseException:
             qgsException()
         try:
@@ -238,7 +238,7 @@ class PaddockPower(PluginStateMachine):
     def onWorkspaceLoaded(self, workspace):
         guiStatusBarAndInfo(f"{PLUGIN_NAME} workspace loaded: {workspace.workspaceName}")
         self.workspace = workspace
-        self.featureView.buildUi()
+        self.pluginDockWidget.buildUi()
 
     def detectWorkspace(self, warning=True):
         f"""Detect a {PLUGIN_NAME} workspace adjacent to the current QGIS project."""
@@ -308,25 +308,25 @@ class PaddockPower(PluginStateMachine):
         projectFile = resolveProjectFile()
 
         if not projectFile:
-            self.featureView.setVisible(False)
+            self.pluginDockWidget.setVisible(False)
             self.unloadWorkspace()
 
     def unloadWorkspace(self):
         f"""Unloads the {PLUGIN_NAME} workspace."""
         if self.workspace is not None:
             qgsInfo(f"{PLUGIN_NAME} unloading workspace …")
-            if self.featureView:
-                self.featureView.clearUi()
+            if self.pluginDockWidget:
+                self.pluginDockWidget.clearUi()
             self.workspace.unload()
             self.workspace = None
 
-    @PluginAction.openFeatureView.handler()
-    def openFeatureView(self):
-        self.featureView.setVisible(True)
+    @PluginAction.openPluginDockWidget.handler()
+    def openPluginDockWidget(self):
+        self.pluginDockWidget.setVisible(True)
 
-    @PluginAction.closeFeatureView.handler()
-    def closeFeatureView(self):
-        self.featureView.setVisible(False)
+    @PluginAction.closePluginDockWidget.handler()
+    def closePluginDockWidget(self):
+        self.pluginDockWidget.setVisible(False)
 
     @PluginAction.openImportDialog.handler()
     def openImportDialog(self):

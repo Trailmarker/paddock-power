@@ -3,7 +3,7 @@ from qgis.PyQt.QtGui import QIcon
 
 from ....models import WorkspaceMixin
 from ....utils import PLUGIN_FOLDER
-from ....widgets.profile_details.profile_details_dialog import ProfileDetailsDialog
+from ....widgets import ProfileDetailsDialog
 from .feature_table_action import FeatureTableAction
 from .feature_table_action_model import FeatureTableActionModel
 
@@ -22,7 +22,7 @@ class ViewFeatureProfileModel(FeatureTableActionModel, WorkspaceMixin):
         feature = self.getFeature(index)
         if feature:
             # Not iface.mainWindow() as it messed with the styles
-            profileDetailsDialog = ProfileDetailsDialog(feature, self.plugin.featureView)
+            profileDetailsDialog = ProfileDetailsDialog(feature, self.plugin.pluginDockWidget)
             profileDetailsDialog.show()
         return feature
 

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields import PipelineSchema
-from ...layers.fields.fields import *
-from ..pipeline_details import PipelineDetailsEdit
-from .feature_table_action import FeatureTableAction
+from ..details import PipelineDetailsEdit
 from .feature_table import FeatureTable
+from .feature_table_action import FeatureTableAction
 
 # PipelineTableSchema = Schema([LengthTitle,
 #                                   Status])

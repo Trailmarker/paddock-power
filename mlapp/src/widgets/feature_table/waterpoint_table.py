@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields import WaterpointSchema
-from ...layers.fields.fields import *
-from ..waterpoint_details import WaterpointDetailsEdit
+from ..details import WaterpointDetailsEdit
 from .feature_table_action.feature_table_action import FeatureTableAction
 from .feature_table import FeatureTable
 

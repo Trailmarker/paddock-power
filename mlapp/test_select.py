@@ -18,7 +18,7 @@
 #         paddockLayer.onSelectedFeatureChanged(type(p.featureLayer), p, True)
 
 
-# waterpointList = plugin().featureView.waterpointTab.waterpointList
+# waterpointList = plugin().pluginDockWidget.waterpointTab.waterpointList
 
 
 # def testListSelection():

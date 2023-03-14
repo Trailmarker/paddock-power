@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
 
-import sip
+import sip # type: ignore
 
 from qgis.PyQt.QtCore import QTimer
 

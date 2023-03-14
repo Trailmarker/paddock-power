@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields import PaddockLandTypeSchema, Timeframe
-from ..paddock_land_type_details import PaddockLandTypeDetails, PaddockLandTypeDetailsEdit
-from .feature_table_action import FeatureTableAction
+from ..details import PaddockLandTypeDetails, PaddockLandTypeDetailsEdit
 from .feature_table import FeatureTable
+from .feature_table_action import FeatureTableAction
 
 
 # PaddockLandTypesTableSchema = Schema([AreaTitle,

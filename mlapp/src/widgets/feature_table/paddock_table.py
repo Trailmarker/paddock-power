@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields import MetricPaddockSchema
-from ...layers.fields.fields import *
-from ..paddock_details import PaddockDetails, PaddockDetailsEdit
+from ..details import PaddockDetails, PaddockDetailsEdit
 from .feature_table_action import FeatureTableAction
 from .feature_table import FeatureTable
 

@@ -7,11 +7,11 @@ from qgis.core import QgsProject, QgsSnappingConfig
 
 from ..layers.fields import Timeframe
 from ..layers.tasks import AnalyseWorkspaceTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
-from ..tools.map_tool import MapTool
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
+from ..widgets.tools.map_tool import MapTool
 from .glitch import Glitch
-from .task_handle import TaskHandle
 from .layer_dependency_graph import LayerDependencyGraph
+from .task_handle import TaskHandle
 from .workspace_layers import WorkspaceLayers
 
 # Initialize Qt resources from file resources.py
@@ -104,10 +104,6 @@ class Workspace(QObject):
 
     def setTool(self, tool):
         """Set the current map tool for this workspace."""
-        if not isinstance(tool, MapTool):
-            raise Glitch(
-                f"The {PLUGIN_NAME} tool must be of a recognised type")
-
         self.unsetTool()
         self.currentTool = tool
         self.iface.mapCanvas().setMapTool(self.currentTool)

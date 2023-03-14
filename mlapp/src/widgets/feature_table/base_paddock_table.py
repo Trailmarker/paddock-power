@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from ...layers.fields import BasePaddockSchema
-from ...layers.fields.fields import *
 from .feature_table_action import FeatureTableAction
 from .feature_table import FeatureTable
 

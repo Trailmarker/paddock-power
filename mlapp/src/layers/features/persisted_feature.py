@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from mlapp.src.utils import PLUGIN_NAME
 from qgis.core import QgsFeature
 
 from ...models import Glitch
