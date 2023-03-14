@@ -56,6 +56,9 @@
         <property name="toolTip">
          <string>Show the Property as it is now</string>
         </property>
+        <property name="whatsThis">
+         <string>Click the Current toggle button to show a view of the Property as it is now, displaying Built and Superseded infrastructure</string>
+        </property>
         <property name="text">
          <string>Current</string>
         </property>
@@ -75,6 +78,9 @@
        <widget class="QToolButton" name="futureTimeframeButton">
         <property name="toolTip">
          <string>Show the Property with all planned changes</string>
+        </property>
+        <property name="whatsThis">
+         <string>Click the Future toggle button to show a view of plans for the Property, displaying Built, Drafted and Planned infrastructure</string>
         </property>
         <property name="text">
          <string>Future</string>
@@ -96,6 +102,9 @@
         <property name="toolTip">
          <string>Sketch a Fence …</string>
         </property>
+        <property name="whatsThis">
+         <string>Interactively sketch a new Fence on the map, using right-click to finish sketching. Once you finish your sketch, a Drafted Fence is created. Plan and then Build the Fence to see its impact in the form of new Paddocks, changed watering and changed carrying capacities.</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -110,6 +119,9 @@
         <property name="toolTip">
          <string>Sketch a Pipeline …</string>
         </property>
+        <property name="whatsThis">
+         <string>Interactively sketch a new Pipeline on the map, using right-click to finish sketching. Once you finish your sketch, a Drafted Pipeline is created.</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -123,6 +135,9 @@
        <widget class="QToolButton" name="sketchWaterpointButton">
         <property name="toolTip">
          <string>Sketch a Waterpoint …</string>
+        </property>
+        <property name="whatsThis">
+         <string>Interactively sketch a new Waterpoint on the map, using right-click to finish sketching. Once you finish your sketch, a Drafted Waterpoint is created with default attributes. Change the Waterpoint Type and Near and Far Grading radiuses to change the way its behaviour is modelled by MLA Paddock Power.</string>
         </property>
         <property name="text">
          <string/>

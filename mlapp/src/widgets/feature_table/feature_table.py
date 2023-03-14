@@ -54,7 +54,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self.verticalHeader().hide()
 
         # Allow the table to be reduced in width and height, but also make it use what it gets
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
         # The section sizes in the table are handled in self.relayout below
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
