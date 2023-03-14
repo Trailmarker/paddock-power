@@ -67,7 +67,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         if self._uiBuilt:
             qgsInfo(f"{PLUGIN_NAME} already built?")
 
-        qgsInfo(f"{PLUGIN_NAME} rebuilding feature view …")
+        qgsInfo(f"{PLUGIN_NAME} rebuilding PluginDockWidget …")
 
         self.paddocksWidget = PaddocksWidget(self.tabWidget)
         self.fencesWidget = FencesWidget(self.tabWidget)
@@ -96,13 +96,13 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.workspace.featureLayerSelected.connect(lambda layerId: self.onFeatureLayerSelected(layerId))
 
         self._uiBuilt = True
-        qgsInfo(f"{PLUGIN_NAME} rebuilt.")
+        qgsInfo(f"{PLUGIN_NAME} rebuilt PluginDockWidget.")
 
     def clearUi(self):
         if not self._uiBuilt:
             return
 
-        qgsInfo(f"{PLUGIN_NAME} tearing down old feature view …")
+        qgsInfo(f"{PLUGIN_NAME} tearing down PluginDockWidget …")
 
         while (self.tabWidget.count() > 0):
             self.tabWidget.removeTab(0)
