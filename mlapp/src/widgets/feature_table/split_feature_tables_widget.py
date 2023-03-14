@@ -4,6 +4,7 @@ from math import floor
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QHBoxLayout, QSplitter, QWidget
 
+from ...utils import qgsDebug
 from ..relayout_mixin import RelayoutMixin
 from .feature_table_group_box import FeatureTableGroupBox
 
@@ -65,11 +66,56 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
 
     def relayout(self):
         """Get the hint widths of all the splitter items and try to balance them out."""
+        count = self.splitter.count()
+        sizes = [self.splitter.widget(i).width() for i in range(count)]
+        hints = [self.splitter.widget(i).sizeHint().width() for i in range(count)]
 
-        hints = [self.splitter.widget(i).sizeHint().width() for i in range(self.splitter.count())]
-        neededWidth = sum(hints)
-        availableWidth = self.width() - self.splitter.handleWidth() * (self.splitter.count() - 1)
-        adjustedSizes = [floor(availableWidth * hint / neededWidth) for hint in hints]
-        self.splitter.setSizes(adjustedSizes)
-        # for i in range(self.splitter.count()):
-        #     self.splitter.setCollapsible(i, i > 0)
+        qgsDebug(f"SplitFeatureTablesWidget.relayout: sizes = {sizes}, hints = {hints}")
+
+        available = self.width() - self.splitter.handleWidth() * (count - 1)
+        current = sum(sizes)
+        needed = sum(hints)
+
+        qgsDebug(f"SplitFeatureTablesWidget.relayout: available = {available}, current = {current}, needed = {needed}")
+
+        # If we have room, try to make everything at least the hint
+        if needed <= available and current < available:
+            sizes = [max(hint, size) for (hint, size) in zip(hints, sizes)]
+        # Or at least let's get the first item
+        elif hints[0] <= available:
+            sizes[0] = hints[0]
+
+        current = sum(sizes)
+        qgsDebug(f"SplitFeatureTablesWidget.relayout: after expanding, sizes = {sizes}, current = {current}, available = {available}")
+
+        # If we've got too much, bring everything down to the hint at maximum,
+        # shrinking from the right first
+        for i in reversed(range(count)):
+            if current <= available:
+                break
+            elif sizes[i] > hints[i]:
+                sizes[i] = hints[i]
+                current = sum(sizes)
+
+        qgsDebug(f"SplitFeatureTablesWidget.relayout: after shrinking from the right, sizes = {sizes}, current = {current}, available = {available}")
+
+        # If we've still got too much, accept that we're going to have to shrink,
+        # but favour the first item
+        first = hints[0]
+
+        if current > available and first <= available:
+
+            (tneed, tavail) = (sum(hints[1:]), available - first)
+            sizes = [first] + [(tavail * hint) // tneed for hint in hints[1:]]
+
+        current = sum(sizes)
+
+        qgsDebug(f"SplitFeatureTablesWidget.relayout: after forced shrink, sizes = {sizes}, current = {current}, available = {available}")
+
+        # If we've still got too much, squash the first item too
+        if current > available:
+            sizes = [max(sizes[0] - (current - available), 0)] + [0 for s in sizes[1:]]
+
+        qgsDebug(f"SplitFeatureTablesWidget.relayout: after final shrink, sizes = {sizes}, current = {current}")
+
+        self.splitter.setSizes(sizes)
