@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
-from math import floor
 
-from qgis.PyQt.QtCore import QSize, QTimer
+from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 
 from qgis.core import QgsVectorLayerCache
@@ -12,6 +11,7 @@ from ...layers.fields import STATUS
 from ...models import QtAbstractMeta, WorkspaceMixin
 from ...utils import PLUGIN_NAME, getComponentStyleSheet, guiWarning
 
+from .. import RelayoutMixin
 from .feature_status_delegate import FeatureStatusDelegate
 from .feature_table_action_delegate import FeatureTableActionDelegate
 from .feature_table_model import FeatureTableModel
@@ -21,36 +21,50 @@ from .feature_table_view_filter_model import FeatureTableViewFilterModel
 STYLESHEET = getComponentStyleSheet(__file__)
 
 
-class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstractMeta):
+class FeatureTableView(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView, metaclass=QtAbstractMeta):
 
     UNIT = 10
     PADDING = 5 * UNIT
 
     def __init__(self, schema, detailsWidgetFactory=None, editWidgetFactory=None, parent=None):
-        QgsAttributeTableView.__init__(self, parent)
+        RelayoutMixin.__init__(self)
         WorkspaceMixin.__init__(self)
+        QgsAttributeTableView.__init__(self, parent)
 
-        self.setStyleSheet(STYLESHEET)
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
-
-        self.layoutTimer = QTimer()
-        self.layoutTimer.setSingleShot(True)
-        self.layoutTimer.setInterval(100)
-        self.layoutTimer.timeout.connect(lambda: self.relayout())
-
+        # Used to configure the table model in line with the plugin's domain
         self._schema = schema
         self._detailsWidgetFactory = detailsWidgetFactory
         self._editWidgetFactory = editWidgetFactory
 
+        # Qt's extensive plumbing for the feature table
         self._featureLayer = None
         self._featureCache = None
         self._tableModel = None
         self._tableFilterModel = None
-        self._statusColumn = None
 
+        # Stash some data about the columns we load for laying out the widget
         self._columnMetrics = None
 
         self.clicked.connect(self.onClicked)
+
+        # Base appearance
+        self.setStyleSheet(STYLESHEET)
+        
+        # Hide QGIS's default row numbers up the left side
+        self.verticalHeader().hide()
+
+        # Allow the table to be reduced in width and height, but also make it use what it gets    
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        # The section sizes in the table are handled in self.relayout below
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+
+        self.setWordWrap(False)
+        
+        # Set "whole row only" selection mode
+        self.setSelectionMode(FeatureTableView.SingleSelection)
+        self.setSelectionBehavior(FeatureTableView.SelectRows)
+
 
     def onClicked(self, index):
         if self._tableModel and self._tableModel.isToolBarIndex(index):
@@ -90,20 +104,6 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
             self._editWidgetFactory,
             self)
 
-        # Hide the numbers up the left side
-        self.verticalHeader().hide()
-
-        # Prevent word wrap
-        self.setWordWrap(False)
-
-        # Try to make the columns resize a bit nicer too
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        # self.horizontalHeader().setStretchLastSection(True)
-   
-        # Set "whole row only" selection mode
-        self.setSelectionMode(FeatureTableView.SingleSelection)
-        self.setSelectionBehavior(FeatureTableView.SelectRows)
-
         # Load the layer - important that this is prior to setting up the proxy/filter model
         self._tableModel.modelReset.connect(self.onFeatureLayerLoaded)
         self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
@@ -119,7 +119,6 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
 
         self.onFeatureLayerLoaded()
 
-
     def clearFeatureLayer(self):
         # Clear everything if the new layer is falsy
         self.setModel(None)
@@ -133,13 +132,6 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
     def setFilteredFeatures(self, fids):
         """Filter the table to show only the features with the given FIDs."""
         self._tableFilterModel.setFilteredFeatures(fids)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-
-        # Re-start the timeout while we're resizing
-        self.layoutTimer.stop()
-        self.layoutTimer.start()
 
     def relayout(self):
         """Shrink the view down to the minimum size needed to show its columns."""
@@ -204,8 +196,7 @@ class FeatureTableView(QgsAttributeTableView, WorkspaceMixin, metaclass=QtAbstra
         # Set up a column item delegate for the "Status" field
         statusColumn = self._tableModel.columnFromFieldName(STATUS)
         if statusColumn >= 0:
-            self._statusColumn = statusColumn
-            self.setItemDelegateForColumn(self._statusColumn, FeatureStatusDelegate())
+            self.setItemDelegateForColumn(statusColumn, FeatureStatusDelegate())
 
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)

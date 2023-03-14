@@ -5,7 +5,7 @@ import sip
 
 from qgis.PyQt.QtCore import QTimer
 
-from ...models import QtAbstractMeta
+from ..models import QtAbstractMeta
 
 
 class RelayoutMixin(ABC, metaclass=QtAbstractMeta):
