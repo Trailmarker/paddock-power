@@ -15,3 +15,4 @@ class FormattedValue(QLabel):
                 super().setText(str(value))
         else:
             super().setText("")
+        return self

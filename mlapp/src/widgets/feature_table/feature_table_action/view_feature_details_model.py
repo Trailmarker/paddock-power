@@ -21,7 +21,7 @@ class ViewFeatureDetailsModel(SelectFeatureModel):
         feature = super().doAction(index)
         if feature:
             detailsDialog = DetailsDialog(feature, self._detailsWidgetFactory, self.plugin.pluginDockWidget)
-            detailsDialog.exec_()
+            detailsDialog.show()
         return feature
 
     @property

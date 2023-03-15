@@ -1,0 +1,94 @@
+# -*- coding: utf-8 -*-
+from enum import Enum
+from functools import cached_property
+
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QSizePolicy, QWidget
+
+from .formatted_value import FormattedValue
+
+
+class Details(QWidget):
+
+    class DisplayMode(Enum):
+        Central = "Align labels and details around the central axis"
+        Outer = "Align labels and details around the left and right perimeters"
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.gridLayout = QGridLayout(self)
+        # self.gridLayout.setSpacing(6)
+        # self.gridLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+
+        self._model = None
+        self._inverted = False
+        self._displayMode = Details.DisplayMode.Central
+
+    @property
+    def model(self):
+        return self._model
+
+    @model.setter
+    def model(self, model):
+        self._model = model
+
+    @property
+    def descriptors(self):
+        """Return the formatting for the details."""
+        return []
+
+    @property
+    def inverted(self):
+        """Return if this widget is inverted."""
+        return self._inverted
+
+    @inverted.setter
+    def inverted(self, inverted):
+        """Set the inverted state for the details."""
+        self._inverted = inverted
+        self.refreshUi()
+
+    @property
+    def displayMode(self):
+        """Return the size hint for the details."""
+        return self._displayMode
+
+    @displayMode.setter
+    def displayMode(self, mode):
+        """Set the inverted state for the details."""
+        self._displayMode = mode
+        self.refreshUi()
+
+    def label(self, descriptor):
+        (_, label, _) = descriptor
+        obj = QLabel(label)
+        font = obj.font()
+        font.setBold(True)
+        obj.setFont(font)
+        return obj
+
+    def valueFormatter(self, descriptor):
+        (extractor, _, formatSpec) = descriptor
+        return lambda m: FormattedValue().setValue(extractor(m), formatSpec)
+
+    @cached_property
+    def labels(self):
+        return [self.label(d) for d in self.descriptors]
+
+    def refreshUi(self):
+        """Refresh the details UI."""
+
+        # Try to get any current items in the grid layout and remove them
+        for i in reversed(range(self.gridLayout.count())):
+            self.gridLayout.removeWidget(self.gridLayout.itemAt(i).widget())
+
+        (labPos, valPos) = (1, 0) if self.inverted else (0, 1)
+        (labAlign, valAlign) = (Qt.AlignLeft, Qt.AlignRight) if self.inverted else (Qt.AlignRight, Qt.AlignLeft)
+        (labAlign, valAlign) = (labAlign, valAlign) if self.displayMode == Details.DisplayMode.Central else (valAlign, labAlign)
+
+        for i, descriptor in enumerate(self.descriptors):
+            self.gridLayout.addWidget(self.labels[i], i, labPos, labAlign)
+            self.gridLayout.addWidget(self.valueFormatter(descriptor)(self.model), i, valPos, valAlign)
