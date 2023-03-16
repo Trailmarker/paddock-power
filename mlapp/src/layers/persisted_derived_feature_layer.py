@@ -26,7 +26,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         """Add an instance of the derived layer for this layer to the map."""
         self.getDerivedLayerInstance(changeset).addToMap()
 
-    def deriveFeatures(self, changeset=None, RAISE_IF_CANCELLED=None):
+    def deriveFeatures(self, changeset=None, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
         # Clean up any instances of the virtual source …
@@ -34,11 +34,11 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
-        RAISE_IF_CANCELLED()
+        raiseErrorIfTaskHasBeenCancelled()
 
         rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest()
 
-        RAISE_IF_CANCELLED()
+        raiseErrorIfTaskHasBeenCancelled()
 
         edits = Edits()
         if not rederiveFeaturesRequest:
@@ -48,7 +48,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
             rederivedFeatures = [f for f in self.getFeatures(rederiveFeaturesRequest)]
             qgsInfo(f"Removing {len(rederivedFeatures)} features in the {self.name()} layer …")
 
-            RAISE_IF_CANCELLED()
+            raiseErrorIfTaskHasBeenCancelled()
 
             for rederivedFeature in rederivedFeatures:
                 edits.editBefore(Edits.delete(rederivedFeature))
@@ -56,7 +56,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         derivedFeatures = []
 
         for f in derivedLayer.getFeatures():
-            RAISE_IF_CANCELLED()
+            raiseErrorIfTaskHasBeenCancelled()
             derivedFeatures.append(self.copyFeature(f))
 
         qgsInfo(f"Deriving {len(derivedFeatures)} features in the {self.name()} layer …")

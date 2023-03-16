@@ -143,14 +143,14 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         """Delete a PersistedFeature from the layer."""
         super().deleteFeature(feature.FID)
 
-    def recalculateFeatures(self, RAISE_IF_CANCELLED=None):
+    def recalculateFeatures(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Recalculate features in this layer."""
         edits = Edits()
 
         qgsInfo(f"Recalculating {self.name()} …")
 
         for feature in self.getFeatures():
-            RAISE_IF_CANCELLED()
+            raiseErrorIfTaskHasBeenCancelled()
             feature.recalculate()
             edits.editBefore(Edits.upsert(feature))
 

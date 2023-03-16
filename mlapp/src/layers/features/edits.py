@@ -212,7 +212,7 @@ class Edits(WorkspaceMixin):
     def layerKeyValues(self, layer, fieldName):
         return set(f.attribute(fieldName) for f in self.layerFeatures(layer))
 
-    def persist(self, RAISE_IF_CANCELLED=None):
+    def persist(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Persist these edits to their layers."""
         with Edits.editAndCommit(self.layers):
 
@@ -223,7 +223,7 @@ class Edits(WorkspaceMixin):
                     # Order matters here, eg we don't want to truncate at the end
                     sortedEdits = sorted(edits, key=lambda e: e.order)
                     for edit in sortedEdits:
-                        RAISE_IF_CANCELLED()
+                        raiseErrorIfTaskHasBeenCancelled()
                         edit.persist()
 
                 layer.editsPersisted.emit()

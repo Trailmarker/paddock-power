@@ -23,7 +23,7 @@ class SaveEditsTask(WorkspaceTask):
             if self.isCanceled():
                 return False
             self.edits = self.editFunction(*self.args, **self.kwargs) or Edits()
-            self.edits.persist(RAISE_IF_CANCELLED=self.raiseIfCancelled)
+            self.edits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
 
         except Exception as e:
             guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to save edits.")

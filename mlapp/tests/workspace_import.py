@@ -50,7 +50,7 @@ def testImportMathisonLandTypes():
 
 
 def testImportMathisonPaddocks():
-    kidmanPaddocks = layerByName("Current Paddocks")
+    kidmanPaddocks = layerByName("Supplied Paddocks")
     fieldMap = FieldMap(kidmanPaddocks, workspace().basePaddockLayer)
     fieldMap["Name"] = "Paddock Name"
     imports = basePaddockLayer.importFeatures(kidmanPaddocks, fieldMap)
@@ -58,7 +58,7 @@ def testImportMathisonPaddocks():
 
 
 def testImportMathisonWaterpoints():
-    kidmanWaterpoints = layerByName("Current Waterpoints")
+    kidmanWaterpoints = layerByName("Supplied Waterpoints")
     fieldMap = FieldMap(kidmanWaterpoints, workspace().waterpointLayer)
     fieldMap["Name"] = "Waterpoint Name"
     fieldMap["Waterpoint Type"] = "Waterpoint Type"
