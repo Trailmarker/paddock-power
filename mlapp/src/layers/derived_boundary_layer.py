@@ -33,9 +33,9 @@ where {Timeframe.Future.includesStatuses(f'"{basePaddockLayer}".{STATUS}')}
 
     def __init__(self,
                  dependentLayers,
-                 edits):
+                 changeset):
 
         super().__init__(DerivedBoundaryLayer.defaultName(),
                          DerivedBoundaryLayer.defaultStyle(),
                          dependentLayers,
-                         None) # Don't try to get fancy
+                         changeset)

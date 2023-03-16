@@ -15,41 +15,70 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
     def getFeatureType(cls):
         return PaddockLandType
 
-    def prepareQuery(self, query, dependentLayers):
+    def getRederiveFeaturesRequest(self):
+        """Define which features must be removed from a target layer to be re-derived."""
+        if not self.changeset:
+            return None
 
-        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.names(dependentLayers)
+        # TODO Land Type condition table?
+        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.dependentLayers
+        return self.prepareRederiveFeaturesRequest(
+            basePaddockLayer, PADDOCK, FID,
+            wateredAreaLayer, PADDOCK, PADDOCK,
+            landTypeLayer, LAND_TYPE, FID)
+
+    def prepareQuery(self, query, dependentLayers):
+        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = dependentLayers
+        [landTypeConditions, basePaddocks, landTypes, wateredAreas] = self.names(dependentLayers)
 
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
         _WATERED_FACTOR = "WateredFactor"
 
+        filterPaddocks = self.andAllKeyClauses(self.changeset, basePaddockLayer,
+                                               FID, FID, wateredAreaLayer, FID, PADDOCK)
+
+        if filterPaddocks:
+            _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
+            withFilteredPaddocks = f"""
+  {_FILTERED_PADDOCKS} as
+    (select * from "{basePaddocks}"
+     where 1=1
+     {filterPaddocks}),
+"""
+        else:
+            _FILTERED_PADDOCKS = basePaddocks
+            withFilteredPaddocks = ""
+
         query = f"""
-with {_PADDOCK_WATERED_AREAS} as
+with
+ {withFilteredPaddocks}
+ {_PADDOCK_WATERED_AREAS} as
 	(select
-		"{wateredAreaLayer}".geometry as geometry,
-		"{basePaddockLayer}".{FID} as {PADDOCK},
-		"{basePaddockLayer}".{NAME},
-		"{wateredAreaLayer}"."{WATERED_TYPE}",
-		"{wateredAreaLayer}".{TIMEFRAME}
-	from "{basePaddockLayer}"
-	inner join "{wateredAreaLayer}"
-		on "{basePaddockLayer}".{FID} = "{wateredAreaLayer}".{PADDOCK}
-		and {Timeframe.timeframesIncludeStatuses(f'"{wateredAreaLayer}".{TIMEFRAME}', f'"{basePaddockLayer}".{STATUS}')}
-	),
-{_PADDOCK_LAND_TYPES} as
+		"{wateredAreas}".geometry as geometry,
+		"{_FILTERED_PADDOCKS}".{FID} as {PADDOCK},
+		"{_FILTERED_PADDOCKS}".{NAME},
+		"{wateredAreas}"."{WATERED_TYPE}",
+		"{wateredAreas}".{TIMEFRAME}
+	from "{_FILTERED_PADDOCKS}"
+	inner join "{wateredAreas}"
+		on "{_FILTERED_PADDOCKS}".{FID} = "{wateredAreas}".{PADDOCK}
+		and {Timeframe.timeframesIncludeStatuses(f'"{wateredAreas}".{TIMEFRAME}', f'"{_FILTERED_PADDOCKS}".{STATUS}')}
+	)
+, {_PADDOCK_LAND_TYPES} as
 	(select
-		st_intersection("{landTypeLayer}".geometry, {_PADDOCK_WATERED_AREAS}.geometry) as geometry,
+		st_intersection("{landTypes}".geometry, {_PADDOCK_WATERED_AREAS}.geometry) as geometry,
 		{_PADDOCK_WATERED_AREAS}.{PADDOCK},
 		{_PADDOCK_WATERED_AREAS}.{NAME} as "{PADDOCK_NAME}",
 		{_PADDOCK_WATERED_AREAS}."{WATERED_TYPE}",
 		{_PADDOCK_WATERED_AREAS}.{TIMEFRAME},
-		"{landTypeLayer}".{FID} as "{LAND_TYPE}",
-		"{landTypeLayer}"."{LAND_TYPE_NAME}" as "{LAND_TYPE_NAME}",
-		"{landTypeLayer}"."{OPTIMAL_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}"
-	from "{landTypeLayer}"
+		"{landTypes}".{FID} as "{LAND_TYPE}",
+		"{landTypes}"."{LAND_TYPE_NAME}" as "{LAND_TYPE_NAME}",
+		"{landTypes}"."{OPTIMAL_CAPACITY_PER_AREA}" as "{ESTIMATED_CAPACITY_PER_AREA}"
+	from "{landTypes}"
 	inner join {_PADDOCK_WATERED_AREAS}
-		on st_intersects("{landTypeLayer}".geometry, {_PADDOCK_WATERED_AREAS}.geometry)
-		and st_area(st_intersection("{landTypeLayer}".geometry, {_PADDOCK_WATERED_AREAS}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
+		on st_intersects("{landTypes}".geometry, {_PADDOCK_WATERED_AREAS}.geometry)
+		and st_area(st_intersection("{landTypes}".geometry, {_PADDOCK_WATERED_AREAS}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 	)
 select
 	st_multi(st_collectionextract(st_union(geometry), 3)) as geometry,
@@ -82,8 +111,8 @@ from
 			when 'Unwatered' then 0.0
 			else 0.0
 		end as {_WATERED_FACTOR},
-        ifnull("{landTypeConditionTable}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
-		case ifnull("{landTypeConditionTable}"."{CONDITION_TYPE}", 'A')
+        ifnull("{landTypeConditions}"."{CONDITION_TYPE}", 'A') as "{CONDITION_TYPE}",
+		case ifnull("{landTypeConditions}"."{CONDITION_TYPE}", 'A')
 			when 'A' then 1.0
 			when 'B' then 0.75
 			when 'C' then 0.45
@@ -99,9 +128,9 @@ from
 		end as "{WATERED_DISCOUNT}",
 		{TIMEFRAME}
 	 from {_PADDOCK_LAND_TYPES}
-	 left outer join "{landTypeConditionTable}"
-	 	on {_PADDOCK_LAND_TYPES}.{PADDOCK} = "{landTypeConditionTable}"."{PADDOCK}"
-	 	and {_PADDOCK_LAND_TYPES}."{LAND_TYPE}" = "{landTypeConditionTable}"."{LAND_TYPE}")
+	 left outer join "{landTypeConditions}"
+	 	on {_PADDOCK_LAND_TYPES}.{PADDOCK} = "{landTypeConditions}"."{PADDOCK}"
+	 	and {_PADDOCK_LAND_TYPES}."{LAND_TYPE}" = "{landTypeConditions}"."{LAND_TYPE}")
 where geometry is not null
 group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 """
@@ -109,9 +138,9 @@ group by "{PADDOCK}", "{LAND_TYPE}", "{CONDITION_TYPE}", {TIMEFRAME}
 
     def __init__(self,
                  dependentLayers,
-                 edits):
+                 changeset):
 
         super().__init__(DerivedPaddockLandTypesLayer.defaultName(),
                          DerivedPaddockLandTypesLayer.defaultStyle(),
                          dependentLayers,
-                         None) # Don't try to get fancy
+                         changeset)

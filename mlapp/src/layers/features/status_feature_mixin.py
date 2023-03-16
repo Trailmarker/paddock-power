@@ -28,48 +28,48 @@ class StatusFeatureMixin(StateMachineMixin, IStatusFeature):
         else:
             return self.attribute(TIMEFRAME)
 
-    @FeatureAction.plan.handleAndPersist()
+    @FeatureAction.plan.handleWithSave()
     def planFeature(self):
         """Plan a Feature."""
 
         return Edits.upsert(self)
 
-    @FeatureAction.undoPlan.handleAndPersist()
+    @FeatureAction.undoPlan.handleWithSave()
     def undoPlanFeature(self):
         """Undo planning a Feature."""
         return Edits.upsert(self)
 
-    @FeatureAction.build.handleAndPersist()
+    @FeatureAction.build.handleWithSave()
     def buildFeature(self):
         """Build a Feature."""
         return Edits.upsert(self)
 
-    @FeatureAction.undoBuild.handleAndPersist()
+    @FeatureAction.undoBuild.handleWithSave()
     def undoBuildFeature(self):
         """Undo Building a Feature."""
         return Edits.upsert(self)
 
-    @FeatureAction.supersede.handleAndPersist()
+    @FeatureAction.supersede.handleWithSave()
     def supersedeFeature(self):
         """Supersede a Feature."""
         return Edits.upsert(self)
 
-    @FeatureAction.undoSupersede.handleAndPersist()
+    @FeatureAction.undoSupersede.handleWithSave()
     def undoSupersedeFeature(self):
         """Undo superseding a Feature."""
         return Edits.upsert(self)
 
-    @FeatureAction.trash.handleAndPersist()
+    @FeatureAction.trash.handleWithSave()
     def trashFeature(self):
         """Trash a Feature."""
         return Edits.delete(self)
 
-    @FeatureAction.archive.handleAndPersist()
+    @FeatureAction.archive.handleWithSave()
     def archiveFeature(self):
         """Archive a Feature."""
         return Edits.upsert(self)
 
-    @FeatureAction.undoArchive.handleAndPersist()
+    @FeatureAction.undoArchive.handleWithSave()
     def undoArchiveFeature(self):
         """Archive a Feature."""
         return Edits.upsert(self)

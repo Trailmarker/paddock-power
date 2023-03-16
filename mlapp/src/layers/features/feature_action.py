@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from qgis.core import QgsApplication
-
-from ...models import Glitch, StateMachineAction, actionHandler
-from ..interfaces import IPersistedFeature
-from .persist_edits_task import PersistEditsTask, persistEdits
+from ...models import StateMachineAction, actionHandler
 
 
 class FeatureAction(StateMachineAction):
-    def handle(self):
-        return partial(actionHandler, self)
+    def handle(selfAsFeatureAction):
+        return partial(actionHandler, selfAsFeatureAction)
 
-    def handleAndPersist(self):
-        def withPersistedEdits(method):
-            def callWithPersistedEdits(feature, *args, **kwargs):
-                if not isinstance(feature, IPersistedFeature):
-                    raise Glitch(f"FeatureAction.handleAndPersist: {feature} is not an IPersistedFeature")
-                persistEdits(feature, partial(actionHandler, self)(method), *args, **kwargs)
-
-            return callWithPersistedEdits
-        return withPersistedEdits
+    def handleWithSave(selfAsFeatureAction):
+        def withActionHandler(method):
+            def withSaveEditsAndDeriveTask(feature, *args, **kwargs):
+                editFunction = actionHandler(selfAsFeatureAction, method)
+                return feature.featureLayer.workspace.saveEditsAndDerive(editFunction, feature, *args, **kwargs)
+            return withSaveEditsAndDeriveTask
+        return withActionHandler
 
     """Allowed transitions for a StatusFeature."""
     draft = "Draft"

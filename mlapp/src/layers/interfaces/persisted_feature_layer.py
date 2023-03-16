@@ -5,8 +5,13 @@ from .persisted_layer import PersistedLayer
 
 
 class PersistedFeatureLayer(FeatureLayer, PersistedLayer):
+    @classmethod
+    def workspaceUrl(cls, workspaceFile):
+        """Return the expected GeoPackage URL for this layer for a given workspace GeoPackage."""
+        return f"{workspaceFile}|layername={cls.defaultName()}"
+
     @abstractmethod
-    def detectInStore(self, storeDefinition, layerName):
+    def detectInStore(self, workspaceFile, layerName):
         """Detect a matching QgsVectorLayer in a GeoPackage."""
         pass
 
@@ -21,6 +26,6 @@ class PersistedFeatureLayer(FeatureLayer, PersistedLayer):
         pass
 
     @abstractmethod
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Re-derive the upstream features in this layer."""
         pass

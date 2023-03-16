@@ -7,6 +7,16 @@ from .layer import Layer
 class PersistedLayer(Layer):
 
     @abstractmethod
+    def readOnly(self):
+        """Return True if this layer is read-only, False otherwise."""
+        pass
+
+    @abstractmethod
+    def setReadOnly(self, readOnly):
+        """Set this layer to read-only or not."""
+        pass
+
+    @abstractmethod
     def isEditable(self):
         """Return True if this layer is currently editable, False otherwise."""
         pass
@@ -57,6 +67,6 @@ class PersistedLayer(Layer):
         pass
 
     @abstractmethod
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Recalculate features in this layer."""
         pass

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from math import hypot
+from math import hypot, isnan, isinf
 
 from shapely.wkb import loads
 from shapely.wkt import dumps
@@ -136,6 +136,9 @@ class Calculator:
                     distances[-1] + hypot(groundDistance, elevationVariation))
 
             elevations = [point.z() for point in pointsWithZ]
+
+        # Clean up bad values (caused eg by points outside the elevation layer)
+        elevations = [(z if not isnan(z) and not isinf(z) else 0.0) for z in elevations]
 
         minimumElevation = round(min(elevations), 1)
         maximumElevation = round(max(elevations), 1)

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from .features import BasePaddock
-from .imported_feature_layer import ImportedFeatureLayer
+from .importable_feature_layer import ImportableFeatureLayer
 from .status_feature_layer_mixin import StatusFeatureLayerMixin
 
 
-class BasePaddockLayer(ImportedFeatureLayer, StatusFeatureLayerMixin):
+class BasePaddockLayer(ImportableFeatureLayer, StatusFeatureLayerMixin):
 
     LAYER_NAME = "Base Paddocks"
     STYLE = "base_paddock"

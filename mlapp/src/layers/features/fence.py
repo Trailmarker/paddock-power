@@ -4,11 +4,11 @@ from shapely.ops import split
 
 from qgis.core import QgsGeometry
 from collections import defaultdict
-from qgis.core import QgsFeatureRequest, QgsGeometry, QgsSpatialIndex
+from qgis.core import QgsFeatureRequest, QgsGeometry
 
 from ...models import Glitch
-from ...utils import PLUGIN_NAME, qgsDebug, qgsInfo
-from ..fields import BUILD_FENCE, NAME, PADDOCK, FeatureStatus, Timeframe, FenceSchema
+from ...utils import PLUGIN_NAME, qgsInfo
+from ..fields import BUILD_FENCE, FeatureStatus, Timeframe, FenceSchema
 from .edits import Edits
 from .feature_action import FeatureAction
 from .persisted_feature import PersistedFeature
@@ -182,13 +182,13 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def getCrossedBasePaddocks(self):
         """Same as getCrossedPaddocks but returns the crossed Base Paddock features."""
         fenceLines, crossedPaddocks = self.getCrossedPaddocks()
-        return fenceLines, self.basePaddockLayer.getFeatures(
-            QgsFeatureRequest().setFilterFids([p.PADDOCK for p in crossedPaddocks]))
+        return fenceLines, [f for f in self.basePaddockLayer.getFeatures(
+            QgsFeatureRequest().setFilterFids([p.PADDOCK for p in crossedPaddocks]))]
 
     def _getRelatedPaddocks(self, *statuses):
         """Get the Paddocks with the specified Build Order and group them by STATUS."""
         if self.matchStatus(FeatureStatus.Drafted):
-            return self.getCrossedPaddocks(), []
+            return self.getCrossedBasePaddocks(), []
 
         if self.BUILD_ORDER <= 0:
             raise Glitch(
@@ -196,7 +196,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         buildFenceRequest = QgsFeatureRequest().setFilterExpression(f'"{BUILD_FENCE}" = {self.BUILD_ORDER}')
 
-        relatedPaddocks = self.paddockLayer.getFeatures(request=buildFenceRequest)
+        relatedPaddocks = self.basePaddockLayer.getFeatures(request=buildFenceRequest)
 
         groupedRelatedPaddocks = defaultdict(list)
 
@@ -212,7 +212,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         affectedPaddocks, resultingPaddocks = [], []
 
         if self.matchStatus(FeatureStatus.Drafted):
-            _, crossedPaddocks = self.getCrossedPaddocks()
+            _, crossedPaddocks = self.getCrossedBasePaddocks()
             affectedPaddocks, resultingPaddocks = crossedPaddocks, []
         elif self.matchStatus(FeatureStatus.Planned):
             plannedSupersededPaddocks, builtSupersededPaddocks, plannedPaddocks = self._getRelatedPaddocks(
@@ -226,12 +226,9 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         affectedPaddocks = [p for p in affectedPaddocks if p.matchTimeframe(Timeframe.Current)]
         resultingPaddocks = [p for p in resultingPaddocks if p.matchTimeframe(Timeframe.Future)]
 
-        # qgsDebug(f"Affected paddocks = {str([format(p) for p in affectedPaddocks])}")
-        # qgsDebug(f"Resulting paddocks = {str([format(p) for p in resultingPaddocks])}")
-
         return affectedPaddocks, resultingPaddocks
 
-    @FeatureAction.draft.handleAndPersist()
+    @FeatureAction.draft.handleWithSave()
     def draftFeature(self, geometry):
         """Draft a Fence."""
 
@@ -262,7 +259,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return Edits.upsert(self).editBefore(edits)
 
-    @FeatureAction.plan.handleAndPersist()
+    @FeatureAction.plan.handleWithSave()
     def planFeature(self):
         """Plan the Paddocks that would be altered after building this Fence."""
 
@@ -274,8 +271,6 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         if self.BUILD_ORDER <= 0:
             raise Glitch("Fence must have a positive Build Order to be Planned")
-
-        index = QgsSpatialIndex
 
         _, crossedBasePaddocks = self.getCrossedBasePaddocks()
 
@@ -307,7 +302,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return Edits.upsert(self).editAfter(edits)
 
-    @FeatureAction.undoPlan.handleAndPersist()
+    @FeatureAction.undoPlan.handleWithSave()
     def undoPlanFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 
@@ -323,7 +318,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         return Edits.upsert(self).editAfter(edits)
 
-    @FeatureAction.build.handleAndPersist()
+    @FeatureAction.build.handleWithSave()
     def buildFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 
@@ -334,18 +329,18 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         for supersededPaddock in supersededPaddocks:
             edits = edits.editBefore(supersededPaddock.archiveFeature())
 
-        # # qgsDebug(f"Fence.buildFeature after archive Paddock processing: {edits.upserts}")
+        # qgsDebug(f"Fence.buildFeature after archive Paddock processing: {edits.upserts}")
 
         for plannedPaddock in plannedPaddocks:
             edits = edits.editBefore(plannedPaddock.buildFeature())
 
-        # # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
+        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
         return Edits.upsert(self).editAfter(edits)
 
         # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
-    @FeatureAction.undoBuild.handleAndPersist()
+    @FeatureAction.undoBuild.handleWithSave()
     def undoBuildFeature(self):
         """Undo the plan of Paddocks implied by a Fence."""
 

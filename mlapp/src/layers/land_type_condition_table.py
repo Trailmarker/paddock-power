@@ -5,16 +5,16 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import PLUGIN_NAME, qgsInfo
-from .features import LandTypeCondition
+from .features import Edits, LandTypeCondition
 from .fields import LAND_TYPE, PADDOCK, CONDITION_TYPE, ConditionType
 from .interfaces import IPersistedLayer
 
 
 class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass=QtAbstractMeta):
 
-    willBeDeleted = pyqtSignal()
-
     LAYER_NAME = "Land Type Condition Table"
+
+    editsPersisted = pyqtSignal()
 
     @classmethod
     def defaultName(cls):
@@ -25,6 +25,7 @@ class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass
         QObject.__init__(self)
         WorkspaceMixin.__init__(self)
 
+        self._readOnly = False
         self._editable = False
         self.tableName = self.defaultName()
 
@@ -163,7 +164,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     paddockId=paddockId,
                     landTypeId=landTypeId,
                     condition=conditionType.name))
-        self.workspace.featuresChanged.emit([self])
 
     def upsertSplitPaddockRecord(self, splitPaddockId, crossedPaddockId):
         """Upsert the condition data for a paddock to the new paddocks into which it will be split."""
@@ -193,7 +193,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             except BaseException:
                 cursor.execute("rollback")
                 raise Exception("Error upserting split paddock condition data")
-        self.workspace.featuresChanged.emit([self])
 
     def deleteRecord(self, paddockId, landTypeId):
         with sqlite3.connect(self.workspaceFile) as conn:
@@ -202,7 +201,12 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
                     tableName=self.tableName,
                     paddockId=paddockId,
                     landTypeId=landTypeId))
-        self.workspace.featuresChanged.emit([self])
+
+    def readOnly(self):
+        return self._readOnly
+
+    def setReadOnly(self, readOnly):
+        self._readOnly = readOnly
 
     def isEditable(self):
         return self._editable
@@ -247,6 +251,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
         for feature in features:
             self.addFeature(feature)
 
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Recalculate features in this layer."""
-        pass
+        return Edits()

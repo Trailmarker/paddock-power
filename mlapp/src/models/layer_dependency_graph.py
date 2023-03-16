@@ -56,3 +56,35 @@ class LayerDependencyGraph(TypeDependencyGraph):
     def recalculateOrder(self):
         return self.operationOrder(lambda t: issubclass(t, IPersistedFeatureLayer)
                                    and not issubclass(t, IPersistedDerivedFeatureLayer), self.loadOrder())
+
+    def cleanupOrder(self):
+        return [PaddockCurrentLandTypesPopupLayer,
+                PaddockFutureLandTypesPopupLayer,
+                WaterpointBufferPopupLayer,
+                BoundaryLayer,
+                DerivedBoundaryLayer,
+                PipelineLayer,
+                FenceLayer,
+                PaddockLayer,
+                DerivedMetricPaddockLayer,
+                PaddockLandTypesLayer,
+                DerivedPaddockLandTypesLayer,
+                WateredAreaLayer,
+                DerivedWateredAreaLayer,
+                WaterpointBufferLayer,
+                DerivedWaterpointBufferLayer,
+                WaterpointLayer,
+                BasePaddockLayer,
+                LandTypeLayer,
+                ElevationLayer]
+        # LandTypeConditionTable]
+
+    def displayOrder(self):
+        return [WaterpointLayer,
+                PipelineLayer,
+                FenceLayer,
+                WateredAreaLayer,
+                LandTypeLayer,
+                BoundaryLayer,
+                PaddockLayer,
+                ElevationLayer]

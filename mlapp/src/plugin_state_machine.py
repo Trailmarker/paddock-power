@@ -18,9 +18,10 @@ class PluginAction(StateMachineAction):
     detectWorkspace = "Detect Workspace"
     createWorkspace = "Create Workspace"
     loadWorkspace = "Load Workspace"
+    refreshWorkspace = "Refresh Workspace"
     analyseWorkspace = "Analyse Workspace"
-    openFeatureView = "Open Feature View"
-    closeFeatureView = "Close Feature View"
+    openPluginDockWidget = "Open Plugin Dock Widget"
+    closePluginDockWidget = "Close Plugin Dock Widget"
     openImportDialog = "Import Data"
     unloadWorkspace = "Unload Workspace"
     projectClosed = "Project Closed"
@@ -51,10 +52,10 @@ class PluginStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
         (PluginStatus.NoWorkspaceLoaded, PluginAction.loadWorkspace): PluginStatus.WorkspaceLoaded,
         (PluginStatus.NoWorkspaceLoaded, PluginAction.projectClosed): PluginStatus.NoWorkspaceLoaded,
 
-        (PluginStatus.WorkspaceLoaded, PluginAction.detectWorkspace): PluginStatus.NoWorkspaceLoaded,
+        (PluginStatus.WorkspaceLoaded, PluginAction.refreshWorkspace): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.analyseWorkspace): PluginStatus.WorkspaceLoaded,
-        (PluginStatus.WorkspaceLoaded, PluginAction.openFeatureView): PluginStatus.WorkspaceLoaded,
-        (PluginStatus.WorkspaceLoaded, PluginAction.closeFeatureView): PluginStatus.WorkspaceLoaded,
+        (PluginStatus.WorkspaceLoaded, PluginAction.openPluginDockWidget): PluginStatus.WorkspaceLoaded,
+        (PluginStatus.WorkspaceLoaded, PluginAction.closePluginDockWidget): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.openImportDialog): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.unloadWorkspace): PluginStatus.NoWorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.projectClosed): PluginStatus.NoWorkspaceLoaded

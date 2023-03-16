@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from ...utils import qgsDebug
 from ..glitch import Glitch
-
 from .state_machine_enum import StateMachineEnum
 from .state_machine_mixin import toStateMachine
 

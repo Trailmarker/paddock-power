@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from .features import Pipeline
-from .imported_feature_layer import ImportedFeatureLayer
+from .importable_feature_layer import ImportableFeatureLayer
 
 
-class PipelineLayer(ImportedFeatureLayer):
+class PipelineLayer(ImportableFeatureLayer):
 
     LAYER_NAME = "Pipelines"
     STYLE = "pipeline"

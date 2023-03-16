@@ -27,23 +27,9 @@ class Waterpoint(PersistedFeature, StatusFeatureMixin):
             return f"{self.NAME} ({self.WATERPOINT_TYPE})"
         return f"Waterpoint ({self.FID}) ({self.WATERPOINT_TYPE})"
 
-    @FeatureAction.draft.handleAndPersist()
+    @FeatureAction.draft.handleWithSave()
     def draftFeature(self, point):
         """Draft a Waterpoint."""
         self.GEOMETRY = point
 
         return Edits.upsert(self)
-
-    def onSelectFeature(self):
-        """Do the stuff we'd normally do, but also add the popup layer."""
-        super().onSelectFeature()
-
-        if self.WATERPOINT_TYPE.givesWater():
-            for layerType in self.popupLayerTypes:
-                self.addPopupLayer(layerType)
-
-    def onDeselectFeature(self):
-        """Do the stuff we'd normally do, but also remove the popup layer."""
-        super().onDeselectFeature()
-
-        self.removeAllPopupLayers()

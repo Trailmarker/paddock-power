@@ -13,17 +13,6 @@ class PersistedFeature(Feature, IPersistedFeature):
         """Create a new Feature."""
 
         super().__init__(featureLayer, existingFeature)
-        self._currentTask = None
-
-    @property
-    def currentTask(self):
-        """Return the current task."""
-        return self._currentTask
-
-    @currentTask.setter
-    def currentTask(self, task):
-        """Set the current task."""
-        self._currentTask = task
 
     @property
     def GEOMETRY(self):

@@ -1,39 +1,38 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsTask
-
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
-from .load_layer_task import LoadLayerTask
+from ...models import WorkspaceTask
+from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 
 
-class LoadWorkspaceTask(QgsTask):
+class LoadWorkspaceTask(WorkspaceTask):
 
-    def __init__(self, layerDependencyGraph, workspaceLayers, workspaceFile, workspaceName):
+    def __init__(self, workspace):
         """Input is a Workspace."""
+        super().__init__(f"{PLUGIN_NAME} is loading the '{workspace.workspaceName}' workspace …", workspace)
 
-        super().__init__(
-            f"{PLUGIN_NAME} is loading the '{workspaceName}' workspace …",
-            flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
+    def safeRun(self):
+        try:
+            loadOrder = self.workspace.layerDependencyGraph.loadOrder()
 
-        self.workspaceFile = workspaceFile
-        self.workspaceName = workspaceName
-        loadOrder = layerDependencyGraph.loadOrder()
+            for layerType in loadOrder:
+                if self.isCanceled():
+                    return False
+                dependentLayerTypes = self.workspace.layerDependencyGraph.getDependencies(layerType)
+                dependentLayers = [self.workspace.workspaceLayers.layer(dependentLayerType)
+                                   for dependentLayerType in dependentLayerTypes]
 
-        predecessors = []
-        for layerType in loadOrder:
-            dependentLayerTypes = layerDependencyGraph.getDependencies(layerType)
-            task = LoadLayerTask(workspaceLayers, layerType, workspaceFile, dependentLayerTypes)
-            task.taskTerminated.connect(self.cancel)
+                layer = layerType(self.workspace.workspaceFile, *dependentLayers)
+                self.workspace.workspaceLayers.addLayer(layerType, layer)
 
-            self.addSubTask(
-                task, dependencies=predecessors,
-                subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
-            predecessors.append(task)
+                guiStatusBarAndInfo(f"{PLUGIN_NAME} {layer.name()} loaded.")
 
-    def run(self):
-        f"""Load all layers in a {PLUGIN_NAME} workspace."""
-        return True
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} loaded the '{self.workspace.workspaceName}' workspace.")
+            return True
 
-    def finished(self, result):
+        except Exception:
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to load workspace.")
+            qgsException()
+            return False
+
+    def safeFinished(self, _):
         """Called when task completes (successfully or otherwise)."""
-        if not result:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to load the '{self.workspaceName}' workspace.")
+        pass

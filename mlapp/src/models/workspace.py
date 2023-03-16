@@ -3,18 +3,15 @@ from os.path import basename
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from qgis.core import QgsApplication, QgsProject, QgsTask
+from qgis.core import QgsProject, QgsSnappingConfig
 
 from ..layers.fields import Timeframe
-from ..layers.interfaces import IFeatureLayer
-from ..layers.tasks import AnalyseWorkspaceTask, DeriveEditsTask, LoadWorkspaceTask, RecalculateFeaturesTask
-from ..layers import (LandTypeConditionTable, BoundaryLayer, PaddockLayer,
-                      ElevationLayer, FenceLayer, LandTypeLayer, PaddockLandTypesLayer, BasePaddockLayer,
-                      PipelineLayer, WateredAreaLayer, WaterpointBufferLayer, WaterpointLayer)
-from ..tools.map_tool import MapTool
-from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo, qgsDebug
+from ..layers.tasks import AnalyseWorkspaceTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
+from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
+from ..widgets.tools.map_tool import MapTool
 from .glitch import Glitch
 from .layer_dependency_graph import LayerDependencyGraph
+from .task_handle import TaskHandle
 from .workspace_layers import WorkspaceLayers
 
 # Initialize Qt resources from file resources.py
@@ -23,57 +20,68 @@ from ...resources_rc import *
 
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
-    featureLayerSelected = pyqtSignal(type)
-    featureLayerDeselected = pyqtSignal(type)
+    featureLayerSelected = pyqtSignal(str)
+    lockChanged = pyqtSignal(bool)
     timeframeChanged = pyqtSignal(Timeframe)
-    featuresChanged = pyqtSignal(list)
     workspaceLoaded = pyqtSignal()
 
     def __init__(self, iface, workspaceFile):
 
-        self.ready = False
-
         super().__init__(iface.mainWindow())
 
-        # These handles are needed to stop QGIS aggressively cleaning up QgsTask objects
-        self._loadWorkspaceTask = None
-        self._deriveFeaturesTask = None
-        self._recalculateFeaturesTask = None
-        
-        self.__selectedFeatures = {}
+        self._locked = False
 
-        self.workspaceName = PLUGIN_NAME
+        self.loadWorkspaceTask = TaskHandle(LoadWorkspaceTask, self)
+        self.loadWorkspaceTask.taskCompleted.connect(self.onLoadWorkspaceTaskCompleted)
+
+        self.analyseWorkspaceTask = TaskHandle(AnalyseWorkspaceTask, self)
+        self.analyseWorkspaceTask.taskCompleted.connect(self.onAnalyseWorkspaceTaskCompleted)
+        self.saveEditsTask = TaskHandle(SaveEditsAndDeriveTask, self)
+
+        self.selectedFeatures = {}
+
         self.iface = iface
         self.workspaceFile = workspaceFile
         self.workspaceName = basename(workspaceFile)
-        
+
         self.currentTool = None
         self.timeframe = Timeframe.Future
 
         self.timeframeChanged.connect(self.deselectLayers)
-        
-        # Load workspace
+
         self.layerDependencyGraph = LayerDependencyGraph()
         self.workspaceLayers = WorkspaceLayers()
 
-        self._loadWorkspaceTask = LoadWorkspaceTask(self.layerDependencyGraph, self.workspaceLayers, self.workspaceFile, self.workspaceName)
-        self._loadWorkspaceTask.taskCompleted.connect(self.onWorkspaceLoaded)
-        QgsApplication.taskManager().addTask(self._loadWorkspaceTask)
+        # Clean up all layers
+        cleanupIds = [layerId for layerType in self.layerDependencyGraph.cleanupOrder()
+                      for layerId in layerType.detectAllOfType(workspaceFile)]
+        QgsProject.instance().removeMapLayers(cleanupIds)
 
-    def onWorkspaceLoaded(self):
-        qgsInfo(f"Workspace.onWorkspaceLoaded()")
-        
-        # Wiring some stuff for selected features …
-        self.addToMap()
-        # Set some convenience variables as usual
-        self.workspaceLayers.setWorkspaceLayerAttributes(self)
-        self.workspaceLoaded.emit()
+        for layerType in self.layerDependencyGraph.cleanupOrder():
+            layerType.removeAllOfType(workspaceFile)
+
+        # Load workspace async
+        self.loadWorkspace()
+
+    def locked(self):
+        """Return True if the workspace is locked."""
+        return self._locked
+
+    def lock(self):
+        """Lock the workspace."""
+        self._locked = True
+        self.lockChanged.emit(True)
+
+    def unlock(self):
+        """Unlock the workspace."""
+        self._locked = False
+        self.lockChanged.emit(False)
 
     def findGroup(self):
         """Find this workspace's group in the Layers panel."""
-        group = QgsProject.instance().layerTreeRoot().findGroup(self.workspaceName)
+        group = QgsProject.instance().layerTreeRoot().findGroup(PLUGIN_NAME)
         if group is None:
-            group = QgsProject.instance().layerTreeRoot().insertGroup(0, self.workspaceName)
+            group = QgsProject.instance().layerTreeRoot().insertGroup(0, PLUGIN_NAME)
         return group
 
     def addToMap(self, group=None):
@@ -82,16 +90,8 @@ class Workspace(QObject):
         self.removeFromMap()
         group = group or self.findGroup()
 
-        layerStackingOrder = [
-            WaterpointLayer,
-            PipelineLayer,
-            FenceLayer,
-            WateredAreaLayer,
-            LandTypeLayer,
-            BoundaryLayer,
-            PaddockLayer,
-            ElevationLayer]
-        availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in layerStackingOrder] if l]
+        displayOrder = self.layerDependencyGraph.displayOrder()
+        availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in displayOrder] if l]
 
         for layer in availableLayers:
             layer.addToMap(group)
@@ -103,10 +103,6 @@ class Workspace(QObject):
 
     def setTool(self, tool):
         """Set the current map tool for this workspace."""
-        if not isinstance(tool, MapTool):
-            raise Glitch(
-                f"The {PLUGIN_NAME} tool must be of a recognised type")
-
         self.unsetTool()
         self.currentTool = tool
         self.iface.mapCanvas().setMapTool(self.currentTool)
@@ -128,48 +124,42 @@ class Workspace(QObject):
             self.timeframe = timeframe
             self.timeframeChanged.emit(timeframe)
 
-    def deselectLayers(self, selectedLayerType=None):
+    def deselectLayers(self, selectedLayerId=None):
         """Deselect any currently selected Feature."""
-        for layerType in [l for l in self.__selectedFeatures.keys() if l != selectedLayerType]:
-            # qgsInfo(f"Workspace.deselectLayers({layerType.__name__})")
-            del self.__selectedFeatures[layerType]
-            self.featureLayerDeselected.emit(layerType)
+        for layerId in [l for l in self.selectedFeatures.keys() if l != selectedLayerId]:
+            qgsInfo(f"Workspace.deselectLayers({selectedLayerId}")
+            layer = QgsProject.instance().mapLayer(layerId)
+            layer.removeSelection()
+            del self.selectedFeatures[layerId]
 
     def selectFeature(self, feature):
         """Select a feature."""
-        # qgsInfo(f"Workspace.selectFeature({feature})")
-        selectedLayerType = type(feature.featureLayer)
-        self.__selectedFeatures[selectedLayerType] = feature
+        selectedLayerId = feature.featureLayer.id()
+        self.selectedFeatures[selectedLayerId] = feature
 
         # If we are going to focus on the new feature, deselect the old layers
-        if selectedLayerType.focusOnSelect():
-            self.deselectLayers(selectedLayerType)
+        if feature.focusOnSelect():
+            qgsInfo(f"Workspace.selectFeature({feature}): focusOnSelect, deselecting other layers")
+            self.deselectLayers(selectedLayerId)
 
-        # Select on the new layer either way
-        self.featureLayerSelected.emit(selectedLayerType)
+        # This is kinda legacy now
+        self.featureLayerSelected.emit(selectedLayerId)
 
-    def selectedFeature(self, layerType):
+    def selectedFeature(self, layerId):
         """Return the selected feature for the given layer type."""
-        return self.__selectedFeatures[layerType] if layerType in self.__selectedFeatures else None
+        return self.selectedFeatures[layerId] if layerId in self.selectedFeatures else None
 
     @pyqtSlot()
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         self.unsetTool()
-
         self.removeFromMap()
 
-        def cleanupByName(name):
-            f"""Remove all layers from the current project with the given names."""
-            for layer in QgsProject.instance().mapLayers().values():
-                if layer.name() == name:
-                    QgsProject.instance().removeMapLayers([layer.id()])
-
-        for cls in self.layerDependencyGraph.unloadOrder():
-            cleanupByName(cls.defaultName())
-
-        for layerType in self.layerDependencyGraph.unloadOrder():
-            self.workspaceLayers.unloadLayer(layerType)
+    def mapLayer(self, layerId):
+        if layerId == self.landTypeConditionTable.id():
+            return self.landTypeConditionTable
+        else:
+            return QgsProject.instance().mapLayer(layerId)
 
     def onLayerLoaded(self, layer):
         guiStatusBarAndInfo(f"{PLUGIN_NAME} {layer.name()} loaded …")
@@ -182,34 +172,33 @@ class Workspace(QObject):
                 guiStatusBarAndInfo(
                     f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
 
-    def deriveEdits(self, edits):
-        """Winnow and re-analyse a batch of updated layers."""        
-        order = self.layerDependencyGraph.deriveOrder(type(layer) for layer in edits.layers)
-        layers = [self.workspaceLayers.layer(layerType) for layerType in order]
+    def loadWorkspace(self):
+        self.loadWorkspaceTask.run(self)
 
-        self._deriveFeaturesTask = DeriveEditsTask(layers, edits, self.onLayerAnalysisComplete)
-        QgsApplication.taskManager().addTask(self._deriveFeaturesTask)
-        return self._deriveFeaturesTask
+    def onLoadWorkspaceTaskCompleted(self):
+        self.workspaceLayers.addLayersToWorkspace(self)
+        self.addToMap()
 
-    def recalculateLayers(self):
+        # TODO this is a bit of a bizarre hack. Without this line, our project
+        # ends up loaded with corrupt snapping configuration (from a QGIS 3 bug, perhaps)
+        # that causes QGIS to crash instead of saving the project file.
+        QgsProject.instance().setSnappingConfig(QgsSnappingConfig())
+
+        self.workspaceLoaded.emit()
+
+    def analyseWorkspace(self):
         """Winnow and re-analyse a batch of updated layers."""
+        self.analyseWorkspaceTask.run(self)
 
-        self._recalculateFeaturesTask = AnalyseWorkspaceTask()
-        QgsApplication.taskManager().addTask(self._recalculateFeaturesTask)
+    def onAnalyseWorkspaceTaskCompleted(self):
+        """Clean up all the derived layers."""
+        pass
 
-    def onLayerAnalysisComplete(self, layerType, result):
-        """Handle a completed recalculation of a layer."""
-        if result:
-            layer = self.workspaceLayers.layer(layerType)
-            qgsDebug(f"{type(self).__name__}.onLayerAnalysisComplete: {type(layer).__name__}.featuresChanged.emit()")
-            layer.featuresChanged.emit()
+    def saveEditsAndDerive(self, editFunction, *args, **kwargs):
+        """Persist this feature and also queue up all required derivation."""
 
-    def onPersistEdits(self, edits):
-        """Handle a change to the features of one or more layer."""
-
-        # Emit a signal to any layer subscribers that these features have changedinstance
-        for layer in edits.layers:
-            layer.featuresChanged.emit()
-
-        # Re-derive other features that depend on these features
-        self.deriveEdits(edits)
+        self.saveEditsTask.run(
+            f"{PLUGIN_NAME} saving edits and deriving changes …",
+            self,
+            editFunction, *args, **kwargs
+        )

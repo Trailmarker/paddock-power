@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from .features import LandType
-from .imported_feature_layer import ImportedFeatureLayer
+from .importable_feature_layer import ImportableFeatureLayer
 
 
-class LandTypeLayer(ImportedFeatureLayer):
+class LandTypeLayer(ImportableFeatureLayer):
 
     LAYER_NAME = "Land Types"
     STYLE = "land_type"

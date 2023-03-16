@@ -6,19 +6,19 @@ from os import mkdir
 from qgis.core import QgsProject
 from qgis.utils import plugins
 
-from .src.layers.fields import Timeframe, FeatureStatus
 from .src.layers.features import *
+from .src.layers.fields import *
 from .src.layers.interfaces import *
 from .src.layers.tasks import *
 from .src.layers import *
 
 
-from .src.utils import resolvePluginPath, qgsDebug, PLUGIN_NAME
+from .src.utils import PLUGIN_FOLDER, PLUGIN_NAME, qgsInfo, resolvePluginPath
 
 
 def plugin():
     f"""Get the instance of the {PLUGIN_NAME} plug-in"""
-    return plugins['mlapp']
+    return plugins[PLUGIN_FOLDER]
 
 
 def container():
@@ -76,7 +76,7 @@ def exportStyles(relativeOutDir, overwrite=False):
             if overwrite or not path.exists(outFile):
                 layer.saveNamedStyle(outFile)
             else:
-                qgsDebug("Can't save style for layer " + layer.name() + " because the file already exists: " + outFile)
+                qgsInfo("Can't save style for layer " + layer.name() + " because the file already exists: " + outFile)
 
 
 layerTypes = [
@@ -103,3 +103,6 @@ if workspace():
      elevationLayer, fenceLayer, landTypeLayer,
      basePaddockLayer, paddockLandTypeLayer, pipelineLayer,
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
+
+
+pdw = plugin().pluginDockWidget

@@ -1,0 +1,35 @@
+QListWidget::item {
+  selection-background-color: green;
+}
+
+QGroupBox {
+  background-color: #fcfcfc;
+}
+
+ProfileDetails {
+  background-color: #fcfcfc;
+}
+
+ProfileDetails QLabel.form-left {
+  background-color: #fcfcfc;
+  padding: 3px;
+  padding-right: 6px;
+}
+
+ProfileDetails QLabel.form-right {
+  background-color: #fcfcfc;
+  padding: 3px;
+  padding-left: 6px;
+}
+
+/* QSplitter::handle { 
+    image: url(:/plugins/{PLUGIN_FOLDER}/images/splitter.png);
+} */
+
+QSplitter::handle:horizontal {
+  width: 14px;
+}
+
+QToolButton.no-border {
+  border: none;
+}
