@@ -45,7 +45,7 @@ class FencesWidget(WorkspaceMixin, SplitFeatureTablesWidget):
 
     @pyqtSlot(QgsGeometry)
     def onSketchFenceFinished(self, sketchLine):
-        fence = self.workspace.fanceLayer.makeFeature()
+        fence = self.workspace.fenceLayer.makeFeature()
         fence.draftFeature(sketchLine)
         self.workspace.selectFeature(fence)
 
