@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtGui import QIcon
+
+from ..utils import PLUGIN_FOLDER
 from .features import Pipeline
-from .imported_feature_layer import ImportedFeatureLayer
+from .importable_feature_layer import ImportableFeatureLayer
 
 
-class PipelineLayer(ImportedFeatureLayer):
+class PipelineLayer(ImportableFeatureLayer):
 
     LAYER_NAME = "Pipelines"
     STYLE = "pipeline"
@@ -20,3 +23,8 @@ class PipelineLayer(ImportedFeatureLayer):
         super().__init__(workspaceFile,
                          layerName=PipelineLayer.defaultName(),
                          styleName=PipelineLayer.defaultStyle())
+        
+    @classmethod    
+    def icon(cls):
+        """The icon to paint to represent this layer."""
+        return QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pipeline.png")

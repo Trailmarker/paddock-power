@@ -12,13 +12,13 @@ class ConditionType(FieldDomain):
     def toColour(self):
         """Get the colour associated with this status."""
         if self == ConditionType.A:
-            return (35, 139, 69)
+            return (35, 139, 69, 100)
         elif self == ConditionType.B:
-            return (65, 171, 93)
+            return (65, 171, 93, 100)
         elif self == ConditionType.C:
-            return (116, 196, 118)
+            return (116, 196, 118, 100)
         elif self == ConditionType.D:
-            return (161, 217, 155)
+            return (161, 217, 155, 100)
         else:
             raise NotImplementedError("Unknown ConditionType value")
 

@@ -33,8 +33,22 @@ class PopupLayerConsumerMixin:
     def rewirePopupLayerSource(self, oldVal, newVal):
         """Rewire the PopupLayerSource."""
         if oldVal:
-            oldVal.popupLayerAdded.disconnect(self.onPopupLayerAdded)
-            oldVal.popupLayerRemoved.disconnect(self.onPopupLayerRemoved)
+            try:
+                oldVal.popupLayerAdded.disconnect()
+            except Exception:
+                pass
+            try:
+                oldVal.popupLayerRemoved.disconnect()
+            except Exception:
+                pass
         if newVal:
-            newVal.popupLayerAdded.connect(self.onPopupLayerAdded)
-            newVal.popupLayerRemoved.connect(self.onPopupLayerRemoved)
+            newVal.popupLayerAdded.connect(lambda layerId: self.onPopupLayerAdded(layerId))
+            newVal.popupLayerRemoved.connect(lambda: self.onPopupLayerRemoved())
+
+    def onPopupLayerAdded(self, layerId):
+        """Override in subclass to handle popup layer added."""
+        pass
+
+    def onPopupLayerRemoved(self):
+        """Override in subclass to handle popup layer removed."""
+        pass

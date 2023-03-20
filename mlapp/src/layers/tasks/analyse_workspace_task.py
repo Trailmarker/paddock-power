@@ -1,37 +1,69 @@
 # -*- coding: utf-8 -*-
-from ...models import SafeTask, WorkspaceMixin
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
-from .cleanup_derived_layers_task import CleanupDerivedLayersTask
-from .derive_edits_single_task import DeriveEditsSingleTask
-from .recalculate_features_single_task import RecalculateFeaturesSingleTask
+from time import sleep
+
+from ...models import WorkspaceTask
+from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
+from ..interfaces import IPersistedDerivedFeatureLayer, IPersistedFeatureLayer
 
 
-class AnalyseWorkspaceTask(SafeTask, WorkspaceMixin):
+class AnalyseWorkspaceTask(WorkspaceTask):
 
-    def __init__(self):
+    def __init__(self, workspace):
+        """Input is a batch of layers (order not important)."""
+        WorkspaceTask.__init__(self, f"{PLUGIN_NAME} analysing the workspace …", workspace)
+
+    def safeRun(self):
         """Input is a correctly ordered batch of layers."""
-        SafeTask.__init__(self, f"{PLUGIN_NAME} analysing the workspace …")
-        WorkspaceMixin.__init__(self)
+        try:
+            recalculateOrder = self.workspace.layerDependencyGraph.recalculateOrder()
+            recalculateLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in recalculateOrder]
+            recalculateLayerNames = ", ".join(layer.name() for layer in recalculateLayers)
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} recalculating {recalculateLayerNames}")
 
-        self.changeset = None
+            for layer in recalculateLayers:
+                assert isinstance(layer, IPersistedFeatureLayer)
+                assert not isinstance(layer, IPersistedDerivedFeatureLayer)
 
-        recalculateOrder = self.workspace.layerDependencyGraph.recalculateOrder()
-        recalculateLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in recalculateOrder]
+                if self.isCanceled():
+                    return False
+                recalculatedEdits = layer.recalculateFeatures(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
+                if self.isCanceled():
+                    return False
+                recalculatedEdits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
+                if self.isCanceled():
+                    return False
 
-        for layer in recalculateLayers:
-            self.safeAddSubTask(RecalculateFeaturesSingleTask(layer, self.changeset))
+                layer.editsPersisted.emit()
+                guiStatusBarAndInfo(f"{PLUGIN_NAME} recalculated {layer.name()}.")
+                sleep(self.TASK_DELAY)
 
-        deriveOrder = self.workspace.layerDependencyGraph.deriveOrder()
-        deriveLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in deriveOrder]
+            deriveOrder = self.workspace.layerDependencyGraph.deriveOrder()
+            deriveLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in deriveOrder]
+            deriveLayerNames = ", ".join(layer.name() for layer in deriveLayers)
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} deriving {deriveLayerNames}")
 
-        for layer in deriveLayers:
-            self.safeAddSubTask(DeriveEditsSingleTask(layer, self.changeset))
+            for layer in deriveLayers:
+                if self.isCanceled():
+                    return False
+                derivedEdits = layer.deriveFeatures(changeset=None, raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
+                if self.isCanceled():
+                    return False
+                derivedEdits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
+                if self.isCanceled():
+                    return False
 
-        self.safeAddSubTask(CleanupDerivedLayersTask())
+                layer.editsPersisted.emit()
+                guiStatusBarAndInfo(f"{PLUGIN_NAME} derived {layer.name()}.")
+                sleep(self.TASK_DELAY)
 
-    def safeFinished(self, result):
-        """Called when task completes (successfully or otherwise)."""
-        if result:
             guiStatusBarAndInfo(f"{PLUGIN_NAME} analysed the '{self.workspace.workspaceName}' workspace.")
-        else:
+            return True
+
+        except Exception:
             guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to analyse the '{self.workspace.workspaceName}' workspace.")
+            qgsException()
+            return False
+
+    def safeFinished(self, _):
+        """Called when task completes (successfully or otherwise)."""
+        pass

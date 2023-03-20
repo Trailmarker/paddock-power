@@ -20,12 +20,15 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
                  workspaceFile,
                  *dependentLayers):
         f"""Create a new {PLUGIN_NAME} Paddock Land Types layer."""
+        PersistedDerivedFeatureLayer.__init__(self,
+                                              workspaceFile,
+                                              PaddockLayer.defaultName(),
+                                              PaddockLayer.defaultStyle(),
+                                              DerivedMetricPaddockLayer,
+                                              dependentLayers)
 
-        super().__init__(workspaceFile,
-                         PaddockLayer.defaultName(),
-                         PaddockLayer.defaultStyle(),
-                         DerivedMetricPaddockLayer,
-                         dependentLayers)
+        PopupLayerSourceMixin.__init__(self)
+        self.connectPopups()
 
     @property
     def hasPopups(self):
@@ -39,3 +42,8 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
     def relativeLayerPosition(self):
         """Makes the Paddock Land Types popups appear *over* the Paddock layer."""
         return -1
+
+    @property
+    def zoomPopupLayerOnLoad(self):
+        """False for this because we're already zoomed to the relevant Paddock."""
+        return False

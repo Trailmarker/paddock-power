@@ -1,55 +1,78 @@
 # -*- coding: utf-8 -*-
 from functools import cached_property
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsGeometry, QgsProject
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsFields, QgsGeometry, QgsProject
 
-from ...models import Glitch
-from ...utils import PADDOCK_POWER_EPSG
+from ...utils import PADDOCK_POWER_EPSG, qgsDebug
 
 
-class FieldMap(dict):
+class FieldMap(list):
 
-    def __init__(self, importLayer, targetLayer, *args, **kwargs):
+    def __init__(self, importLayer, targetLayer):
         """Create a FieldMap."""
+        super().__init__()
 
         self.importLayer = importLayer
         self.targetLayer = targetLayer
-        self.update(*args, **kwargs)
+
+        self.initMappings()
 
     @cached_property
-    def importFieldNames(self):
-        """Return the import layer's field names as a list."""
-        return [f.name() for f in self.importLayer.fields()]
+    def importFields(self):
+        """Return the import layer's field names as a QgsFields object."""
+        return self.importLayer.fields()
 
     @cached_property
-    def targetFieldNames(self):
+    def targetFields(self):
         """Return the target schema's field names as a list."""
-        return [f.name() for f in self.targetLayer.getSchema()]
-
-    def __setitem__(self, __key, __value) -> None:
-        """Set the mapping for the given Field."""
-        if not isinstance(__key, str) or __key not in self.targetFieldNames:
-            raise Glitch(f"Invalid FieldMap key, must be a field name from the import layer")
-
-        if not isinstance(__value, str) or __value not in self.importFieldNames:
-            raise Glitch(f"Invalid FieldMap value, must be a field name from the target schema")
-
-        return super().__setitem__(__key, __value)
-
-    def __getitem__(self, __key) -> object:
-        """Get the mapping for the given Field."""
-        if not isinstance(__key, str) or __key not in self.targetFieldNames:
-            raise Glitch(f"Invalid FieldMap key, must be a field name from the import layer")
-
-        return super().__getitem__(__key)
+        return self.targetLayer.getSchema().toImportableFields()
 
     def __repr__(self):
         """Return a string representation of the FieldMap."""
         return f"{type(self).__name__}({super().__repr__()})"
 
-    def update(self, *args, **kwargs):
-        """Update the FieldMap."""
-        for k, v in dict(*args, **kwargs).items():
-            self[k] = v
+    def initMappings(self):
+        """Set up the default field mappings based on the import and target fields."""
+        self.clear()
+        for targetField in self.targetFields:
+            default = None
+            for importField in self.importFields:
+                if targetField.name().upper() == importField.name().upper():
+                    default = (importField, targetField)
+            if not default and targetField.required():
+                default = (None, targetField)
+            if default:
+                self.append(default)
+        qgsDebug(f"FieldMap.initMappings: {self}")
+
+    @property
+    def unmappedImportFields(self):
+        """Return the import fields that are not mapped."""
+        mapped = [importField for (importField, _) in self if importField is not None]
+        unmapped = QgsFields()
+        for importField in self.importFields:
+            if importField not in mapped:
+                unmapped.append(importField)
+        return unmapped
+
+    @property
+    def unmappedTargetFields(self):
+        """Return the target fields that are not mapped."""
+        mapped = [targetField for (_, targetField) in self]
+        unmapped = QgsFields()
+        for targetField in self.targetFields:
+            if targetField not in mapped:
+                unmapped.append(targetField)
+        return unmapped
+
+    def update(self, index, importFieldName, targetFieldName):
+        """Update the mapping for the given target Field."""
+        importField = self.importFields.field(importFieldName) if importFieldName else None
+        targetField = self.targetLayer.getSchema().field(targetFieldName)
+
+        if index == len(self):
+            self.append((importField, targetField))
+        else:
+            self[index] = (importField, targetField)
 
     def mapFeature(self, feature, targetFeature):
         """Map a QgsFeature to another QgsFeature via this FieldMap."""

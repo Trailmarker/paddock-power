@@ -7,7 +7,6 @@ from ..utils import PLUGIN_FOLDER
 class WorkspaceMixin:
 
     def __init__(self):
-        super().__init__()
         self._workspace = None
 
     @property

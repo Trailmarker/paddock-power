@@ -7,7 +7,7 @@ from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsFiel
 
 from ...models import Glitch
 from .field_domain import FieldDomain
-from .names import FID
+from .names import AREA, LENGTH, NAME, FID, TITLE
 
 
 class Field(QgsField):
@@ -195,6 +195,22 @@ class Field(QgsField):
         layer.setEditorWidgetSetup(fieldIndex, self.editorWidgetSetup())
         layer.setDefaultValueDefinition(fieldIndex, self.defaultValueDefinition())
 
+    def displayFieldName(self):
+        """Name of the Field that should be displayed to represent this Field."""
+        return self.name()
+
+    def hiddenFieldNames(self):
+        """Names of any Fields that should be hidden from the attribute table."""
+        return []
+
+    def importable(self):
+        """Whether this Field can be imported."""
+        return True
+    
+    def required(self):
+        """Whether this Field is required."""
+        return self._required
+
 
 class MeasureField(Field):
     def __init__(self, propertyName, name, dps=2, *args, **kwargs):
@@ -209,7 +225,7 @@ class MeasureField(Field):
         super().setupLayer(layer)
 
         # Create a separate, rounded expression field and add that as an expression field
-        roundedField = QgsField(f"Rounded {self.name()}", QVariant.Double)
+        roundedField = QgsField(self.displayFieldName(), QVariant.Double)
         roundedField.setAlias(self.name())
         layer.addExpressionField(f"round(\"{self.name()}\", {self._dps})", roundedField)
 
@@ -223,11 +239,22 @@ class MeasureField(Field):
             config.setColumns(columns)
             layer.setAttributeTableConfig(config)
 
+    def displayFieldName(self):
+        """Name of the Field that should be displayed to represent this Field."""
+        return f"Rounded {self.name()}"
+
+    def hiddenFieldNames(self):
+        """Names of any Fields that should be hidden from the attribute table."""
+        return [self.name()]
+
 
 class CalculatedField(MeasureField):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def importable(self):
+        """Whether this Field can be imported."""
+        return False
 
 
 class StringField(Field):
@@ -240,6 +267,10 @@ class IdField(Field):
     def __init__(self, propertyName, name, *args, **kwargs):
         super().__init__(propertyName=propertyName, name=name, type=QVariant.LongLong, typeName="Integer64",
                          len=0, prec=0, comment="", subType=QVariant.Invalid, *args, **kwargs)
+
+    def importable(self):
+        """Whether this Field can be imported."""
+        return False
 
 
 class DomainField(Field):

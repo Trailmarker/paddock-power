@@ -165,7 +165,7 @@ def ensureIterated(seq):
 
 # See https://stackoverflow.com/questions/28258875/how-to-obtain-the-set-of-all-signals-for-a-given-widget
 def getSignals(source):
-    """Get the signals of an object."""
+    """Get the signals of an object, useful for debugging."""
     cls = source if isinstance(source, type) else type(source)
     signal = type(pyqtSignal())
 
@@ -182,27 +182,3 @@ def getSignals(source):
 def getBoundSignals(obj):
     signal = pyqtBoundSignal
     return [(key, value) for (key, value) in inspect.getmembers(obj) if isinstance(value, signal)]
-
-
-def clearItem(item):
-    """Fully delete a QWidget or QLayout and all of its children."""
-    if hasattr(item, "layout"):
-        if callable(item.layout):
-            layout = item.layout()
-            if layout is not None:
-                for i in reversed(range(layout.count())):
-                    clearItem(layout.itemAt(i))
-                del layout
-
-    if hasattr(item, "widget"):
-        if callable(item.widget):
-            widget = item.widget()
-            if widget is not None:
-                widget.setParent(None)
-                del widget
-
-
-def staticinit(cls):
-    if getattr(cls, "__staticinit__", None):
-        cls.__staticinit__()
-    return cls

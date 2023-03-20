@@ -33,17 +33,3 @@ class Waterpoint(PersistedFeature, StatusFeatureMixin):
         self.GEOMETRY = point
 
         return Edits.upsert(self)
-
-    def onSelectFeature(self):
-        """Do the stuff we'd normally do, but also add the popup layer."""
-        super().onSelectFeature()
-
-        if self.WATERPOINT_TYPE.givesWater():
-            for layerType in self.popupLayerTypes:
-                self.addPopupLayer(layerType)
-
-    def onDeselectFeature(self):
-        """Do the stuff we'd normally do, but also remove the popup layer."""
-        super().onDeselectFeature()
-
-        self.removeAllPopupLayers()

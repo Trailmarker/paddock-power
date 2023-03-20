@@ -9,7 +9,7 @@ from .feature_state_machine import FeatureStateMachine
 
 @StatusFeatureSchema.addSchema()
 class StatusFeatureMixin(StateMachineMixin, IStatusFeature):
-    
+
     def __init__(self):
         """Create a new AreaFeature."""
         StateMachineMixin.__init__(self)

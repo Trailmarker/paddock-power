@@ -3,17 +3,13 @@ from os.path import basename
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from qgis.core import QgsApplication, QgsProject
+from qgis.core import QgsProject, QgsSnappingConfig
 
 from ..layers.fields import Timeframe
-from ..layers.tasks import AnalyseWorkspaceTask, DeriveEditsTask, LoadWorkspaceTask
-from ..layers import (BoundaryLayer, PaddockLayer,
-                      ElevationLayer, FenceLayer, LandTypeLayer,
-                      PipelineLayer, WateredAreaLayer, WaterpointLayer)
-from ..tools.map_tool import MapTool
+from ..layers.tasks import AnalyseWorkspaceTask, ImportFeaturesTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
-from .glitch import Glitch
 from .layer_dependency_graph import LayerDependencyGraph
+from .task_handle import TaskHandle
 from .workspace_layers import WorkspaceLayers
 
 # Initialize Qt resources from file resources.py
@@ -23,22 +19,24 @@ from ...resources_rc import *
 class Workspace(QObject):
     # emit this signal when a selected PersistedFeature is updated
     featureLayerSelected = pyqtSignal(str)
-    featureLayerDeselected = pyqtSignal(str)
+    lockChanged = pyqtSignal(bool)
     timeframeChanged = pyqtSignal(Timeframe)
     workspaceLoaded = pyqtSignal()
 
     def __init__(self, iface, workspaceFile):
 
-        self.ready = False
-
         super().__init__(iface.mainWindow())
 
-        self.loadWorkspaceTask = None
-        self.loadWorkspaceTaskId = -1
-        self._deriveEditsTask = None
-        self._deriveFeaturesTaskId = -1
-        self._analyseWorkspaceTask = None
-        self._analyseWorkspaceTaskId = -1
+        self._locked = False
+
+        self.loadWorkspaceTask = TaskHandle(LoadWorkspaceTask, self)
+        self.loadWorkspaceTask.taskCompleted.connect(self.onLoadWorkspaceTaskCompleted)
+
+        self.analyseWorkspaceTask = TaskHandle(AnalyseWorkspaceTask, self)
+        self.analyseWorkspaceTask.taskCompleted.connect(self.onAnalyseWorkspaceTaskCompleted)
+        
+        self.saveEditsTask = TaskHandle(SaveEditsAndDeriveTask, self)
+        self.importFeaturesTask = TaskHandle(ImportFeaturesTask, self)
 
         self.selectedFeatures = {}
 
@@ -51,26 +49,33 @@ class Workspace(QObject):
 
         self.timeframeChanged.connect(self.deselectLayers)
 
-        # Load workspace
         self.layerDependencyGraph = LayerDependencyGraph()
         self.workspaceLayers = WorkspaceLayers()
 
-        self.loadWorkspaceTask = LoadWorkspaceTask(
-            self.layerDependencyGraph,
-            self.workspaceLayers,
-            self.workspaceFile,
-            self.workspaceName)
-        self.loadWorkspaceTask.taskCompleted.connect(self.onWorkspaceLoaded)
-        self.loadWorkspaceTaskId = QgsApplication.taskManager().addTask(self.loadWorkspaceTask)
+        # Clean up all layers
+        cleanupIds = [layerId for layerType in self.layerDependencyGraph.cleanupOrder()
+                      for layerId in layerType.detectAllOfType(workspaceFile)]
+        QgsProject.instance().removeMapLayers(cleanupIds)
 
-    def onWorkspaceLoaded(self):
-        qgsInfo(f"Workspace.onWorkspaceLoaded()")
+        for layerType in self.layerDependencyGraph.cleanupOrder():
+            layerType.removeAllOfType(workspaceFile)
 
-        # Wiring some stuff for selected features …
-        self.workspaceLayers.addLayersToWorkspace(self)
-        self.workspaceLoaded.emit()
+        # Load workspace async
+        self.loadWorkspace()
 
-        self.addToMap()
+    def locked(self):
+        """Return True if the workspace is locked."""
+        return self._locked
+
+    def lock(self):
+        """Lock the workspace."""
+        self._locked = True
+        self.lockChanged.emit(True)
+
+    def unlock(self):
+        """Unlock the workspace."""
+        self._locked = False
+        self.lockChanged.emit(False)
 
     def findGroup(self):
         """Find this workspace's group in the Layers panel."""
@@ -85,16 +90,8 @@ class Workspace(QObject):
         self.removeFromMap()
         group = group or self.findGroup()
 
-        layerStackingOrder = [
-            WaterpointLayer,
-            PipelineLayer,
-            FenceLayer,
-            WateredAreaLayer,
-            LandTypeLayer,
-            BoundaryLayer,
-            PaddockLayer,
-            ElevationLayer]
-        availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in layerStackingOrder] if l]
+        displayOrder = self.layerDependencyGraph.displayOrder()
+        availableLayers = [l for l in [self.workspaceLayers.layer(layerType) for layerType in displayOrder] if l]
 
         for layer in availableLayers:
             layer.addToMap(group)
@@ -106,10 +103,6 @@ class Workspace(QObject):
 
     def setTool(self, tool):
         """Set the current map tool for this workspace."""
-        if not isinstance(tool, MapTool):
-            raise Glitch(
-                f"The {PLUGIN_NAME} tool must be of a recognised type")
-
         self.unsetTool()
         self.currentTool = tool
         self.iface.mapCanvas().setMapTool(self.currentTool)
@@ -134,25 +127,23 @@ class Workspace(QObject):
     def deselectLayers(self, selectedLayerId=None):
         """Deselect any currently selected Feature."""
         for layerId in [l for l in self.selectedFeatures.keys() if l != selectedLayerId]:
-            # qgsInfo(f"Workspace.deselectLayers({layerType.__name__})")
+            qgsInfo(f"Workspace.deselectLayers({selectedLayerId}")
+            layer = QgsProject.instance().mapLayer(layerId)
+            layer.removeSelection()
             del self.selectedFeatures[layerId]
-            self.featureLayerDeselected.emit(layerId)
 
     def selectFeature(self, feature):
         """Select a feature."""
-        # qgsInfo(f"Workspace.selectFeature({feature})")
         selectedLayerId = feature.featureLayer.id()
-        # qgsInfo(f"Workspace.selectFeature({feature}): selectedLayerId={selectedLayerId}")
         self.selectedFeatures[selectedLayerId] = feature
 
         # If we are going to focus on the new feature, deselect the old layers
-        if feature.featureLayer.focusOnSelect():
+        if feature.focusOnSelect():
             qgsInfo(f"Workspace.selectFeature({feature}): focusOnSelect, deselecting other layers")
             self.deselectLayers(selectedLayerId)
 
-        # Select on the new layer either way
+        # This is kinda legacy now
         self.featureLayerSelected.emit(selectedLayerId)
-        # qgsInfo(f"Workspace.featureLayerSelected.emit({selectedLayerId})")
 
     def selectedFeature(self, layerId):
         """Return the selected feature for the given layer type."""
@@ -162,20 +153,7 @@ class Workspace(QObject):
     def unload(self):
         """Removes the plugin menu item and icon from QGIS interface."""
         self.unsetTool()
-
         self.removeFromMap()
-
-        def cleanupByName(name):
-            f"""Remove all layers from the current project with the given names."""
-            for layer in QgsProject.instance().mapLayers().values():
-                if layer.name() == name:
-                    QgsProject.instance().removeMapLayers([layer.id()])
-
-        for cls in self.layerDependencyGraph.unloadOrder():
-            cleanupByName(cls.defaultName())
-
-        for layerType in self.layerDependencyGraph.unloadOrder():
-            self.workspaceLayers.unloadLayer(layerType)
 
     def mapLayer(self, layerId):
         if layerId == self.landTypeConditionTable.id():
@@ -194,24 +172,37 @@ class Workspace(QObject):
                 guiStatusBarAndInfo(
                     f"{PLUGIN_NAME} {task.description()} failed for an unknown reason. You may want to check the {PLUGIN_NAME}, 'Python Error' and other log messages for any exception details.")
 
-    def deriveEdits(self, changeset):
-        """Winnow and re-analyse a batch of updated layers."""
-        deriveEditsTask = QgsApplication.taskManager().task(self._deriveFeaturesTaskId)
-        if deriveEditsTask and deriveEditsTask.isActive():
-            deriveEditsTask.cancel()
-            self._deriveFeaturesTaskId = -1
+    def loadWorkspace(self):
+        self.loadWorkspaceTask.run(self)
 
-        order = self.layerDependencyGraph.deriveOrder(type(layer) for layer in changeset.layers)
-        layers = [self.workspaceLayers.layer(layerType) for layerType in order]
-        self._deriveEditsTask = DeriveEditsTask(layers, changeset)
-        self._deriveFeaturesTaskId = QgsApplication.taskManager().addTask(self._deriveEditsTask)
+    def onLoadWorkspaceTaskCompleted(self):
+        self.workspaceLayers.addLayersToWorkspace(self)
+        self.addToMap()
+
+        # TODO this is a bit of a bizarre hack. Without this line, our project
+        # ends up loaded with corrupt snapping configuration (from a QGIS 3 bug, perhaps)
+        # that causes QGIS to crash instead of saving the project file.
+        QgsProject.instance().setSnappingConfig(QgsSnappingConfig())
+
+        self.workspaceLoaded.emit()
 
     def analyseWorkspace(self):
         """Winnow and re-analyse a batch of updated layers."""
-        analyseWorkspaceTask = QgsApplication.taskManager().task(self._analyseWorkspaceTaskId)
-        if analyseWorkspaceTask and analyseWorkspaceTask.isActive():
-            analyseWorkspaceTask.cancel()
-            self._deriveFeaturesTaskId = -1
+        self.analyseWorkspaceTask.run(self)
 
-        self._analyseWorkspaceTask = AnalyseWorkspaceTask()
-        self._analyseWorkspaceTaskId = QgsApplication.taskManager().addTask(self._analyseWorkspaceTask)
+    def onAnalyseWorkspaceTaskCompleted(self):
+        """Clean up all the derived layers."""
+        pass
+
+    def saveEditsAndDerive(self, editFunction, *args, **kwargs):
+        """Persist this feature and also queue up all required derivation."""
+
+        self.saveEditsTask.run(
+            f"{PLUGIN_NAME} saving edits and deriving changes …",
+            self,
+            editFunction, *args, **kwargs
+        )
+        
+    def importFeatures(self, importableLayer, importLayer, fieldMap):
+        """Import features to the workspace."""
+        self.importFeaturesTask.run(self, importableLayer, importLayer, fieldMap)

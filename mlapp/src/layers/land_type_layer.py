@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtGui import QIcon
+
+from ..utils import PLUGIN_FOLDER
 from .features import LandType
-from .imported_feature_layer import ImportedFeatureLayer
+from .importable_feature_layer import ImportableFeatureLayer
 
 
-class LandTypeLayer(ImportedFeatureLayer):
+class LandTypeLayer(ImportableFeatureLayer):
 
     LAYER_NAME = "Land Types"
     STYLE = "land_type"
@@ -18,3 +21,9 @@ class LandTypeLayer(ImportedFeatureLayer):
                          styleName=LandTypeLayer.defaultStyle())
 
         self.setReadOnly(True)
+        
+    @classmethod    
+    def icon(cls):
+        """The icon to paint to represent this layer."""
+        return QIcon(f":/plugins/{PLUGIN_FOLDER}/images/land-type.png")
+

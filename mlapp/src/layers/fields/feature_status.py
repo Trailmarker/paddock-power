@@ -37,7 +37,7 @@ class FeatureStatus(StateMachineStatus):
         if self in [FeatureStatus.Undefined, FeatureStatus.Drafted]:
             return (0, 0, 0)
         elif self == FeatureStatus.Planned:
-            return (255, 255, 255)
+            return (0, 0, 0)
         elif self == FeatureStatus.Built:
             return (0, 0, 0)
         elif self == FeatureStatus.PlannedSuperseded:

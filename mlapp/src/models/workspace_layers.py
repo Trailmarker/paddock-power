@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayer, QgsProject
 
-from ..layers.interfaces import IFeatureLayer, ILayer
+from ..layers.interfaces import IFeatureLayer, IImportableFeatureLayer, ILayer
 from ..utils import PLUGIN_NAME
 from .glitch import Glitch
 from .type_dict import TypeDict
@@ -39,6 +39,10 @@ class WorkspaceLayers(TypeDict):
     def featureLayers(self):
         """Get all layers in the registry."""
         return [l for l in self.layers() if isinstance(l, IFeatureLayer)]
+
+    def importableFeatureLayers(self):
+        """Get all importable layers in the registry."""
+        return [l for l in self.layers() if isinstance(l, IImportableFeatureLayer)]
 
     def unloadLayer(self, layerType):
         """Unload the layer of the given type."""

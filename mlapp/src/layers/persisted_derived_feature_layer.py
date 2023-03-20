@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-from functools import partial
-
-from mlapp.src.layers.features.edits import Edits
-
+from ..layers.features import Edits
 from ..models import Glitch
-from ..utils import PLUGIN_NAME, qgsDebug, qgsInfo
+from ..utils import PLUGIN_NAME, qgsInfo
 from .interfaces import IPersistedDerivedFeatureLayer
 from .persisted_feature_layer import PersistedFeatureLayer
 
@@ -22,44 +19,51 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
     def getDerivedLayerInstance(self, changeset=None):
         """Return the derived layer for this layer."""
+        self.derivedLayerType.removeAllOfType()
         return self.derivedLayerType(self.dependentLayers, changeset)
 
     def showDerivedLayerInstance(self, changeset=None):
         """Add an instance of the derived layer for this layer to the map."""
         self.getDerivedLayerInstance(changeset).addToMap()
 
-    def deriveFeatures(self, changeset):
+    def deriveFeatures(self, changeset=None, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
         # Clean up any instances of the virtual source …
-        # self.derivedLayerType.detectAndRemoveAllOfType()
         derivedLayer = self.getDerivedLayerInstance(changeset)
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
+        raiseErrorIfTaskHasBeenCancelled()
+
         rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest()
+
+        raiseErrorIfTaskHasBeenCancelled()
 
         edits = Edits()
         if not rederiveFeaturesRequest:
             qgsInfo(f"Removing and re-deriving the whole {self.name()} layer …")
             edits.editBefore(Edits.truncate(self))
         else:
-            qgsInfo(
-                f"Filter expression for re-deriving features: {rederiveFeaturesRequest.filterExpression().expression()}")
-
             rederivedFeatures = [f for f in self.getFeatures(rederiveFeaturesRequest)]
             qgsInfo(f"Removing {len(rederivedFeatures)} features in the {self.name()} layer …")
+
+            raiseErrorIfTaskHasBeenCancelled()
 
             for rederivedFeature in rederivedFeatures:
                 edits.editBefore(Edits.delete(rederivedFeature))
 
-        derivedFeatures = [self.copyFeature(f) for f in derivedLayer.getFeatures()]
+        derivedFeatures = []
+
+        for f in derivedLayer.getFeatures():
+            raiseErrorIfTaskHasBeenCancelled()
+            derivedFeatures.append(self.copyFeature(f))
+
         qgsInfo(f"Deriving {len(derivedFeatures)} features in the {self.name()} layer …")
 
         # Get a second batch of edits that copies the new records to this layer …
         edits.editBefore(Edits.bulkAdd(self, derivedFeatures))
 
-        # for derivedFeature in derivedFeatures:
-        #     edits.editBefore(Edits.upsert(self.copyFeature(derivedFeature)))
-
+        # Get rid of the derived layer … does not work
+        # QgsProject.instance().removeMapLayer(derivedLayer.id())
         return edits

@@ -6,8 +6,7 @@ from contextlib import contextmanager
 from qgis.core import QgsVectorLayer
 
 from ...models import Glitch, WorkspaceMixin
-from ...utils import qgsDebug, qgsException, qgsInfo
-from ..interfaces import IPersistedDerivedFeatureLayer
+from ...utils import qgsException, qgsInfo
 from .land_type_condition import LandTypeCondition
 
 
@@ -42,9 +41,9 @@ class Edits(WorkspaceMixin):
             return repr(self)
 
         def persist(self):
-            if not isinstance(self._layer, IPersistedDerivedFeatureLayer):
-                raise Glitch(
-                    f"Cannot truncate layer {self._layer.id()} because it is not an IPersistedDerivedFeatureLayer")
+            # if not isinstance(self._layer, IPersistedDerivedFeatureLayer):
+            #     raise Glitch(
+            #         f"Cannot truncate layer {self._layer.id()} because it is not an IPersistedDerivedFeatureLayer")
             self.layer.dataProvider().truncate()
 
         @property
@@ -183,6 +182,12 @@ class Edits(WorkspaceMixin):
     def allEdits(self):
         return [edit for edits in self.edits.values() for edit in edits]
 
+    def editsForLayer(self, layer):
+        """Return only the edits in this structure for a given layer."""
+        layerEdits = Edits()
+        layerEdits.edits[layer.id()] = self.edits[layer.id()]
+        return layerEdits
+
     def getFeatures(self, edits):
         for edit in edits:
             if isinstance(edit, Edits.Upsert):
@@ -207,50 +212,23 @@ class Edits(WorkspaceMixin):
     def layerKeyValues(self, layer, fieldName):
         return set(f.attribute(fieldName) for f in self.layerFeatures(layer))
 
-    def persist(self):
+    def persist(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Persist these edits to their layers."""
         with Edits.editAndCommit(self.layers):
 
-            for _, edits in self.edits.items():
-                # Order matters here, eg we don't want to truncate at the end
-                sortedEdits = sorted(edits, key=lambda e: e.order)
-                for edit in sortedEdits:
-                    edit.persist()
+            for layer in self.layers:
+                layerEdits = self.editsForLayer(layer)
 
-            qgsDebug(f"{self}.persist()")
+                for edits in layerEdits.edits.values():
+                    # Order matters here, eg we don't want to truncate at the end
+                    sortedEdits = sorted(edits, key=lambda e: e.order)
+                    for edit in sortedEdits:
+                        raiseErrorIfTaskHasBeenCancelled()
+                        edit.persist()
 
-            # Return a response …
+                layer.editsPersisted.emit()
+
             return self
-
-    def notifyPersisted(self):
-        """Called when edits are persisted."""
-        # Start deriving updates in the background …
-        self.workspace.deriveEdits(self)
-
-        for layer in self.layers:
-            edits = self.edits[layer.id()]
-
-            truncates = [edit for edit in edits if isinstance(edit, Edits.Truncate)]
-            if truncates:
-                qgsDebug(f"{layer}.layerTruncated.emit()")
-                layer.layerTruncated.emit()
-
-            upsertedFids = [edit.feature.FID for edit in edits if isinstance(edit, Edits.Upsert) and not isinstance(edit, Edits.UpsertTable)]
-            if upsertedFids:
-                qgsDebug(f"{layer}.featuresUpserted.emit({upsertedFids})")
-                layer.featuresUpserted.emit(upsertedFids)
-
-            deletedFids = [edit.feature.FID for edit in edits if isinstance(edit, Edits.Delete)]
-            if deletedFids:
-                qgsDebug(f"{layer}.featuresDeleted.emit({deletedFids})")
-                layer.featuresDeleted.emit(deletedFids)
-
-            bulkAddedFids = [
-                feature.FID for edit in edits if isinstance(
-                    edit, Edits.BulkAdd) for feature in edit.features]
-            if bulkAddedFids:
-                qgsDebug(f"{layer}.featuresBulkAdded.emit({bulkAddedFids})")
-                layer.featuresBulkAdded.emit(bulkAddedFids)
 
     @staticmethod
     @contextmanager

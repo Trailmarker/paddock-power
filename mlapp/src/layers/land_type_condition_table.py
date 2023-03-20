@@ -14,6 +14,8 @@ class LandTypeConditionTable(QObject, WorkspaceMixin, IPersistedLayer, metaclass
 
     LAYER_NAME = "Land Type Condition Table"
 
+    editsPersisted = pyqtSignal()
+
     @classmethod
     def defaultName(cls):
         """Return the default name for this layer."""
@@ -249,6 +251,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
         for feature in features:
             self.addFeature(feature)
 
-    def recalculateFeatures(self):
+    def recalculateFeatures(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Recalculate features in this layer."""
         return Edits()
