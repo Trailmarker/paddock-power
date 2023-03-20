@@ -247,7 +247,8 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
     def invalidateCache(self):
         """Invalidate the underlying QgsVectorLayerCache (causes the view to be re-loaded)."""
-        self._featureCache.invalidate()
+        if self._featureCache:
+            self._featureCache.invalidate()
 
     def indexToFeature(self, index):
         fid = self._tableModel.rowToId(index.row())
