@@ -79,10 +79,10 @@ class FencesWidget(WorkspaceMixin, SplitFeatureTablesWidget):
             if self.fence.matchStatus(fenceStatus):
                 for i, paddocks in enumerate(self.fence.getRelatedPaddocks()):
                     if paddocks:
-                        self.featureTable(i + 1).setVisible(True)
-                        self.featureTable(i + 1).setTitle(self._PADDOCK_TABLE_TITLES[fenceStatus][i])
-                        self.featureTable(i + 1).setFilteredFeatures([p.FID for p in paddocks])
+                        self.setFeatureTableVisible(i + 1, True)
+                        self.setFeatureTableTitle(i + 1, self._PADDOCK_TABLE_TITLES[fenceStatus][i])
+                        self.setFeatureTableFilteredFeatures(i + 1, [p.FID for p in paddocks])
                     else:
-                        self.featureTable(i + 1).setVisible(False)
+                        self.setFeatureTableVisible(i + 1, False)
 
         super().relayout()

@@ -44,7 +44,7 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
 
     def setFeatureTableFilteredFeatures(self, index, fids):
         """Set the filtered features of a feature table."""
-        self.splitter.widget(index).setFilteredFeatures(fids)
+        self.featureTable(index).setFilteredFeatures(fids)
 
     def setFeatureTableTitle(self, index, title):
         """Set the title of a feature table."""
