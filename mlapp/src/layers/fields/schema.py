@@ -16,8 +16,13 @@ class Schema(list):
         self.wkbType = wkbType
         self.hiddenFields = hiddenFields
 
-    def hasField(self, field):
-        return any(field == f.name() for f in self)
+    def field(self, fieldName):
+        """Return the Field with the given name."""
+        return next((f for f in self if f.name() == fieldName), None)
+
+    def hasField(self, fieldName):
+        """Check if this Schema has a Field with the given name."""
+        return any(fieldName == f.name() for f in self)
 
     def toQgsFields(self):
         """Convert this Schema to a QgsFields object."""
@@ -26,13 +31,9 @@ class Schema(list):
             fields.append(f)
         return fields
 
-    def toImportFields(self):
+    def toImportableFields(self):
         """Convert this Schema to a QgsFields object representing fields that can be imported."""
-        fields = QgsFields()
-        for f in self:
-            if f.importable():
-                fields.append(f)
-        return fields
+        return [f for f in self if f.importable()]
 
     def addSchema(self):
         """Return a decorator that implements getSchema and getWkbType classmethods for

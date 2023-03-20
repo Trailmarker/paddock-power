@@ -48,7 +48,7 @@ class ImportDialog(Dialog, FORM_CLASS):
         self.fieldMapWidget.layout().setContentsMargins(0, 0, 0, 0)
 
         self.cancelButton.clicked.connect(self.reject)
-        self.importButton.clicked.connect(self.validateAndImport)
+        self.importButton.clicked.connect(self.importFeatures)
         self.importLayerComboBox.layerChanged.connect(self.setLayers)
         self.targetLayerComboBox.layerChanged.connect(self.setLayers)
         self.fieldMapWidget.fieldMapChanged.connect(self.adjustSize)
@@ -64,10 +64,12 @@ class ImportDialog(Dialog, FORM_CLASS):
         if importLayer:
             self.setWindowTitle(importLayer.name())
 
-    def validateAndImport(self):
+    def importFeatures(self):
         """Validate the field mappings and do the import."""
-        self.targetLayerComboBox.currentLayer().importFeatures(
-            self.importLayerComboBox.currentLayer(), self.fieldMapWidget.fieldMap)
+        self.workspace.importFeatures(
+            self.targetLayerComboBox.currentLayer(),
+            self.importLayerComboBox.currentLayer(),
+            self.fieldMapWidget.fieldMap)
 
     @property
     def dialogRole(self):

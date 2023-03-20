@@ -1,26 +1,35 @@
 # -*- coding: utf-8 -*-
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo
-from ..interfaces import IImportableFeatureLayer
+from ...models import WorkspaceTask
+from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 
 
-class ImportFeaturesTask(PersistEditsTask):
+class ImportFeaturesTask(WorkspaceTask):
 
-    def __init__(self, layer, importLayer, fieldMap):
-        """Input is a correctly ordered batch of layers."""
-        self.layer = layer
+    def __init__(self, workspace, importableLayer, importLayer, fieldMap):
+        """Input is a closure over a FeatureAction handler for a given Feature."""
+        WorkspaceTask.__init__(self, f"{PLUGIN_NAME} impporting features …", workspace)
+
+        self.importableLayer = importableLayer
         self.importLayer = importLayer
         self.fieldMap = fieldMap
 
-        super().__init__(f"{PLUGIN_NAME} importing {layer.name()}", True, self.editFunction)
+    def safeRun(self):
+        """Generate Feature edit operations from an import, and persist the edits."""
+        try:
+            if self.isCanceled():
+                return False
 
-    def editFunction(self):
-        assert isinstance(self.layer, IImportableFeatureLayer)
-        guiStatusBarAndInfo(f"{PLUGIN_NAME} importing {self.importLayer.name()} to {self.layer.name()} …")
+            edits = self.importableLayer.importFeatures(self.importLayer, self.fieldMap, self.raiseIfCancelled)
+            edits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
 
-        return self.layer.importFeatures(self.importLayer, self.fieldMap)
+        except Exception as e:
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to import features.")
+            qgsException()
+            return False
 
-    def safeFinished(self, result):
+        guiStatusBarAndInfo(f"{PLUGIN_NAME} imported features.")
+        return True
+
+    def safeFinished(self, _):
         """Called when task completes (successfully or otherwise)."""
-        super().safeFinished(result)
-        if not result:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to import {self.importLayer.name()} to {self.layer.name()} …")
+        pass

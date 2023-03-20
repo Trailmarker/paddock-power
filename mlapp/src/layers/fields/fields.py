@@ -47,7 +47,7 @@ NearGrazingRadius = MeasureField(
     defaultValue="3000.0",
     dps=0)
 OptimalCapacityPerArea = MeasureField(propertyName="OPTIMAL_CAPACITY_PER_AREA",
-                                      name=OPTIMAL_CAPACITY_PER_AREA, defaultValue=15.0, dps=1)
+                                      name=OPTIMAL_CAPACITY_PER_AREA, defaultValue=15.0, dps=1, required=True)
 Paddock = IdField(propertyName="PADDOCK", name=PADDOCK)
 PaddockName = StringField(propertyName="PADDOCK_NAME", name=PADDOCK_NAME)
 PaddockStatus = DomainField(

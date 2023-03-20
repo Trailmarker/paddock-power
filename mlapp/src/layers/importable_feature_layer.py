@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSlot
-
 from ..utils import PLUGIN_NAME, qgsInfo
 from .features import Edits
 from .fields import FeatureStatus
@@ -28,13 +26,16 @@ class ImportableFeatureLayer(PersistedFeatureLayer, IImportableFeatureLayer):
 
         return feature
 
-    @pyqtSlot()
-    def importFeatures(self, importLayer, fieldMap):
+    def importFeatures(self, importLayer, fieldMap, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Import all Features from the specified layer, applying the given field map."""
         qgsInfo(f"Importing features for layer {self.name()} …")
 
         edits = Edits.truncate(self)
-        features = [self.mapFeature(qf, fieldMap) for qf in list(importLayer.getFeatures())]
+
+        features = []
+        for importQgsFeature in importLayer.getFeatures():
+            raiseErrorIfTaskHasBeenCancelled()
+            features.append(self.mapFeature(importQgsFeature, fieldMap))
 
         # Import as a bulkAdd
         return edits.editBefore(Edits.bulkAdd(self, features))
