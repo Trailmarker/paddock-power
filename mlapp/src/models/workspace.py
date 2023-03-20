@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 from qgis.core import QgsProject, QgsSnappingConfig
 
 from ..layers.fields import Timeframe
-from ..layers.tasks import AnalyseWorkspaceTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
+from ..layers.tasks import AnalyseWorkspaceTask, ImportFeaturesTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
 from .layer_dependency_graph import LayerDependencyGraph
 from .task_handle import TaskHandle
@@ -34,7 +34,9 @@ class Workspace(QObject):
 
         self.analyseWorkspaceTask = TaskHandle(AnalyseWorkspaceTask, self)
         self.analyseWorkspaceTask.taskCompleted.connect(self.onAnalyseWorkspaceTaskCompleted)
+        
         self.saveEditsTask = TaskHandle(SaveEditsAndDeriveTask, self)
+        self.importFeaturesTask = TaskHandle(ImportFeaturesTask, self)
 
         self.selectedFeatures = {}
 
@@ -200,3 +202,7 @@ class Workspace(QObject):
             self,
             editFunction, *args, **kwargs
         )
+        
+    def importFeatures(self, importableLayer, importLayer, fieldMap):
+        """Import features to the workspace."""
+        self.importFeaturesTask.run(self, importableLayer, importLayer, fieldMap)
