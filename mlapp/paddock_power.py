@@ -330,8 +330,9 @@ class PaddockPower(PluginStateMachine):
     @PluginAction.openImportDialog.handler()
     def openImportDialog(self):
         if self.workspace:
-            self.importDialog = ImportDialog(self.iface.mainWindow())
-            self.importDialog.show()
+            guiWarning(f"The import feature is disabled in this release of {PLUGIN_NAME}.")
+            # self.importDialog = ImportDialog(self.iface.mainWindow())
+            # self.importDialog.show()
         else:
             self.failureMessage(f"{PLUGIN_NAME} no workspace loaded …")
             raise PluginActionFailure()
