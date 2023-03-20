@@ -8,8 +8,6 @@ from qgis.core import QgsProject, QgsSnappingConfig
 from ..layers.fields import Timeframe
 from ..layers.tasks import AnalyseWorkspaceTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
-from ..widgets.tools.map_tool import MapTool
-from .glitch import Glitch
 from .layer_dependency_graph import LayerDependencyGraph
 from .task_handle import TaskHandle
 from .workspace_layers import WorkspaceLayers

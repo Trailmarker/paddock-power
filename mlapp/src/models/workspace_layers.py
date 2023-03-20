@@ -40,7 +40,7 @@ class WorkspaceLayers(TypeDict):
         """Get all layers in the registry."""
         return [l for l in self.layers() if isinstance(l, IFeatureLayer)]
 
-    def importableLayers(self):
+    def importableFeatureLayers(self):
         """Get all importable layers in the registry."""
         return [l for l in self.layers() if isinstance(l, IImportableFeatureLayer)]
 

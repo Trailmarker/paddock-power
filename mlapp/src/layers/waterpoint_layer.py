@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtGui import QIcon
+
+from ..utils import PLUGIN_FOLDER
+
 from .features import Waterpoint
 from .popup_layer_source_mixin import PopupLayerSourceMixin
 from .importable_feature_layer import ImportableFeatureLayer
@@ -41,3 +45,8 @@ class WaterpointLayer(ImportableFeatureLayer, PopupLayerSourceMixin):
     def zoomPopupLayerOnLoad(self):
         """True for this becaus Waterpoints don't zoom nicely."""
         return True
+    
+    @classmethod    
+    def icon(cls):
+        """The icon to paint to represent this layer."""
+        return QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png")

@@ -28,3 +28,8 @@ class Dialog(ABC, WorkspaceMixin, QDialog, metaclass=QtAbstractMeta):
         self.adjustSize()
         self.resize(max(800, self.minimumWidth(), self.width()), self.height())
         super().showEvent(event)
+
+    # def closeEvent(self, event):
+    #     """Override the close event to also close the dialog."""
+    #     self.reject()
+    #     super().closeEvent(event)

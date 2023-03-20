@@ -26,6 +26,14 @@ class Schema(list):
             fields.append(f)
         return fields
 
+    def toImportFields(self):
+        """Convert this Schema to a QgsFields object representing fields that can be imported."""
+        fields = QgsFields()
+        for f in self:
+            if f.importable():
+                fields.append(f)
+        return fields
+
     def addSchema(self):
         """Return a decorator that implements getSchema and getWkbType classmethods for
            the decorated class based on this Schema."""
