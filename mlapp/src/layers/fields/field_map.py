@@ -64,6 +64,10 @@ class FieldMap(list):
                 unmapped.append(targetField)
         return unmapped
 
+    def importField(self, targetField):
+        """Return the import field, if any, that maps to the given target field."""
+        return next((importField for (importField, field) in self if field == targetField), None)
+
     def update(self, index, importFieldName, targetFieldName):
         """Update the mapping for the given target Field."""
         importField = self.importFields.field(importFieldName) if importFieldName else None
@@ -90,7 +94,13 @@ class FieldMap(list):
 
         # Suck the mapped import fields into the target feature fields
         for targetField in targetFeature.getSchema():
-            if targetField.name() in self:
-                targetField.setValue(targetFeature, feature.attribute(self[targetField.name()]))
+            qgsDebug(f"Importing {targetField.name()}")
+            
+            importField = self.importField(targetField)
+            
+            if importField:            
+                # targetField.setValue(targetFeature, feature.attribute(importField.name()))
+                targetFeature.setAttribute(targetField.name(), feature.attribute(importField.name()))
+                qgsDebug(f"Imported {targetField.name()} value: {targetFeature.attribute(targetField.name())}")
 
         return targetFeature
