@@ -22,6 +22,7 @@ class LoadWorkspaceTask(WorkspaceTask):
 
                 layer = layerType(self.workspace.workspaceFile, *dependentLayers)
                 self.workspace.workspaceLayers.addLayer(layerType, layer)
+                layer.connectWorkspace(self.workspace)
 
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} {layer.name()} loaded.")
 

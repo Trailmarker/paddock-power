@@ -65,7 +65,7 @@ class MapLayerMixin(IMapLayer):
 
     def addInBackground(self):
         """Add this layer to the map in the background."""
-        # qgsInfo(f"Adding layer {self.name()} in background …")
+        qgsInfo(f"Adding layer {self.name()} in background …")
         QgsProject.instance().addMapLayer(self, False)
 
     def addToMap(self, group=None):

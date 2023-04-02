@@ -59,7 +59,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         return repr(self)
 
     def connectWorkspace(self, workspace):
-        self.workspace = workspace
+        super().connectWorkspace(workspace)
 
         self.selectionChanged.connect(lambda selection, *_: self.onSelectionChanged(selection, *_))
         self.workspace.timeframeChanged.connect(lambda timeframe: self.onTimeframeChanged(timeframe))

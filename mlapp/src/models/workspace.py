@@ -27,6 +27,11 @@ class Workspace(QObject):
 
         super().__init__(iface.mainWindow())
 
+        # TODO this is a bit of a bizarre hack. Without this line, our project
+        # ends up loaded with corrupt snapping configuration (from a QGIS 3 bug, perhaps)
+        # that causes QGIS to crash instead of saving the project file.
+        QgsProject.instance().setSnappingConfig(QgsSnappingConfig())
+            
         self._locked = False
 
         self.loadWorkspaceTask = TaskHandle(LoadWorkspaceTask, self)
@@ -176,14 +181,11 @@ class Workspace(QObject):
         self.loadWorkspaceTask.run(self)
 
     def onLoadWorkspaceTaskCompleted(self):
-        self.workspaceLayers.addLayersToWorkspace(self)
         self.addToMap()
 
-        # TODO this is a bit of a bizarre hack. Without this line, our project
-        # ends up loaded with corrupt snapping configuration (from a QGIS 3 bug, perhaps)
-        # that causes QGIS to crash instead of saving the project file.
-        QgsProject.instance().setSnappingConfig(QgsSnappingConfig())
-
+        # Save project file when workspace is loaded - TODO comment this out for now
+        # QgsProject.instance().write(QgsProject.instance().fileName())
+        
         self.workspaceLoaded.emit()
 
     def analyseWorkspace(self):
