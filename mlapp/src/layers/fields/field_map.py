@@ -64,6 +64,12 @@ class FieldMap(list):
                 unmapped.append(targetField)
         return unmapped
 
+    @property
+    def nextUnmappedTargetField(self):
+        """Return the next unmapped target field, if any."""
+        mapped = [targetField for (_, targetField) in self]
+        return next((targetField for targetField in self.targetFields if targetField not in mapped), None)
+
     def importField(self, targetField):
         """Return the import field, if any, that maps to the given target field."""
         return next((importField for (importField, field) in self if field == targetField), None)

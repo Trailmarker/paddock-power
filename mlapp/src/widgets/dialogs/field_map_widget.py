@@ -32,27 +32,33 @@ class FieldMapWidget(QWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.fieldMap = None
-        self.mapFieldButton.clicked.connect(lambda: self.mapField(len(self.fieldMap)))
+        self.addFieldButton.clicked.connect(self.addFieldUi)
 
-    def setLayers(self, importLayer, targetLayer):
-        """Set the import layer from which to map fields."""
-        if importLayer and targetLayer and (
-            self.fieldMap is None or (
-                self.fieldMap.importLayer.id() != importLayer.id() or self.fieldMap.targetLayer.id() != targetLayer.id()
-            )
-        ):
-            self.resetFieldMap(importLayer, targetLayer)
+    @property
+    def hasFieldMap(self):
+        return self.fieldMap is not None
 
     def resetFieldMap(self, importLayer, targetLayer):
-        """Clear all mapped fields."""
-        if importLayer is None or targetLayer is None:
-            self.fieldMap = None
+        """Set the import layer from which to map fields."""
+        if importLayer and targetLayer and self.fieldMap and self.fieldMap.importLayer.id() == importLayer.id() and self.fieldMap.targetLayer.id() == targetLayer.id():
             return
-        qgsDebug(f"FieldMapWidget.resetFieldMap({importLayer.id()}, {targetLayer.id()})")
-        self.fieldMap = FieldMap(importLayer, targetLayer)
+        
+        self.removeFieldMapUi()            
+        if importLayer and targetLayer:
+            self.fieldMap = FieldMap(importLayer, targetLayer)
+            self.setupFieldMapUi()
+        else:
+            self.fieldMap = None
         self.update()
 
-    def unmapField(self, index):
+    def updateFieldMap(self, index, importFieldName, targetFieldName):
+        """Set the fields to be mapped."""
+        self.removeFieldMapUi()
+        self.fieldMap.update(index, importFieldName, targetFieldName)
+        self.setupFieldMapUi()
+        self.update()
+
+    def removeFieldUi(self, index):
         for column in range(3):
             item = self.layout().itemAtPosition(index + 1, column)
             if item:
@@ -60,22 +66,23 @@ class FieldMapWidget(QWidget, FORM_CLASS):
                 if widget:
                     widget.deleteLater()
 
-    def updateFieldMap(self, index, importFieldName, targetFieldName):
-        """Set the fields to be mapped."""
-        self.fieldMap.update(index, importFieldName, targetFieldName)
-        self.update()
+    def removeFieldMapUi(self):
+        if self.hasFieldMap:
+            for index in range(len(self.fieldMap)):
+                self.removeFieldUi(index)
 
-    def buildFieldMap(self):
-        """Build the mapping user interface from the current field map."""
-        for (index, (importField, targetField)) in enumerate(self.fieldMap):
-            self.mapField(index, importField, targetField)
-        self.adjustSize()
+    def addFieldUi(self):
+        """Add a new field mapping row to the user interface."""
+        qgsDebug(f"addFieldUi")
+        if self.hasFieldMap:
+            qgsDebug(f"addFieldUi: got field map")
+            self.setupFieldUi(len(self.fieldMap))
 
-    def mapField(self, index, importField=None, targetField=None):
+    def setupFieldUi(self, index, importField=None, targetField=None):
         """Map the selected import layer field to the selected target layer field."""
 
         if not targetField:
-            targetField = next(iter(self.fieldMap.unmappedTargetFields), None)
+            targetField = self.fieldMap.nextUnmappedTargetField
 
         if not targetField:
             return
@@ -107,10 +114,10 @@ class FieldMapWidget(QWidget, FORM_CLASS):
             removeButton = QPushButton(QIcon(f":/plugins/{PLUGIN_FOLDER}/images/trash-feature.png"), None)
             removeButton.setMinimumSize(50, 50)
             removeButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-            removeButton.clicked.connect(lambda: self.unmapField(row))
+            removeButton.clicked.connect(lambda: self.removeFieldUi(index))
 
         row = index + 1
-
+        
         importLayerFieldComboBox.fieldChanged.connect(
             lambda field: self.updateFieldMap(index,
                 field, targetLayerFieldComboBox.currentField()))
@@ -123,11 +130,9 @@ class FieldMapWidget(QWidget, FORM_CLASS):
         if removeButton:
             self.layout().addWidget(removeButton, row, 2)
 
-    def update(self):
-        if self.fieldMap:
-            for index in range(len(self.fieldMap)):
-                self.unmapField(index)
-
-            self.buildFieldMap()
-
-        super().update()
+    def setupFieldMapUi(self):
+        """Build the mapping user interface from the current field map."""
+        if self.hasFieldMap:
+            for (index, (importField, targetField)) in enumerate(self.fieldMap):
+                self.setupFieldUi(index, importField, targetField)
+        self.adjustSize()

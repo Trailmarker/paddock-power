@@ -18,11 +18,12 @@ class Layer(ABC):
         """Return the id of the layer."""
         pass
 
+    @classmethod
+    def variableName(cls):
+        """Return a variable name for this layer type, eg 'basePaddockLayer' or 'elevationLayer'."""
+        # Just use the lower-cased class name
+        return cls.__name__[:1].lower() + cls.__name__[1:]
+
     def connectWorkspace(self, workspace):
         self.workspace = workspace
-        
-        # Convenience attributes, eg workspace.paddockLayer = self
-        # TODO this is a bit of hack that can cause various issues
-        typeName = type(self).__name__
-        attrName = typeName[:1].lower() + typeName[1:]
-        setattr(self.workspace, attrName, self)
+        setattr(self.workspace, self.variableName(), self)

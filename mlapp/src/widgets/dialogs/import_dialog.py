@@ -2,14 +2,10 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog, QPushButton
 
-from qgis.core import QgsProject
-from qgis.gui import QgsFieldComboBox
+from qgis.core import QgsMapLayerProxyModel, QgsProject, QgsRasterLayer, QgsVectorLayer
 
-from ...layers.fields import FieldMap
-from ...layers.interfaces import IMapLayer, IImportableFeatureLayer
-from ...models import WorkspaceMixin
+from ...layers.interfaces import IMapLayer, IImportableFeatureLayer, IImportableLayer
 from .dialog import Dialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
@@ -32,12 +28,18 @@ class ImportDialog(Dialog, FORM_CLASS):
         self.importLayerComboBox.setExceptedLayerList(workspaceLayers)
         self.importLayerComboBox.setAllowEmptyLayer(True)
 
-        # Importable layers are only the instances of IImportableFeatureLayer so again
-        # get the opposite
-        nonImportableLayers = [layer for layer in QgsProject.instance().mapLayers().values()
-                               if not isinstance(layer, IImportableFeatureLayer)]
+        self.importPaddocksFirstLabel.setVisible(not self.workspace.hasBasePaddocks)
 
-        self.targetLayerComboBox.setExceptedLayerList(nonImportableLayers)
+        exceptedTargetLayers = []
+        if self.workspace.hasBasePaddocks:
+            exceptedTargetLayers = [layer for layer in QgsProject.instance().mapLayers().values()
+                                    if not isinstance(layer, IImportableLayer)]
+
+        else:
+            exceptedTargetLayers = [layer for layer in QgsProject.instance().mapLayers().values()
+                                    if layer.id() != self.workspace.basePaddockLayer.id()]
+
+        self.targetLayerComboBox.setExceptedLayerList(exceptedTargetLayers)
         self.targetLayerComboBox.setAllowEmptyLayer(True)
 
         for i in range(self.targetLayerComboBox.count()):
@@ -48,28 +50,62 @@ class ImportDialog(Dialog, FORM_CLASS):
         self.fieldMapWidget.layout().setContentsMargins(0, 0, 0, 0)
 
         self.cancelButton.clicked.connect(self.reject)
-        self.importButton.clicked.connect(self.importFeatures)
-        self.importLayerComboBox.layerChanged.connect(self.setLayers)
-        self.targetLayerComboBox.layerChanged.connect(self.setLayers)
+        self.importButton.clicked.connect(self.importLayer)
+        self.importLayerComboBox.layerChanged.connect(self.setImportLayer)
+        self.targetLayerComboBox.layerChanged.connect(self.setTargetLayer)
         self.fieldMapWidget.fieldMapChanged.connect(self.adjustSize)
+
+        # Initialise the field map widget
+        self.setImportLayer()
+        self.setTargetLayer()
+
+        # Ensure the target layer combo box and labels are set up correctly
+        self.update()
 
     def adjustSize(self):
         self.fieldMapWidget.adjustSize()
         super().adjustSize()
 
-    def setLayers(self):
+    def setImportLayer(self):
         """Set the import layer from which to map fields."""
         (importLayer, targetLayer) = (self.importLayerComboBox.currentLayer(), self.targetLayerComboBox.currentLayer())
-        self.fieldMapWidget.setLayers(importLayer, targetLayer)
-        if importLayer:
-            self.setWindowTitle(importLayer.name())
 
-    def importFeatures(self):
-        """Validate the field mappings and do the import."""
-        self.workspace.importFeatures(
-            self.targetLayerComboBox.currentLayer(),
-            self.importLayerComboBox.currentLayer(),
-            self.fieldMapWidget.fieldMap)
+        if isinstance(importLayer, QgsVectorLayer) and isinstance(targetLayer, IImportableFeatureLayer):
+            self.fieldMapWidget.setVisible(True)
+            self.fieldMapWidget.resetFieldMap(importLayer, targetLayer)
+        else:
+            self.fieldMapWidget.setVisible(False)
+
+    def setTargetLayer(self):
+        """Set the target layer from which to map fields."""
+        targetLayer = self.targetLayerComboBox.currentLayer()
+
+        if targetLayer:
+            self.setWindowTitle(targetLayer.name())
+            self.importButton.setText(f"Import {targetLayer.name()}")
+
+        if isinstance(targetLayer, IImportableFeatureLayer):
+            self.importLayerComboBox.setFilters(QgsMapLayerProxyModel.VectorLayer)
+            importLayer = self.importLayerComboBox.currentLayer()
+            if isinstance(importLayer, QgsVectorLayer):
+                self.fieldMapWidget.setVisible(True)
+                self.fieldMapWidget.resetFieldMap(importLayer, targetLayer)
+        else:
+            self.importLayerComboBox.setFilters(QgsMapLayerProxyModel.RasterLayer)
+            self.fieldMapWidget.setVisible(False)
+
+    def importLayer(self):
+        """Validate inputs and either import elevation or features."""
+        importLayer = self.importLayerComboBox.currentLayer()
+        targetLayer = self.targetLayerComboBox.currentLayer()
+
+        if isinstance(importLayer, QgsVectorLayer) and isinstance(targetLayer, IImportableFeatureLayer):
+            self.workspace.importFeatureLayer(
+                self.targetLayerComboBox.currentLayer(),
+                self.importLayerComboBox.currentLayer(),
+                self.fieldMapWidget.fieldMap)
+        elif isinstance(importLayer, QgsRasterLayer):
+            self.workspace.importElevationLayer(self.importLayerComboBox.currentLayer())
 
     @property
     def dialogRole(self):

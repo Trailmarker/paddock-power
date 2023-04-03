@@ -5,8 +5,9 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsProject, QgsSnappingConfig
 
+from ..layers import BasePaddockLayer
 from ..layers.fields import Timeframe
-from ..layers.tasks import AnalyseWorkspaceTask, ImportFeaturesTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
+from ..layers.tasks import AnalyseWorkspaceTask, ImportElevationLayerTask, ImportFeatureLayerTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
 from .layer_dependency_graph import LayerDependencyGraph
 from .task_handle import TaskHandle
@@ -31,7 +32,7 @@ class Workspace(QObject):
         # ends up loaded with corrupt snapping configuration (from a QGIS 3 bug, perhaps)
         # that causes QGIS to crash instead of saving the project file.
         QgsProject.instance().setSnappingConfig(QgsSnappingConfig())
-            
+
         self._locked = False
 
         self.loadWorkspaceTask = TaskHandle(LoadWorkspaceTask, self)
@@ -39,9 +40,10 @@ class Workspace(QObject):
 
         self.analyseWorkspaceTask = TaskHandle(AnalyseWorkspaceTask, self)
         self.analyseWorkspaceTask.taskCompleted.connect(self.onAnalyseWorkspaceTaskCompleted)
-        
+
         self.saveEditsTask = TaskHandle(SaveEditsAndDeriveTask, self)
-        self.importFeaturesTask = TaskHandle(ImportFeaturesTask, self)
+        self.importElevationLayerTask = TaskHandle(ImportElevationLayerTask, self)
+        self.importFeatureLayerTask = TaskHandle(ImportFeatureLayerTask, self)
 
         self.selectedFeatures = {}
 
@@ -67,6 +69,16 @@ class Workspace(QObject):
 
         # Load workspace async
         self.loadWorkspace()
+
+    @property
+    def hasBasePaddocks(self):
+        """Return True if this workspace has a base paddock layer with at least one feature."""
+        return self.workspaceLayers.hasBasePaddocks
+
+    @property
+    def isAnalytic(self):
+        """Return True if this workspace can be analysed."""
+        return self.workspaceLayers.isAnalytic
 
     def locked(self):
         """Return True if the workspace is locked."""
@@ -185,7 +197,7 @@ class Workspace(QObject):
 
         # Save project file when workspace is loaded - TODO comment this out for now
         # QgsProject.instance().write(QgsProject.instance().fileName())
-        
+
         self.workspaceLoaded.emit()
 
     def analyseWorkspace(self):
@@ -204,7 +216,11 @@ class Workspace(QObject):
             self,
             editFunction, *args, **kwargs
         )
-        
-    def importFeatures(self, importableLayer, importLayer, fieldMap):
+
+    def importElevationLayer(self, importLayer):
+        """Import elevation to the workspace."""
+        self.importElevationLayerTask.run(self, importLayer)
+
+    def importFeatureLayer(self, importableLayer, importLayer, fieldMap):
         """Import features to the workspace."""
-        self.importFeaturesTask.run(self, importableLayer, importLayer, fieldMap)
+        self.importFeatureLayerTask.run(self, importableLayer, importLayer, fieldMap)

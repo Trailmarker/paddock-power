@@ -13,7 +13,7 @@ class WorkspaceTaskCancelledException(Exception):
 
 class WorkspaceTask(QgsTask):
 
-    TASK_DELAY = 0.2
+    TASK_DELAY = 1.0
 
     def __init__(self, description, workspace):
         """Input is a closure over a FeatureAction handler for a given Feature."""
