@@ -11,6 +11,7 @@ from qgis.core import QgsProject
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from .fences_widget import FencesWidget
+from .land_types_widget import LandTypesWidget
 from .paddocks_widget import PaddocksWidget
 from .pipelines_widget import PipelinesWidget
 from .waterpoints_widget import WaterpointsWidget
@@ -37,6 +38,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.setStyleSheet(STYLESHEET)
 
         self.paddocksWidget = None
+        self.landTypesWidget = None
         self.fencesWidget = None
         self.pipelinesWidget = None
         self.waterpointsWidget = None
@@ -70,11 +72,13 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         qgsInfo(f"{PLUGIN_NAME} rebuilding PluginDockWidget …")
 
         self.paddocksWidget = PaddocksWidget(self.tabWidget)
+        self.landTypesWidget = LandTypesWidget(self.tabWidget)
         self.fencesWidget = FencesWidget(self.tabWidget)
         self.pipelinesWidget = PipelinesWidget(self.tabWidget)
         self.waterpointsWidget = WaterpointsWidget(self.tabWidget)
 
         self.tabWidget.addTab(self.paddocksWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
+        self.tabWidget.addTab(self.landTypesWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/land-type.png"), 'Land Types')
         self.tabWidget.addTab(self.fencesWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
         self.tabWidget.addTab(
             self.pipelinesWidget,
@@ -108,6 +112,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
             self.tabWidget.removeTab(0)
 
         self.paddocksWidget = None
+        self.landTypesWidget = None
         self.fencesWidget = None
         self.pipelinesWidget = None
         self.waterpointsWidget = None
@@ -133,6 +138,8 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         name = featureLayer.getFeatureType().__name__
         if name == 'FenceLayer':
             self.tabWidget.setCurrentWidget(self.fencesWidget)
+        elif name == 'LandTypeLayer':
+            self.tabWidget.setCurrentWidget(self.landTypesWidget)
         elif name == 'PaddockLayer':
             self.tabWidget.setCurrentWidget(self.paddocksWidget)
         elif name == 'PipelineLayer':
