@@ -38,7 +38,6 @@ class ImportableFeatureLayer(PersistedFeatureLayer, IImportableFeatureLayer):
             targetFeature = self.mapFeature(importQgsFeature, fieldMap)
             
             # Calculate the name, length, perimeter etc of any imported feature
-            targetFeature.recalculate()
             features.append(targetFeature)
 
         # Import as a bulkAdd
