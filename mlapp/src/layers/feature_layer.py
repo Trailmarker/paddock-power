@@ -66,7 +66,13 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         self.editsPersisted.connect(self.onEditsPersisted)
 
     @property
+    def hasFeatures(self):
+        """Return True if this layer has features."""
+        return self.featureCount() > 0
+
+    @property
     def hasPopups(self):
+        """Return True if this layer has popup layers for each feature."""
         return False
 
     def sameId(self, layerId):

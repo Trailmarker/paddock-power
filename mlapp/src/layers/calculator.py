@@ -34,9 +34,12 @@ class Calculator:
             raise Glitch(
                 "Calculator.calculateElevationAtPoint: point is not a QgsGeometry.")
 
-        pointXY = point.asPoint()
-        dataProvider = elevationLayer.dataProvider()
-        return dataProvider.identify(pointXY, QgsRaster.IdentifyFormatValue).results()[1]
+        try:
+            pointXY = point.asPoint()
+            dataProvider = elevationLayer.dataProvider()
+            return dataProvider.identify(pointXY, QgsRaster.IdentifyFormatValue).results()[1]
+        except Exception:
+            return 0.0
 
     @staticmethod
     def calculateLongitudeAndLatitudeAtPoint(point):
@@ -114,8 +117,16 @@ class Calculator:
             # Add Z values to points along line
             dataProvider = elevationLayer.dataProvider()
 
-            pointsWithZ = [QgsPoint(point.x(), point.y(), dataProvider.identify(
-                point, QgsRaster.IdentifyFormatValue).results()[1]) for point in pointsAlongLine]
+            pointsWithZ = []
+            for point in pointsAlongLine:
+                elevation = 0.0
+                try:
+                    pointXY = point.asPoint()
+                    dataProvider = elevationLayer.dataProvider()
+                    elevation = dataProvider.identify(pointXY, QgsRaster.IdentifyFormatValue).results()[1]
+                except Exception:
+                    pass
+                pointsWithZ.append(QgsPoint(point.x(), point.y(), elevation))
 
             # Calculate distances along line using the GDA2020 ellipsoid
             pointPairs = zip(pointsWithZ, pointsWithZ[1:])

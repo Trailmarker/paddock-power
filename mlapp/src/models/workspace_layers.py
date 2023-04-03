@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayer, QgsProject
 
+from ..layers import BasePaddockLayer, LandTypeLayer, WaterpointLayer
 from ..layers.interfaces import IFeatureLayer, IImportableFeatureLayer, ILayer
 from ..utils import PLUGIN_NAME
 from .glitch import Glitch
@@ -31,6 +32,21 @@ class WorkspaceLayers(TypeDict):
     def layer(self, layerType):
         """Get the layer for the given layer type."""
         return super().getObject(layerType)
+
+    def hasFeatures(self, layerType):
+        """Check if the layer for the given layer type has features."""
+        layer = self.layer(layerType)
+        return layer and layer.hasFeatures
+
+    @property
+    def hasBasePaddocks(self):
+        """Check if the base paddock layer has features."""
+        return self.hasFeatures(BasePaddockLayer)
+    
+    @property
+    def isAnalytic(self):
+        """Check if the workspace is analytic."""
+        return self.hasBasePaddocks and self.hasFeatures(LandTypeLayer) and self.hasFeatures(WaterpointLayer) 
 
     def layers(self):
         """Get all layers in the registry."""

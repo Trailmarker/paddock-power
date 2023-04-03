@@ -2,26 +2,28 @@
 from os import path
 import sqlite3
 
-from qgis.core import QgsRasterLayer
+from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer
+import processing
 
+from ..layers.interfaces import IImportableLayer
 from ..models import Glitch, QtAbstractMeta, WorkspaceMixin
-from ..utils import PLUGIN_NAME
+from ..utils import PLUGIN_NAME, PADDOCK_POWER_EPSG
 from .map_layer_mixin import MapLayerMixin
 
 
-class ElevationLayer(QgsRasterLayer, WorkspaceMixin, MapLayerMixin, metaclass=QtAbstractMeta):
+class ElevationLayer(QgsRasterLayer, WorkspaceMixin, MapLayerMixin, IImportableLayer, metaclass=QtAbstractMeta):
 
-    LAYER_NAME = "Elevation Mapping"
+    LAYER_NAME = "Elevation"
     STYLE = "elevation"
 
     @staticmethod
-    def _rasterGpkgUrl(workspaceFile, layerName):
+    def __getRasterGeoPackageUrl(workspaceFile, layerName):
         """Return a URL for a raster layer in a GeoPackage file."""
         # different from QgsVectorLayer GeoPackage URL format!
         return f"GPKG:{workspaceFile}:{layerName}"
 
     @classmethod
-    def detectInGeoPackage(_, workspaceFile):
+    def detectInStore(_, workspaceFile):
         """Find an elevation layer in a workspace GeoPackage."""
         try:
             if not path.exists(workspaceFile):
@@ -43,22 +45,33 @@ class ElevationLayer(QgsRasterLayer, WorkspaceMixin, MapLayerMixin, metaclass=Qt
         except BaseException:
             return None
 
+    @classmethod
+    def importToStore(cls, workspaceFile, rasterLayer):
+        """Import an elevation layer into a workspace GeoPackage."""
+
+        params = {
+            "INPUT": rasterLayer.source(),
+            "TARGET_CRS": QgsCoordinateReferenceSystem(f"EPSG:{PADDOCK_POWER_EPSG}"),
+            "NODATA": None,
+            "COPY_SUBDATASETS": False,
+            "OPTIONS": f"APPEND_SUBDATASET=YES|RASTER_TABLE={cls.defaultName()}",
+            "EXTRA": "",
+            # Float32
+            "DATA_TYPE": 6,
+            "OUTPUT": workspaceFile
+        }
+
+        processing.run("gdal:translate", params)
+
     def __init__(self, workspaceFile, layerName=None, *args, **kwargs):
         """Create a new elevation layer."""
 
-        self._workspace = None
-
-        # Route changes to this layer *through* the Paddock Power
-        # workspace so other objects can respond
-        self._blockWorkspaceConnnection = False
-
         layerName = layerName or ElevationLayer.defaultName()
-
         styleName = kwargs.pop("styleName", ElevationLayer.defaultStyle())
 
         # Note ths URL format is different from QgsVectorLayer!
-        rasterUrl = ElevationLayer._rasterGpkgUrl(workspaceFile, layerName)
-        QgsRasterLayer.__init__(self, rasterUrl, baseName=layerName)
+        rasterGeoPackageUrl = ElevationLayer.__getRasterGeoPackageUrl(workspaceFile, layerName)
+        QgsRasterLayer.__init__(self, rasterGeoPackageUrl, baseName=layerName)
         WorkspaceMixin.__init__(self)
         MapLayerMixin.__init__(self)
 
