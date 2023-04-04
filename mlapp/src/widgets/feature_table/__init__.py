@@ -5,6 +5,7 @@ from .feature_table import FeatureTable
 from .feature_table_group_box import FeatureTableGroupBox
 from .fence_table import FenceTable
 from .land_type_table import LandTypeTable
+from .paddock_land_types_group_box import PaddockLandTypesGroupBox
 from .paddock_land_types_table import PaddockLandTypesTable, CurrentPaddockLandTypesTable, FuturePaddockLandTypesTable
 from .paddock_table import PaddockTable
 from .pipeline_table import PipelineTable

@@ -163,7 +163,6 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
 
     def selectFeature(self):
         """Select the Feature."""
-        # qgsDebug(f"{self}.selectFeature()")
         self.featureLayer.selectByIds([self.FID], QgsVectorLayer.SetSelection)
 
     def zoomFeature(self):
