@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsFeatureRequest
+
 from .. import BasePaddockLayer
 from ...models import WorkspaceTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
@@ -22,12 +24,17 @@ class ImportFeatureLayerTask(WorkspaceTask):
             if self.isCanceled():
                 return False
 
-            if not isinstance(self.targetLayer, BasePaddockLayer) and not self.workspace.hasBasePaddocks:
+            notImportingPaddocks = not isinstance(self.targetLayer, BasePaddockLayer)
+
+            if notImportingPaddocks and not self.workspace.hasBasePaddocks:
                 # guiWarning(f"{PLUGIN_NAME} you must import {BasePaddockLayer.defaultName()} before all other property data.")
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} abandoned import because there are no {BasePaddockLayer.defaultName()}.")
                 return False 
 
-            edits = self.targetLayer.importFeatures(self.importLayer, self.fieldMap, self.raiseIfCancelled)
+            # Constrain imported features to the neighbourhood of the Property's Base Paddocks
+            importFeatureRequest = QgsFeatureRequest().setFilterRect(self.workspace.basePaddockLayer.neighbourhood) if notImportingPaddocks else None
+
+            edits = self.targetLayer.importFeatures(self.importLayer, self.fieldMap, importFilter=importFeatureRequest, raiseIfCancelled=self.raiseIfCancelled)
             edits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
 
         except Exception as e:

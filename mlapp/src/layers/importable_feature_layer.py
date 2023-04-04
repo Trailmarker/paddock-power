@@ -26,14 +26,14 @@ class ImportableFeatureLayer(PersistedFeatureLayer, IImportableFeatureLayer):
 
         return feature
 
-    def importFeatures(self, importLayer, fieldMap, raiseErrorIfTaskHasBeenCancelled=lambda: None):
+    def importFeatures(self, importLayer, fieldMap, importFilter=None, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Import all Features from the specified layer, applying the given field map."""
         qgsInfo(f"Importing features for layer {self.name()} …")
 
         edits = Edits.truncate(self)
 
         features = []
-        for importQgsFeature in importLayer.getFeatures():
+        for importQgsFeature in importLayer.getFeatures(importFilter):
             raiseErrorIfTaskHasBeenCancelled()
             targetFeature = self.mapFeature(importQgsFeature, fieldMap)            
             features.append(targetFeature)
