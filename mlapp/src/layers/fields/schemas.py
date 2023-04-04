@@ -4,9 +4,19 @@ from qgis.core import QgsWkbTypes
 from .fields import *
 from .schema import Schema
 
-BoundarySchema = Schema([Fid,
-                         TimeframeField],
-                        wkbType=QgsWkbTypes.MultiPolygon)
+PropertySchema = Schema([Fid,
+                         TimeframeField,
+                         Perimeter,
+                         Area,
+                         WateredArea,
+                         EstimatedCapacityPerArea,
+                         PotentialCapacityPerArea,
+                         EstimatedCapacity,
+                         PotentialCapacity],
+                        wkbType=QgsWkbTypes.MultiPolygon,
+                        hiddenFields=[Fid,
+                                      EstimatedCapacityPerArea,
+                                      PotentialCapacityPerArea])
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid,
                       Name,
@@ -61,8 +71,8 @@ MetricPaddockSchema = Schema([Fid,
                               Area,
                               WateredArea,
                               EstimatedCapacityPerArea,
-                              EstimatedCapacity,
                               PotentialCapacityPerArea,
+                              EstimatedCapacity,
                               PotentialCapacity],
                              wkbType=QgsWkbTypes.MultiPolygon,
                              hiddenFields=[Fid,

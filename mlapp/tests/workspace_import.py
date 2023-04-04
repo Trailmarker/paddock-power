@@ -21,7 +21,7 @@ def testImportKidmanPaddocks():
     kidmanPaddocks = layerByName("b_Kidman_Paddocks")
     fieldMap = FieldMap(kidmanPaddocks, workspace().basePaddockLayer)
     fieldMap["Name"] = "Name"
-    imports = basePaddockLayer.importFeatures(kidmanPaddocks, fieldMap)
+    imports = paddockLayer.importFeatures(kidmanPaddocks, fieldMap)
     imports.persist()
 
 
@@ -53,7 +53,7 @@ def testImportMathisonPaddocks():
     mathisonPaddocks = layerByName("Supplied Paddocks")
     fieldMap = FieldMap(mathisonPaddocks, workspace().basePaddockLayer)
     fieldMap.update(0, "Paddock Name", "Name")
-    imports = basePaddockLayer.importFeatures(mathisonPaddocks, fieldMap)
+    imports = paddockLayer.importFeatures(mathisonPaddocks, fieldMap)
     imports.persist()
 
 

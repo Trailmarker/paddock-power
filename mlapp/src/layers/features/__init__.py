@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .base_paddock import BasePaddock
-from .boundary import Boundary
+from .property import Property
 from .edits import Edits
 from .feature_action import FeatureAction
 from .fence import Fence
