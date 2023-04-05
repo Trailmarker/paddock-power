@@ -104,9 +104,10 @@ class FieldMap(list):
 
             importField = self.importField(targetField)
 
-            if importField:
+            if importField and feature.attribute(importField.name()):
                 # targetField.setValue(targetFeature, feature.attribute(importField.name()))
                 targetFeature.setAttribute(targetField.name(), feature.attribute(importField.name()))
-                qgsDebug(f"Imported {targetField.name()} value: {targetFeature.attribute(targetField.name())}")
+                # qgsDebug(
+                #   f"Imported {importField.name()} value: '{feature.attribute(importField.name())}' to {targetField.name()} value: '{targetFeature.attribute(targetField.name())}'")
 
         return targetFeature

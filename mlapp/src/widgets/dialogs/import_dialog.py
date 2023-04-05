@@ -106,6 +106,8 @@ class ImportDialog(Dialog, FORM_CLASS):
                 self.fieldMapWidget.fieldMap)
         elif isinstance(importLayer, QgsRasterLayer):
             self.workspace.importElevationLayer(self.importLayerComboBox.currentLayer())
+        
+        super().accept()
 
     @property
     def dialogRole(self):

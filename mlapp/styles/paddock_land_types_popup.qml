@@ -557,7 +557,7 @@
     <default field="Rounded Potential AE" expression="" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint field="fid" constraints="3" unique_strength="1" notnull_strength="1" exp_strength="0"/>
+    <constraint field="fid" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Paddock" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Land Type" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>
     <constraint field="Paddock Name" constraints="0" unique_strength="0" notnull_strength="0" exp_strength="0"/>

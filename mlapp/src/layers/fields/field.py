@@ -182,7 +182,7 @@ class Field(QgsField):
 
     def setDefaultValue(self, feature):
         """Set the default value of a field on a feature."""
-        if self._defaultValue:
+        if self._defaultValue is not None:
             self.__makeSetter()(feature, self._defaultValue)
 
     def addFieldProperty(self, cls):

@@ -238,9 +238,9 @@
     <default expression="" field="Rounded Length (km)" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" constraints="3" field="fid" exp_strength="0" unique_strength="1"/>
+    <constraint notnull_strength="0" constraints="0" field="fid" exp_strength="0" unique_strength="1"/>
     <constraint notnull_strength="0" constraints="0" field="Name" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="1" constraints="1" field="Status" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" constraints="0" field="Status" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Length (km)" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Rounded Length (km)" exp_strength="0" unique_strength="0"/>
   </constraints>

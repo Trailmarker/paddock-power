@@ -230,7 +230,7 @@
     <default field="Rounded Potential AE" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
-    <constraint field="fid" constraints="3" exp_strength="0" notnull_strength="1" unique_strength="1"/>
+    <constraint field="fid" constraints="0" exp_strength="0" notnull_strength="0" unique_strength="0"/>
     <constraint field="Timeframe" constraints="0" exp_strength="0" notnull_strength="0" unique_strength="0"/>
     <constraint field="Perimeter (km)" constraints="0" exp_strength="0" notnull_strength="0" unique_strength="0"/>
     <constraint field="Area (km²)" constraints="0" exp_strength="0" notnull_strength="0" unique_strength="0"/>

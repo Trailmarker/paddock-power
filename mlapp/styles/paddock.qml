@@ -446,7 +446,7 @@
     <default expression="" applyOnUpdate="0" field="Rounded Potential AE"/>
   </defaults>
   <constraints>
-    <constraint exp_strength="0" constraints="3" notnull_strength="1" unique_strength="1" field="fid"/>
+    <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="fid"/>
     <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="Paddock"/>
     <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="Name"/>
     <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="Status"/>

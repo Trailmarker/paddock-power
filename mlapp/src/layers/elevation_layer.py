@@ -49,19 +49,43 @@ class ElevationLayer(QgsRasterLayer, WorkspaceMixin, MapLayerMixin, IImportableL
     def importToStore(cls, workspaceFile, rasterLayer):
         """Import an elevation layer into a workspace GeoPackage."""
 
+        # params = {
+        #     "INPUT": rasterLayer.source(),
+        #     "TARGET_CRS": QgsCoordinateReferenceSystem(f"EPSG:{PADDOCK_POWER_EPSG}"),
+        #     "NODATA": None,
+        #     "COPY_SUBDATASETS": False,
+        #     "OPTIONS": f"APPEND_SUBDATASET=YES|RASTER_TABLE={cls.defaultName()}",
+        #     "EXTRA": "",
+        #     # Float32
+        #     "DATA_TYPE": 6,
+        #     "OUTPUT": workspaceFile
+        # }
+
+        # processing.run("gdal:translate", params)
+
         params = {
             "INPUT": rasterLayer.source(),
+            "SOURCE_CRS": None,
+            # "SOURCE_CRS": rasterLayer.crs(),
             "TARGET_CRS": QgsCoordinateReferenceSystem(f"EPSG:{PADDOCK_POWER_EPSG}"),
+            "RESAMPLING": 1,
             "NODATA": None,
+            "TARGET_RESOLUTION": None,
             "COPY_SUBDATASETS": False,
-            "OPTIONS": f"APPEND_SUBDATASET=YES|RASTER_TABLE={cls.defaultName()}",
+            "OPTIONS": f"APPEND_SUBDATASET=YES|OVERWRITE=YES|RASTER_TABLE={cls.defaultName()}",
             "EXTRA": "",
             # Float32
             "DATA_TYPE": 6,
+            "TARGET_EXTENT": None,
+            "TARGET_EXTENT_CRS": None,
+            "MULTITHREADING": False,
+            "EXTRA": "",
             "OUTPUT": workspaceFile
         }
 
-        processing.run("gdal:translate", params)
+        processing.run("gdal:warpreproject", params)
+
+
 
     def __init__(self, workspaceFile, layerName=None, *args, **kwargs):
         """Create a new elevation layer."""

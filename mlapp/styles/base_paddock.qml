@@ -326,7 +326,7 @@
     <default expression="" field="Rounded Perimeter (km)" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" constraints="3" field="fid" exp_strength="0" unique_strength="1"/>
+    <constraint notnull_strength="0" constraints="0" field="fid" exp_strength="0" unique_strength="1"/>
     <constraint notnull_strength="0" constraints="0" field="Name" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Build Fence" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Status" exp_strength="0" unique_strength="0"/>

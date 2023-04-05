@@ -20,7 +20,7 @@ class LandTypeLayer(ImportableFeatureLayer):
                          layerName=LandTypeLayer.defaultName(),
                          styleName=LandTypeLayer.defaultStyle())
 
-        self.setReadOnly(True)
+        self.setReadOnly(False)
 
     @classmethod
     def icon(cls):
