@@ -78,7 +78,10 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.waterpointsWidget = WaterpointsWidget(self.tabWidget)
 
         self.tabWidget.addTab(self.paddocksWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
-        self.tabWidget.addTab(self.landTypesWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/land-type.png"), 'Land Types')
+        self.tabWidget.addTab(
+            self.landTypesWidget,
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/land-type.png"),
+            'Land Types')
         self.tabWidget.addTab(self.fencesWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
         self.tabWidget.addTab(
             self.pipelinesWidget,

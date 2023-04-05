@@ -20,7 +20,7 @@ class DerivedPropertyLayer(DerivedFeatureLayer):
         # _PROPERTY_TIMEFRAMES = f"PropertyTimeframes{randomString()}"
 
         query = f"""
-select 
+select
     st_union(geometry) as geometry,
     0 as {FID},
     "{paddocks}".{TIMEFRAME} as {TIMEFRAME},

@@ -160,7 +160,8 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         fineModulus = 0 if sectionIncrease >= padding else (max(self.width() - neededWidth, 0) % len(sectionsToResize))
 
         for i in sectionsToResize:
-            self.horizontalHeader().resizeSection(i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
+            self.horizontalHeader().resizeSection(
+                i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
 
     def sizeHint(self):
         hint = super().sizeHint()

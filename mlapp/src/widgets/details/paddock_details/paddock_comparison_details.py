@@ -3,15 +3,13 @@ from ....models import WorkspaceMixin
 from ..comparison_details import ComparisonDetails
 from ..details import Details
 
+
 class PaddockComparisonDetails(WorkspaceMixin, ComparisonDetails):
 
     def __init__(self, details, comparison, detailsTitle=None, comparisonTitle=None, parent=None):
         """Constructor."""
         WorkspaceMixin.__init__(self)
-        
-        
-        
-        
+
         ComparisonDetails.__init__(self)
 
         self.setupUi(self)

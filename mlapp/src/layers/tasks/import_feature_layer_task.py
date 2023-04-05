@@ -24,8 +24,9 @@ class ImportFeatureLayerTask(WorkspaceTask):
 
             if not isinstance(self.targetLayer, BasePaddockLayer) and not self.workspace.hasBasePaddocks:
                 # guiWarning(f"{PLUGIN_NAME} you must import {BasePaddockLayer.defaultName()} before all other property data.")
-                guiStatusBarAndInfo(f"{PLUGIN_NAME} abandoned import because there are no {BasePaddockLayer.defaultName()}.")
-                return False 
+                guiStatusBarAndInfo(
+                    f"{PLUGIN_NAME} abandoned import because there are no {BasePaddockLayer.defaultName()}.")
+                return False
 
             edits = self.targetLayer.importFeatures(self.importLayer, self.fieldMap, self.raiseIfCancelled)
             edits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)

@@ -23,8 +23,8 @@ class PipelineLayer(ImportableFeatureLayer):
         super().__init__(workspaceFile,
                          layerName=PipelineLayer.defaultName(),
                          styleName=PipelineLayer.defaultStyle())
-        
-    @classmethod    
+
+    @classmethod
     def icon(cls):
         """The icon to paint to represent this layer."""
         return QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pipeline.png")

@@ -40,10 +40,11 @@ class FieldMapWidget(QWidget, FORM_CLASS):
 
     def resetFieldMap(self, importLayer, targetLayer):
         """Set the import layer from which to map fields."""
-        if importLayer and targetLayer and self.fieldMap and self.fieldMap.importLayer.id() == importLayer.id() and self.fieldMap.targetLayer.id() == targetLayer.id():
+        if importLayer and targetLayer and self.fieldMap and self.fieldMap.importLayer.id(
+        ) == importLayer.id() and self.fieldMap.targetLayer.id() == targetLayer.id():
             return
-        
-        self.removeFieldMapUi()            
+
+        self.removeFieldMapUi()
         if importLayer and targetLayer:
             self.fieldMap = FieldMap(importLayer, targetLayer)
             self.setupFieldMapUi()
@@ -103,7 +104,7 @@ class FieldMapWidget(QWidget, FORM_CLASS):
         targetLayerFieldComboBox.setAllowEmptyFieldName(False)
 
         removeButton = None
-        
+
         if targetField.required():
             # Can't change required items
             singleField = QgsFields()
@@ -117,13 +118,13 @@ class FieldMapWidget(QWidget, FORM_CLASS):
             removeButton.clicked.connect(lambda: self.removeFieldUi(index))
 
         row = index + 1
-        
+
         importLayerFieldComboBox.fieldChanged.connect(
             lambda field: self.updateFieldMap(index,
-                field, targetLayerFieldComboBox.currentField()))
+                                              field, targetLayerFieldComboBox.currentField()))
         targetLayerFieldComboBox.fieldChanged.connect(
             lambda field: self.updateFieldMap(index,
-                importLayerFieldComboBox.currentField(), field))
+                                              importLayerFieldComboBox.currentField(), field))
 
         self.layout().addWidget(importLayerFieldComboBox, row, 0)
         self.layout().addWidget(targetLayerFieldComboBox, row, 1)

@@ -45,7 +45,8 @@ class AnalyseWorkspaceTask(WorkspaceTask):
             for layer in deriveLayers:
                 if self.isCanceled():
                     return False
-                derivedEdits = layer.deriveFeatures(changeset=None, raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
+                derivedEdits = layer.deriveFeatures(
+                    changeset=None, raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
                 if self.isCanceled():
                     return False
                 derivedEdits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)

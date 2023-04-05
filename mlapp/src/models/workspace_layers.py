@@ -42,11 +42,11 @@ class WorkspaceLayers(TypeDict):
     def hasBasePaddocks(self):
         """Check if the base paddock layer has features."""
         return self.hasFeatures(BasePaddockLayer)
-    
+
     @property
     def isAnalytic(self):
         """Check if the workspace is analytic."""
-        return self.hasBasePaddocks and self.hasFeatures(LandTypeLayer) and self.hasFeatures(WaterpointLayer) 
+        return self.hasBasePaddocks and self.hasFeatures(LandTypeLayer) and self.hasFeatures(WaterpointLayer)
 
     def layers(self):
         """Get all layers in the registry."""

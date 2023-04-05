@@ -21,9 +21,8 @@ class LandTypeLayer(ImportableFeatureLayer):
                          styleName=LandTypeLayer.defaultStyle())
 
         self.setReadOnly(True)
-        
-    @classmethod    
+
+    @classmethod
     def icon(cls):
         """The icon to paint to represent this layer."""
         return QIcon(f":/plugins/{PLUGIN_FOLDER}/images/land-type.png")
-

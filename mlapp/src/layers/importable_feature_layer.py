@@ -35,7 +35,7 @@ class ImportableFeatureLayer(PersistedFeatureLayer, IImportableFeatureLayer):
         features = []
         for importQgsFeature in importLayer.getFeatures():
             raiseErrorIfTaskHasBeenCancelled()
-            targetFeature = self.mapFeature(importQgsFeature, fieldMap)            
+            targetFeature = self.mapFeature(importQgsFeature, fieldMap)
             features.append(targetFeature)
 
         # Import as a bulkAdd

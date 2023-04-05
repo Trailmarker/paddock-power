@@ -206,7 +206,7 @@ class Field(QgsField):
     def importable(self):
         """Whether this Field can be imported."""
         return True
-    
+
     def required(self):
         """Whether this Field is required."""
         return self._required

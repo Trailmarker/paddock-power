@@ -101,10 +101,10 @@ class FieldMap(list):
         # Suck the mapped import fields into the target feature fields
         for targetField in targetFeature.getSchema():
             qgsDebug(f"Importing {targetField.name()}")
-            
+
             importField = self.importField(targetField)
-            
-            if importField:            
+
+            if importField:
                 # targetField.setValue(targetFeature, feature.attribute(importField.name()))
                 targetFeature.setAttribute(targetField.name(), feature.attribute(importField.name()))
                 qgsDebug(f"Imported {targetField.name()} value: {targetFeature.attribute(targetField.name())}")

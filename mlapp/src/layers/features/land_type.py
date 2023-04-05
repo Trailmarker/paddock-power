@@ -6,7 +6,7 @@ from .persisted_feature import PersistedFeature
 @LandTypeSchema.addSchema()
 class LandType(PersistedFeature):
 
-    MINIMUM_OPTIMAL_CAPACITY_PER_AREA = 0   
+    MINIMUM_OPTIMAL_CAPACITY_PER_AREA = 0
     MAXIMUM_OPTIMAL_CAPACITY_PER_AREA = 100
 
     def __init__(self, featureLayer, existingFeature=None):
