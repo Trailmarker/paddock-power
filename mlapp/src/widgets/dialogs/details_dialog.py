@@ -2,6 +2,7 @@
 import os
 
 from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QSizePolicy
 
 from .dialog import Dialog
 
@@ -23,6 +24,12 @@ class DetailsDialog(Dialog, FORM_CLASS):
 
         self.detailsWidget = detailsWidgetFactory(self.feature, self)
         self.detailsLayout.addWidget(self.detailsWidget)
+        
+        # Get size right and prevent vertical resizing
+        self.adjustSize()
+        self.setMaximumHeight(self.height())
+        self.setMinimumHeight(self.height())
+
 
         self.setWindowTitle(f"{self.feature.TITLE}")
         self.dismissButton.clicked.connect(self.reject)

@@ -20,7 +20,7 @@
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item row="5" column="1">
-      <widget class="FormattedValue" name="farGrazingRadiusText">
+      <widget class="FormattedValues" name="farGrazingRadiusText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -59,7 +59,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="FormattedValue" name="waterpointTypeText">
+      <widget class="FormattedValues" name="waterpointTypeText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -119,7 +119,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="FormattedValue" name="nearGrazingRadiusText">
+      <widget class="FormattedValues" name="nearGrazingRadiusText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -142,9 +142,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FormattedValue</class>
+   <class>FormattedValues</class>
    <extends>QLabel</extends>
-   <header>mlapp/src/widgets/details/formatted_value</header>
+   <header>mlapp/src/widgets/details/formatted_values</header>
   </customwidget>
  </customwidgets>
  <resources/>

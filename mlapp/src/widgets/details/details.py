@@ -5,7 +5,7 @@ from functools import cached_property
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QSizePolicy, QWidget
 
-from .formatted_value import FormattedValue
+from .formatted_values import FormattedValues
 
 
 class Details(QWidget):
@@ -21,7 +21,7 @@ class Details(QWidget):
         # self.gridLayout.setSpacing(6)
         # self.gridLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
         self._model = None
         self._inverted = False
@@ -72,7 +72,7 @@ class Details(QWidget):
 
     def valueFormatter(self, descriptor):
         (extractor, _, formatSpec) = descriptor
-        return lambda m: FormattedValue().setValue(extractor(m), formatSpec)
+        return lambda m: FormattedValues().setValues(formatSpec, *extractor(m))
 
     @cached_property
     def labels(self):
@@ -92,3 +92,5 @@ class Details(QWidget):
         for i, descriptor in enumerate(self.descriptors):
             self.gridLayout.addWidget(self.labels[i], i, labPos, labAlign)
             self.gridLayout.addWidget(self.valueFormatter(descriptor)(self.model), i, valPos, valAlign)
+            
+        self.adjustSize()

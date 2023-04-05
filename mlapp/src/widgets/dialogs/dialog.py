@@ -21,7 +21,7 @@ class Dialog(ABC, WorkspaceMixin, QDialog, metaclass=QtAbstractMeta):
 
     def setWindowTitle(self, title):
         """Set the dialog's title using a standard format."""
-        super().setWindowTitle(f"{PLUGIN_NAME} | {self.dialogRole} {' — ' + title if title else None}")
+        super().setWindowTitle(f"{PLUGIN_NAME} | {self.dialogRole}{(' — ' + title) if title else ''}")
 
     def showEvent(self, event):
         """Override the show event to also adjust the dialog layout."""

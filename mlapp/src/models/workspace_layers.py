@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayer, QgsProject
 
-from ..layers import BasePaddockLayer, LandTypeLayer, WaterpointLayer
+from ..layers import BasePaddockLayer, LandTypeLayer, PropertyLayer, WaterpointLayer
 from ..layers.interfaces import IFeatureLayer, IImportableFeatureLayer, ILayer
 from ..utils import PLUGIN_NAME
 from .glitch import Glitch
@@ -43,6 +43,11 @@ class WorkspaceLayers(TypeDict):
         """Check if the base paddock layer has features."""
         return self.hasFeatures(BasePaddockLayer)
 
+    @property
+    def hasPropertyMetrics(self):
+        """Check if the base paddock layer has features."""
+        return self.hasFeatures(PropertyLayer)
+    
     @property
     def isAnalytic(self):
         """Check if the workspace is analytic."""

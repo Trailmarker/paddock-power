@@ -23,6 +23,7 @@ class PluginAction(StateMachineAction):
     openPluginDockWidget = "Open Plugin Dock Widget"
     closePluginDockWidget = "Close Plugin Dock Widget"
     openImportDialog = "Import Data"
+    openPropertyMetricsDialog = "View Property Metrics"
     unloadWorkspace = "Unload Workspace"
     projectClosed = "Project Closed"
 
@@ -57,6 +58,7 @@ class PluginStateMachine(QObject, StateMachine, metaclass=QtAbstractMeta):
         (PluginStatus.WorkspaceLoaded, PluginAction.openPluginDockWidget): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.closePluginDockWidget): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.openImportDialog): PluginStatus.WorkspaceLoaded,
+        (PluginStatus.WorkspaceLoaded, PluginAction.openPropertyMetricsDialog): PluginStatus.WorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.unloadWorkspace): PluginStatus.NoWorkspaceLoaded,
         (PluginStatus.WorkspaceLoaded, PluginAction.projectClosed): PluginStatus.NoWorkspaceLoaded
     }

@@ -20,7 +20,6 @@ class WaterpointDetails(QWidget, FORM_CLASS):
 
     def refreshUi(self):
         if self.waterpoint is not None:
-            # self.nameText.setValue(self.waterpoint.NAME, "{0}")
-            self.nearGrazingRadiusText.setValue(self.waterpoint.NEAR_GRAZING_RADIUS, "{0:.0f}")
-            self.farGrazingRadiusText.setValue(self.waterpoint.FAR_GRAZING_RADIUS, "{0:.0f}")
-            self.waterpointTypeText.setValue(self.waterpoint.WATERPOINT_TYPE.value, "{0}")
+            self.nearGrazingRadiusText.setValues("{0:.0f}", self.waterpoint.NEAR_GRAZING_RADIUS)
+            self.farGrazingRadiusText.setValues("{0:.0f}", self.waterpoint.FAR_GRAZING_RADIUS)
+            self.waterpointTypeText.setValues("{0}", self.waterpoint.WATERPOINT_TYPE.value)

@@ -76,9 +76,15 @@ class Workspace(QObject):
         return self.workspaceLayers.hasBasePaddocks
 
     @property
+    def hasPropertyMetrics(self):
+        """Return True if this workspace has property metrics."""
+        return self.workspaceLayers.hasPropertyMetrics
+
+    @property
     def isAnalytic(self):
         """Return True if this workspace can be analysed."""
         return self.workspaceLayers.isAnalytic
+
 
     def locked(self):
         """Return True if the workspace is locked."""

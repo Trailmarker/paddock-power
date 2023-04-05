@@ -83,7 +83,7 @@
       </widget>
      </item>
      <item row="7" column="1">
-      <widget class="FormattedValue" name="estimatedCapacityPerAreaText">
+      <widget class="FormattedValues" name="estimatedCapacityPerAreaText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -101,7 +101,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="FormattedValue" name="areaText">
+      <widget class="FormattedValues" name="areaText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -119,7 +119,7 @@
       </widget>
      </item>
      <item row="6" column="1">
-      <widget class="FormattedValue" name="potentialCapacityText">
+      <widget class="FormattedValues" name="potentialCapacityText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -179,7 +179,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="FormattedValue" name="landTypeNameText">
+      <widget class="FormattedValues" name="landTypeNameText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -197,7 +197,7 @@
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="FormattedValue" name="estimatedCapacityText">
+      <widget class="FormattedValues" name="estimatedCapacityText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -257,7 +257,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="FormattedValue" name="conditionTypeText">
+      <widget class="FormattedValues" name="conditionTypeText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -275,7 +275,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="FormattedValue" name="wateredAreaText">
+      <widget class="FormattedValues" name="wateredAreaText">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -298,9 +298,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FormattedValue</class>
+   <class>FormattedValues</class>
    <extends>QLabel</extends>
-   <header>mlapp/src/widgets/details/formatted_value</header>
+   <header>mlapp/src/widgets/details/formatted_values</header>
   </customwidget>
  </customwidgets>
  <resources/>

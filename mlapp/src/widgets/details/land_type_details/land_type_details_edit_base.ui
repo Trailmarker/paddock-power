@@ -78,12 +78,21 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSpinBox" name="optimalCapacityPerAreaSpinBox">
+      <widget class="QDoubleSpinBox" name="optimalCapacityPerAreaDoubleSpinBox">
+       <property name="suffix">
+        <string/>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
        <property name="maximum">
-        <number>100</number>
+        <double>100.000000000000000</double>
        </property>
        <property name="singleStep">
-        <number>1</number>
+        <double>0.100000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
        </property>
       </widget>
      </item>

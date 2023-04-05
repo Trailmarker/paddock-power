@@ -59,8 +59,11 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         return repr(self)
 
     def connectWorkspace(self, workspace):
+        # Sets self.workspace and sets eg workspace.thisLayer = self
         super().connectWorkspace(workspace)
 
+
+        # qgsDebug(f"{type(self).__name__}.connectWorkspace: {self.name()}")
         self.selectionChanged.connect(lambda selection, *_: self.onSelectionChanged(selection, *_))
         self.workspace.timeframeChanged.connect(lambda timeframe: self.onTimeframeChanged(timeframe))
         self.editsPersisted.connect(self.onEditsPersisted)
@@ -151,6 +154,8 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
 
     def onSelectionChanged(self, selection, deselection, *_):
         """Translate our own selectionChanged signal into a workspace selectFeature call."""
+        
+        # qgsDebug(f"{type(self).__name__}.onSelectionChanged({selection}, {deselection})")
         self.onDeselectFeatures(deselection)
 
         if len(selection) == 1:

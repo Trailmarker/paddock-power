@@ -3,3 +3,4 @@
 from .details_dialog import DetailsDialog
 from .edit_dialog import EditDialog
 from .import_dialog import ImportDialog
+from .property_metrics_dialog import PropertyMetricsDialog
