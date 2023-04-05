@@ -21,15 +21,15 @@ class LandTypeDetailsEdit(QWidget, FORM_CLASS, WorkspaceMixin):
 
         self.setupUi(self)
 
-        self.optimalCapacityPerAreaSpinBox.setMinimum(LandType.MINIMUM_OPTIMAL_CAPACITY_PER_AREA)
-        self.optimalCapacityPerAreaSpinBox.setMaximum(LandType.MAXIMUM_OPTIMAL_CAPACITY_PER_AREA)
+        self.optimalCapacityPerAreaDoubleSpinBox.setMinimum(LandType.MINIMUM_OPTIMAL_CAPACITY_PER_AREA)
+        self.optimalCapacityPerAreaDoubleSpinBox.setMaximum(LandType.MAXIMUM_OPTIMAL_CAPACITY_PER_AREA)
 
         self.landType = landType
         self.landTypeNameLineEdit.setText(self.landType.LAND_TYPE_NAME)
-        self.optimalCapacityPerAreaSpinBox.setValue(self.landType.OPTIMAL_CAPACITY_PER_AREA)
+        self.optimalCapacityPerAreaDoubleSpinBox.setValue(self.landType.OPTIMAL_CAPACITY_PER_AREA)
 
     def saveFeature(self):
         """Save the Land Type Details."""
         self.landType.LAND_TYPE_NAME = self.landTypeNameLineEdit.text()
-        self.landType.OPTIMAL_CAPACITY_PER_AREA = self.optimalCapacityPerAreaSpinBox.value()
+        self.landType.OPTIMAL_CAPACITY_PER_AREA = self.optimalCapacityPerAreaDoubleSpinBox.value()
         return Edits.upsert(self.landType)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .comparison_details import ComparisonDetails
 from .fence_details import *
 from .land_type_details import *
 from .paddock_details import *

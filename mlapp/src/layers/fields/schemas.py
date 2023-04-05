@@ -30,7 +30,8 @@ LandTypeSchema = Schema([Fid,
                          OptimalCapacityPerArea,
                          Perimeter,
                          Area],
-                        wkbType=QgsWkbTypes.MultiPolygon)
+                        wkbType=QgsWkbTypes.MultiPolygon,
+                        hiddenFields=[Fid])
 BasePaddockSchema = Schema([Fid,
                             Name,
                             BuildFence,
@@ -59,6 +60,7 @@ PaddockLandTypeSchema = Schema([Fid,
                                              PaddockName,
                                              TimeframeField,
                                              Area,
+                                             WateredArea,
                                              EstimatedCapacityPerArea,
                                              PotentialCapacityPerArea])
 MetricPaddockSchema = Schema([Fid,

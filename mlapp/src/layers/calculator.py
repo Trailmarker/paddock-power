@@ -121,12 +121,10 @@ class Calculator:
             for point in pointsAlongLine:
                 elevation = 0.0
                 try:
-                    pointXY = point.asPoint()
-                    dataProvider = elevationLayer.dataProvider()
-                    elevation = dataProvider.identify(pointXY, QgsRaster.IdentifyFormatValue).results()[1]
+                    elevation = dataProvider.identify(point, QgsRaster.IdentifyFormatValue).results()[1]
+                    pointsWithZ.append(QgsPoint(point.x(), point.y(), elevation))
                 except Exception:
                     pass
-                pointsWithZ.append(QgsPoint(point.x(), point.y(), elevation))
 
             # Calculate distances along line using the GDA2020 ellipsoid
             pointPairs = zip(pointsWithZ, pointsWithZ[1:])

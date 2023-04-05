@@ -2,7 +2,7 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QWidget
+from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
 
 from .details import Details
 
@@ -19,6 +19,18 @@ class ComparisonDetails(QWidget, FORM_CLASS):
         FORM_CLASS.__init__(self)
 
         self.setupUi(self)
+
+        self.detailsVerticalLayout = QVBoxLayout(self)
+        self.detailsVerticalLayout.setSpacing(0)
+        self.detailsVerticalLayout.setContentsMargins(0, 1, 0, 0)
+        self.detailsGroupBox.setLayout(self.detailsVerticalLayout)
+        self.detailsGroupBox.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+
+        self.comparisonVerticalLayout = QVBoxLayout(self)
+        self.comparisonVerticalLayout.setSpacing(0)
+        self.comparisonVerticalLayout.setContentsMargins(0, 1, 0, 0)
+        self.comparisonGroupBox.setLayout(self.comparisonVerticalLayout)
+        self.comparisonGroupBox.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
         details.displayMode = Details.DisplayMode.Outer
         self.detailsGroupBox.layout().addWidget(details)

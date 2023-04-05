@@ -34,7 +34,7 @@ order by "{LAND_TYPE_NAME}"
 
         super().__init__(
             paddock,
-            f"{paddock.NAME} {timeframe.name} Land Types",
+            f"{paddock.NAME} {timeframe.value}",
             PaddockLandTypesPopupLayer.defaultStyle(),
             [self.paddock.paddockLandTypesLayer])
 
