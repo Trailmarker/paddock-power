@@ -45,7 +45,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>../../../images/new.png</normaloff>../../../images/new.png</iconset>
+       <normaloff>:/plugins/mlapp/images/new.png</normaloff>:/plugins/mlapp/images/new.png</iconset>
      </property>
      <property name="iconSize">
       <size>

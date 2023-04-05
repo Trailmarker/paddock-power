@@ -340,7 +340,7 @@ class PaddockPower(PluginStateMachine):
     def openImportDialog(self):
         if self.workspace:
             # guiWarning(f"The import feature is disabled in this release of {PLUGIN_NAME}.")
-            importDialog = ImportDialog(self.iface.mainWindow())
+            importDialog = ImportDialog(self.pluginDockWidget)
             importDialog.exec_()
         else:
             self.failureMessage(f"{PLUGIN_NAME} no workspace loaded …")
@@ -350,7 +350,7 @@ class PaddockPower(PluginStateMachine):
     def openPropertyMetricsDialog(self):   
         if self.workspace:
             if self.workspace.hasPropertyMetrics:
-                propertyMetricsDialog = PropertyMetricsDialog(self.iface.mainWindow())
+                propertyMetricsDialog = PropertyMetricsDialog(self.pluginDockWidget)
                 propertyMetricsDialog.show()
             else:
                 self.failureMessage(f"Please analyse your {PLUGIN_NAME} workspace before viewing property metrics …")
