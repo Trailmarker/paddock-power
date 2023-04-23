@@ -3,7 +3,7 @@ from time import sleep
 
 from qgis.core import QgsTask
 
-from ..utils import PLUGIN_NAME, qgsException, qgsInfo
+from ..utils import PLUGIN_NAME, getSetting, qgsException, qgsInfo
 
 
 class WorkspaceTaskCancelledException(Exception):
@@ -13,7 +13,7 @@ class WorkspaceTaskCancelledException(Exception):
 
 class WorkspaceTask(QgsTask):
 
-    TASK_DELAY = 1.0
+    TASK_DELAY = getSetting("taskDelay", default=1.0)
 
     def __init__(self, description, workspace):
         """Input is a closure over a FeatureAction handler for a given Feature."""
