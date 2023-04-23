@@ -93,4 +93,4 @@ class FeatureTableModel(QgsAttributeTableModel):
         # if self.isToolBarIndex(index) or index.column() == self.columnFromFieldName(STATUS):
         #     return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         # else:
-        #     return super().flags(self.createIndex(index.row(), index.column() - self.featureTableActionCount))
+        #     return super().flags(self.zcreateIndex(index.row(), index.column() - self.featureTableActionCount))

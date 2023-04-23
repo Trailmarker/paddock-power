@@ -24,7 +24,7 @@ select
     st_union(geometry) as geometry,
     0 as {FID},
     "{paddocks}".{TIMEFRAME} as {TIMEFRAME},
-    "{paddocks}"."{PERIMETER}" as "{PERIMETER}",
+    st_perimeter(st_union(geometry)) / 1000 as "{PERIMETER}",
 	sum("{paddocks}"."{AREA}") as "{AREA}",
     sum("{paddocks}"."{WATERED_AREA}") as "{WATERED_AREA}",
 	(sum("{paddocks}"."{ESTIMATED_CAPACITY}") / nullif({paddocks}."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
