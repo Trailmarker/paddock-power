@@ -18,8 +18,8 @@ from ...resources_rc import *
 
 
 class Workspace(QObject):
-    # emit this signal when a selected PersistedFeature is updated
-    featureLayerSelected = pyqtSignal(str)
+    featureSelected = pyqtSignal(str)
+    featureDeselected = pyqtSignal(str)
     lockChanged = pyqtSignal(bool)
     timeframeChanged = pyqtSignal(Timeframe)
     workspaceLoaded = pyqtSignal()
@@ -84,7 +84,6 @@ class Workspace(QObject):
     def isAnalytic(self):
         """Return True if this workspace can be analysed."""
         return self.workspaceLayers.isAnalytic
-
 
     def locked(self):
         """Return True if the workspace is locked."""
@@ -154,6 +153,7 @@ class Workspace(QObject):
             layer = QgsProject.instance().mapLayer(layerId)
             layer.removeSelection()
             del self.selectedFeatures[layerId]
+            self.featureDeselected.emit(layerId)
 
     def selectFeature(self, feature):
         """Select a feature."""
@@ -165,8 +165,7 @@ class Workspace(QObject):
             qgsInfo(f"Workspace.selectFeature({feature}): focusOnSelect, deselecting other layers")
             self.deselectLayers(selectedLayerId)
 
-        # This is kinda legacy now
-        self.featureLayerSelected.emit(selectedLayerId)
+        self.featureSelected.emit(selectedLayerId)
 
     def selectedFeature(self, layerId):
         """Return the selected feature for the given layer type."""

@@ -107,13 +107,14 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         # Load the layer - important that this is prior to setting up the proxy/filter model
         self._tableModel.modelReset.connect(self.onFeatureLayerLoaded)
         self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
-        self._featureLayer.featureDeselected.connect(self.onFeatureDeselected)
+        self.workspace.featureSelected.connect(self.onFeatureSelected)
 
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
         self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
         self.workspace.lockChanged.connect(self.invalidateCache)
+
         # Set our model
         self.setModel(self._tableFilterModel)
 
@@ -265,15 +266,20 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self.invalidateCache()
         self.updateColumnMetrics()
 
-    def onFeatureDeselected(self, _):
-        """Handle a feature being deselected on the underlying layer."""
-        self.selectionModel().clearSelection()
+    def hasLayerId(self, layerId):
+        """Return True if this FeatureTable is built on a FeatureLayer with a matching layer ID."""
+        return self.featureLayer and self.featureLayer.id() == layerId
 
     def onFeatureSelected(self, layerId):
-        """Handle a feature being selected on the underlying layer."""
+        """Scroll to new selection when feature selected, if not visible."""
+        if not self.hasLayerId(layerId):
+            return
+        
         feature = self.workspace.selectedFeature(layerId)
         if feature:
-            self.selectRow(self._tableModel.idToRow(feature.FID))
+            row = self._tableModel.idToRow(feature.FID)
+            if row and row >= 0:
+                self.scrollTo(self.model().index(row, 0))
 
     def onFeatureTableActionClicked(self, index):
         """Handle a feature table action being clicked."""

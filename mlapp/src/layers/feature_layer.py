@@ -13,8 +13,6 @@ from .map_layer_mixin import MapLayerMixin
 class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer, metaclass=QtAbstractMeta):
 
     editsPersisted = pyqtSignal()
-    featureSelected = pyqtSignal(str)
-    featureDeselected = pyqtSignal(str)
 
     @classmethod
     def getFeatureType(cls):
@@ -141,13 +139,12 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
 
     def onSelectFeature(self, feature):
         feature.zoomFeature()
-        self.featureSelected.emit(self.id())
 
         if self.hasPopups:
             self.onSelectPopupFeature(feature)
 
     def onDeselectFeatures(self, fids):
-        self.featureDeselected.emit(self.id())
+        self.workspace.featureDeselected.emit(self.id())
 
         if self.hasPopups:
             self.onDeselectPopupFeatures()

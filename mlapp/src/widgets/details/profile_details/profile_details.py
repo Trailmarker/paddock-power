@@ -29,8 +29,7 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
         self.feature = None
         self.profileCanvas = None
 
-        self.fenceLayer.featureSelected.connect(self.onSelectedFeatureChanged)
-        self.pipelineLayer.featureSelected.connect(self.onSelectedFeatureChanged)
+        self.workspace.featureSelected.connect(self.onSelectedFeatureChanged)
 
         self.refreshUi()
 

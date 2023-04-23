@@ -100,7 +100,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchWaterpointButton.clicked.connect(self.waterpointsWidget.sketchWaterpoint)
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
-        self.workspace.featureLayerSelected.connect(lambda layerId: self.onFeatureLayerSelected(layerId))
+        self.workspace.featureSelected.connect(lambda layerId: self.onFeatureSelected(layerId))
 
         self._uiBuilt = True
         qgsInfo(f"{PLUGIN_NAME} rebuilt PluginDockWidget.")
@@ -136,16 +136,18 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         # self.update()
 
-    def onFeatureLayerSelected(self, layerId):
-        featureLayer = QgsProject.instance().mapLayer(layerId)
-        name = featureLayer.getFeatureType().__name__
-        if name == 'FenceLayer':
-            self.tabWidget.setCurrentWidget(self.fencesWidget)
-        elif name == 'LandTypeLayer':
-            self.tabWidget.setCurrentWidget(self.landTypesWidget)
-        elif name == 'PaddockLayer':
-            self.tabWidget.setCurrentWidget(self.paddocksWidget)
-        elif name == 'PipelineLayer':
-            self.tabWidget.setCurrentWidget(self.pipelinesWidget)
-        if name == 'WaterpointLayer':
-            self.tabWidget.setCurrentWidget(self.waterpointsWidget)
+    def onFeatureSelected(self, layerId):
+        """Switch to the correct tab when a feature is selected."""
+
+        widgets = [
+            self.paddocksWidget,
+            self.landTypesWidget,
+            self.fencesWidget,
+            self.pipelinesWidget,
+            self.waterpointsWidget
+        ]
+
+        matchedWidget = next((w for w in widgets if w.hasLayerId(layerId)), None)
+
+        if matchedWidget:
+            self.tabWidget.setCurrentWidget(matchedWidget)

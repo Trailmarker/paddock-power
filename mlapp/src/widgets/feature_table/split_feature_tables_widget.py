@@ -42,6 +42,10 @@ class SplitFeatureTablesWidget(RelayoutMixin, QWidget):
         """Get a feature table by index."""
         return self.splitter.widget(index).featureTable
 
+    def hasLayerId(self, layerId):
+        """Return True if one of the FeatureTables held in this splitter has a matching layer ID."""
+        return any(self.featureTable(i).hasLayerId(layerId) for i in range(self.splitter.count()))
+
     def setFeatureTableFilteredFeatures(self, index, fids):
         """Set the filtered features of a feature table."""
         self.featureTable(index).setFilteredFeatures(fids)
