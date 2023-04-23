@@ -106,7 +106,7 @@ select
     {_BUFFERS}."{GRAZING_RADIUS}",
     {_BUFFERS}.{STATUS},
     {_IN_PADDOCKS}.{TIMEFRAME},
-    st_area(st_intersection({_BUFFERS}.geometry, {_IN_PADDOCKS}.geometry)) as "{AREA}"
+    st_area(st_intersection({_BUFFERS}.geometry, {_IN_PADDOCKS}.geometry)) / 1000000 as "{AREA}"
 from {_BUFFERS}
 inner join {_IN_PADDOCKS}
 on {_BUFFERS}."{WATERPOINT}" = {_IN_PADDOCKS}."{WATERPOINT}"

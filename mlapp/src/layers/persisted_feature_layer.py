@@ -53,12 +53,6 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
         layer.dataProvider().addAttributes(schema)
         layer.commitChanges()
 
-        # layer.startEditing()
-
-        # for field in self.getSchema():
-        #     field.setupLayer(layer)
-        # layer.commitChanges()
-
         params = {
             'LAYERS': [layer],
             'OVERWRITE': not path.exists(workspaceFile),
