@@ -47,6 +47,20 @@ class Timeframe(FieldDomain):
         return bool([fs for fs in self.matchingFeatureStatuses()
                      if FeatureStatus[featureStatus.name] == FeatureStatus[fs.name]])
 
+    def displayedFeatureStatuses(self):
+        """Return all Feature Statuses that should be displayed in this Timeframe."""
+        if Timeframe[self.name] == Timeframe.Current:
+            return [FeatureStatus.Built, FeatureStatus.BuiltSuperseded, FeatureStatus.PlannedSuperseded]
+        elif Timeframe[self.name] == Timeframe.Future:
+            return [FeatureStatus.Drafted, FeatureStatus.Built, FeatureStatus.Planned]
+        elif Timeframe[self.name] == Timeframe.Undefined:
+            return []
+
+    def displayFeatureStatus(self, featureStatus):
+        """Check if a Feature Status corresponds to this Timeframe."""
+        return bool([fs for fs in self.displayedFeatureStatuses()
+                     if FeatureStatus[featureStatus.name] == FeatureStatus[fs.name]])
+
     def matchTimeframe(self, timeframe):
         """Check if a Timeframe corresponds to this Timeframe."""
         return (Timeframe[self.name] == Timeframe[timeframe.name])

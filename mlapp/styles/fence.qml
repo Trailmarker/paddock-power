@@ -21,7 +21,7 @@
             <Option name="properties" type="Map">
               <Option name="alpha" type="Map">
                 <Option name="active" type="bool" value="true"/>
-                <Option name="expression" type="QString" value="case &#xd;&#xa;when matchCurrentFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end"/>
+                <Option name="expression" type="QString" value="case &#xd;&#xa;when displayInCurrentTimeframeByFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end"/>
                 <Option name="type" type="int" value="3"/>
               </Option>
             </Option>

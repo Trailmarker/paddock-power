@@ -54,7 +54,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self.verticalHeader().hide()
 
         # Allow the table to be reduced in width and height, but also make it use what it gets
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # The section sizes in the table are handled in self.relayout below
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
@@ -106,14 +106,18 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         # Load the layer - important that this is prior to setting up the proxy/filter model
         self._tableModel.modelReset.connect(self.onFeatureLayerLoaded)
+
+        # Persisting edits will invalidate the cache
         self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
+
+        # Selecting a feature will scroll to that feature in the table if it's not visible
         self.workspace.featureSelected.connect(self.onFeatureSelected)
 
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
         self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
-        self.workspace.lockChanged.connect(self.invalidateCache)
+        self.workspace.lockChanged.connect(self.onLockChanged)
 
         # Set our model
         self.setModel(self._tableFilterModel)
@@ -163,6 +167,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         for i in sectionsToResize:
             self.horizontalHeader().resizeSection(
                 i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
+
 
     def sizeHint(self):
         hint = super().sizeHint()
@@ -264,7 +269,6 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         """Handle a batch of edits being persisted on the underyling layer."""
         # At the moment, we just invalidate the cache and reload the layer
         self.invalidateCache()
-        self.updateColumnMetrics()
 
     def hasLayerId(self, layerId):
         """Return True if this FeatureTable is built on a FeatureLayer with a matching layer ID."""
@@ -274,7 +278,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         """Scroll to new selection when feature selected, if not visible."""
         if not self.hasLayerId(layerId):
             return
-        
+
         feature = self.workspace.selectedFeature(layerId)
         if feature:
             row = self._tableModel.idToRow(feature.FID)
@@ -295,4 +299,11 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         feature = delegate.featureTableActionModel.doAction(index)
 
         if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
+            self.invalidateCache()
+
+    def onLockChanged(self, locked):
+        """Handle the lock state changing."""
+
+        # When the workspace is unlocked, we assume data may have changed and reload our cache
+        if not locked:
             self.invalidateCache()
