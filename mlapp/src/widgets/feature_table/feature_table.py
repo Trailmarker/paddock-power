@@ -302,9 +302,8 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         feature = delegate.featureTableActionModel.doAction(index)
 
-        # STAB_TODO
-        # if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
-        #     self.invalidateCache()
+        if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
+            self.invalidateCache()
 
     def onLockChanged(self, locked):
         """Handle the lock state changing."""

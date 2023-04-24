@@ -2,7 +2,6 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QSizePolicy
 
 from ...layers.fields import Timeframe
 from ..details import ComparisonDetails, PropertyDetails
@@ -23,7 +22,7 @@ class PropertyMetricsDialog(Dialog, FORM_CLASS):
         self.setupUi(self)
 
         currentProperty = next(self.workspace.propertyLayer.getFeaturesByTimeframe(Timeframe.Current), None)
-        futureProperty = next(self.workspace.propertyLayer.getFeaturesByTimeframe(Timeframe.Current), None)
+        futureProperty = next(self.workspace.propertyLayer.getFeaturesByTimeframe(Timeframe.Future), None)
 
         if currentProperty is not None and futureProperty is not None:
             currentPropertyDetails = PropertyDetails(currentProperty, self)

@@ -88,17 +88,17 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         if not fenceLine or fenceLine.isEmpty():
             return [], []
 
-        notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=1.0)
+        notProperty = self.getNotPropertyGeometry(glitchBuffer=1.0)
 
-        if notPropertyGeometry.isEmpty():
+        if notProperty.isEmpty():
             raise Glitch(f"{PLUGIN_NAME} can't find the property boundary, is there any paddock data?")
 
         if fenceLine.isEmpty():
             return [], []
 
-        _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g])
-                                  for p in notPropertyGeometry.asMultiPolygon()
-                                  for g in p]
+        notProperty = notProperty.asGeometryCollection() if notProperty.isMultipart() else [notProperty] 
+
+        _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY(p.asPolygon()) for p in notProperty]
 
         # Straightforward case where we have a single new fence line enclosing things
         if fenceLine.isMultipart():
@@ -114,12 +114,12 @@ class Fence(PersistedFeature, StatusFeatureMixin):
                 # We crossed the not-property boundary more than once, so we are enclosing land
                 blade = shape(fenceLine.__geo_interface__)
 
-                notPropertyGeometry = shape(self.getNotPropertyGeometry().__geo_interface__)
-                splits = split(notPropertyGeometry, blade)
+                notProperty = shape(self.getNotPropertyGeometry().__geo_interface__)
+                splits = split(notProperty, blade)
 
                 # The first result is always the piece of notProperty that is carved out? TODO check this
                 if splits:
-                    paddockGeometry = notPropertyGeometry.difference(splits[0])
+                    paddockGeometry = notProperty.difference(splits[0])
                     newBasePaddock = self.basePaddockLayer.makeFeature()
                     newBasePaddock.draftFeature(QgsGeometry.fromWkt(paddockGeometry.wkt))
                     newBasePaddocks.append(newBasePaddock)
@@ -167,6 +167,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             polygon = paddock.GEOMETRY.asMultiPolygon()
             boundaryLine = QgsGeometry.fromMultiPolylineXY(polygon[0])
             intersection = boundaryLine.intersection(fenceLine)
+            # If the intersection is multipart, we cut at least one piece out
             if intersection.isMultipart():
                 crossedPaddocks.append(paddock)
 
@@ -243,9 +244,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         # Split Paddocks
         splitLines, supersededPaddocks = self.getCrossedBasePaddocks()
 
-        # STAB_TODO
-        # fenceLines = enclosingLines + splitLines
-        fenceLines = splitLines  # enclosingLines + splitLines
+        fenceLines = enclosingLines + splitLines
 
         if (not newPaddocks and not supersededPaddocks) or not fenceLines:
             qgsInfo("The sketched Fence did not cross or touch any Built or Planned Paddocks, or enclose any new Paddocks.")
@@ -253,9 +252,9 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         self.GEOMETRY, *fenceLines = fenceLines
 
-        # for fenceLine in fenceLines:
-        #     extraFence = self.featureLayer.makeFeature()
-        #     edits = edits.editAfter(extraFence.draftFeature(fenceLine))
+        for fenceLine in fenceLines:
+            extraFence = self.featureLayer.makeFeature()
+            edits = edits.editAfter(extraFence.draftFeature(fenceLine))
 
         currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
         self.BUILD_ORDER = currentBuildOrder + 1

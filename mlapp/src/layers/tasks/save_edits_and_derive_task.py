@@ -16,7 +16,7 @@ class SaveEditsAndDeriveTask(SaveEditsTask):
         saveEditsResult = super().safeRun()
 
         if not saveEditsResult:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to derive features for {len(self.layers)} layers.")
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to save and derive downstream features …")
             return False
 
         try:

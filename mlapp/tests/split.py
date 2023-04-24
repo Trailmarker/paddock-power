@@ -100,18 +100,18 @@ def getNewBasePaddocks(fence):
     if not fenceLine or fenceLine.isEmpty():
         return [], []
 
-    notPropertyGeometry = getNotPropertyGeometry(glitchBuffer=1.0)
+    notProperty = getNotPropertyGeometry(glitchBuffer=1.0)
 
-    if notPropertyGeometry.isEmpty():
+    if notProperty.isEmpty():
         raise BaseException(f"{PLUGIN_NAME} can't find the property boundary, is there any paddock data?")
 
     if fenceLine.isEmpty():
         return [], []
 
-    # QgsGeometry.fromPolygonXY([g]) to get the rings as polygons
-    _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g])
-                              for p in notPropertyGeometry.asMultiPolygon()
-                              for g in p] 
+    notProperty = notProperty.asGeometryCollection() if notProperty.isMultipart() else [notProperty] 
+
+    _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY(p.asPolygon()) for p in notProperty]
+
 
     # Straightforward case where we have a single new fence line enclosing things
     if fenceLine.isMultipart():
@@ -128,12 +128,12 @@ def getNewBasePaddocks(fence):
             blade = shape(fenceLine.__geo_interface__)
 
             # qgsDebug("getNewPaddocks: splitGeometry in progress …")
-            notPropertyGeometry = shape(getNotPropertyGeometry().__geo_interface__)
-            splits = split(notPropertyGeometry, blade)
+            notProperty = shape(getNotPropertyGeometry().__geo_interface__)
+            splits = split(notProperty, blade)
 
             # The first result is always the piece of notProperty that is carved out? TODO check this
             if splits:
-                paddockGeometry = notPropertyGeometry.difference(splits[0])
+                paddockGeometry = notProperty.difference(splits[0])
                 newBasePaddock = workspace().basePaddockLayer.makeFeature()
                 newBasePaddock.draftFeature(QgsGeometry.fromWkt(paddockGeometry.wkt), f"Fence New")
                 newBasePaddocks.append(newBasePaddock)
