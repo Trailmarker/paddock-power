@@ -57,8 +57,8 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # The section sizes in the table are handled in self.relayout below
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.horizontalHeader().setStretchLastSection(True)
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        # self.horizontalHeader().setStretchLastSection(True)
 
         self.setWordWrap(False)
 
@@ -156,24 +156,28 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         preferredWidth = neededWidth + len(sectionsToResize) * padding
 
         # If we have our preferred width available within our parent, expand into it
-        if preferredWidth < (self.parent().width() - 6) and self.width() < preferredWidth:
-            self.resize(preferredWidth, self.height())
-            return
-
-        # Section change can be negative? Nah …
-        sectionIncrease = min(max(self.width() - neededWidth, 0) // len(sectionsToResize), padding)
-        fineModulus = 0 if sectionIncrease >= padding else (max(self.width() - neededWidth, 0) % len(sectionsToResize))
+        # if preferredWidth < (self.parent().width() - 6) and self.width() < preferredWidth:
+        #     self.resize(preferredWidth, self.height())
+        #     return
 
         for i in sectionsToResize:
             self.horizontalHeader().resizeSection(
-                i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
+                i, baseSectionSizes[i])
+
+        # Section change can be negative? Nah …
+        # sectionIncrease = min(max(self.width() - neededWidth, 0) // len(sectionsToResize), padding)
+        # fineModulus = 0 if sectionIncrease >= padding else (max(self.width() - neededWidth, 0) % len(sectionsToResize))
+
+        # for i in sectionsToResize:
+        #     self.horizontalHeader().resizeSection(
+        #         i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
 
 
     def sizeHint(self):
         hint = super().sizeHint()
 
         if not self._columnMetrics:
-            return hint
+            self._columnMetrics = self.updateColumnMetrics()
 
         (padding, baseSectionSizes, sectionsToResize) = self._columnMetrics
 
@@ -246,7 +250,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         # Allow all our columns except the action buttons to grow
         sectionsToResize = [
             i for i in range(
-                self._tableModel.featureTableActionCount,
+                self._tableModel.featureTableActionCount if self._tableModel else 0,
                 header.count()) if header.sectionSize(i) > 0]
 
         self._columnMetrics = (padding, baseSectionSizes, sectionsToResize)
@@ -298,8 +302,9 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         feature = delegate.featureTableActionModel.doAction(index)
 
-        if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
-            self.invalidateCache()
+        # STAB_TODO
+        # if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
+        #     self.invalidateCache()
 
     def onLockChanged(self, locked):
         """Handle the lock state changing."""

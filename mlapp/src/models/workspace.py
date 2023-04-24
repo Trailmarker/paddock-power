@@ -92,11 +92,17 @@ class Workspace(QObject):
     def lock(self):
         """Lock the workspace."""
         self._locked = True
+        if self.iface:
+            # Pause map rendering while workspace is locked
+            self.iface.mapCanvas().freeze(True)
         self.lockChanged.emit(True)
 
     def unlock(self):
         """Unlock the workspace."""
         self._locked = False
+        if self.iface:
+            self.iface.mapCanvas().freeze(False)
+            self.iface.mapCanvas().refresh()
         self.lockChanged.emit(False)
 
     def findGroup(self):

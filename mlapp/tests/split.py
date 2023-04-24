@@ -109,7 +109,9 @@ def getNewBasePaddocks(fence):
         return [], []
 
     # QgsGeometry.fromPolygonXY([g]) to get the rings as polygons
-    _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g]) for g in notPropertyGeometry.asPolygon()]
+    _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g])
+                              for p in notPropertyGeometry.asMultiPolygon()
+                              for g in p] 
 
     # Straightforward case where we have a single new fence line enclosing things
     if fenceLine.isMultipart():

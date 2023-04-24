@@ -21,13 +21,14 @@ class WorkspaceTask(QgsTask):
         self.workspace = workspace
         self._tasks = []
 
-    def safeAddSubTask(self, task):
-        assert isinstance(task, WorkspaceTask)
-        task.taskTerminated.connect(self.cancel)
-        self.addSubTask(
-            task, dependencies=self._tasks,
-            subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
-        self._tasks.append(task)
+    # Keeping things simple for now - we don't need subtasks (yet, maybe)
+    # def safeAddSubTask(self, task):
+    #     assert isinstance(task, WorkspaceTask)
+    #     task.taskTerminated.connect(self.cancel)
+    #     self.addSubTask(
+    #         task, dependencies=self._tasks,
+    #         subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask)
+    #     self._tasks.append(task)
 
     def run(self):
         """Carry out a function that generates Feature edit operations, and persist the edits."""
@@ -36,7 +37,7 @@ class WorkspaceTask(QgsTask):
             self.workspace.lock()
             result = self.safeRun()
         except WorkspaceTaskCancelledException:
-            qgsInfo(f"{PLUGIN_NAME} User successfully cancelled {self.description()}")
+            qgsInfo(f"{PLUGIN_NAME} User successfully cancelled '{self.description()}'")
             result = False
         except Exception:
             qgsException()

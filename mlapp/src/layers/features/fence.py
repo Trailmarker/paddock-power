@@ -96,8 +96,9 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         if fenceLine.isEmpty():
             return [], []
 
-        # QgsGeometry.fromPolygonXY([g]) to get the rings as polygons
-        _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g]) for g in notPropertyGeometry.asPolygon()]
+        _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g])
+                                  for p in notPropertyGeometry.asMultiPolygon()
+                                  for g in p]
 
         # Straightforward case where we have a single new fence line enclosing things
         if fenceLine.isMultipart():
@@ -242,7 +243,9 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         # Split Paddocks
         splitLines, supersededPaddocks = self.getCrossedBasePaddocks()
 
-        fenceLines = enclosingLines + splitLines
+        # STAB_TODO
+        # fenceLines = enclosingLines + splitLines
+        fenceLines = splitLines  # enclosingLines + splitLines
 
         if (not newPaddocks and not supersededPaddocks) or not fenceLines:
             qgsInfo("The sketched Fence did not cross or touch any Built or Planned Paddocks, or enclose any new Paddocks.")
@@ -250,9 +253,9 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         self.GEOMETRY, *fenceLines = fenceLines
 
-        for fenceLine in fenceLines:
-            extraFence = self.featureLayer.makeFeature()
-            edits = edits.editAfter(extraFence.draftFeature(fenceLine))
+        # for fenceLine in fenceLines:
+        #     extraFence = self.featureLayer.makeFeature()
+        #     edits = edits.editAfter(extraFence.draftFeature(fenceLine))
 
         currentBuildOrder, _, _ = self.featureLayer.getBuildOrder()
         self.BUILD_ORDER = currentBuildOrder + 1

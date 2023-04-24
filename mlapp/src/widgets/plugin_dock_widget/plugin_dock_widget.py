@@ -101,6 +101,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
         self.workspace.featureSelected.connect(lambda layerId: self.onFeatureSelected(layerId))
+        self.workspace.lockChanged.connect(self.onLockChanged)
 
         self._uiBuilt = True
         qgsInfo(f"{PLUGIN_NAME} rebuilt PluginDockWidget.")
@@ -151,3 +152,13 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         if matchedWidget:
             self.tabWidget.setCurrentWidget(matchedWidget)
+
+    def onLockChanged(self, locked):
+        """Disable buttons when the workspace is locked."""
+        self.currentTimeframeButton.setEnabled(not locked)
+        self.futureTimeframeButton.setEnabled(not locked)
+        self.sketchFenceButton.setEnabled(not locked)
+        self.sketchPipelineButton.setEnabled(not locked)
+        self.sketchWaterpointButton.setEnabled(not locked)
+        
+        
