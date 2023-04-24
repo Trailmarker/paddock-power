@@ -31,7 +31,7 @@ LandTypeSchema = Schema([Fid,
                          Perimeter,
                          Area],
                         wkbType=QgsWkbTypes.MultiPolygon,
-                        hiddenFields=[Fid])
+                        hiddenFields=[Fid, Perimeter])
 BasePaddockSchema = Schema([Fid,
                             Name,
                             BuildFence,
