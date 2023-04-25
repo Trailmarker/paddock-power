@@ -1,5 +1,5 @@
 {
-    "removeAllDelay": 0.5,
+    "removeAllDelay": 1.0,
     "respectChangesets": true,
-    "taskDelay": 0.1
+    "taskDelay": 2.0
 }
