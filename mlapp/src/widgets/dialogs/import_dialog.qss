@@ -1,0 +1,30 @@
+ImportDialog {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QLineEdit {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsMapLayerComboBox QListView::item:selected {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsMapLayerComboBox QListView {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsMapLayerComboBox QAbstractItemView::item:selected {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsMapLayerComboBox QAbstractItemView {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+

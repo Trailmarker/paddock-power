@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
-
 from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
 
 from ...models import Glitch
 from .field_domain import FieldDomain
-from .names import AREA, LENGTH, NAME, FID, TITLE
+from .names import FID
 
 
 class Field(QgsField):

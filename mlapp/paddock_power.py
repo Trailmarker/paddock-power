@@ -339,7 +339,6 @@ class PaddockPower(PluginStateMachine):
     @PluginAction.openImportDialog.handler()
     def openImportDialog(self):
         if self.workspace:
-            # guiWarning(f"The import feature is disabled in this release of {PLUGIN_NAME}.")
             importDialog = ImportDialog(self.pluginDockWidget)
             importDialog.exec_()
         else:

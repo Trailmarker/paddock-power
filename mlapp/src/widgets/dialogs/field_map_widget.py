@@ -13,10 +13,13 @@ from qgis.core import QgsFields
 from qgis.gui import QgsFieldComboBox
 
 from ...layers.fields import FieldMap
-from ...utils import PLUGIN_FOLDER, qgsDebug
+from ...utils import PLUGIN_FOLDER, getComponentStyleSheet, qgsDebug
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'field_map_widget_base.ui')))
+
+
+STYLESHEET = getComponentStyleSheet(__file__)
 
 
 class FieldMapWidget(QWidget, FORM_CLASS):
@@ -30,6 +33,8 @@ class FieldMapWidget(QWidget, FORM_CLASS):
         FORM_CLASS.__init__(self)
 
         self.setupUi(self)
+
+        self.setStyleSheet(STYLESHEET)
 
         self.fieldMap = None
         self.addFieldButton.clicked.connect(self.addFieldUi)
@@ -50,14 +55,12 @@ class FieldMapWidget(QWidget, FORM_CLASS):
             self.setupFieldMapUi()
         else:
             self.fieldMap = None
-        self.update()
 
     def updateFieldMap(self, index, importFieldName, targetFieldName):
         """Set the fields to be mapped."""
         self.removeFieldMapUi()
         self.fieldMap.update(index, importFieldName, targetFieldName)
         self.setupFieldMapUi()
-        self.update()
 
     def removeFieldUi(self, index):
         for column in range(3):
@@ -89,19 +92,20 @@ class FieldMapWidget(QWidget, FORM_CLASS):
             return
 
         importLayerFieldComboBox = QgsFieldComboBox(self)
-        importLayerFieldComboBox.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        importLayerFieldComboBox.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         importLayerFieldComboBox.setAllowEmptyFieldName(True)
         importLayerFieldComboBox.setPlaceholderText("Select incoming field …")
-        importLayerFieldComboBox.setFields(self.fieldMap.unmappedImportFields)
+        importLayerFieldComboBox.setFields(self.fieldMap.importQgsFields)
 
-        if importField:
+        if importField is not None:
             importLayerFieldComboBox.setField(importField.name())
 
         targetLayerFieldComboBox = QgsFieldComboBox(self)
         targetLayerFieldComboBox.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
-        targetLayerFieldComboBox.setFields(self.fieldMap.unmappedTargetFields)
-        targetLayerFieldComboBox.setField(targetField.name())
         targetLayerFieldComboBox.setAllowEmptyFieldName(False)
+        targetLayerFieldComboBox.setPlaceholderText("Select target field …")
+        targetLayerFieldComboBox.setFields(self.fieldMap.targetQgsFields)
+        targetLayerFieldComboBox.setField(targetField.name())
 
         removeButton = None
 
@@ -136,4 +140,3 @@ class FieldMapWidget(QWidget, FORM_CLASS):
         if self.hasFieldMap:
             for (index, (importField, targetField)) in enumerate(self.fieldMap):
                 self.setupFieldUi(index, importField, targetField)
-        self.adjustSize()

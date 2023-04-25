@@ -6,10 +6,14 @@ from qgis.PyQt import uic
 from qgis.core import QgsMapLayerProxyModel, QgsProject, QgsRasterLayer, QgsVectorLayer
 
 from ...layers.interfaces import IMapLayer, IImportableFeatureLayer, IImportableLayer
+from ...utils import getComponentStyleSheet
 from .dialog import Dialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'import_dialog_base.ui')))
+
+
+STYLESHEET = getComponentStyleSheet(__file__)
 
 
 class ImportDialog(Dialog, FORM_CLASS):
@@ -48,6 +52,9 @@ class ImportDialog(Dialog, FORM_CLASS):
                 self.targetLayerComboBox.setItemIcon(i, targetLayer.icon())
 
         self.fieldMapWidget.layout().setContentsMargins(0, 0, 0, 0)
+
+         # Base appearance
+        self.setStyleSheet(STYLESHEET)
 
         self.cancelButton.clicked.connect(self.reject)
         self.importButton.clicked.connect(self.importLayer)
@@ -106,7 +113,7 @@ class ImportDialog(Dialog, FORM_CLASS):
                 self.fieldMapWidget.fieldMap)
         elif isinstance(importLayer, QgsRasterLayer):
             self.workspace.importElevationLayer(self.importLayerComboBox.currentLayer())
-        
+
         super().accept()
 
     @property

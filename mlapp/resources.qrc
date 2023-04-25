@@ -39,6 +39,8 @@
 
         <file>src/widgets/details/condition_type_label.qss</file>
         <file>src/widgets/details/feature_status_label.qss</file>
+        <file>src/widgets/dialogs/field_map_widget.qss</file>
+        <file>src/widgets/dialogs/import_dialog.qss</file>
         <file>src/widgets/feature_table/feature_table.qss</file>
         <file>src/widgets/plugin_dock_widget/plugin_dock_widget.qss</file>
     </qresource>
