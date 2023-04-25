@@ -2,7 +2,7 @@
 name=MLA Paddock Power
 qgisMinimumVersion=3.22
 description=Meat & Livestock Australia tool for cattle property planning and financial modelling.
-version=0.72
+version=0.73
 author=Trailmarker
 email=tom@trailmarker.io
 
