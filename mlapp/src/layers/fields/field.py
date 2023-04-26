@@ -5,6 +5,7 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsFeature, QgsEditorWidgetSetup, QgsField
 
 from ...models import Glitch
+from ...utils import PLUGIN_NAME
 from .field_domain import FieldDomain
 from .names import FID
 
@@ -19,18 +20,21 @@ class Field(QgsField):
                 self._domainType = args[0]._domainType
                 self._defaultValue = args[0]._defaultValue
                 self._required = args[0]._required
+                self._sortable = args[0]._sortable
             elif isinstance(args[0], QgsField):
                 # Construct from a 'raw' QgsField with a default _propertyName
                 self._propertyName = re.sub('\\W|^(?=\\d)', '_', args[0].name())
                 self._domainType = None
                 self._defaultValue = None
                 self._required = False
+                self._sortable = False
         else:
             # Pop off and apply the extra args for Field versus QgsField
             self._propertyName = kwargs.pop("propertyName", None)
             self._domainType = kwargs.pop('domainType', None)
             self._defaultValue = kwargs.pop('defaultValue', None)
             self._required = kwargs.pop('required', False)
+            self._sortable = kwargs.pop('sortable', False)
 
         super().__init__(*args, **kwargs)
 
@@ -209,6 +213,10 @@ class Field(QgsField):
     def required(self):
         """Whether this Field is required."""
         return self._required
+    
+    def sortable(self):
+        f"""Whether this Field should be sortable in the {PLUGIN_NAME} attribute tables."""
+        return self._sortable
 
 
 class MeasureField(Field):

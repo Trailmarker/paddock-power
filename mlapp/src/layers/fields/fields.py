@@ -40,7 +40,7 @@ Latitude = CalculatedField(propertyName="LATITUDE", name=LATITUDE, defaultValue=
 Length = CalculatedField(propertyName="LENGTH", name=LENGTH, dps=2)
 Longitude = CalculatedField(propertyName="LONGITUDE", name=LONGITUDE, defaultValue=float('NaN'), dps=5)
 MapUnit = StringField(propertyName="MAP_UNIT", name=MAP_UNIT)
-Name = StringField(propertyName="NAME", name=NAME)
+Name = StringField(propertyName="NAME", name=NAME, sortable=True)
 NearGrazingRadius = MeasureField(
     propertyName="NEAR_GRAZING_RADIUS",
     name=NEAR_GRAZING_RADIUS,
@@ -49,7 +49,7 @@ NearGrazingRadius = MeasureField(
 OptimalCapacityPerArea = MeasureField(propertyName="OPTIMAL_CAPACITY_PER_AREA",
                                       name=OPTIMAL_CAPACITY_PER_AREA, defaultValue=0.0, dps=1, required=False)
 Paddock = IdField(propertyName="PADDOCK", name=PADDOCK)
-PaddockName = StringField(propertyName="PADDOCK_NAME", name=PADDOCK_NAME)
+PaddockName = StringField(propertyName="PADDOCK_NAME", name=PADDOCK_NAME, sortable=True)
 PaddockStatus = DomainField(
     propertyName="PADDOCK_STATUS",
     name=PADDOCK_STATUS,

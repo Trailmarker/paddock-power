@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
 
-from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtCore import QSize, Qt
 from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 
 from qgis.core import QgsVectorLayerCache
@@ -116,6 +116,10 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
+        
+        self.setSortingEnabled(True)
+        self.sortByColumn(self._tableModel.sortColumn, Qt.AscendingOrder)
+        
         self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
         self.workspace.lockChanged.connect(self.onLockChanged)
 
