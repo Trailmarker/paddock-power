@@ -1,6 +1,6 @@
 {
     "freezeMapCanvas": true,
-    "removeAllDelay": 1.0,
+    "removeAllDelay": 3.0,
     "respectChangesets": true,
     "taskDelay": 2.0
 }
