@@ -35,7 +35,7 @@ FarGrazingRadius = MeasureField(
 Fid = IdField("FID", name=FID)
 LandscapeClass = StringField(propertyName="LANDSCAPE_CLASS", name=LANDSCAPE_CLASS)
 LandType = IdField(propertyName="LAND_TYPE", name=LAND_TYPE)
-LandTypeName = StringField(propertyName="LAND_TYPE_NAME", name=LAND_TYPE_NAME, required=True)
+LandTypeName = StringField(propertyName="LAND_TYPE_NAME", name=LAND_TYPE_NAME, required=True, sortable=True)
 Latitude = CalculatedField(propertyName="LATITUDE", name=LATITUDE, defaultValue=float('NaN'), dps=5)
 Length = CalculatedField(propertyName="LENGTH", name=LENGTH, dps=2)
 Longitude = CalculatedField(propertyName="LONGITUDE", name=LONGITUDE, defaultValue=float('NaN'), dps=5)
@@ -74,7 +74,7 @@ WateredTypeField = DomainField(
     domainType=WateredType,
     defaultValue=WateredType.Unwatered)
 Waterpoint = IdField(propertyName="WATERPOINT", name=WATERPOINT)
-WaterpointName = StringField(propertyName="WATERPOINT_NAME", name=WATERPOINT_NAME)
+WaterpointName = StringField(propertyName="WATERPOINT_NAME", name=WATERPOINT_NAME, sortable=True)
 GrazingRadiusTypeField = DomainField(
     propertyName="GRAZING_RADIUS_TYPE",
     name=GRAZING_RADIUS_TYPE,
