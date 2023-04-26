@@ -8,7 +8,7 @@ from qgis.core import QgsProject, QgsSnappingConfig
 from ..layers import BasePaddockLayer
 from ..layers.fields import Timeframe
 from ..layers.tasks import AnalyseWorkspaceTask, ImportElevationLayerTask, ImportFeatureLayerTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
-from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
+from ..utils import PLUGIN_NAME, getSetting, guiStatusBarAndInfo, qgsInfo
 from .layer_dependency_graph import LayerDependencyGraph
 from .task_handle import TaskHandle
 from .workspace_layers import WorkspaceLayers
@@ -18,6 +18,8 @@ from ...resources_rc import *
 
 
 class Workspace(QObject):
+    FREEZE_MAP_CANVAS = getSetting("freezeMapCanvas", default=True)
+    
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)
     lockChanged = pyqtSignal(bool)
@@ -92,7 +94,7 @@ class Workspace(QObject):
     def lock(self):
         """Lock the workspace."""
         self._locked = True
-        if self.iface:
+        if self.FREEZE_MAP_CANVAS and self.iface:
             # Pause map rendering while workspace is locked
             self.iface.mapCanvas().freeze(True)
         self.lockChanged.emit(True)
@@ -100,7 +102,7 @@ class Workspace(QObject):
     def unlock(self):
         """Unlock the workspace."""
         self._locked = False
-        if self.iface:
+        if self.FREEZE_MAP_CANVAS and self.iface:
             self.iface.mapCanvas().freeze(False)
             self.iface.mapCanvas().refresh()
         self.lockChanged.emit(False)

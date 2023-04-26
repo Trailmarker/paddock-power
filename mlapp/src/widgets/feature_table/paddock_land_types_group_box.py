@@ -11,11 +11,19 @@ class PaddockLandTypesGroupBox(FeatureTableGroupBox):
 
         self.paddockDetails = None
 
-    def removePaddockDetails(self):
-        """Remove any current FeatureTable from the widget."""
-        if self.paddockDetails:
-            self.layout().removeWidget(self.paddockDetails)
-            self.paddockDetails.deleteLater()
+        # If we've got PaddockDetails, update display when paddocks are updated
+        self.workspace.paddockLayer.editsPersisted.connect(self.onPaddocksUpdated)
+
+    def onPaddocksUpdated(self):
+        """Update the PaddockDetails display."""
+        if self.featureLayer:
+            if not self.paddockDetails:
+                # Create and add the PaddockDetails
+                self.paddockDetails = PaddockDetails(self.featureLayer.paddock, self)
+                self.layout().addWidget(self.paddockDetails)
+            else:
+                # Just update the PaddockDetails display
+                self.paddockDetails.model = self.featureLayer.paddock
 
     def onPopupLayerAdded(self, layerId):
         """Handle a new layer from the popup layer source (if any)."""
@@ -23,14 +31,11 @@ class PaddockLandTypesGroupBox(FeatureTableGroupBox):
         featureLayer = self.workspace.mapLayer(layerId)
         if type(featureLayer) not in self.popupLayerTypes:
             return
-
-        # feature layer is a subclass of PaddockLandTypesPopupLayer
-        self.removePaddockDetails()
-        self.paddockDetails = PaddockDetails(featureLayer.paddock, self)
-        self.layout().addWidget(self.paddockDetails)
-
-        # set the feature layer (triggers other logic)
+        
+        # Trigger the default logic for handling a new feature layer
         self.featureLayer = featureLayer
+
+        self.onPaddocksUpdated()
 
     def onPopupLayerRemoved(self):
         """Override in subclass to handle popup layer removed."""

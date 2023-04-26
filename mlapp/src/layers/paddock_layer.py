@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsFeatureRequest
+
+from ..layers.fields import PADDOCK
 from ..utils import PLUGIN_NAME
 from .features import Paddock
 from .derived_metric_paddock_layer import DerivedMetricPaddockLayer
@@ -29,6 +32,9 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
 
         PopupLayerSourceMixin.__init__(self)
         self.connectPopups()
+
+    def getByPaddockId(self, paddockId):
+        return next(self.getFeatures(QgsFeatureRequest().setFilterExpression(f'"{PADDOCK}" = {paddockId}')), None)
 
     @property
     def hasPopups(self):

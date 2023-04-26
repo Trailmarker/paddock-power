@@ -34,6 +34,7 @@ class Details(QWidget):
     @model.setter
     def model(self, model):
         self._model = model
+        self.refreshUi()
 
     @property
     def descriptors(self):
