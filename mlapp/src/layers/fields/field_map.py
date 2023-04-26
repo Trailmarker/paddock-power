@@ -96,10 +96,7 @@ class FieldMap(list):
                 if importField:
                     importValue = feature.attribute(importField.name())
                     if importValue is not None:
-                        currentTargetValue = targetFeature.attribute(targetField.name())
                         targetFeature.setAttribute(targetField.name(), importValue)
-                        # qgsDebug(
-                        #    f"[{importField.name()}:'{importValue}'] → [{targetField.name()}:'{currentTargetValue}' → '{importValue}']")
                 elif targetField.required():
                     raise Glitch(
                         f"{self}.mapFeature(): no configured import field maps to required field '{targetField.name()}'")

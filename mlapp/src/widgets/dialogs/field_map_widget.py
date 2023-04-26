@@ -77,9 +77,7 @@ class FieldMapWidget(QWidget, FORM_CLASS):
 
     def addFieldUi(self):
         """Add a new field mapping row to the user interface."""
-        qgsDebug(f"addFieldUi")
         if self.hasFieldMap:
-            qgsDebug(f"addFieldUi: got field map")
             self.setupFieldUi(len(self.fieldMap))
 
     def setupFieldUi(self, index, importField=None, targetField=None):

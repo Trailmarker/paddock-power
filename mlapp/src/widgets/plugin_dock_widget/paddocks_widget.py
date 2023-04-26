@@ -21,12 +21,11 @@ class PaddocksWidget(WorkspaceMixin, SplitFeatureTablesWidget):
         currentPaddockLandTypesGroupBox.popupLayerTypes = [PaddockCurrentLandTypesPopupLayer]
         currentPaddockLandTypesGroupBox.popupLayerSource = self.workspace.paddockLayer
         self.splitter.addWidget(currentPaddockLandTypesGroupBox)
-        
+
         futurePaddockLandTypesGroupBox = PaddockLandTypesGroupBox()
         futurePaddockLandTypesGroupBox.featureTableFactory = FuturePaddockLandTypesTable
         futurePaddockLandTypesGroupBox.popupLayerTypes = [PaddockFutureLandTypesPopupLayer]
         futurePaddockLandTypesGroupBox.popupLayerSource = self.workspace.paddockLayer
         self.splitter.addWidget(futurePaddockLandTypesGroupBox)
-        
-        self.relayout()
 
+        self.relayout()

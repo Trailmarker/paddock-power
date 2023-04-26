@@ -93,5 +93,5 @@ class Details(QWidget):
         for i, descriptor in enumerate(self.descriptors):
             self.gridLayout.addWidget(self.labels[i], i, labPos, labAlign)
             self.gridLayout.addWidget(self.valueFormatter(descriptor)(self.model), i, valPos, valAlign)
-            
+
         self.adjustSize()

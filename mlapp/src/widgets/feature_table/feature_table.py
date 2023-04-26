@@ -116,10 +116,10 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
-        
+
         self.setSortingEnabled(True)
         self.sortByColumn(self._tableModel.sortColumn, Qt.AscendingOrder)
-        
+
         self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
         self.workspace.lockChanged.connect(self.onLockChanged)
 
@@ -175,7 +175,6 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         # for i in sectionsToResize:
         #     self.horizontalHeader().resizeSection(
         #         i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
-
 
     def sizeHint(self):
         hint = super().sizeHint()

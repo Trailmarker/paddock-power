@@ -27,9 +27,14 @@ class PropertyMetricsDialog(Dialog, FORM_CLASS):
         if currentProperty is not None and futureProperty is not None:
             currentPropertyDetails = PropertyDetails(currentProperty, self)
             futurePropertyDetails = PropertyDetails(futureProperty, self)
-            
-            self.propertyComparisonDetails = ComparisonDetails(currentPropertyDetails, futurePropertyDetails, Timeframe.Current.value, Timeframe.Future.value, self)
-            self.detailsLayout.addWidget(self.propertyComparisonDetails) 
+
+            self.propertyComparisonDetails = ComparisonDetails(
+                currentPropertyDetails,
+                futurePropertyDetails,
+                Timeframe.Current.value,
+                Timeframe.Future.value,
+                self)
+            self.detailsLayout.addWidget(self.propertyComparisonDetails)
 
         # Get size right and prevent vertical resizing
         self.adjustSize()
@@ -43,4 +48,3 @@ class PropertyMetricsDialog(Dialog, FORM_CLASS):
     @property
     def dialogRole(self):
         return "Property Metrics"
-

@@ -14,7 +14,7 @@ class Schema(list):
         fields = QgsFields()
         for f in fieldList:
             fields.append(f)
-        return fields 
+        return fields
 
     def __init__(self, fields, wkbType=None, hiddenFields=[]):
         assert isinstance(fields, list)

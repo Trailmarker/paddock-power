@@ -121,7 +121,7 @@ def getSetting(setting, default=None):
         with open(settingsFilePath) as settingsFile:
             settings = json.load(settingsFile)
             return settings.get(setting, default)
-    except:
+    except BaseException:
         guiError("Error reading {PLUGIN_NAME} settings file at {settingsFilePath}")
         return default
 

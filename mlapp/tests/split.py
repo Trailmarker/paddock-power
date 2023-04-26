@@ -108,10 +108,9 @@ def getNewBasePaddocks(fence):
     if fenceLine.isEmpty():
         return [], []
 
-    notProperty = notProperty.asGeometryCollection() if notProperty.isMultipart() else [notProperty] 
+    notProperty = notProperty.asGeometryCollection() if notProperty.isMultipart() else [notProperty]
 
     _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY(p.asPolygon()) for p in notProperty]
-
 
     # Straightforward case where we have a single new fence line enclosing things
     if fenceLine.isMultipart():

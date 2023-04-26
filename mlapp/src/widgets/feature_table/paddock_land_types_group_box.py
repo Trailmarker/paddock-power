@@ -31,7 +31,7 @@ class PaddockLandTypesGroupBox(FeatureTableGroupBox):
         featureLayer = self.workspace.mapLayer(layerId)
         if type(featureLayer) not in self.popupLayerTypes:
             return
-        
+
         # Trigger the default logic for handling a new feature layer
         self.featureLayer = featureLayer
 

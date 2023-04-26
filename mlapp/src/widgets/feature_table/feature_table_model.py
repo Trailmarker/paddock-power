@@ -48,7 +48,7 @@ class FeatureTableModel(QgsAttributeTableModel):
     @cached_property
     def sortColumn(self):
         """The column to sort by."""
-        sortField = next((f for f in self._schema if f.sortable()), None)        
+        sortField = next((f for f in self._schema if f.sortable()), None)
         return self.columnFromFieldName(sortField.name()) if sortField else -1
 
     def columnFromFieldName(self, name):

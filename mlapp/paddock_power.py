@@ -304,7 +304,8 @@ class PaddockPower(PluginStateMachine):
     def analyseWorkspace(self):
         """Recalculates then re-derives the whole workspace."""
         if not self.workspace.isAnalytic:
-            self.failureMessage(f"Your {PLUGIN_NAME} workspace must include Base Paddocks, Land Types and Waterpoints to be analysed …")
+            self.failureMessage(
+                f"Your {PLUGIN_NAME} workspace must include Base Paddocks, Land Types and Waterpoints to be analysed …")
 
         if guiConfirm(
             f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock and property metrics.",
@@ -346,7 +347,7 @@ class PaddockPower(PluginStateMachine):
             raise PluginActionFailure()
 
     @PluginAction.openPropertyMetricsDialog.handler()
-    def openPropertyMetricsDialog(self):   
+    def openPropertyMetricsDialog(self):
         if self.workspace:
             if self.workspace.hasPropertyMetrics:
                 propertyMetricsDialog = PropertyMetricsDialog(self.pluginDockWidget)

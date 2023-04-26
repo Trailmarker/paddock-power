@@ -53,7 +53,7 @@ class ImportDialog(Dialog, FORM_CLASS):
 
         self.fieldMapWidget.layout().setContentsMargins(0, 0, 0, 0)
 
-         # Base appearance
+        # Base appearance
         self.setStyleSheet(STYLESHEET)
 
         self.cancelButton.clicked.connect(self.reject)

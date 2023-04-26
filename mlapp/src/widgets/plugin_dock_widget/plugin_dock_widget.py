@@ -160,5 +160,3 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchFenceButton.setEnabled(not locked)
         self.sketchPipelineButton.setEnabled(not locked)
         self.sketchWaterpointButton.setEnabled(not locked)
-        
-        

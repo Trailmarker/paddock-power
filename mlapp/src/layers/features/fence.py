@@ -96,7 +96,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         if fenceLine.isEmpty():
             return [], []
 
-        notProperty = notProperty.asGeometryCollection() if notProperty.isMultipart() else [notProperty] 
+        notProperty = notProperty.asGeometryCollection() if notProperty.isMultipart() else [notProperty]
 
         _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY(p.asPolygon()) for p in notProperty]
 
@@ -331,16 +331,10 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         for supersededPaddock in supersededPaddocks:
             edits = edits.editBefore(supersededPaddock.archiveFeature())
 
-        # qgsDebug(f"Fence.buildFeature after archive Paddock processing: {edits.upserts}")
-
         for plannedPaddock in plannedPaddocks:
             edits = edits.editBefore(plannedPaddock.buildFeature())
 
-        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
-
         return Edits.upsert(self).editAfter(edits)
-
-        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
     @FeatureAction.undoBuild.handleWithSave()
     def undoBuildFeature(self):

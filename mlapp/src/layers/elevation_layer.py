@@ -85,8 +85,6 @@ class ElevationLayer(QgsRasterLayer, WorkspaceMixin, MapLayerMixin, IImportableL
 
         processing.run("gdal:warpreproject", params)
 
-
-
     def __init__(self, workspaceFile, layerName=None, *args, **kwargs):
         """Create a new elevation layer."""
 

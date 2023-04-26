@@ -167,7 +167,6 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
 
     def zoomFeature(self):
         """Zoom to the Feature."""
-        # qgsDebug(f"{self}.zoomFeature()")
         iface = self.featureLayer and self.featureLayer.workspace and self.featureLayer.workspace.iface
         if self.GEOMETRY and iface:
             featureExtent = QgsRectangle(self.GEOMETRY.boundingBox())

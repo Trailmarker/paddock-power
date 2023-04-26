@@ -47,7 +47,7 @@ class WorkspaceLayers(TypeDict):
     def hasPropertyMetrics(self):
         """Check if the base paddock layer has features."""
         return self.hasFeatures(PropertyLayer)
-    
+
     @property
     def isAnalytic(self):
         """Check if the workspace is analytic."""

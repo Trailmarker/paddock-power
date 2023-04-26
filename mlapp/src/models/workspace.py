@@ -19,7 +19,7 @@ from ...resources_rc import *
 
 class Workspace(QObject):
     FREEZE_MAP_CANVAS = getSetting("freezeMapCanvas", default=True)
-    
+
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)
     lockChanged = pyqtSignal(bool)

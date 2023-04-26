@@ -213,7 +213,7 @@ class Field(QgsField):
     def required(self):
         """Whether this Field is required."""
         return self._required
-    
+
     def sortable(self):
         f"""Whether this Field should be sortable in the {PLUGIN_NAME} attribute tables."""
         return self._sortable
