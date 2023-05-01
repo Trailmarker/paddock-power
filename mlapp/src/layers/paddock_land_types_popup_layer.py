@@ -14,7 +14,7 @@ class PaddockLandTypesPopupLayer(PopupFeatureLayer):
 
     @property
     def paddock(self):
-        return self.workspace.paddockLayer.getByPaddockId(self._paddockFid)
+        return self.workspace.paddockLayer.getByPaddockId(self.layerTimeframe, self._paddockFid)
 
     def prepareQuery(self, query, dependentLayers):
         [paddockLandTypesLayer] = self.names(dependentLayers)
