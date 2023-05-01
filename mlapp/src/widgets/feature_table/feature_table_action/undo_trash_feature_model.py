@@ -22,11 +22,6 @@ class UndoTrashFeatureModel(FeatureActionsModel):
         """The table action associated with this delegate"""
         return FeatureTableAction.undoTrashFeature
 
-    @classmethod
-    def actionInvalidatesCache(self):
-        """Invalidate the cache after a call to doAction."""
-        return True
-
     @property
     def featureActionIcons(self):
         """A dictionary of FeatureAction objects and their associated icons."""
@@ -36,3 +31,9 @@ class UndoTrashFeatureModel(FeatureActionsModel):
             FeatureAction.undoPlan: self._undoPlanIcon,
             FeatureAction.undoBuild: self._undoBuildIcon
         }
+        
+    @property
+    def locked(self):
+        """Whether the action is locked."""
+        return self.workspace.locked()
+

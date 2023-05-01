@@ -108,7 +108,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self._tableModel.modelReset.connect(self.onFeatureLayerLoaded)
 
         # Persisting edits will invalidate the cache
-        self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
+        # self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
 
         # Selecting a feature will scroll to that feature in the table if it's not visible
         self.workspace.featureSelected.connect(self.onFeatureSelected)
@@ -272,10 +272,10 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         """Handle the timeframe being changed."""
         self._tableFilterModel.onTimeframeChanged(timeframe)
 
-    def onEditsPersisted(self):
-        """Handle a batch of edits being persisted on the underyling layer."""
-        # At the moment, we just invalidate the cache and reload the layer
-        self.invalidateCache()
+    # def onEditsPersisted(self):
+    #     """Handle a batch of edits being persisted on the underyling layer."""
+    #     # At the moment, we just invalidate the cache and reload the layer
+    #     self.invalidateCache()
 
     def hasLayerId(self, layerId):
         """Return True if this FeatureTable is built on a FeatureLayer with a matching layer ID."""
@@ -301,12 +301,8 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         if delegate.featureTableActionModel.locked:
             guiWarning(f"Please wait while {PLUGIN_NAME} finishes processing.")
-            return
-
-        feature = delegate.featureTableActionModel.doAction(index)
-
-        if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
-            self.invalidateCache()
+        else:
+            delegate.featureTableActionModel.doAction(index)
 
     def onLockChanged(self, locked):
         """Handle the lock state changing."""

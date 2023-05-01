@@ -34,11 +34,6 @@ class ViewFeatureDetailsModel(SelectFeatureModel):
         """Can't use this action without an edit form."""
         return self._detailsWidgetFactory is not None
 
-    @classmethod
-    def actionInvalidatesCache(self):
-        """Invalidate the cache after a call to doAction."""
-        return False
-
     def icon(self, _):
         """The icon to paint in the cell."""
         return self._icon

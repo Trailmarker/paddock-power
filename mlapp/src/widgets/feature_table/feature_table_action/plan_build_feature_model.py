@@ -21,11 +21,6 @@ class PlanBuildFeatureModel(FeatureActionsModel):
         """The table action associated with this delegate"""
         return FeatureTableAction.planBuildFeature
 
-    @classmethod
-    def actionInvalidatesCache(self):
-        """Invalidate the cache after a call to doAction."""
-        return True
-
     @property
     def featureActionIcons(self):
         """A dictionary of FeatureAction objects and their associated icons."""
@@ -34,3 +29,9 @@ class PlanBuildFeatureModel(FeatureActionsModel):
             FeatureAction.plan: self._planIcon,
             FeatureAction.build: self._buildIcon
         }
+        
+    @property
+    def locked(self):
+        """Whether the action is locked."""
+        return self.workspace.locked()
+

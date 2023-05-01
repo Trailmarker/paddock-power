@@ -34,10 +34,10 @@ class EditFeatureModel(SelectFeatureModel):
         """Can't use this action without an edit form."""
         return self._editWidgetFactory is not None
 
-    @classmethod
-    def actionInvalidatesCache(self):
-        """Invalidate the cache after a call to doAction."""
-        return True
+    @property
+    def locked(self):
+        """Whether the action is locked."""
+        return self.workspace.locked()
 
     def icon(self, _):
         """The icon to paint in the cell."""
