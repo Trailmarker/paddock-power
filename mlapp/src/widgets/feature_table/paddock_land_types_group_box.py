@@ -9,22 +9,19 @@ class PaddockLandTypesGroupBox(FeatureTableGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.paddockDetails = None
+        # Create and add an empty PaddockDetails
+        self.paddockDetails = PaddockDetails(None, self)
+        self.layout().insertWidget(0, self.paddockDetails)
 
         # If we've got PaddockDetails, update display when paddocks are updated
         self.workspace.paddockLayer.editsPersisted.connect(self.onPaddocksUpdated)
 
     def onPaddocksUpdated(self):
         """Update the PaddockDetails display."""
-        if self.featureLayer:
-            if not self.paddockDetails:
-                # Create and add the PaddockDetails
-                self.paddockDetails = PaddockDetails(self.featureLayer.paddock, self)
-                self.layout().addWidget(self.paddockDetails)
-            else:
-                # Just update the PaddockDetails display
-                self.paddockDetails.model = self.featureLayer.paddock
-
+        # If there's no data, clear the PaddockDetails model
+        showData = bool(self.featureLayer) and self.featureLayer.featureCount() > 0
+        self.paddockDetails.model = self.featureLayer.paddock if showData else None
+        
     def onPopupLayerAdded(self, layerId):
         """Handle a new layer from the popup layer source (if any)."""
 

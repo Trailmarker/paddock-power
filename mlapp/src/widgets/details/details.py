@@ -86,12 +86,17 @@ class Details(QWidget):
         for i in reversed(range(self.gridLayout.count())):
             self.gridLayout.removeWidget(self.gridLayout.itemAt(i).widget())
 
-        (labPos, valPos) = (1, 0) if self.inverted else (0, 1)
-        (labAlign, valAlign) = (Qt.AlignLeft, Qt.AlignRight) if self.inverted else (Qt.AlignRight, Qt.AlignLeft)
-        (labAlign, valAlign) = (labAlign, valAlign) if self.displayMode == Details.DisplayMode.Central else (valAlign, labAlign)
+        if self.model is not None:
+            # Lay out the model details as per the descriptors
+            (labPos, valPos) = (1, 0) if self.inverted else (0, 1)
+            (labAlign, valAlign) = (Qt.AlignLeft, Qt.AlignRight) if self.inverted else (Qt.AlignRight, Qt.AlignLeft)
+            (labAlign, valAlign) = (labAlign, valAlign) if self.displayMode == Details.DisplayMode.Central else (valAlign, labAlign)
 
-        for i, descriptor in enumerate(self.descriptors):
-            self.gridLayout.addWidget(self.labels[i], i, labPos, labAlign)
-            self.gridLayout.addWidget(self.valueFormatter(descriptor)(self.model), i, valPos, valAlign)
+            for i, descriptor in enumerate(self.descriptors):
+                self.gridLayout.addWidget(self.labels[i], i, labPos, labAlign)
+                self.gridLayout.addWidget(self.valueFormatter(descriptor)(self.model), i, valPos, valAlign)
+
+        else:
+            self.gridLayout.addWidget(QLabel('No data'), 0, 0, Qt.AlignCenter)
 
         self.adjustSize()
