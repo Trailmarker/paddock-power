@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..utils import randomString
+from ..utils import getSetting
 from .features import Property
 from .fields import AREA, ESTIMATED_CAPACITY, ESTIMATED_CAPACITY_PER_AREA, FID, PERIMETER, POTENTIAL_CAPACITY, POTENTIAL_CAPACITY_PER_AREA, STATUS, TIMEFRAME, WATERED_AREA, Timeframe
 from .derived_feature_layer import DerivedFeatureLayer
@@ -9,6 +9,8 @@ class DerivedPropertyLayer(DerivedFeatureLayer):
 
     LAYER_NAME = "Derived Property"
     STYLE = "property"
+
+    GLITCH_BUFFER = getSetting("glitchBuffer", default=1.0)
 
     @classmethod
     def getFeatureType(cls):
@@ -21,10 +23,10 @@ class DerivedPropertyLayer(DerivedFeatureLayer):
 
         query = f"""
 select
-    st_union(geometry) as geometry,
+    st_buffer(st_buffer(st_union(geometry), {self.GLITCH_BUFFER}), -{self.GLITCH_BUFFER}) as geometry,
     0 as {FID},
     "{paddocks}".{TIMEFRAME} as {TIMEFRAME},
-    st_perimeter(st_union(geometry)) / 1000 as "{PERIMETER}",
+    st_perimeter(st_buffer(st_buffer(st_union(geometry), {self.GLITCH_BUFFER}), -{self.GLITCH_BUFFER})) / 1000 as "{PERIMETER}",
 	sum("{paddocks}"."{AREA}") as "{AREA}",
     sum("{paddocks}"."{WATERED_AREA}") as "{WATERED_AREA}",
 	(sum("{paddocks}"."{ESTIMATED_CAPACITY}") / nullif({paddocks}."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",

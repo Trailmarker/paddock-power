@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+from time import sleep
+
 from qgis.core import QgsMapLayer, QgsProject
 
-from ..utils import PLUGIN_NAME, qgsInfo, resolveStylePath
+from ..utils import PLUGIN_NAME, getSetting, qgsInfo, resolveStylePath
 from .interfaces import IDerivedFeatureLayer, IMapLayer, IPersistedFeatureLayer
 
 
 class MapLayerMixin(IMapLayer):
+
+    REMOVE_ALL_OF_TYPE_DELAY = getSetting("removeAllOfTypeDelay", default=1.0)
 
     @classmethod
     def defaultName(cls):
@@ -47,6 +51,9 @@ class MapLayerMixin(IMapLayer):
         for layerId in matches:
             qgsInfo(f"{PLUGIN_NAME} Cleaning up {layerId} …")
             QgsProject.instance().removeMapLayer(layerId)
+                    
+        # Sleep briefly as QGIS gets confused when we do this …
+        sleep(cls.REMOVE_ALL_OF_TYPE_DELAY)
 
     def __init__(self):
         super().__init__()

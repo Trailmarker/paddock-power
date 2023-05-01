@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from time import sleep
+from time import sleep, time
 
 from qgis.core import QgsTask
 
@@ -19,6 +19,7 @@ class WorkspaceTask(QgsTask):
         """Input is a closure over a FeatureAction handler for a given Feature."""
         super().__init__(description, flags=QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
         self.workspace = workspace
+        self.startTime = time()
         self._tasks = []
 
     # Keeping things simple for now - we don't need subtasks (yet, maybe)
@@ -55,6 +56,7 @@ class WorkspaceTask(QgsTask):
         try:
             sleep(self.TASK_DELAY)
             self.safeFinished(result)
+            qgsInfo(f"{PLUGIN_NAME} '{self.description()}' completed in {time() - self.startTime:2f}s")
             self.workspace.unlock()
         except Exception:
             qgsException()

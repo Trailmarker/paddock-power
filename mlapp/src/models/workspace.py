@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import basename
+from time import sleep
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
@@ -19,6 +20,7 @@ from ...resources_rc import *
 
 class Workspace(QObject):
     FREEZE_MAP_CANVAS = getSetting("freezeMapCanvas", default=True)
+    WORKSPACE_UNLOCK_DELAY = getSetting("workspaceUnlockDelay", default=1.0)
 
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)
@@ -101,6 +103,7 @@ class Workspace(QObject):
 
     def unlock(self):
         """Unlock the workspace."""
+        sleep(self.WORKSPACE_UNLOCK_DELAY)
         self._locked = False
         if self.FREEZE_MAP_CANVAS and self.iface:
             self.iface.mapCanvas().freeze(False)

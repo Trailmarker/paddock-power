@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from time import sleep
 from ..layers.features import Edits
 from ..models import Glitch
 from ..utils import PLUGIN_NAME, getSetting, qgsInfo
@@ -9,7 +8,6 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatureLayer):
 
-    REMOVE_ALL_DELAY = getSetting("removeAllDelay", default=1.0)
     RESPECT_CHANGESETS = getSetting("respectChangesets", default=True)
 
     def __init__(self, workspaceFile, layerName, styleName, derivedLayerType, dependentLayers):
@@ -25,9 +23,6 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         """Return the derived layer for this layer."""
         # Clean up any instances of the virtual source …
         self.derivedLayerType.removeAllOfType()
-
-        # Sleep briefly as QGIS gets confused when we do this …
-        sleep(self.REMOVE_ALL_DELAY)
 
         # Create the new instance and return
         return self.derivedLayerType(self.dependentLayers, changeset)
@@ -74,6 +69,9 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
         # Get a second batch of edits that copies the new records to this layer …
         edits.editBefore(Edits.bulkAdd(self, derivedFeatures))
+        
+        # Clean up the derived layer after all this gets persisted
+        edits.editBefore(Edits.cleanupDerivedLayer(self, derivedLayer))
 
         # Get rid of the derived layer … does not work
         # QgsProject.instance().removeMapLayer(derivedLayer.id())
