@@ -1025,7 +1025,7 @@
     <default field="Rounded Far Grazing Radius (m)" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
-    <constraint field="fid" unique_strength="1" notnull_strength="1" constraints="3" exp_strength="0"/>
+    <constraint field="fid" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
     <constraint field="Name" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
     <constraint field="Waterpoint Type" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
     <constraint field="Near Grazing Radius (m)" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>

@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
-import os
-
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QWidget
-
-FORM_CLASS, _ = uic.loadUiType(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'paddock_land_type_details_base.ui')))
+from ..details import Details
 
 
-class PaddockLandTypeDetails(QWidget, FORM_CLASS):
+class PaddockLandTypeDetails(Details):
 
     def __init__(self, paddockLandType, parent=None):
         """Constructor."""
         super().__init__(parent)
 
-        self.setupUi(self)
-        self.paddockLandType = paddockLandType
+        self._model = paddockLandType
         self.refreshUi()
 
-    def refreshUi(self):
-        if self.paddockLandType is not None:
-            self.landTypeNameText.setValue(self.paddockLandType.LAND_TYPE_NAME, "{0}")
-            self.conditionTypeText.setValue(self.paddockLandType.CONDITION_TYPE.value, "{0}")
-            self.areaText.setValue(self.paddockLandType.AREA, "{0:.2f}")
-            self.wateredAreaText.setValue(self.paddockLandType.WATERED_AREA, "{0:.2f}")
-            self.estimatedCapacityText.setValue(self.paddockLandType.ESTIMATED_CAPACITY, "{0:.0f}")
-            self.potentialCapacityText.setValue(self.paddockLandType.POTENTIAL_CAPACITY, "{0:.0f}")
-            self.estimatedCapacityPerAreaText.setValue(self.paddockLandType.ESTIMATED_CAPACITY_PER_AREA, "{0:.1f}")
-            # self.potentialCapacityPerAreaText.setValue(self.paddockLandType.potentialCapacityPerArea, "{0:.1f}")
+    @property
+    def descriptors(self):
+        return [
+            (lambda m: [m.LAND_TYPE_NAME], "Land type name", "{0}"),
+            (lambda m: [m.CONDITION_TYPE.value], "Condition", "{0}"),
+            (lambda m: [m.AREA, m.WATERED_AREA], "Area (km²)", "{0:.2f} ({1:.2f}💧)"),
+            (lambda m: [m.ESTIMATED_CAPACITY, m.POTENTIAL_CAPACITY], "Estimated capacity (AE)", "{0:.0f} ({1:.0f}📈)")
+            # (lambda m: [m.ESTIMATED_CAPACITY_PER_AREA], "Watered carrying capacity (AE/km²)", "{0:.1f}"),
+        ]

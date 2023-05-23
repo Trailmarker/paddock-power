@@ -28,8 +28,9 @@ class ImportFeatureLayerTask(WorkspaceTask):
 
             if notImportingPaddocks and not self.workspace.hasBasePaddocks:
                 # guiWarning(f"{PLUGIN_NAME} you must import {BasePaddockLayer.defaultName()} before all other property data.")
-                guiStatusBarAndInfo(f"{PLUGIN_NAME} abandoned import because there are no {BasePaddockLayer.defaultName()}.")
-                return False 
+                guiStatusBarAndInfo(
+                    f"{PLUGIN_NAME} abandoned import because there are no {BasePaddockLayer.defaultName()}.")
+                return False
 
             # Constrain imported features to the neighbourhood of the Property's Base Paddocks
             importFeatureRequest = QgsFeatureRequest().setFilterRect(self.workspace.basePaddockLayer.neighbourhood) if notImportingPaddocks else None

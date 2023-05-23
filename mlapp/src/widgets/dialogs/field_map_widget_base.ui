@@ -20,7 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(255,255,255);</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,0" rowminimumheight="0">
    <property name="verticalSpacing">
@@ -45,7 +45,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>../../../images/new.png</normaloff>../../../images/new.png</iconset>
+       <normaloff>:/plugins/mlapp/images/new.png</normaloff>:/plugins/mlapp/images/new.png</iconset>
      </property>
      <property name="iconSize">
       <size>

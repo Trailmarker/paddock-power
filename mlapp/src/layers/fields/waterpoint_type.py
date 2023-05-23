@@ -7,6 +7,7 @@ class WaterpointType(FieldDomain):
     Dam = "Dam"
     Trough = "Trough"
     TurkeyNest = "Turkey Nest"
+    OtherNoWater = "Other - No Water"
     WaterTank = "Water Tank"
     Waterhole = "Waterhole"
 

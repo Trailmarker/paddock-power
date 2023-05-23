@@ -22,7 +22,27 @@ def currentTimeframe(vals, *_):
 
 
 @qgsfunction(args=1, group=PLUGIN_NAME)
-def matchCurrentFeatureStatus(vals, *_):
+def matchCurrentTimeframeByFeatureStatus(vals, *_):
+    f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
+    try:
+        workspace = getWorkspace()
+        return workspace and vals[0] and workspace.timeframe.matchFeatureStatus(FeatureStatus[vals[0]])
+    except BaseException:
+        return False
+
+
+@qgsfunction(args=1, group=PLUGIN_NAME)
+def displayInCurrentTimeframeByFeatureStatus(vals, *_):
+    f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
+    try:
+        workspace = getWorkspace()
+        return workspace and vals[0] and workspace.timeframe.displayFeatureStatus(FeatureStatus[vals[0]])
+    except BaseException:
+        return False
+
+
+@qgsfunction(args=1, group=PLUGIN_NAME)
+def matchCurrentTimeframeByFeatureStatus(vals, *_):
     f"""Return True if a Feature Status matches the current {PLUGIN_NAME} Timeframe"""
     try:
         workspace = getWorkspace()
@@ -127,7 +147,8 @@ def waterpointInitials(vals, *_):
 
 PaddockPowerFunctions = {
     "currentTimeframe": currentTimeframe,
-    "matchCurrentFeatureStatus": matchCurrentFeatureStatus,
+    "matchCurrentTimeframeByFeatureStatus": matchCurrentTimeframeByFeatureStatus,
+    "displayInCurrentTimeframeByFeatureStatus": displayInCurrentTimeframeByFeatureStatus,
     "matchCurrentTimeframe": matchCurrentTimeframe,
     "ifCurrentFeatureStatus": ifCurrentFeatureStatus,
     "ifCurrentTimeframe": ifCurrentTimeframe,

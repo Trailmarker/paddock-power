@@ -23,8 +23,8 @@ class BasePaddockLayer(ImportableFeatureLayer, StatusFeatureLayerMixin):
         super().__init__(workspaceFile,
                          layerName=BasePaddockLayer.defaultName(),
                          styleName=BasePaddockLayer.defaultStyle())
-    
-    @classmethod    
+
+    @classmethod
     def icon(cls):
         """The icon to paint to represent this layer."""
         return QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png")

@@ -1,6 +1,6 @@
 rem @ECHO OFF
 
-set OSGEO4W_ROOT=C:\Program Files\QGIS 3.22.14
+set OSGEO4W_ROOT=C:\Program Files\QGIS 3.28.4
 
 set PATH=%OSGEO4W_ROOT%\bin;%PATH%
 set PATH=%PATH%;%OSGEO4W_ROOT%\apps\qgis\bin

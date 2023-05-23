@@ -5,7 +5,7 @@ from functools import cached_property
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QSizePolicy, QWidget
 
-from .formatted_value import FormattedValue
+from .formatted_values import FormattedValues
 
 
 class Details(QWidget):
@@ -21,7 +21,7 @@ class Details(QWidget):
         # self.gridLayout.setSpacing(6)
         # self.gridLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
         self._model = None
         self._inverted = False
@@ -34,6 +34,7 @@ class Details(QWidget):
     @model.setter
     def model(self, model):
         self._model = model
+        self.refreshUi()
 
     @property
     def descriptors(self):
@@ -72,7 +73,7 @@ class Details(QWidget):
 
     def valueFormatter(self, descriptor):
         (extractor, _, formatSpec) = descriptor
-        return lambda m: FormattedValue().setValue(extractor(m), formatSpec)
+        return lambda m: FormattedValues().setValues(formatSpec, *extractor(m))
 
     @cached_property
     def labels(self):
@@ -85,10 +86,17 @@ class Details(QWidget):
         for i in reversed(range(self.gridLayout.count())):
             self.gridLayout.removeWidget(self.gridLayout.itemAt(i).widget())
 
-        (labPos, valPos) = (1, 0) if self.inverted else (0, 1)
-        (labAlign, valAlign) = (Qt.AlignLeft, Qt.AlignRight) if self.inverted else (Qt.AlignRight, Qt.AlignLeft)
-        (labAlign, valAlign) = (labAlign, valAlign) if self.displayMode == Details.DisplayMode.Central else (valAlign, labAlign)
+        if self.model is not None:
+            # Lay out the model details as per the descriptors
+            (labPos, valPos) = (1, 0) if self.inverted else (0, 1)
+            (labAlign, valAlign) = (Qt.AlignLeft, Qt.AlignRight) if self.inverted else (Qt.AlignRight, Qt.AlignLeft)
+            (labAlign, valAlign) = (labAlign, valAlign) if self.displayMode == Details.DisplayMode.Central else (valAlign, labAlign)
 
-        for i, descriptor in enumerate(self.descriptors):
-            self.gridLayout.addWidget(self.labels[i], i, labPos, labAlign)
-            self.gridLayout.addWidget(self.valueFormatter(descriptor)(self.model), i, valPos, valAlign)
+            for i, descriptor in enumerate(self.descriptors):
+                self.gridLayout.addWidget(self.labels[i], i, labPos, labAlign)
+                self.gridLayout.addWidget(self.valueFormatter(descriptor)(self.model), i, valPos, valAlign)
+
+        else:
+            self.gridLayout.addWidget(QLabel('No data'), 0, 0, Qt.AlignCenter)
+
+        self.adjustSize()

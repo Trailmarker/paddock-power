@@ -23,8 +23,8 @@ class WaterpointLayer(ImportableFeatureLayer, PopupLayerSourceMixin):
                  *dependentLayers):
         """Create or open a Waterpoint layer."""
         ImportableFeatureLayer.__init__(self, workspaceFile,
-                                      layerName=WaterpointLayer.defaultName(),
-                                      styleName=WaterpointLayer.defaultStyle())
+                                        layerName=WaterpointLayer.defaultName(),
+                                        styleName=WaterpointLayer.defaultStyle())
         PopupLayerSourceMixin.__init__(self)
         self.connectPopups()
 
@@ -45,8 +45,8 @@ class WaterpointLayer(ImportableFeatureLayer, PopupLayerSourceMixin):
     def zoomPopupLayerOnLoad(self):
         """True for this becaus Waterpoints don't zoom nicely."""
         return True
-    
-    @classmethod    
+
+    @classmethod
     def icon(cls):
         """The icon to paint to represent this layer."""
         return QIcon(f":/plugins/{PLUGIN_FOLDER}/images/waterpoint.png")

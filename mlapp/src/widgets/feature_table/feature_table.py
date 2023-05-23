@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import abstractproperty
 
-from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtCore import QSize, Qt
 from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 
 from qgis.core import QgsVectorLayerCache
@@ -54,11 +54,11 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self.verticalHeader().hide()
 
         # Allow the table to be reduced in width and height, but also make it use what it gets
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # The section sizes in the table are handled in self.relayout below
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.horizontalHeader().setStretchLastSection(True)
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        # self.horizontalHeader().setStretchLastSection(True)
 
         self.setWordWrap(False)
 
@@ -106,14 +106,23 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         # Load the layer - important that this is prior to setting up the proxy/filter model
         self._tableModel.modelReset.connect(self.onFeatureLayerLoaded)
-        self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
-        self._featureLayer.featureDeselected.connect(self.onFeatureDeselected)
+
+        # Persisting edits will invalidate the cache
+        # self._featureLayer.editsPersisted.connect(self.onEditsPersisted)
+
+        # Selecting a feature will scroll to that feature in the table if it's not visible
+        self.workspace.featureSelected.connect(self.onFeatureSelected)
 
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
+
+        self.setSortingEnabled(True)
+        self.sortByColumn(self._tableModel.sortColumn, Qt.AscendingOrder)
+
         self.workspace.timeframeChanged.connect(self._tableFilterModel.onTimeframeChanged)
-        self.workspace.lockChanged.connect(self.invalidateCache)
+        self.workspace.lockChanged.connect(self.onLockChanged)
+
         # Set our model
         self.setModel(self._tableFilterModel)
 
@@ -151,22 +160,27 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         preferredWidth = neededWidth + len(sectionsToResize) * padding
 
         # If we have our preferred width available within our parent, expand into it
-        if preferredWidth < (self.parent().width() - 6) and self.width() < preferredWidth:
-            self.resize(preferredWidth, self.height())
-            return
-
-        # Section change can be negative? Nah …
-        sectionIncrease = min(max(self.width() - neededWidth, 0) // len(sectionsToResize), padding)
-        fineModulus = 0 if sectionIncrease >= padding else (max(self.width() - neededWidth, 0) % len(sectionsToResize))
+        # if preferredWidth < (self.parent().width() - 6) and self.width() < preferredWidth:
+        #     self.resize(preferredWidth, self.height())
+        #     return
 
         for i in sectionsToResize:
-            self.horizontalHeader().resizeSection(i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
+            self.horizontalHeader().resizeSection(
+                i, baseSectionSizes[i])
+
+        # Section change can be negative? Nah …
+        # sectionIncrease = min(max(self.width() - neededWidth, 0) // len(sectionsToResize), padding)
+        # fineModulus = 0 if sectionIncrease >= padding else (max(self.width() - neededWidth, 0) % len(sectionsToResize))
+
+        # for i in sectionsToResize:
+        #     self.horizontalHeader().resizeSection(
+        #         i, baseSectionSizes[i] + sectionIncrease + (1 if i < fineModulus else 0))
 
     def sizeHint(self):
         hint = super().sizeHint()
 
         if not self._columnMetrics:
-            return hint
+            self._columnMetrics = self.updateColumnMetrics()
 
         (padding, baseSectionSizes, sectionsToResize) = self._columnMetrics
 
@@ -239,7 +253,7 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         # Allow all our columns except the action buttons to grow
         sectionsToResize = [
             i for i in range(
-                self._tableModel.featureTableActionCount,
+                self._tableModel.featureTableActionCount if self._tableModel else 0,
                 header.count()) if header.sectionSize(i) > 0]
 
         self._columnMetrics = (padding, baseSectionSizes, sectionsToResize)
@@ -258,21 +272,25 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         """Handle the timeframe being changed."""
         self._tableFilterModel.onTimeframeChanged(timeframe)
 
-    def onEditsPersisted(self):
-        """Handle a batch of edits being persisted on the underyling layer."""
-        # At the moment, we just invalidate the cache and reload the layer
-        self.invalidateCache()
-        self.updateColumnMetrics()
+    # def onEditsPersisted(self):
+    #     """Handle a batch of edits being persisted on the underyling layer."""
+    #     # At the moment, we just invalidate the cache and reload the layer
+    #     self.invalidateCache()
 
-    def onFeatureDeselected(self, _):
-        """Handle a feature being deselected on the underlying layer."""
-        self.selectionModel().clearSelection()
+    def hasLayerId(self, layerId):
+        """Return True if this FeatureTable is built on a FeatureLayer with a matching layer ID."""
+        return self.featureLayer and self.featureLayer.id() == layerId
 
     def onFeatureSelected(self, layerId):
-        """Handle a feature being selected on the underlying layer."""
+        """Scroll to new selection when feature selected, if not visible."""
+        if not self.hasLayerId(layerId):
+            return
+
         feature = self.workspace.selectedFeature(layerId)
         if feature:
-            self.selectRow(self._tableModel.idToRow(feature.FID))
+            row = self._tableModel.idToRow(feature.FID)
+            if row and row >= 0:
+                self.scrollTo(self.model().index(row, 0))
 
     def onFeatureTableActionClicked(self, index):
         """Handle a feature table action being clicked."""
@@ -283,9 +301,12 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
 
         if delegate.featureTableActionModel.locked:
             guiWarning(f"Please wait while {PLUGIN_NAME} finishes processing.")
-            return
+        else:
+            delegate.featureTableActionModel.doAction(index)
 
-        feature = delegate.featureTableActionModel.doAction(index)
+    def onLockChanged(self, locked):
+        """Handle the lock state changing."""
 
-        if not feature or delegate.featureTableActionModel.actionInvalidatesCache():
+        # When the workspace is unlocked, we assume data may have changed and reload our cache
+        if not locked:
             self.invalidateCache()

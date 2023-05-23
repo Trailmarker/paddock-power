@@ -4,9 +4,19 @@ from qgis.core import QgsWkbTypes
 from .fields import *
 from .schema import Schema
 
-BoundarySchema = Schema([Fid,
-                         TimeframeField],
-                        wkbType=QgsWkbTypes.MultiPolygon)
+PropertySchema = Schema([Fid,
+                         TimeframeField,
+                         Perimeter,
+                         Area,
+                         WateredArea,
+                         EstimatedCapacityPerArea,
+                         PotentialCapacityPerArea,
+                         EstimatedCapacity,
+                         PotentialCapacity],
+                        wkbType=QgsWkbTypes.MultiPolygon,
+                        hiddenFields=[Fid,
+                                      EstimatedCapacityPerArea,
+                                      PotentialCapacityPerArea])
 FeatureSchema = Schema([Fid])
 FenceSchema = Schema([Fid,
                       Name,
@@ -20,7 +30,8 @@ LandTypeSchema = Schema([Fid,
                          OptimalCapacityPerArea,
                          Perimeter,
                          Area],
-                        wkbType=QgsWkbTypes.MultiPolygon)
+                        wkbType=QgsWkbTypes.MultiPolygon,
+                        hiddenFields=[Fid, Perimeter])
 BasePaddockSchema = Schema([Fid,
                             Name,
                             BuildFence,
@@ -49,6 +60,7 @@ PaddockLandTypeSchema = Schema([Fid,
                                              PaddockName,
                                              TimeframeField,
                                              Area,
+                                             WateredArea,
                                              EstimatedCapacityPerArea,
                                              PotentialCapacityPerArea])
 MetricPaddockSchema = Schema([Fid,
@@ -61,8 +73,8 @@ MetricPaddockSchema = Schema([Fid,
                               Area,
                               WateredArea,
                               EstimatedCapacityPerArea,
-                              EstimatedCapacity,
                               PotentialCapacityPerArea,
+                              EstimatedCapacity,
                               PotentialCapacity],
                              wkbType=QgsWkbTypes.MultiPolygon,
                              hiddenFields=[Fid,

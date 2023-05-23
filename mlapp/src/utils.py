@@ -2,6 +2,7 @@
 from collections.abc import Generator
 
 import inspect
+import json
 import os
 import random
 import string
@@ -111,6 +112,18 @@ def resolvePluginPath(relative=None, base=None):
         # note this function will break if this code in src/utils.py is moved to a different directory
         base = path.normpath(path.join(base, os.pardir))
     return path.normpath(path.join(base, relative if relative else ""))
+
+
+def getSetting(setting, default=None):
+    f"""Retrieve a {PLUGIN_NAME} setting."""
+    settingsFilePath = resolvePluginPath(f"{PLUGIN_FOLDER}.json")
+    try:
+        with open(settingsFilePath) as settingsFile:
+            settings = json.load(settingsFile)
+            return settings.get(setting, default)
+    except BaseException:
+        guiError("Error reading {PLUGIN_NAME} settings file at {settingsFilePath}")
+        return default
 
 
 def resolveProjectFile():

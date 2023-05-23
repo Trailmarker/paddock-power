@@ -26,8 +26,8 @@ class FencesWidget(WorkspaceMixin, SplitFeatureTablesWidget):
         self.addFeatureTable("Affected Paddocks", BasePaddockTable, visible=False)
         self.addFeatureTable("Resulting Paddocks", BasePaddockTable, visible=False)
 
-        self.fenceLayer.featureSelected.connect(self.selectFence)
-        self.fenceLayer.featureDeselected.connect(self.clearSelectedFence)
+        self.workspace.featureSelected.connect(self.selectFence)
+        self.workspace.featureDeselected.connect(self.clearSelectedFence)
 
     @property
     def fenceLayer(self):
@@ -49,18 +49,20 @@ class FencesWidget(WorkspaceMixin, SplitFeatureTablesWidget):
         fence.draftFeature(sketchLine)
         self.workspace.selectFeature(fence)
 
-    def selectFence(self, _):
-        selectedFids = self.fenceLayer.selectedFeatureIds()
+    def selectFence(self, layerId):
+        if self.fenceLayer and layerId == self.fenceLayer.id():
+            selectedFids = self.fenceLayer.selectedFeatureIds()
 
-        if len(selectedFids) == 1:
-            feature = self.fenceLayer.getFeature(selectedFids[0])
-            if isinstance(feature, Fence):
-                self.fence = feature
-                self.relayout()
+            if len(selectedFids) == 1:
+                feature = self.fenceLayer.getFeature(selectedFids[0])
+                if isinstance(feature, Fence):
+                    self.fence = feature
+                    self.relayout()
 
-    def clearSelectedFence(self):
-        self.fence = None
-        self.relayout()
+    def clearSelectedFence(self, layerId):
+        if self.fenceLayer and layerId == self.fenceLayer.id():
+            self.fence = None
+            self.relayout()
 
     _PADDOCK_TABLE_TITLES = {
         FeatureStatus.Drafted: ["Crossed Paddocks", "New Paddocks"],

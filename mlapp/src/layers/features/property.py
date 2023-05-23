@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from ..fields import BoundarySchema
+from ..fields import PropertySchema
 from .persisted_feature import PersistedFeature
 
 
-@BoundarySchema.addSchema()
-class Boundary(PersistedFeature):
+@PropertySchema.addSchema()
+class Property(PersistedFeature):
 
     @classmethod
     def focusOnSelect(cls):

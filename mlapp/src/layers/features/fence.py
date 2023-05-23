@@ -7,7 +7,7 @@ from collections import defaultdict
 from qgis.core import QgsFeatureRequest, QgsGeometry
 
 from ...models import Glitch
-from ...utils import PLUGIN_NAME, qgsInfo
+from ...utils import PLUGIN_NAME, getSetting, qgsInfo
 from ..fields import BUILD_FENCE, FeatureStatus, Timeframe, FenceSchema
 from .edits import Edits
 from .feature_action import FeatureAction
@@ -17,6 +17,8 @@ from .status_feature_mixin import StatusFeatureMixin
 
 @FenceSchema.addSchema()
 class Fence(PersistedFeature, StatusFeatureMixin):
+
+    GLITCH_BUFFER = getSetting("glitchBuffer", default=1.0)
 
     def __init__(self, featureLayer, existingFeature=None):
         PersistedFeature.__init__(self, featureLayer, existingFeature)
@@ -48,7 +50,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             self.recalculate()
         return self._profile
 
-    def getPropertyGeometry(self, glitchBuffer=1.0):
+    def getPropertyGeometry(self, glitchBuffer=GLITCH_BUFFER):
         """Get the property geometry for this Fence."""
         # Get the whole area around the property
         # We are only interested in Paddocks that are going to be there if we Plan this Fence (so Future, not Current)
@@ -70,7 +72,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         propertyExtent.scale(1.5)  # Expand by 50%
         return QgsGeometry.fromRect(propertyExtent)
 
-    def getNotPropertyGeometry(self, glitchBuffer=1.0):
+    def getNotPropertyGeometry(self, glitchBuffer=GLITCH_BUFFER):
         """Get the not property geometry for this Fence."""
         # Get the whole area around the property
         propertyNeighbourhood = self.getPropertyNeighbourhood()
@@ -88,16 +90,17 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         if not fenceLine or fenceLine.isEmpty():
             return [], []
 
-        notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=1.0)
+        notProperty = self.getNotPropertyGeometry(glitchBuffer=self.GLITCH_BUFFER)
 
-        if notPropertyGeometry.isEmpty():
+        if notProperty.isEmpty():
             raise Glitch(f"{PLUGIN_NAME} can't find the property boundary, is there any paddock data?")
 
         if fenceLine.isEmpty():
             return [], []
 
-        # QgsGeometry.fromPolygonXY([g]) to get the rings as polygons
-        _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY([g]) for g in notPropertyGeometry.asPolygon()]
+        notProperty = notProperty.asGeometryCollection() if notProperty.isMultipart() else [notProperty]
+
+        _, *propertyBoundaries = [QgsGeometry.fromMultiPolylineXY(p.asPolygon()) for p in notProperty]
 
         # Straightforward case where we have a single new fence line enclosing things
         if fenceLine.isMultipart():
@@ -113,17 +116,17 @@ class Fence(PersistedFeature, StatusFeatureMixin):
                 # We crossed the not-property boundary more than once, so we are enclosing land
                 blade = shape(fenceLine.__geo_interface__)
 
-                notPropertyGeometry = shape(self.getNotPropertyGeometry().__geo_interface__)
-                splits = split(notPropertyGeometry, blade)
+                notProperty = shape(self.getNotPropertyGeometry().__geo_interface__)
+                splits = split(notProperty, blade)
 
                 # The first result is always the piece of notProperty that is carved out? TODO check this
                 if splits:
-                    paddockGeometry = notPropertyGeometry.difference(splits[0])
+                    paddockGeometry = notProperty.difference(splits[0])
                     newBasePaddock = self.basePaddockLayer.makeFeature()
                     newBasePaddock.draftFeature(QgsGeometry.fromWkt(paddockGeometry.wkt))
                     newBasePaddocks.append(newBasePaddock)
 
-        # notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=1.0)
+        # notPropertyGeometry = self.getNotPropertyGeometry(glitchBuffer=self.GLITCH_BUFFER)
         # fenceLine = fenceLine.intersection(notPropertyGeometry)
 
         if not newBasePaddocks or not fenceLine:
@@ -148,7 +151,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         intersects = [p for p in candidatePaddocks if fenceLine.intersects(p.GEOMETRY)]
 
         # Crop the fence line to the property
-        propertyBoundary = self.getPropertyGeometry(glitchBuffer=1.0)
+        propertyBoundary = self.getPropertyGeometry(glitchBuffer=self.GLITCH_BUFFER)
 
         # If this makes the fence multipart, we can ignore it
         fenceLine = fenceLine.intersection(propertyBoundary)
@@ -166,6 +169,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             polygon = paddock.GEOMETRY.asMultiPolygon()
             boundaryLine = QgsGeometry.fromMultiPolylineXY(polygon[0])
             intersection = boundaryLine.intersection(fenceLine)
+            # If the intersection is multipart, we cut at least one piece out
             if intersection.isMultipart():
                 crossedPaddocks.append(paddock)
 
@@ -329,16 +333,10 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         for supersededPaddock in supersededPaddocks:
             edits = edits.editBefore(supersededPaddock.archiveFeature())
 
-        # qgsDebug(f"Fence.buildFeature after archive Paddock processing: {edits.upserts}")
-
         for plannedPaddock in plannedPaddocks:
             edits = edits.editBefore(plannedPaddock.buildFeature())
 
-        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
-
         return Edits.upsert(self).editAfter(edits)
-
-        # qgsDebug(f"Fence.buildFeature after build Paddock processing: {edits.upserts}")
 
     @FeatureAction.undoBuild.handleWithSave()
     def undoBuildFeature(self):

@@ -15,7 +15,7 @@
             <Option name="properties" type="Map">
               <Option name="alpha" type="Map">
                 <Option value="true" name="active" type="bool"/>
-                <Option value="case&#xd;&#xa;when matchCurrentTimeframe(&quot;Timeframe&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end" name="expression" type="QString"/>
+                <Option value="case&#xd;&#xa;when displayInCurrentTimeframeByFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end" name="expression" type="QString"/>
                 <Option value="3" name="type" type="int"/>
               </Option>
             </Option>
@@ -62,7 +62,7 @@
   </renderer-v2>
   <labeling type="rule-based">
     <rules key="{a0101363-e0a9-4d70-a7ae-21810c8ec23b}">
-      <rule filter="&quot;Area (km²)&quot; > 5 and matchCurrentFeatureStatus(&quot;Status&quot;)" key="{5c2616fd-369b-48ac-938e-43cfbdc6dcc2}">
+      <rule filter="&quot;Area (km²)&quot; > 1 and displayInCurrentTimeframeByFeatureStatus(&quot;Status&quot;)" key="{5c2616fd-369b-48ac-938e-43cfbdc6dcc2}">
         <settings calloutType="simple">
           <text-style fontSize="12" fontWeight="75" fontLetterSpacing="0" multilineHeight="1" fontStrikeout="0" fontFamily="Arial" blendMode="0" fontSizeMapUnitScale="3x:0,0,0,0,0,0" fontWordSpacing="0" allowHtml="0" namedStyle="Bold" fontUnderline="0" isExpression="1" textColor="0,0,0,255" previewBkgrdColor="0,251,0,255" textOrientation="horizontal" useSubstitutions="0" fontKerning="1" legendString="Aa" fontItalic="0" textOpacity="1" fieldName=" title(  &quot;Name&quot; ||  '\n' || round(  &quot;Area (km²)&quot;  ,1) || 'km²')" capitalization="0" fontSizeUnit="Point">
             <families/>
@@ -446,7 +446,7 @@
     <default expression="" applyOnUpdate="0" field="Rounded Potential AE"/>
   </defaults>
   <constraints>
-    <constraint exp_strength="0" constraints="3" notnull_strength="1" unique_strength="1" field="fid"/>
+    <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="fid"/>
     <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="Paddock"/>
     <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="Name"/>
     <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="Status"/>

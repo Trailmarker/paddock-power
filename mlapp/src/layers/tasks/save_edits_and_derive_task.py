@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -
-from time import sleep
-
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 from .save_edits_task import SaveEditsTask
 
@@ -16,7 +14,7 @@ class SaveEditsAndDeriveTask(SaveEditsTask):
         saveEditsResult = super().safeRun()
 
         if not saveEditsResult:
-            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to derive features for {len(self.layers)} layers.")
+            guiStatusBarAndInfo(f"{PLUGIN_NAME} failed to save and derive downstream features …")
             return False
 
         try:
@@ -42,7 +40,6 @@ class SaveEditsAndDeriveTask(SaveEditsTask):
                 changeset.editBefore(derivedEdits)
                 layer.editsPersisted.emit()
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} derived {layer.name()}.")
-                sleep(self.TASK_DELAY)
 
             guiStatusBarAndInfo(f"{PLUGIN_NAME} derived all features.")
             return True

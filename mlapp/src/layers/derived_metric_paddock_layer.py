@@ -63,8 +63,8 @@ select
 	sum("{paddockLandTypes}"."{AREA}") as "{AREA}",
     sum("{paddockLandTypes}"."{WATERED_AREA}") as "{WATERED_AREA}",
 	(sum("{paddockLandTypes}"."{ESTIMATED_CAPACITY}") / nullif("{_FILTERED_PADDOCKS}"."{AREA}", 0.0)) as "{ESTIMATED_CAPACITY_PER_AREA}",
-	sum("{paddockLandTypes}"."{ESTIMATED_CAPACITY}") as "{ESTIMATED_CAPACITY}",
 	(sum("{paddockLandTypes}"."{POTENTIAL_CAPACITY}") / nullif("{_FILTERED_PADDOCKS}"."{AREA}", 0.0)) as "{POTENTIAL_CAPACITY_PER_AREA}",
+	sum("{paddockLandTypes}"."{ESTIMATED_CAPACITY}") as "{ESTIMATED_CAPACITY}",
 	sum("{paddockLandTypes}"."{POTENTIAL_CAPACITY}") as "{POTENTIAL_CAPACITY}"
 from "{_FILTERED_PADDOCKS}"
 inner join "{paddockLandTypes}"

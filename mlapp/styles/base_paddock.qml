@@ -15,7 +15,7 @@
             <Option name="properties" type="Map">
               <Option name="alpha" type="Map">
                 <Option value="true" name="active" type="bool"/>
-                <Option value="case&#xd;&#xa;when matchCurrentFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end" name="expression" type="QString"/>
+                <Option value="case&#xd;&#xa;when displayInCurrentTimeframeByFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end" name="expression" type="QString"/>
                 <Option value="3" name="type" type="int"/>
               </Option>
             </Option>
@@ -62,7 +62,7 @@
   </renderer-v2>
   <labeling type="rule-based">
     <rules key="{7f5ce27e-dedd-42a8-9736-4cba5de0ee6f}">
-      <rule filter="&quot;Area (km²)&quot; > 5 and matchCurrentFeatureStatus(&quot;Status&quot;)" key="{14aac2d3-b065-49f0-bf10-e8b98dc0c5c5}">
+      <rule filter="&quot;Area (km²)&quot; > 1 and displayInCurrentTimeframeByFeatureStatus(&quot;Status&quot;)" key="{14aac2d3-b065-49f0-bf10-e8b98dc0c5c5}">
         <settings calloutType="simple">
           <text-style multilineHeight="1" fontFamily="Arial" textOpacity="1" allowHtml="0" fontLetterSpacing="0" fontSize="12" namedStyle="Bold" fontWordSpacing="0" blendMode="0" useSubstitutions="0" fontUnderline="0" textOrientation="horizontal" capitalization="0" textColor="0,0,0,255" fontSizeMapUnitScale="3x:0,0,0,0,0,0" fontWeight="75" previewBkgrdColor="0,251,0,255" legendString="Aa" fontItalic="0" fontKerning="1" isExpression="1" fontSizeUnit="Point" fieldName=" title(  &quot;Name&quot; ||  '\n' || round(  &quot;Area (km²)&quot;  ,1) || 'km²')" fontStrikeout="0">
             <families/>
@@ -326,7 +326,7 @@
     <default expression="" field="Rounded Perimeter (km)" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" constraints="3" field="fid" exp_strength="0" unique_strength="1"/>
+    <constraint notnull_strength="0" constraints="0" field="fid" exp_strength="0" unique_strength="1"/>
     <constraint notnull_strength="0" constraints="0" field="Name" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Build Fence" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Status" exp_strength="0" unique_strength="0"/>

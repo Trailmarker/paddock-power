@@ -15,7 +15,7 @@ from .src.models import Glitch, Workspace
 from .src.paddock_power_functions import PaddockPowerFunctions
 from .src.plugin_state_machine import PluginStateMachine, PluginAction, PluginActionFailure, PluginStatus
 from .src.utils import guiConfirm, guiStatusBar, guiStatusBarAndInfo, guiWarning, qgsDebug, qgsException, qgsInfo, resolveWorkspaceFile, resolveProjectFile, PLUGIN_FOLDER, PLUGIN_NAME
-from .src.widgets import ImportDialog, PluginDockWidget
+from .src.widgets import ImportDialog, PluginDockWidget, PropertyMetricsDialog
 
 
 class PaddockPower(PluginStateMachine):
@@ -137,6 +137,13 @@ class PaddockPower(PluginStateMachine):
             QIcon(f":/plugins/{PLUGIN_FOLDER}/images/import.png"),
             text=f"Import {PLUGIN_NAME} Data …",
             callback=lambda *_: self.openImportDialog(),
+            parent=self.iface.mainWindow())
+
+        self.viewPropertyMetricsAction = self.addAction(
+            PluginAction.openPropertyMetricsDialog,
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/property-metrics.png"),
+            text=f"View {PLUGIN_NAME} Property Metrics …",
+            callback=lambda *_: self.openPropertyMetricsDialog(),
             parent=self.iface.mainWindow())
 
         self._stateChanged.connect(self.refreshUi)
@@ -296,9 +303,12 @@ class PaddockPower(PluginStateMachine):
     @PluginAction.analyseWorkspace.handler()
     def analyseWorkspace(self):
         """Recalculates then re-derives the whole workspace."""
+        if not self.workspace.isAnalytic:
+            self.failureMessage(
+                f"Your {PLUGIN_NAME} workspace must include Base Paddocks, Land Types and Waterpoints to be analysed …")
 
         if guiConfirm(
-            f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock metrics.",
+            f"This will analyse or re-derive all {PLUGIN_NAME} workspace measurements, including property feature elevations, lengths, and areas, as well as derived paddock and property metrics.",
                 f"Analyse {PLUGIN_NAME} workspace?"):
             self.workspace.analyseWorkspace()
 
@@ -330,9 +340,20 @@ class PaddockPower(PluginStateMachine):
     @PluginAction.openImportDialog.handler()
     def openImportDialog(self):
         if self.workspace:
-            # guiWarning(f"The import feature is disabled in this release of {PLUGIN_NAME}.")
-            self.importDialog = ImportDialog(self.iface.mainWindow())
-            self.importDialog.exec_()
+            importDialog = ImportDialog(self.pluginDockWidget)
+            importDialog.exec_()
+        else:
+            self.failureMessage(f"{PLUGIN_NAME} no workspace loaded …")
+            raise PluginActionFailure()
+
+    @PluginAction.openPropertyMetricsDialog.handler()
+    def openPropertyMetricsDialog(self):
+        if self.workspace:
+            if self.workspace.hasPropertyMetrics:
+                propertyMetricsDialog = PropertyMetricsDialog(self.pluginDockWidget)
+                propertyMetricsDialog.show()
+            else:
+                self.failureMessage(f"Please analyse your {PLUGIN_NAME} workspace before viewing property metrics …")
         else:
             self.failureMessage(f"{PLUGIN_NAME} no workspace loaded …")
             raise PluginActionFailure()
@@ -345,7 +366,4 @@ class PaddockPower(PluginStateMachine):
 
     def refreshUi(self):
         for pluginAction in self.actions:
-            if self.isPermitted(pluginAction):
-                self.actions[pluginAction].setEnabled(True)
-            else:
-                self.actions[pluginAction].setEnabled(False)
+            self.actions[pluginAction].setEnabled(self.isPermitted(pluginAction))

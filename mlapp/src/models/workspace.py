@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import basename
+from time import sleep
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
@@ -8,7 +9,7 @@ from qgis.core import QgsProject, QgsSnappingConfig
 from ..layers import BasePaddockLayer
 from ..layers.fields import Timeframe
 from ..layers.tasks import AnalyseWorkspaceTask, ImportElevationLayerTask, ImportFeatureLayerTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
-from ..utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsInfo
+from ..utils import PLUGIN_NAME, getSetting, guiStatusBarAndInfo, qgsInfo
 from .layer_dependency_graph import LayerDependencyGraph
 from .task_handle import TaskHandle
 from .workspace_layers import WorkspaceLayers
@@ -18,8 +19,11 @@ from ...resources_rc import *
 
 
 class Workspace(QObject):
-    # emit this signal when a selected PersistedFeature is updated
-    featureLayerSelected = pyqtSignal(str)
+    FREEZE_MAP_CANVAS = getSetting("freezeMapCanvas", default=True)
+    WORKSPACE_UNLOCK_DELAY = getSetting("workspaceUnlockDelay", default=1.0)
+
+    featureSelected = pyqtSignal(str)
+    featureDeselected = pyqtSignal(str)
     lockChanged = pyqtSignal(bool)
     timeframeChanged = pyqtSignal(Timeframe)
     workspaceLoaded = pyqtSignal()
@@ -76,6 +80,11 @@ class Workspace(QObject):
         return self.workspaceLayers.hasBasePaddocks
 
     @property
+    def hasPropertyMetrics(self):
+        """Return True if this workspace has property metrics."""
+        return self.workspaceLayers.hasPropertyMetrics
+
+    @property
     def isAnalytic(self):
         """Return True if this workspace can be analysed."""
         return self.workspaceLayers.isAnalytic
@@ -87,11 +96,18 @@ class Workspace(QObject):
     def lock(self):
         """Lock the workspace."""
         self._locked = True
+        if self.FREEZE_MAP_CANVAS and self.iface:
+            # Pause map rendering while workspace is locked
+            self.iface.mapCanvas().freeze(True)
         self.lockChanged.emit(True)
 
     def unlock(self):
         """Unlock the workspace."""
+        sleep(self.WORKSPACE_UNLOCK_DELAY)
         self._locked = False
+        if self.FREEZE_MAP_CANVAS and self.iface:
+            self.iface.mapCanvas().freeze(False)
+            self.iface.mapCanvas().refresh()
         self.lockChanged.emit(False)
 
     def findGroup(self):
@@ -148,6 +164,7 @@ class Workspace(QObject):
             layer = QgsProject.instance().mapLayer(layerId)
             layer.removeSelection()
             del self.selectedFeatures[layerId]
+            self.featureDeselected.emit(layerId)
 
     def selectFeature(self, feature):
         """Select a feature."""
@@ -159,8 +176,7 @@ class Workspace(QObject):
             qgsInfo(f"Workspace.selectFeature({feature}): focusOnSelect, deselecting other layers")
             self.deselectLayers(selectedLayerId)
 
-        # This is kinda legacy now
-        self.featureLayerSelected.emit(selectedLayerId)
+        self.featureSelected.emit(selectedLayerId)
 
     def selectedFeature(self, layerId):
         """Return the selected feature for the given layer type."""

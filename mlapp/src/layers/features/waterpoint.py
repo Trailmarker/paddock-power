@@ -24,8 +24,8 @@ class Waterpoint(PersistedFeature, StatusFeatureMixin):
     @property
     def TITLE(self):
         if self.NAME and self.NAME != "NULL":
-            return f"{self.NAME} ({self.WATERPOINT_TYPE})"
-        return f"Waterpoint ({self.FID}) ({self.WATERPOINT_TYPE})"
+            return f"{self.NAME}"
+        return f"{self.WATERPOINT_TYPE} {self.FID}"
 
     @FeatureAction.draft.handleWithSave()
     def draftFeature(self, point):

@@ -22,7 +22,6 @@ class LoadWorkspaceTask(WorkspaceTask):
 
                 layer = layerType(self.workspace.workspaceFile, *dependentLayers)
                 self.workspace.workspaceLayers.addLayer(layerType, layer)
-                layer.connectWorkspace(self.workspace)
 
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} {layer.name()} loaded.")
 
@@ -36,4 +35,5 @@ class LoadWorkspaceTask(WorkspaceTask):
 
     def safeFinished(self, _):
         """Called when task completes (successfully or otherwise)."""
-        pass
+        for layer in self.workspace.workspaceLayers.layers():
+            layer.connectWorkspace(self.workspace)

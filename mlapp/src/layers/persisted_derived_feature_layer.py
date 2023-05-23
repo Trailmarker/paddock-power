@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from ..layers.features import Edits
 from ..models import Glitch
-from ..utils import PLUGIN_NAME, qgsInfo
+from ..utils import PLUGIN_NAME, getSetting, qgsInfo
 from .interfaces import IPersistedDerivedFeatureLayer
 from .persisted_feature_layer import PersistedFeatureLayer
 
 
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatureLayer):
+
+    RESPECT_CHANGESETS = getSetting("respectChangesets", default=True)
 
     def __init__(self, workspaceFile, layerName, styleName, derivedLayerType, dependentLayers):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""
@@ -19,7 +21,10 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
     def getDerivedLayerInstance(self, changeset=None):
         """Return the derived layer for this layer."""
+        # Clean up any instances of the virtual source …
         self.derivedLayerType.removeAllOfType()
+
+        # Create the new instance and return
         return self.derivedLayerType(self.dependentLayers, changeset)
 
     def showDerivedLayerInstance(self, changeset=None):
@@ -29,14 +34,15 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
     def deriveFeatures(self, changeset=None, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
-        # Clean up any instances of the virtual source …
-        derivedLayer = self.getDerivedLayerInstance(changeset)
+        # RESPECT_CHANGESETS determines whether we try to home in just on dependent data
+        derivedLayer = self.getDerivedLayerInstance(
+            changeset) if self.RESPECT_CHANGESETS else self.getDerivedLayerInstance(None)
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 
         raiseErrorIfTaskHasBeenCancelled()
 
-        rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest()
+        rederiveFeaturesRequest = derivedLayer.getRederiveFeaturesRequest() if self.RESPECT_CHANGESETS else None
 
         raiseErrorIfTaskHasBeenCancelled()
 
@@ -63,6 +69,9 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
         # Get a second batch of edits that copies the new records to this layer …
         edits.editBefore(Edits.bulkAdd(self, derivedFeatures))
+        
+        # Clean up the derived layer after all this gets persisted
+        edits.editBefore(Edits.cleanupDerivedLayer(self, derivedLayer))
 
         # Get rid of the derived layer … does not work
         # QgsProject.instance().removeMapLayer(derivedLayer.id())

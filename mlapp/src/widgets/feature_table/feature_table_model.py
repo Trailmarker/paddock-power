@@ -45,6 +45,12 @@ class FeatureTableModel(QgsAttributeTableModel):
                          if f.name() in hiddenNames]
         return hiddenColumns
 
+    @cached_property
+    def sortColumn(self):
+        """The column to sort by."""
+        sortField = next((f for f in self._schema if f.sortable()), None)
+        return self.columnFromFieldName(sortField.name()) if sortField else -1
+
     def columnFromFieldName(self, name):
         """Get the column number for a field in the layer, accounting for the action columns."""
         baseIndex = self.layer().fields().indexFromName(name)
@@ -93,4 +99,4 @@ class FeatureTableModel(QgsAttributeTableModel):
         # if self.isToolBarIndex(index) or index.column() == self.columnFromFieldName(STATUS):
         #     return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         # else:
-        #     return super().flags(self.createIndex(index.row(), index.column() - self.featureTableActionCount))
+        #     return super().flags(self.zcreateIndex(index.row(), index.column() - self.featureTableActionCount))

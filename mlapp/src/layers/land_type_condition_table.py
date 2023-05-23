@@ -151,11 +151,6 @@ DELETE FROM "{tableName}" WHERE "{PADDOCK}"={paddockId} AND "{LAND_TYPE}={landTy
             else:
                 return row[3]
 
-    def getByPaddockId(self, paddockId):
-        with sqlite3.connect(self.workspaceFile) as conn:
-            cursor = conn.execute(self.makeGetByPaddockQuery(tableName=self.tableName, paddockId=paddockId))
-            return cursor.fetchall()
-
     def upsertRecord(self, paddockId, landTypeId, conditionType):
         with sqlite3.connect(self.workspaceFile) as conn:
             conn.execute(

@@ -256,7 +256,7 @@
     <default expression="'Undefined'" field="Timeframe" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" constraints="3" field="fid" exp_strength="0" unique_strength="1"/>
+    <constraint notnull_strength="0" constraints="0" field="fid" exp_strength="0" unique_strength="1"/>
     <constraint notnull_strength="0" constraints="0" field="Paddock" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Watered" exp_strength="0" unique_strength="0"/>
     <constraint notnull_strength="0" constraints="0" field="Timeframe" exp_strength="0" unique_strength="0"/>

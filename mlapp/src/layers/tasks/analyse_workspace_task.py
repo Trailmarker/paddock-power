@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from time import sleep
-
 from ...models import WorkspaceTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 from ..interfaces import IPersistedDerivedFeatureLayer, IPersistedFeatureLayer
@@ -35,7 +33,6 @@ class AnalyseWorkspaceTask(WorkspaceTask):
 
                 layer.editsPersisted.emit()
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} recalculated {layer.name()}.")
-                sleep(self.TASK_DELAY)
 
             deriveOrder = self.workspace.layerDependencyGraph.deriveOrder()
             deriveLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in deriveOrder]
@@ -45,7 +42,8 @@ class AnalyseWorkspaceTask(WorkspaceTask):
             for layer in deriveLayers:
                 if self.isCanceled():
                     return False
-                derivedEdits = layer.deriveFeatures(changeset=None, raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
+                derivedEdits = layer.deriveFeatures(
+                    changeset=None, raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
                 if self.isCanceled():
                     return False
                 derivedEdits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
@@ -54,7 +52,6 @@ class AnalyseWorkspaceTask(WorkspaceTask):
 
                 layer.editsPersisted.emit()
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} derived {layer.name()}.")
-                sleep(self.TASK_DELAY)
 
             guiStatusBarAndInfo(f"{PLUGIN_NAME} analysed the '{self.workspace.workspaceName}' workspace.")
             return True

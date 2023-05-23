@@ -46,11 +46,6 @@ class FeatureTableActionModel(QObject, WorkspaceMixin, ABC, metaclass=QtAbstract
         """Whether the action is validly configurad."""
         return True
 
-    @classmethod
-    def actionInvalidatesCache(self):
-        """Invalidate the cache after a call to doAction."""
-        return False
-
     @abstractmethod
     def icon(self, index):
         """The icon to paint for the action."""
@@ -64,8 +59,8 @@ class FeatureTableActionModel(QObject, WorkspaceMixin, ABC, metaclass=QtAbstract
     @property
     def locked(self):
         """Whether the action is locked."""
-        return self.workspace.locked() and self.actionInvalidatesCache()
-
+        return False
+    
     @abstractmethod
     def description(self, index):
         """The description of the action, given the matching column."""

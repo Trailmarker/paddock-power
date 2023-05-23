@@ -44,12 +44,13 @@ class PersistedFeature(Feature, IPersistedFeature):
                     self.LATITUDE = latitude
             if self.hasElevation or self.hasLength:
                 elevationLayer = self.featureLayer.workspace.elevationLayer
-                if self.hasElevation:
-                    self.ELEVATION = Calculator.calculateElevationAtPoint(self.GEOMETRY, elevationLayer)
-                if self.hasLength:
-                    self._profile = Calculator.calculateProfile(self.GEOMETRY, elevationLayer)
-                    length = round(self._profile.maximumDistance / 1000, 2)
-                    self.LENGTH = length
+                if elevationLayer and elevationLayer.isValid():
+                    if self.hasElevation:
+                        self.ELEVATION = Calculator.calculateElevationAtPoint(self.GEOMETRY, elevationLayer)
+                    if self.hasLength:
+                        self._profile = Calculator.calculateProfile(self.GEOMETRY, elevationLayer)
+                        length = round(self._profile.maximumDistance / 1000, 2)
+                        self.LENGTH = length
 
     def __toProviderFeature(self):
         """Map the PersistedFeature's fields to the provider's fields."""

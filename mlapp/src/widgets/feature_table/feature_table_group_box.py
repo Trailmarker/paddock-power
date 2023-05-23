@@ -27,6 +27,9 @@ class FeatureTableGroupBox(WorkspaceMixin, PopupLayerConsumerMixin, QGroupBox):
         self._featureTable = None
         self._popupLayerTypes = []
 
+        # Not visible until the feature layer is set
+        self.setVisible(False)
+
     @property
     def featureTableFactory(self):
         """Return the FeatureTable factory (usually just a FeatureTable specialisation) used to create the FeatureTables of this group box."""
@@ -59,10 +62,18 @@ class FeatureTableGroupBox(WorkspaceMixin, PopupLayerConsumerMixin, QGroupBox):
     def featureLayer(self, featureLayer):
         """Create a new FeatureTable and set its feature layer, if we have a configured FeatureTable factory, or clear everything."""
         self.removeFeatureTable()
-        if featureLayer and self.featureTableFactory:
+        
+        showTable = bool(featureLayer) and bool(self.featureTableFactory) and featureLayer.featureCount() > 0
+        if showTable:
             self._featureTable = self.featureTableFactory(self)
             self.featureTable.featureLayer = featureLayer
             self.layout().addWidget(self.featureTable)
+
+        # Becomes visible when the feature layer is set
+        self.setVisible(showTable)
+
+        if featureLayer:
+            self.setTitle(featureLayer.name())
 
     def sizeHint(self):
         """Return the size hint for the widget."""

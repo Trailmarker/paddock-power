@@ -8,6 +8,14 @@ from .names import FID
 
 
 class Schema(list):
+    @staticmethod
+    def fieldListToQgsFields(fieldList):
+        """Convert a list of Fields to a QgsFields object."""
+        fields = QgsFields()
+        for f in fieldList:
+            fields.append(f)
+        return fields
+
     def __init__(self, fields, wkbType=None, hiddenFields=[]):
         assert isinstance(fields, list)
         assert all(isinstance(f, Field) for f in fields)
@@ -26,13 +34,11 @@ class Schema(list):
 
     def toQgsFields(self):
         """Convert this Schema to a QgsFields object."""
-        fields = QgsFields()
-        for f in self:
-            fields.append(f)
-        return fields
+        return Schema.fieldListToQgsFields(self)
 
-    def toImportableFields(self):
-        """Convert this Schema to a QgsFields object representing fields that can be imported."""
+    @property
+    def targetFields(self):
+        """Convert this Schema to a list representing fields that can be imported."""
         return [f for f in self if f.importable()]
 
     def addSchema(self):

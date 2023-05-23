@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from ...layers.fields import Timeframe
 from ...layers import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
 from ...models import WorkspaceMixin
-from ..feature_table import PaddockTable, CurrentPaddockLandTypesTable, FuturePaddockLandTypesTable, SplitFeatureTablesWidget
+from ..feature_table import PaddockTable, CurrentPaddockLandTypesTable, FuturePaddockLandTypesTable, PaddockLandTypesGroupBox, SplitFeatureTablesWidget
 
 
 class PaddocksWidget(WorkspaceMixin, SplitFeatureTablesWidget):
@@ -15,14 +16,16 @@ class PaddocksWidget(WorkspaceMixin, SplitFeatureTablesWidget):
 
         self.addFeatureTable("Paddocks", PaddockTable)
 
-        self.addFeatureTable(
-            "Current Paddock Land Types",
-            CurrentPaddockLandTypesTable,
-            [PaddockCurrentLandTypesPopupLayer],
-            self.workspace.paddockLayer)
+        currentPaddockLandTypesGroupBox = PaddockLandTypesGroupBox()
+        currentPaddockLandTypesGroupBox.featureTableFactory = CurrentPaddockLandTypesTable
+        currentPaddockLandTypesGroupBox.popupLayerTypes = [PaddockCurrentLandTypesPopupLayer]
+        currentPaddockLandTypesGroupBox.popupLayerSource = self.workspace.paddockLayer
+        self.splitter.addWidget(currentPaddockLandTypesGroupBox)
 
-        self.addFeatureTable(
-            "Future Paddock Land Types",
-            FuturePaddockLandTypesTable,
-            [PaddockFutureLandTypesPopupLayer],
-            self.workspace.paddockLayer)
+        futurePaddockLandTypesGroupBox = PaddockLandTypesGroupBox()
+        futurePaddockLandTypesGroupBox.featureTableFactory = FuturePaddockLandTypesTable
+        futurePaddockLandTypesGroupBox.popupLayerTypes = [PaddockFutureLandTypesPopupLayer]
+        futurePaddockLandTypesGroupBox.popupLayerSource = self.workspace.paddockLayer
+        self.splitter.addWidget(futurePaddockLandTypesGroupBox)
+
+        self.relayout()

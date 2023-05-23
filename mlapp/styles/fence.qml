@@ -21,7 +21,7 @@
             <Option name="properties" type="Map">
               <Option name="alpha" type="Map">
                 <Option name="active" type="bool" value="true"/>
-                <Option name="expression" type="QString" value="case &#xd;&#xa;when matchCurrentFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end"/>
+                <Option name="expression" type="QString" value="case &#xd;&#xa;when displayInCurrentTimeframeByFeatureStatus(&quot;Status&quot;) then 100.0&#xd;&#xa;else 0.0&#xd;&#xa;end"/>
                 <Option name="type" type="int" value="3"/>
               </Option>
             </Option>
@@ -267,7 +267,7 @@
     <default expression="" field="Rounded Length (km)" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="1" field="fid" unique_strength="1" exp_strength="0" constraints="3"/>
+    <constraint notnull_strength="0" field="fid" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Name" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Length (km)" unique_strength="0" exp_strength="0" constraints="0"/>
     <constraint notnull_strength="0" field="Build Order" unique_strength="0" exp_strength="0" constraints="0"/>

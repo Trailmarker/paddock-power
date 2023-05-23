@@ -41,9 +41,6 @@ class Edits(WorkspaceMixin):
             return repr(self)
 
         def persist(self):
-            # if not isinstance(self._layer, IPersistedDerivedFeatureLayer):
-            #     raise Glitch(
-            #         f"Cannot truncate layer {self._layer.id()} because it is not an IPersistedDerivedFeatureLayer")
             self.layer.dataProvider().truncate()
 
         @property
@@ -131,6 +128,28 @@ class Edits(WorkspaceMixin):
         def layer(self):
             return self.feature.featureLayer
 
+    class CleanupDerivedLayer(Edit):
+
+        def __init__(self, layer, derivedLayer):
+            super().__init__()
+            self.order = 5
+            self._layer = layer
+            self.derivedLayer = derivedLayer
+
+        def __repr__(self):
+            """Return a string representation of the Edit."""
+            return f"{type(self).__name__}(layer={self.layer})"
+
+        def __str__(self):
+            return repr(self)
+
+        def persist(self):
+            self.derivedLayer.removeAllOfType()
+        
+        @property
+        def layer(self):
+            return self._layer
+
     def __init__(self):
         WorkspaceMixin.__init__(self)
         self.edits = defaultdict(list)
@@ -177,6 +196,10 @@ class Edits(WorkspaceMixin):
     @staticmethod
     def delete(feature):
         return Edits().append(Edits.Delete(feature))
+
+    @staticmethod
+    def cleanupDerivedLayer(layer, derivedLayer):
+        return Edits().append(Edits.CleanupDerivedLayer(layer, derivedLayer))
 
     @property
     def allEdits(self):

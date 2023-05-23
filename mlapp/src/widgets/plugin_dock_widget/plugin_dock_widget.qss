@@ -2,9 +2,9 @@ QListWidget::item {
   selection-background-color: green;
 }
 
-QGroupBox {
+/* QGroupBox {
   background-color: #fcfcfc;
-}
+} */
 
 ProfileDetails {
   background-color: #fcfcfc;

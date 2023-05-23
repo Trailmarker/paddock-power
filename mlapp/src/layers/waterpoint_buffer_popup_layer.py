@@ -30,6 +30,6 @@ order by "{GRAZING_RADIUS_TYPE}"
         self.waterpoint = waterpoint
 
         super().__init__(waterpoint,
-                         f"{waterpoint.WATERPOINT_TYPE.value} {waterpoint.FID} Watered Area",
+                         f"{waterpoint.NAME} Water",
                          WaterpointBufferPopupLayer.defaultStyle(),
                          [self.waterpoint.waterpointBufferLayer])

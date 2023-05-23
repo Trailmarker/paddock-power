@@ -1,0 +1,30 @@
+FieldMapWidget {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QLineEdit {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsFieldComboBox QListView::item:selected {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsFieldComboBox QListView {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsFieldComboBox QAbstractItemView::item:selected {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+QgsFieldComboBox QAbstractItemView {
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+

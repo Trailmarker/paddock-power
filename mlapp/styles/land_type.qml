@@ -167,7 +167,7 @@
     <default field="Rounded Best AE/km² (if Condition is 'A')" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
-    <constraint field="fid" unique_strength="1" notnull_strength="1" constraints="3" exp_strength="0"/>
+    <constraint field="fid" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
     <constraint field="Land Type Name" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
     <constraint field="Best AE/km² (if Condition is 'A')" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
     <constraint field="Perimeter (km)" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>

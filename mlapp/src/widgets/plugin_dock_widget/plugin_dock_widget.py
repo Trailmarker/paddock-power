@@ -78,7 +78,10 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.waterpointsWidget = WaterpointsWidget(self.tabWidget)
 
         self.tabWidget.addTab(self.paddocksWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/paddock.png"), 'Paddocks')
-        self.tabWidget.addTab(self.landTypesWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/land-type.png"), 'Land Types')
+        self.tabWidget.addTab(
+            self.landTypesWidget,
+            QIcon(f":/plugins/{PLUGIN_FOLDER}/images/land-type.png"),
+            'Land Types')
         self.tabWidget.addTab(self.fencesWidget, QIcon(f":/plugins/{PLUGIN_FOLDER}/images/fence.png"), 'Fences')
         self.tabWidget.addTab(
             self.pipelinesWidget,
@@ -97,7 +100,8 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchWaterpointButton.clicked.connect(self.waterpointsWidget.sketchWaterpoint)
 
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
-        self.workspace.featureLayerSelected.connect(lambda layerId: self.onFeatureLayerSelected(layerId))
+        self.workspace.featureSelected.connect(lambda layerId: self.onFeatureSelected(layerId))
+        self.workspace.lockChanged.connect(self.onLockChanged)
 
         self._uiBuilt = True
         qgsInfo(f"{PLUGIN_NAME} rebuilt PluginDockWidget.")
@@ -133,16 +137,26 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         # self.update()
 
-    def onFeatureLayerSelected(self, layerId):
-        featureLayer = QgsProject.instance().mapLayer(layerId)
-        name = featureLayer.getFeatureType().__name__
-        if name == 'FenceLayer':
-            self.tabWidget.setCurrentWidget(self.fencesWidget)
-        elif name == 'LandTypeLayer':
-            self.tabWidget.setCurrentWidget(self.landTypesWidget)
-        elif name == 'PaddockLayer':
-            self.tabWidget.setCurrentWidget(self.paddocksWidget)
-        elif name == 'PipelineLayer':
-            self.tabWidget.setCurrentWidget(self.pipelinesWidget)
-        if name == 'WaterpointLayer':
-            self.tabWidget.setCurrentWidget(self.waterpointsWidget)
+    def onFeatureSelected(self, layerId):
+        """Switch to the correct tab when a feature is selected."""
+
+        widgets = [
+            self.paddocksWidget,
+            self.landTypesWidget,
+            self.fencesWidget,
+            self.pipelinesWidget,
+            self.waterpointsWidget
+        ]
+
+        matchedWidget = next((w for w in widgets if w.hasLayerId(layerId)), None)
+
+        if matchedWidget:
+            self.tabWidget.setCurrentWidget(matchedWidget)
+
+    def onLockChanged(self, locked):
+        """Disable buttons when the workspace is locked."""
+        self.currentTimeframeButton.setEnabled(not locked)
+        self.futureTimeframeButton.setEnabled(not locked)
+        self.sketchFenceButton.setEnabled(not locked)
+        self.sketchPipelineButton.setEnabled(not locked)
+        self.sketchWaterpointButton.setEnabled(not locked)

@@ -23,7 +23,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(PaddockLayer, [BasePaddockLayer, PaddockLandTypesLayer])
         self.addDependencies(FenceLayer, [ElevationLayer, BasePaddockLayer, PaddockLayer])
         self.addDependencies(PipelineLayer, [ElevationLayer])
-        self.addDependencies(BoundaryLayer, [BasePaddockLayer])
+        self.addDependencies(PropertyLayer, [PaddockLayer])
 
     def loadOrder(self):
         """Return a list of layer types in the order they should be initialised."""
@@ -61,8 +61,8 @@ class LayerDependencyGraph(TypeDependencyGraph):
         return [PaddockCurrentLandTypesPopupLayer,
                 PaddockFutureLandTypesPopupLayer,
                 WaterpointBufferPopupLayer,
-                BoundaryLayer,
-                DerivedBoundaryLayer,
+                PropertyLayer,
+                DerivedPropertyLayer,
                 PipelineLayer,
                 FenceLayer,
                 PaddockLayer,
@@ -85,6 +85,6 @@ class LayerDependencyGraph(TypeDependencyGraph):
                 FenceLayer,
                 WateredAreaLayer,
                 LandTypeLayer,
-                BoundaryLayer,
+                PropertyLayer,
                 PaddockLayer,
                 ElevationLayer]

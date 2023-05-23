@@ -2,7 +2,9 @@
 from functools import cached_property
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsFields, QgsGeometry, QgsProject
 
+from ...models import Glitch
 from ...utils import PADDOCK_POWER_EPSG, qgsDebug
+from ...layers.fields.schema import Schema
 
 
 class FieldMap(list):
@@ -17,14 +19,19 @@ class FieldMap(list):
         self.initMappings()
 
     @cached_property
-    def importFields(self):
+    def importQgsFields(self):
         """Return the import layer's field names as a QgsFields object."""
         return self.importLayer.fields()
 
     @cached_property
     def targetFields(self):
         """Return the target schema's field names as a list."""
-        return self.targetLayer.getSchema().toImportableFields()
+        return self.targetLayer.getSchema().targetFields
+
+    @cached_property
+    def targetQgsFields(self):
+        """Return the target schema's field names as a list."""
+        return Schema.toQgsFields(self.targetFields)
 
     def __repr__(self):
         """Return a string representation of the FieldMap."""
@@ -35,34 +42,13 @@ class FieldMap(list):
         self.clear()
         for targetField in self.targetFields:
             default = None
-            for importField in self.importFields:
+            for importField in self.importQgsFields:
                 if targetField.name().upper() == importField.name().upper():
                     default = (importField, targetField)
             if not default and targetField.required():
                 default = (None, targetField)
             if default:
                 self.append(default)
-        qgsDebug(f"FieldMap.initMappings: {self}")
-
-    @property
-    def unmappedImportFields(self):
-        """Return the import fields that are not mapped."""
-        mapped = [importField for (importField, _) in self if importField is not None]
-        unmapped = QgsFields()
-        for importField in self.importFields:
-            if importField not in mapped:
-                unmapped.append(importField)
-        return unmapped
-
-    @property
-    def unmappedTargetFields(self):
-        """Return the target fields that are not mapped."""
-        mapped = [targetField for (_, targetField) in self]
-        unmapped = QgsFields()
-        for targetField in self.targetFields:
-            if targetField not in mapped:
-                unmapped.append(targetField)
-        return unmapped
 
     @property
     def nextUnmappedTargetField(self):
@@ -70,13 +56,17 @@ class FieldMap(list):
         mapped = [targetField for (_, targetField) in self]
         return next((targetField for targetField in self.targetFields if targetField not in mapped), None)
 
-    def importField(self, targetField):
+    def getImportField(self, targetField):
         """Return the import field, if any, that maps to the given target field."""
-        return next((importField for (importField, field) in self if field == targetField), None)
+
+        for (importField, field) in self:
+            if field.name() == targetField.name():
+                return importField
+        return None
 
     def update(self, index, importFieldName, targetFieldName):
         """Update the mapping for the given target Field."""
-        importField = self.importFields.field(importFieldName) if importFieldName else None
+        importField = self.importQgsFields.field(importFieldName) if importFieldName else None
         targetField = self.targetLayer.getSchema().field(targetFieldName)
 
         if index == len(self):
@@ -99,14 +89,19 @@ class FieldMap(list):
             targetFeature.setGeometry(destGeom)
 
         # Suck the mapped import fields into the target feature fields
-        for targetField in targetFeature.getSchema():
-            qgsDebug(f"Importing {targetField.name()}")
-            
-            importField = self.importField(targetField)
-            
-            if importField:            
-                # targetField.setValue(targetFeature, feature.attribute(importField.name()))
-                targetFeature.setAttribute(targetField.name(), feature.attribute(importField.name()))
-                qgsDebug(f"Imported {targetField.name()} value: {targetFeature.attribute(targetField.name())}")
+        for targetField in targetFeature.getSchema().targetFields:
+            importField = self.getImportField(targetField)
+
+            try:
+                if importField:
+                    importValue = feature.attribute(importField.name())
+                    if importValue is not None:
+                        targetFeature.setAttribute(targetField.name(), importValue)
+                elif targetField.required():
+                    raise Glitch(
+                        f"{self}.mapFeature(): no configured import field maps to required field '{targetField.name()}'")
+            except BaseException:
+                qgsDebug(f"Failed to import {importField.name()} to {targetField.name()}")
+                raise
 
         return targetFeature
