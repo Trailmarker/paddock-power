@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>471</width>
     <height>300</height>
    </rect>
   </property>
@@ -145,6 +145,23 @@
         <property name="icon">
          <iconset>
           <normaloff>:/plugins/mlapp/images/new-waterpoint.png</normaloff>:/plugins/mlapp/images/new-waterpoint.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="extractCsvButton">
+        <property name="toolTip">
+         <string>Extract Features to CSV …</string>
+        </property>
+        <property name="whatsThis">
+         <string>Extract current features to CSV</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/plugins/mlapp/images/extract-csv.png</normaloff>:/plugins/mlapp/images/extract-csv.png</iconset>
         </property>
        </widget>
       </item>
