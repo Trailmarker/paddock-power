@@ -143,6 +143,18 @@ class Field(QgsField):
             return float(val)
         return _getter
 
+    def __makeBooleanGetter(self):
+        """Make a getter for the value of a string-valued field. Handle 'NULL' correctly. Should not be called directly."""
+        def _getter(feature: QgsFeature):
+            val = feature[self.name()]
+            if isinstance(val, QVariant):
+                if val.isNull():
+                    return True
+            elif val is None:
+                return True
+            return bool(val)
+        return _getter
+
     def __makeStringGetter(self):
         """Make a getter for the value of a string-valued field. Handle 'NULL' correctly. Should not be called directly."""
         def _getter(feature: QgsFeature):
@@ -160,6 +172,8 @@ class Field(QgsField):
             return self.__makeIdGetter()
         if self._domainType is not None:
             return self.__makeFieldDomainGetter()
+        elif self.typeName() == "Boolean":
+            return self.__makeBooleanGetter()
         elif self.typeName() == "String":
             return self.__makeStringGetter()
         elif self.typeName() == "Real":
@@ -284,3 +298,9 @@ class DomainField(Field):
     def __init__(self, propertyName, name, domainType, *args, **kwargs):
         super().__init__(propertyName=propertyName, name=name, type=QVariant.String, typeName="String",
                          len=0, prec=0, comment="", subType=QVariant.Invalid, domainType=domainType, *args, **kwargs)
+
+
+class BooleanField(Field):
+    def __init__(self, propertyName, name, *args, **kwargs):
+        super().__init__(propertyName=propertyName, name=name, type=QVariant.Bool, typeName="Boolean",
+                         len=0, prec=0, comment="", subType=QVariant.Invalid)
