@@ -78,7 +78,9 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def neighbourhood(self):
         """Return a 50% scaled version of the layer's extent."""
         if self.hasFeatures:
-            return self.extent().scale(0.5)
+            extent = self.extent()
+            extent.scale(0.5)
+            return extent
         else:
             return None
 

@@ -35,7 +35,7 @@ class ImportFeatureLayerTask(WorkspaceTask):
             # Constrain imported features to the neighbourhood of the Property's Base Paddocks
             importFeatureRequest = QgsFeatureRequest().setFilterRect(self.workspace.basePaddockLayer.neighbourhood) if notImportingPaddocks else None
 
-            edits = self.targetLayer.importFeatures(self.importLayer, self.fieldMap, importFilter=importFeatureRequest, raiseIfCancelled=self.raiseIfCancelled)
+            edits = self.targetLayer.importFeatures(self.importLayer, self.fieldMap, importFilter=importFeatureRequest, raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
             edits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
 
         except Exception as e:
