@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+ACTIVE = "Active"
 AREA = "Area (km²)"
 BORE_REPORT_URL = "Bore Report URL"
 BORE_YIELD = "Bore Yield (L/s)"

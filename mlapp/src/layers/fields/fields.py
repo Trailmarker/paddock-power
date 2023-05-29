@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from .names import *
 
+from .active_status import ActiveStatus
 from .condition_type import ConditionType
 from .feature_status import FeatureStatus
 from .field import CalculatedField, DomainField, IdField, MeasureField, StringField
@@ -10,6 +11,7 @@ from .grazing_radius_type import GrazingRadiusType
 from .waterpoint_type import WaterpointType
 
 
+ActiveStatusField = DomainField(propertyName="ACTIVE", name=ACTIVE, domainType=ActiveStatus, defaultValue=ActiveStatus.Active)
 Area = CalculatedField(propertyName="AREA", name=AREA, dps=2)
 BoreReportUrl = StringField(propertyName="BORE_REPORT_URL", name=BORE_REPORT_URL)
 BoreYield = MeasureField(propertyName="BORE_YIELD", name=BORE_YIELD)
