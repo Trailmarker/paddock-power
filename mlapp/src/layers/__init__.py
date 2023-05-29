@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .base_paddock_layer import BasePaddockLayer
+from .csv import extractCsv
 from .derived_feature_layer import DerivedFeatureLayer
 from .derived_metric_paddock_layer import DerivedMetricPaddockLayer
 from .derived_paddock_land_types_layer import DerivedPaddockLandTypesLayer

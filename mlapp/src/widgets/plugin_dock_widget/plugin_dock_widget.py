@@ -8,6 +8,7 @@ from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
 from qgis.core import QgsProject
 
+from ...layers import extractCsv
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from .fences_widget import FencesWidget
@@ -52,6 +53,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.toolBar.addWidget(self.sketchFenceButton)
         self.toolBar.addWidget(self.sketchPipelineButton)
         self.toolBar.addWidget(self.sketchWaterpointButton)
+        self.toolBar.addWidget(self.extractCsvButton)
 
         self.tabWidget.setCornerWidget(self.toolBar)
 
@@ -99,6 +101,8 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchPipelineButton.clicked.connect(self.pipelinesWidget.sketchPipeline)
         self.sketchWaterpointButton.clicked.connect(self.waterpointsWidget.sketchWaterpoint)
 
+        self.extractCsvButton.clicked.connect(self.onExtractCsv)
+
         self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
         self.workspace.featureSelected.connect(lambda layerId: self.onFeatureSelected(layerId))
         self.workspace.lockChanged.connect(self.onLockChanged)
@@ -136,6 +140,11 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         qgsInfo(f"{PLUGIN_NAME} torn down.")
 
         # self.update()
+
+    def onExtractCsv(self):
+        """Extract the current Feature Table as CSV."""
+        featureLayer = self.tabWidget.currentWidget().featureTable(0).featureLayer
+        extractCsv(featureLayer)
 
     def onFeatureSelected(self, layerId):
         """Switch to the correct tab when a feature is selected."""

@@ -136,7 +136,13 @@ def resolveProjectFile():
         # "Save the current QGIS session as your Paddock Power workspace before continuing.")
     return projectFilePath
 
-
+def resolveProjectPath(relative, projectFilePath=None):
+    """Get a path relative to the current QGS project file."""
+    projectFilePath = projectFilePath or resolveProjectFile()
+    projectDir = path.dirname(projectFilePath)
+    
+    return path.normpath(path.join(projectDir, relative if relative else ""))
+    
 def resolveWorkspaceFile(projectFilePath=None):
     f"""Get where the current {PLUGIN_NAME} GeoPackage should be."""
     projectFilePath = projectFilePath or resolveProjectFile()
