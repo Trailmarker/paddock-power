@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from ..utils import qgsDebug
 from .calculator import Calculator
 from .features import WaterpointBuffer
-from .fields import AREA, FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NAME, NEAR_GRAZING_RADIUS, PADDOCK, PADDOCK_NAME, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_NAME, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
+from .fields import ACTIVE, AREA, FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NAME, NEAR_GRAZING_RADIUS, PADDOCK, PADDOCK_NAME, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_NAME, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
 from .derived_feature_layer import DerivedFeatureLayer
 
 
@@ -75,7 +74,8 @@ with {_IN_PADDOCKS} as
 		 "{NEAR_GRAZING_RADIUS}" as {_NEAR_BUFFER},
 		 "{FAR_GRAZING_RADIUS}" as {_FAR_BUFFER}
 	  from "{waterpoints}"
-      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
+      where {ACTIVE}
+      and {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
       {renamedWaterpointsClause}),
     {_BUFFERS} as
     (select
