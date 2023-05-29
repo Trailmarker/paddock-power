@@ -40,4 +40,4 @@ class ViewFeatureDetailsModel(SelectFeatureModel):
 
     def description(self, _):
         """The description of the action, given the matching column."""
-        return "Edit Feature"
+        return "View Feature Details"

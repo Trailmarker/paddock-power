@@ -24,6 +24,16 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
 
         self.nameLineEdit.setText(self.waterpoint.NAME)
 
+        self._waterpointType = waterpoint.WATERPOINT_TYPE
+
+        for waterpointType in WaterpointType:
+            self.waterpointTypeComboBox.addItem(waterpointType.value, waterpointType)
+
+        self.waterpointTypeComboBox.setCurrentIndex(
+            self.waterpointTypeComboBox.findData(self._waterpointType))
+
+        self.waterpointTypeComboBox.currentIndexChanged.connect(self.setWaterpointType)
+
         self.nearGrazingRadiusSpinBox.setMinimum(Waterpoint.NEAREST_GRAZING_RADIUS)
         self.nearGrazingRadiusSpinBox.setMaximum(Waterpoint.FARTHEST_GRAZING_RADIUS)
         self.farGrazingRadiusSpinBox.setMinimum(Waterpoint.NEAREST_GRAZING_RADIUS)
@@ -37,16 +47,8 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
 
         self.adjustMinimumFarGrazingRadius()
         self.adjustMaximumNearGrazingRadius()
-
-        self._waterpointType = waterpoint.WATERPOINT_TYPE
-
-        for waterpointType in WaterpointType:
-            self.waterpointTypeComboBox.addItem(waterpointType.value, waterpointType)
-
-        self.waterpointTypeComboBox.setCurrentIndex(
-            self.waterpointTypeComboBox.findData(self._waterpointType))
-
-        self.waterpointTypeComboBox.currentIndexChanged.connect(self.setWaterpointType)
+        
+        self.activeCheckBox.setChecked(self.waterpoint.ACTIVE)
 
     @pyqtSlot()
     def adjustMinimumFarGrazingRadius(self):
@@ -69,5 +71,6 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
         self.waterpoint.WATERPOINT_TYPE = self._waterpointType
         self.waterpoint.NEAR_GRAZING_RADIUS = float(self.nearGrazingRadiusSpinBox.value())
         self.waterpoint.FAR_GRAZING_RADIUS = float(self.farGrazingRadiusSpinBox.value())
+        self.waterpoint.ACTIVE = self.activeCheckBox.isChecked()
 
         return Edits.upsert(self.waterpoint)

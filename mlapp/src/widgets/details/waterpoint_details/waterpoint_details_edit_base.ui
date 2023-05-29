@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>102</height>
+    <height>140</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,61 @@
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nameLineEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="waterpointTypeComboBox"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="nearGrazingRadiusLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Near grazing radius (m)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="farGrazingRadiusLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Far grazing radius (m)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="nameLabel">
        <property name="sizePolicy">
@@ -46,24 +101,23 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="nearGrazingRadiusLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="farGrazingRadiusSpinBox">
+       <property name="maximum">
+        <number>20000</number>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
+       <property name="singleStep">
+        <number>100</number>
        </property>
-       <property name="text">
-        <string notr="true">Near grazing radius (m)</string>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="nearGrazingRadiusSpinBox">
+       <property name="maximum">
+        <number>20000</number>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <property name="singleStep">
+        <number>100</number>
        </property>
       </widget>
      </item>
@@ -94,11 +148,8 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="waterpointTypeComboBox"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="farGrazingRadiusLabel">
+     <item row="4" column="0">
+      <widget class="QLabel" name="activeLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -111,40 +162,17 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Far grazing radius (m)</string>
+        <string notr="true">Active</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QSpinBox" name="nearGrazingRadiusSpinBox">
-       <property name="maximum">
-        <number>20000</number>
-       </property>
-       <property name="singleStep">
-        <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSpinBox" name="farGrazingRadiusSpinBox">
-       <property name="maximum">
-        <number>20000</number>
-       </property>
-       <property name="singleStep">
-        <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="nameLineEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+     <item row="4" column="1">
+      <widget class="QCheckBox" name="activeCheckBox">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

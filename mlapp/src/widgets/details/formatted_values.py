@@ -8,7 +8,7 @@ class FormattedValues(QLabel):
         super().__init__(parent)
 
     def setValues(self, formatSpec: str, *values):
-        if values and formatSpec is not None:
+        if values and all(values) and formatSpec is not None:
             super().setText(formatSpec.format(*values))
         else:
             super().setText("")
