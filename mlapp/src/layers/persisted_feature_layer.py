@@ -66,7 +66,7 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
     def deleteFromStore(self, workspaceFile, layerName):
         """Delete this FeatureLayer from the GeoPackage file."""
 
-        #gpkgUrl = f"{workspaceFile}|layername={layerName}"
+        # gpkgUrl = f"{workspaceFile}|layername={layerName}"
 
         processing.run("native:spatialiteexecutesql", {
             'DATABASE': workspaceFile,

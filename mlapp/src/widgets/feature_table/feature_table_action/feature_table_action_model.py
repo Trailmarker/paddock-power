@@ -60,7 +60,7 @@ class FeatureTableActionModel(QObject, WorkspaceMixin, ABC, metaclass=QtAbstract
     def locked(self):
         """Whether the action is locked."""
         return False
-    
+
     @abstractmethod
     def description(self, index):
         """The description of the action, given the matching column."""

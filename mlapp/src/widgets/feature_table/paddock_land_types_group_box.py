@@ -21,7 +21,7 @@ class PaddockLandTypesGroupBox(FeatureTableGroupBox):
         # If there's no data, clear the PaddockDetails model
         showData = bool(self.featureLayer) and self.featureLayer.featureCount() > 0
         self.paddockDetails.model = self.featureLayer.paddock if showData else None
-        
+
     def onPopupLayerAdded(self, layerId):
         """Handle a new layer from the popup layer source (if any)."""
 

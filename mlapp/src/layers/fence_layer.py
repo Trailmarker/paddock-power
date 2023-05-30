@@ -34,7 +34,7 @@ class FenceLayer(PersistedFeatureLayer):
 
         currentBuildOrder = max([bo for (bo, _) in pairs], default=0)
         lowestDraftBuildOrder = min(
-            [bo for(bo, f) in pairs if f.matchStatus(FeatureStatus.Drafted)],
+            [bo for (bo, f) in pairs if f.matchStatus(FeatureStatus.Drafted)],
             default=currentBuildOrder + 1)
         highestPlannedBuildOrder = max([bo for (bo, f) in pairs if f.matchStatus(FeatureStatus.Planned)], default=0)
 

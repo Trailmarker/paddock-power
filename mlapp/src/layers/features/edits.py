@@ -145,7 +145,7 @@ class Edits(WorkspaceMixin):
 
         def persist(self):
             self.derivedLayer.removeAllOfType()
-        
+
         @property
         def layer(self):
             return self._layer

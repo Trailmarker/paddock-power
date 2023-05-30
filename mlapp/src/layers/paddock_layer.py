@@ -34,7 +34,8 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
         self.connectPopups()
 
     def getByPaddockId(self, timeframe, paddockId):
-        return next(self.getFeatures(QgsFeatureRequest().setFilterExpression(f'"{PADDOCK}" = {paddockId} and "{TIMEFRAME}" = \'{timeframe.name}\'')), None)
+        return next(self.getFeatures(QgsFeatureRequest().setFilterExpression(
+            f'"{PADDOCK}" = {paddockId} and "{TIMEFRAME}" = \'{timeframe.name}\'')), None)
 
     @property
     def hasPopups(self):

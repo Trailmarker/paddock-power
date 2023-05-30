@@ -51,7 +51,7 @@ class MapLayerMixin(IMapLayer):
         for layerId in matches:
             qgsInfo(f"{PLUGIN_NAME} Cleaning up {layerId} …")
             QgsProject.instance().removeMapLayer(layerId)
-                    
+
         # Sleep briefly as QGIS gets confused when we do this …
         sleep(cls.REMOVE_ALL_OF_TYPE_DELAY)
 

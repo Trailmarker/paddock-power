@@ -29,9 +29,8 @@ class PlanBuildFeatureModel(FeatureActionsModel):
             FeatureAction.plan: self._planIcon,
             FeatureAction.build: self._buildIcon
         }
-        
+
     @property
     def locked(self):
         """Whether the action is locked."""
         return self.workspace.locked()
-

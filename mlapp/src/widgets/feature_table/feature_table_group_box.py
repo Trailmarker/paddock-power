@@ -62,7 +62,7 @@ class FeatureTableGroupBox(WorkspaceMixin, PopupLayerConsumerMixin, QGroupBox):
     def featureLayer(self, featureLayer):
         """Create a new FeatureTable and set its feature layer, if we have a configured FeatureTable factory, or clear everything."""
         self.removeFeatureTable()
-        
+
         showTable = bool(featureLayer) and bool(self.featureTableFactory) and featureLayer.featureCount() > 0
         if showTable:
             self._featureTable = self.featureTableFactory(self)

@@ -32,12 +32,15 @@ class ImportFeatureLayerTask(WorkspaceTask):
                     f"{PLUGIN_NAME} abandoned import because there are no {BasePaddockLayer.defaultName()}.")
                 return False
 
-           # Constrain imported features (other than paddocks themselves!) to the neighbourhood of the Property's Base Paddocks
+           # Constrain imported features (other than paddocks themselves!) to the
+           # neighbourhood of the Property's Base Paddocks
             importFeatureRequest = QgsFeatureRequest()
             if notImportingPaddocks:
                 importFeatureRequest = importFeatureRequest.setFilterRect(self.workspace.basePaddockLayer.neighbourhood)
 
-            edits = self.targetLayer.importFeatures(self.importLayer, self.fieldMap, importFilter=importFeatureRequest, raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
+            edits = self.targetLayer.importFeatures(
+                self.importLayer, self.fieldMap, importFilter=importFeatureRequest,
+                raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
             edits.persist(raiseErrorIfTaskHasBeenCancelled=self.raiseIfCancelled)
 
         except Exception as e:

@@ -31,9 +31,8 @@ class UndoTrashFeatureModel(FeatureActionsModel):
             FeatureAction.undoPlan: self._undoPlanIcon,
             FeatureAction.undoBuild: self._undoBuildIcon
         }
-        
+
     @property
     def locked(self):
         """Whether the action is locked."""
         return self.workspace.locked()
-

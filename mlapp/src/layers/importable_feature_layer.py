@@ -32,9 +32,9 @@ class ImportableFeatureLayer(PersistedFeatureLayer, IImportableFeatureLayer):
 
         features = []
         importQgsFeatures = [importFeature for importFeature in importLayer.getFeatures(importFilter)]
-        
+
         qgsInfo(f"Importing {len(importQgsFeatures)} features into layer {self.name()} via field map {fieldMap} …")
-        
+
         for importQgsFeature in importQgsFeatures:
             raiseErrorIfTaskHasBeenCancelled()
             targetFeature = self.mapFeature(importQgsFeature, fieldMap)

@@ -47,7 +47,7 @@ class WaterpointDetailsEdit(QWidget, FORM_CLASS):
 
         self.adjustMinimumFarGrazingRadius()
         self.adjustMaximumNearGrazingRadius()
-        
+
         self.activeCheckBox.setChecked(self.waterpoint.ACTIVE)
 
     @pyqtSlot()

@@ -69,7 +69,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
         # Get a second batch of edits that copies the new records to this layer …
         edits.editBefore(Edits.bulkAdd(self, derivedFeatures))
-        
+
         # Clean up the derived layer after all this gets persisted
         edits.editBefore(Edits.cleanupDerivedLayer(self, derivedLayer))
 

@@ -31,4 +31,4 @@ def testCrash():
     p1.featureLayer.startEditing()
     p1.upsert()
 
-#testPipeline.GEOMETRY = testGeom
+# testPipeline.GEOMETRY = testGeom
