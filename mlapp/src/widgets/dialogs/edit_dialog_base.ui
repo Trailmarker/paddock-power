@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MLA Paddock Power | Edit</string>
+   <string>Paddock Power | Edit</string>
   </property>
   <property name="toolTip">
    <string>Edit this feature using the provided form</string>

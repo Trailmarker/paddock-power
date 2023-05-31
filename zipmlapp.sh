@@ -16,7 +16,7 @@ rm -rf mlapp/dev.py
 
 find . -name "*.qss" | xargs rm -f
 
-# zip up the MLA Paddock Power plug-in directory only into a datestamped archive
+# zip up the Paddock Power plug-in directory only into a datestamped archive
 7z a -r "../mlapp-$(date +'%Y%m%d').zip" mlapp
 cd ..
 rm -rf deployment

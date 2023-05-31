@@ -15,10 +15,10 @@ from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsMessageLog, QgsProject
 from qgis.utils import iface
 
-# MLA Paddock Power data is held in the GDA2020 coordinate system
+# Paddock Power data is held in the GDA2020 coordinate system
 PADDOCK_POWER_EPSG = 7845
 
-PLUGIN_NAME = "MLA Paddock Power"
+PLUGIN_NAME = "Paddock Power"
 PLUGIN_FOLDER = "mlapp"
 
 # 16777215

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MLA Paddock Power | Details</string>
+   <string>Paddock Power | Details</string>
   </property>
   <property name="toolTip">
    <string>View the details of this feature</string>

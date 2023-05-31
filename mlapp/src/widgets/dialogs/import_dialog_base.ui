@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>MLA Paddock Power | Import</string>
+   <string>Paddock Power | Import</string>
   </property>
   <property name="toolTip">
    <string>Edit this feature using the provided form</string>

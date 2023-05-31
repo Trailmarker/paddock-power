@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from ...layers.fields import Timeframe
 from ...layers import PaddockCurrentLandTypesPopupLayer, PaddockFutureLandTypesPopupLayer
 from ...models import WorkspaceMixin
+from ...utils import PLUGIN_NAME
 from ..feature_table import PaddockTable, CurrentPaddockLandTypesTable, FuturePaddockLandTypesTable, PaddockLandTypesGroupBox, SplitFeatureTablesWidget
 
 
 class PaddocksWidget(WorkspaceMixin, SplitFeatureTablesWidget):
-    """A widget that shows three adjacent feature tables: Paddocks, Current Paddock Land Types, Future Paddock Land Types.
-       Selecting items in the Paddock Table adds popup layers to MLA Paddock Power which are then tabulated in the Land Types Tables."""
+    f"""A widget that shows three adjacent feature tables: Paddocks, Current Paddock Land Types, Future Paddock Land Types.
+        Selecting items in the Paddock Table adds popup layers to ${PLUGIN_NAME} which are then tabulated in the Land Types Tables."""
 
     def __init__(self, parent=None):
         """Constructor."""

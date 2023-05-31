@@ -14,7 +14,7 @@
    <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
   </property>
   <property name="windowTitle">
-   <string>MLA Paddock Power</string>
+   <string>Paddock Power</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -137,7 +137,7 @@
          <string>Sketch a Waterpoint …</string>
         </property>
         <property name="whatsThis">
-         <string>Interactively sketch a new Waterpoint on the map, using right-click to finish sketching. Once you finish your sketch, a Drafted Waterpoint is created with default attributes. Change the Waterpoint Type and Near and Far Grading radiuses to change the way its behaviour is modelled by MLA Paddock Power.</string>
+         <string>Interactively sketch a new Waterpoint on the map, using right-click to finish sketching. Once you finish your sketch, a Drafted Waterpoint is created with default attributes. Change the Waterpoint Type and Near and Far Grading radiuses to change the way its behaviour is modelled by Paddock Power.</string>
         </property>
         <property name="text">
          <string/>
