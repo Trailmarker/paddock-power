@@ -6,9 +6,6 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
-from qgis.core import QgsProject
-
-from ...layers import extractCsv
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from .fences_widget import FencesWidget
@@ -144,7 +141,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
     def onExtractCsv(self):
         """Extract the current Feature Table as CSV."""
         featureLayer = self.tabWidget.currentWidget().featureTable(0).featureLayer
-        extractCsv(featureLayer)
+        featureLayer.extractCsv()
 
     def onFeatureSelected(self, layerId):
         """Switch to the correct tab when a feature is selected."""

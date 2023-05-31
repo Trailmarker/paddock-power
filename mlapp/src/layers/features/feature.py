@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from functools import cached_property
 from re import finditer
-
 from qgis.core import QgsFeature, QgsRectangle, QgsVectorLayer
 
 from ...models import Glitch, QtAbstractMeta
+from ...utils import guiInformation, resolveProjectPath
 from ..fields import AREA, ELEVATION, FID, LENGTH, LONGITUDE, LATITUDE, NAME, STATUS, PERIMETER, TIMEFRAME, Timeframe
 from ..interfaces import IFeature
+from ..csv import makeCsvWriter, timestampedCsvFilename, writeFeature
 
 
 class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
@@ -173,3 +174,12 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
             featureExtent.scale(1.5)  # Expand by 50%
             iface.mapCanvas().setExtent(featureExtent)
             iface.mapCanvas().refresh()
+
+    def extractCsv(self):
+        """Extract this feature layer to CSV."""
+        csvFilename = resolveProjectPath(timestampedCsvFilename(self.NAME))
+        
+        with makeCsvWriter(csvFilename) as csvWriter:
+            writeFeature(csvWriter, self)
+            guiInformation(f"Feature data extracted to:\n{csvFilename}.")
+        

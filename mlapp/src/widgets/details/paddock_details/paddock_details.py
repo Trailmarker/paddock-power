@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from ..details import Details
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from abc import abstractclassmethod
+from abc import abstractclassmethod, abstractmethod
 from .map_layer import MapLayer
 
 
@@ -23,3 +23,8 @@ class FeatureLayer(MapLayer):
     def focusOnSelect(self):
         """Return True if this layer should be focused when a feature is selected."""
         return self.getFeatureType().focusOnSelect()
+
+    @abstractmethod
+    def extractCsv(self):
+        "Extract this feature layer to CSV."
+        pass
