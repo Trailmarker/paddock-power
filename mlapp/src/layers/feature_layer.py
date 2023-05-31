@@ -139,7 +139,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
     def extractCsv(self):
         """Extract this feature layer to CSV."""
         csvFilename = resolveProjectPath(timestampedCsvFilename(self.name()))
-        
+
         with makeCsvWriter(csvFilename) as csvWriter:
             writeFeatureLayer(csvWriter, self)
             guiInformation(f"Features extracted to:\n{csvFilename}.")
@@ -176,4 +176,3 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
             if feature:
                 self.onSelectFeature(feature)
                 self.workspace.selectFeature(feature)
-

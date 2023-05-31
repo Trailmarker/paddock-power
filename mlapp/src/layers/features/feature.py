@@ -178,8 +178,7 @@ class Feature(QgsFeature, IFeature, metaclass=QtAbstractMeta):
     def extractCsv(self):
         """Extract this feature layer to CSV."""
         csvFilename = resolveProjectPath(timestampedCsvFilename(self.NAME))
-        
+
         with makeCsvWriter(csvFilename) as csvWriter:
             writeFeature(csvWriter, self)
             guiInformation(f"Feature data extracted to:\n{csvFilename}.")
-        

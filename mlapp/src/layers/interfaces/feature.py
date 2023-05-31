@@ -106,9 +106,8 @@ class Feature(ABC):
     def zoomFeature(self):
         """Zoom to the Feature."""
         pass
-    
+
     @abstractmethod
     def extractCsv(self):
         "Extract this Feature to CSV."
         pass
-
