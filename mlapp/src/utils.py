@@ -153,7 +153,7 @@ def resolveWorkspaceFile(projectFilePath=None):
 
 def resolveStylePath(styleName):
     """Resolve the path of a style file packaged with the plugin."""
-    relative = f"styles\\{styleName}.qml"
+    relative = path.join("styles", f"{styleName}.qml")
     return resolvePluginPath(relative)
 
 
