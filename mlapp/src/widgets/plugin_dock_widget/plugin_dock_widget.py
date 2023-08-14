@@ -8,6 +8,7 @@ from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
+from ...pdf_report.pdf_report import pdfReportDialog
 from .fences_widget import FencesWidget
 from .land_types_widget import LandTypesWidget
 from .paddocks_widget import PaddocksWidget
@@ -41,6 +42,12 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.pipelinesWidget = None
         self.waterpointsWidget = None
 
+        self.pdfReportDlg = None
+        self.pdfReportButton = QPushButton(QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pdf-icon.png"), '', self)
+        self.pdfReportButton.setToolTip("Generate Paddock Report …")
+        self.pdfReportButton.clicked.connect(self.onGenerateReport)
+        self.msg = QMessageBox(self)
+
         self.toolBar = QToolBar()
         self.toolBar.setMovable(False)
         self.toolBar.setFloatable(False)
@@ -50,6 +57,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.toolBar.addWidget(self.sketchFenceButton)
         self.toolBar.addWidget(self.sketchPipelineButton)
         self.toolBar.addWidget(self.sketchWaterpointButton)
+        self.toolBar.addWidget(self.pdfReportButton)
         self.toolBar.addWidget(self.extractCsvButton)
 
         self.tabWidget.setCornerWidget(self.toolBar)
@@ -137,6 +145,12 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         qgsInfo(f"{PLUGIN_NAME} torn down.")
 
         # self.update()
+        
+    def onGenerateReport(self):
+        """Open dialog to preview and generate PDF report"""
+        if not self.pdfReportDlg:
+            self.pdfReportDlg = pdfReportDialog()
+        self.pdfReportDlg.show()
 
     def onExtractCsv(self):
         """Extract the current Feature Table as CSV."""
@@ -166,3 +180,6 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchFenceButton.setEnabled(not locked)
         self.sketchPipelineButton.setEnabled(not locked)
         self.sketchWaterpointButton.setEnabled(not locked)
+        
+    def closeEvent(self, e):
+        self.pdfReportDlg = None

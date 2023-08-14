@@ -37,6 +37,7 @@
         <file>images/view-item.png</file>
         <file>images/waterpoint.png</file>
         <file>images/zoom-item.png</file>
+        <file>images/pdf-icon.png</file>
 
         <file>src/widgets/details/condition_type_label.qss</file>
         <file>src/widgets/details/feature_status_label.qss</file>
