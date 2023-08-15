@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QFont, QColor
+from qgis.PyQt.QtGui import QFont, QColor
 
 from qgis.core import (QgsProject, QgsFillSymbol, QgsSingleSymbolRenderer,
                         QgsPalLayerSettings, QgsTextFormat, QgsTextBufferSettings,
