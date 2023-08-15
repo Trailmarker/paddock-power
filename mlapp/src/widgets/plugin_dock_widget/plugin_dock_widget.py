@@ -4,7 +4,7 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
+from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar, QPushButton
 
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
@@ -46,7 +46,6 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.pdfReportButton = QPushButton(QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pdf-icon.png"), '', self)
         self.pdfReportButton.setToolTip("Generate Paddock Report …")
         self.pdfReportButton.clicked.connect(self.onGenerateReport)
-        self.msg = QMessageBox(self)
 
         self.toolBar = QToolBar()
         self.toolBar.setMovable(False)

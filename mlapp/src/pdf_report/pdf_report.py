@@ -1,14 +1,14 @@
-from PyQt5.QtCore import Qt, QSize, QByteArray, QBuffer, QIODevice, QUrl
+from qgis.PyQt.QtCore import Qt, QSize, QByteArray, QBuffer, QIODevice, QUrl
 
-from PyQt5.QtWidgets import (qApp, QDialog, QFileDialog, QMessageBox, QStyle, QLabel,
+from qgis.PyQt.QtWidgets import (qApp, QDialog, QFileDialog, QMessageBox, QStyle, QLabel,
                             QComboBox, QLineEdit, QRadioButton, QPushButton,
                             QGridLayout, QVBoxLayout, QHBoxLayout)
                             
-from PyQt5.QtGui import QIcon, QColor, QPageLayout, QPageSize
+from qgis.PyQt.QtGui import QIcon, QColor, QPageLayout, QPageSize
 
-from PyQt5.QtPrintSupport import QPrintDialog, QPrintPreviewDialog, QPrinter
+from qgis.PyQt.QtPrintSupport import QPrintDialog, QPrintPreviewDialog, QPrinter
 
-from PyQt5.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWebKitWidgets import QWebView
 
 from qgis.core import QgsMapSettings, QgsMapRendererParallelJob
                         
