@@ -1,7 +1,9 @@
 {
     "python.analysis.extraPaths": [
         "/Applications/QGIS.app/Contents/Resources/python",
-        "/Applications/QGIS.app/Contents/Resources/python/site-packages"
+        "/Applications/QGIS.app/Contents/Resources/python/site-packages",
+        "/Applications/QGIS-LTR.app/Contents/Resources/python",
+        "/Applications/QGIS-LTR.app/Contents/Resources/python/site-packages"
     ],
     "xml.validation.enabled": false
 }

@@ -7,8 +7,8 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar, QPushButton
 
 from ...models import WorkspaceMixin
+from ...pdf_report.pdf_report_dialog import PdfReportDialog
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
-from ...pdf_report.pdf_report import pdfReportDialog
 from .fences_widget import FencesWidget
 from .land_types_widget import LandTypesWidget
 from .paddocks_widget import PaddocksWidget
@@ -42,7 +42,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.pipelinesWidget = None
         self.waterpointsWidget = None
 
-        self.pdfReportDlg = None
+        self.pdfReportDialog = None
         self.pdfReportButton = QPushButton(QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pdf-icon.png"), '', self)
         self.pdfReportButton.setToolTip("Generate Paddock Report …")
         self.pdfReportButton.clicked.connect(self.onGenerateReport)
@@ -146,10 +146,10 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         # self.update()
         
     def onGenerateReport(self):
-        """Open dialog to preview and generate PDF report"""
-        if not self.pdfReportDlg:
-            self.pdfReportDlg = pdfReportDialog()
-        self.pdfReportDlg.show()
+        """Open dialog to preview and generate PDF report."""
+        if not self.pdfReportDialog:
+            self.pdfReportDialog = PdfReportDialog()
+        self.pdfReportDialog.show()
 
     def onExtractCsv(self):
         """Extract the current Feature Table as CSV."""
@@ -181,4 +181,4 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchWaterpointButton.setEnabled(not locked)
         
     def closeEvent(self, e):
-        self.pdfReportDlg = None
+        self.pdfReportDialog = None
