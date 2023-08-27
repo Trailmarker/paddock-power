@@ -2,7 +2,7 @@
 import base64
 import os
 
-from qgis.PyQt.QtCore import Qt, QSize, QByteArray, QBuffer, QIODevice
+from qgis.PyQt.QtCore import Qt, QSize, QByteArray, QBuffer, QIODevice, QTimer
 from qgis.PyQt.QtWidgets import (qApp, QDialog, QFileDialog, QMessageBox, QStyle, QLabel,
                                  QComboBox, QLineEdit, QRadioButton, QPushButton,
                                  QGridLayout, QVBoxLayout, QHBoxLayout)
@@ -10,7 +10,8 @@ from qgis.PyQt.QtGui import QIcon, QColor, QPageLayout, QPageSize
 from qgis.PyQt.QtPrintSupport import QPrintPreviewDialog, QPrinter
 from qgis.PyQt.QtWebKitWidgets import QWebView
 
-from qgis.core import QgsMapSettings, QgsMapRendererParallelJob
+from qgis.core import (QgsMapSettings, QgsMapRendererParallelJob, QgsRasterLayer,
+                        QgsCoordinateReferenceSystem)
 
 from .report_utils import reportUtils
 
@@ -39,24 +40,34 @@ class PdfReportDialog(QDialog):
         self.basicReportRadioButton = QRadioButton('Basic Report', self)
         self.basicReportRadioButton.setChecked(True)
         self.advancedReportRadioButton = QRadioButton('Advanced Report', self)
+        self.advancedReportRadioButton.toggled.connect(self.radioButtonToggled)
+        self.basemapLabel = QLabel('Basemap:')
+        self.basemapComboBox = QComboBox(self)
+        self.basemapComboBox.setMinimumWidth(200)
+        self.basemapComboBox.addItems(['Bing Virtual Earth', 'Esri Satellite', 'Google Satellite', 'OpenTopoMap', 'No Basemap'])
+        self.basemapComboBox.setEnabled(False)
         self.previewButton = QPushButton('Preview', self)
         self.previewButton.setToolTip('Show Selected Report Preview')
 
         self.populateComboBox()
 
-        self.previewButton.clicked.connect(self.showPreview)
+        self.previewButton.clicked.connect(self.setStandbyHtml)
         self.widget_layout = QGridLayout()
         self.widget_layout.addWidget(self.paddocksLabel, 0, 0, 1, 1)
-        self.widget_layout.addWidget(self.paddocksComboBox, 0, 1, 1, 3)
+        self.widget_layout.addWidget(self.paddocksComboBox, 0, 1, 1, 4)
         self.widget_layout.addWidget(self.titleLabel, 1, 0, 1, 1)
-        self.widget_layout.addWidget(self.titleEdit, 1, 1, 1, 3)
-        self.widget_layout.addWidget(self.reportOptionLabel, 2, 0, 1, 1)
-        self.widget_layout.addWidget(self.basicReportRadioButton, 2, 1, 1, 1)
-        self.widget_layout.addWidget(self.advancedReportRadioButton, 2, 2, 1, 1)
-        self.widget_layout.addWidget(self.previewButton, 2, 3, 1, 1)
+        self.widget_layout.addWidget(self.titleEdit, 1, 1, 1, 4)
+        self.control_layout = QHBoxLayout()
+        self.control_layout.addWidget(self.reportOptionLabel)
+        self.control_layout.addWidget(self.basicReportRadioButton)
+        self.control_layout.addWidget(self.advancedReportRadioButton)
+        self.control_layout.addWidget(self.basemapLabel, alignment=Qt.AlignRight)
+        self.control_layout.addWidget(self.basemapComboBox, alignment=Qt.AlignLeft)
+        self.control_layout.addWidget(self.previewButton)
         self.view = QWebView(self)
         self.master_layout = QVBoxLayout(self)
         self.master_layout.addLayout(self.widget_layout)
+        self.master_layout.addLayout(self.control_layout)
         self.master_layout.addWidget(self.view)
         self.export_button = QPushButton(QIcon(":images/themes/default/mActionSaveAsPDF.svg"), '', self)
         self.export_button.setFixedSize(QSize(50, 50))
@@ -80,6 +91,7 @@ class PdfReportDialog(QDialog):
         self.msgBox = QMessageBox()
 
     def populateComboBox(self):
+        self.paddocksComboBox.clear()
         developed_paddocks = self.utils.getDevelopedPaddocks()
         if developed_paddocks:
             self.paddocksComboBox.addItems(developed_paddocks)
@@ -87,11 +99,18 @@ class PdfReportDialog(QDialog):
                 self.paddocksComboBox.setEnabled(True)
             self.manageWidgets(True)
         else:
-            self.paddocksComboBox.clear()
             self.paddocksComboBox.setCurrentText('No Developed Paddocks')
             if self.paddocksComboBox.isEnabled():
                 self.paddocksComboBox.setEnabled(False)
             self.manageWidgets(False)
+            
+    def radioButtonToggled(self, is_checked):
+        if is_checked:
+            if not self.basemapComboBox.isEnabled():
+                self.basemapComboBox.setEnabled(True)
+        else:
+            if self.basemapComboBox.isEnabled():
+                self.basemapComboBox.setEnabled(False)
 
     def manageWidgets(self, bool_val):
         self.titleEdit.setEnabled(bool_val)
@@ -106,23 +125,41 @@ class PdfReportDialog(QDialog):
         html_text += "</body>"
         html_text += "</html>"
         self.view.setHtml(html_text)
-
+        
+    def setStandbyHtml(self):
+        # Show 'Generating preview...' screen while maps are rendering (bottleneck)
+        standby_html = "<html>"
+        standby_html += "<body>"
+        standby_html += "<h1>"
+        standby_html += "Generating preview..."
+        standby_html += "</h1>"
+        standby_html += "</body>"
+        standby_html += "</html>"
+        standby_html += "<style>"
+        standby_html += "body {display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif; background-color: #D3D3D3;}"
+        standby_html += "</style>"
+        self.view.setHtml(standby_html)
+        
+        QTimer.singleShot(250, self.showPreview)
 
 ##### **************METHODS TO GENERATE HTML CONTENT**********************#####
 
 
     def basicReportHtml(self, paddock_name, development_name):
-        html_text = "<html>\
-                    <body>\
-                    <h2>\
-                    Paddock Power Investment Calculator Data\
-                    </h2>"
+        html_text = "<html>"
+        html_text += "<body>"
+        html_text += "<div id='report-1-heading'>"
+        html_text += "<h1>"
+        html_text += "Paddock Power Investment Calculator Data"
+        html_text += "</h1>"
+        html_text += "</div>"
         current_pdk_details = self.utils.paddockDetails(paddock_name, 'Current')
         if not current_pdk_details:
             return None
         html_text += "<div id='info-panel'>"
         html_text += "<div id='current-info'>"
         html_text += "<h2>Current Situation</h2>"
+        html_text += "<hr>"
         html_text += f"<h3>{paddock_name}</h3>"
         html_text += f"<p>Total paddock area (km²) = {round(current_pdk_details[0]/1000000, 1)}</p>"
         html_text += f"<p>Recommended carrying capacity (AE/yr) = {round(current_pdk_details[1])}</p>"
@@ -131,9 +168,11 @@ class PdfReportDialog(QDialog):
         html_text += f"<p>5km Watered Area (km² and %) = {round(current_pdk_details[5]/1000000, 1)} | {round(current_pdk_details[6], 1)}</p>"
         html_text += f"<p>Minimum length of fencing (km) = {round(current_pdk_details[7]/1000, 1)}</p>"
         html_text += "</div>"
-
         html_text += "<div id='proposed-development-info'>"
-        html_text += f"<h2>{development_name}</h2>"
+        html_text += "<h2>Proposed Development Option</h2>"
+        html_text += "<hr>"
+        if development_name != "Proposed Development Option":
+            html_text += f"<h3>{development_name}</h3>"
 
         pdks = [ft for ft in self.utils.pdk_lyr.getFeatures() if ft['Name'] == paddock_name]
         if pdks:
@@ -203,6 +242,7 @@ class PdfReportDialog(QDialog):
             html_text += "<style>"
             html_text += "body {font-family: Arial, sans-serif; background-color: #fcf5e1;}"
             html_text += "#info-panel {margin-left: 50px;}"
+            html_text += "#report-1-heading {text-align: center; margin-top: 50px; margin-bottom:50px;}"
             html_text += "</style>"
             return html_text
         return None
@@ -214,7 +254,10 @@ class PdfReportDialog(QDialog):
         current_recommended_cc = round(current_pdk_details[1])
         current_avg_AE = 'TODO'
         current_num_wpts = current_pdk_details[2]
-        current_avg_AE_per_wpt = round(current_recommended_cc / current_num_wpts)
+        if current_num_wpts > 0:
+            current_avg_AE_per_wpt = round(current_recommended_cc / current_num_wpts)
+        else:
+            current_avg_AE_per_wpt = 0
         current_wa_3km = round(current_pdk_details[3] / 1000000, 1)
         current_wa_3km_pcnt = round(current_pdk_details[4], 1)
         current_wa_3km_info = f'{current_wa_3km}km² | {current_wa_3km_pcnt}%'
@@ -327,6 +370,12 @@ class PdfReportDialog(QDialog):
             self.view.setHtml(basic_html)
         ##### ADVANCED REPORT TEMPLATE#####
         elif self.advancedReportRadioButton.isChecked():
+            basemap = self.basemapComboBox.currentText()
+            if basemap == 'No Basemap':
+                basemap_lyr = None
+            else:
+                basemap_lyr = self.utils.basemapLayer(basemap)
+            #############################################################
             advanced_html = "<html>"
             advanced_html += "<body>"
             advanced_html += "<h1>"
@@ -335,7 +384,7 @@ class PdfReportDialog(QDialog):
             advanced_html += self.advancedReportTableHtml(paddock_name)
 
             # Create image tag for current layers
-            current_layers = self.utils.currentMapLayers(paddock_name)
+            current_layers = self.utils.currentMapLayers(paddock_name, basemap)
             current_layer_names = [l.name() for l in current_layers]
             current_layers_ordered = []
 
@@ -350,7 +399,13 @@ class PdfReportDialog(QDialog):
                 current_layers_ordered.append(current_layers[wa_lyr_index])
             if 'Paddocks' in current_layer_names:
                 pdk_lyr_index = current_layer_names.index('Paddocks')
+                if not basemap_lyr:
+                    ls_lyr = self.utils.landTypesLayer(current_layers[pdk_lyr_index])
+                    if ls_lyr:
+                        current_layers_ordered.append(ls_lyr)
                 current_layers_ordered.append(current_layers[pdk_lyr_index])
+            if basemap_lyr:
+                current_layers_ordered.append(basemap_lyr)
 
             full_extent = current_layers[pdk_lyr_index].extent()
             longest_dim = max([full_extent.width(), full_extent.height()])
@@ -360,6 +415,7 @@ class PdfReportDialog(QDialog):
             scale_bar_lyr = self.utils.scaleBarLayer(full_extent)
             current_layers_ordered.insert(0, scale_bar_lyr)
             settings = QgsMapSettings()
+            settings.setDestinationCrs(QgsCoordinateReferenceSystem('EPSG:7845'))
             settings.setOutputDpi(350)
             settings.setLayers(current_layers_ordered)
             settings.setExtent(full_extent)
@@ -378,7 +434,7 @@ class PdfReportDialog(QDialog):
                 byte_array).decode())
 
             # Create image tag for future layers
-            future_layers = self.utils.futureMapLayers(self.paddocksComboBox.currentText())
+            future_layers = self.utils.futureMapLayers(paddock_name, basemap)
             future_layer_names = [l.name() for l in future_layers]
             future_layers_ordered = []
 
@@ -393,8 +449,13 @@ class PdfReportDialog(QDialog):
                 future_layers_ordered.append(future_layers[wa_lyr_index])
             if 'Paddocks' in future_layer_names:
                 pdk_lyr_index = future_layer_names.index('Paddocks')
+                if not basemap_lyr:
+                    ls_lyr = self.utils.landTypesLayer(future_layers[pdk_lyr_index])
+                    if ls_lyr:
+                        future_layers_ordered.append(ls_lyr)
                 future_layers_ordered.append(future_layers[pdk_lyr_index])
-
+            if basemap_lyr:
+                future_layers_ordered.append(basemap_lyr)
             full_extent = future_layers[pdk_lyr_index].extent()
             longest_dim = max([full_extent.width(), full_extent.height()])
             grow_factor = longest_dim / 30
@@ -403,6 +464,7 @@ class PdfReportDialog(QDialog):
             scale_bar_lyr = self.utils.scaleBarLayer(full_extent)
             future_layers_ordered.insert(0, scale_bar_lyr)
             settings = QgsMapSettings()
+            settings.setDestinationCrs(QgsCoordinateReferenceSystem('EPSG:7845'))
             settings.setOutputDpi(350)
             settings.setLayers(future_layers_ordered)
             settings.setExtent(full_extent)
@@ -430,7 +492,12 @@ class PdfReportDialog(QDialog):
             advanced_html += img_tag2
             advanced_html += "</div>"  # Closing tag for planned-map-img div
             advanced_html += "</div>"  # Closing tag for image-div
-            advanced_html += f"<img src='file:///{self.current_dir}/legend-img.png' alt='Legend' width='750'/>"
+            if basemap_lyr:
+                attribution_txt = self.utils.basemapAttribution(basemap)
+                advanced_html += f"<p id=attribution-txt>{attribution_txt}</p>"
+                advanced_html += f"<img src='file:///{self.current_dir}/legend-img-basemap.png' alt='Legend' width='750'/>"
+            else:
+                advanced_html += f"<img src='file:///{self.current_dir}/legend-img-no-basemap.png' alt='Legend' width='750'/>"
             advanced_html += "</body>"
             advanced_html += "</html>"
             advanced_html += "<style>"
@@ -445,6 +512,7 @@ class PdfReportDialog(QDialog):
             advanced_html += "table {margin-left: auto; margin-right: auto; margin-bottom: 50px;}"
             advanced_html += "body {padding-top: 50; background-color: #fcf5e1; text-align: center;}"
             advanced_html += "#image-div {display: flex; justify-content: center;}"
+            advanced_html += "#attribution-txt {font-family: Arial, sans-serif; font-size: 12}"
             advanced_html += "</style>"
             self.view.setHtml(advanced_html)
 
