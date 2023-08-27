@@ -1,5 +1,7 @@
 from qgis.PyQt.QtGui import QFont, QColor
 
+from qgis.PyQt.QtCore import QVariant
+
 from qgis.core import (QgsProject, QgsFillSymbol, QgsSingleSymbolRenderer,
                         QgsPalLayerSettings, QgsTextFormat, QgsTextBufferSettings,
                         QgsVectorLayerSimpleLabeling, QgsSimpleMarkerSymbolLayer,
@@ -8,20 +10,40 @@ from qgis.core import (QgsProject, QgsFillSymbol, QgsSingleSymbolRenderer,
                         QgsLineSymbol, QgsSingleSymbolRenderer, QgsSingleSymbolRenderer,
                         QgsMapSettings, QgsMapRendererParallelJob, QgsGeometry,
                         QgsFeatureRequest, QgsRendererCategory, QgsSimpleLineSymbolLayer,
-                        QgsVectorLayer, QgsPoint, QgsFeature)
+                        QgsVectorLayer, QgsPoint, QgsFeature, QgsPointXY, QgsRectangle,
+                        QgsSimpleFillSymbolLayer, QgsProperty, QgsSymbolLayer,
+                        QgsPropertyCollection, QgsField, QgsRasterLayer)
+
+import processing
+
+import datetime
 
 class reportUtils():
     
     def __init__(self):
         
         self.project = QgsProject.instance()
-        
-        self.pdk_lyr = self.project.mapLayersByName('Paddocks')[0]
-        self.wpt_lyr = self.project.mapLayersByName('Waterpoints')[0]
-        self.fence_lyr = self.project.mapLayersByName('Fences')[0]
-        self.pipe_lyr = self.project.mapLayersByName('Pipelines')[0]
-        self.wa_lyr = self.project.mapLayersByName('Watered Areas')[0]
-        
+        self.layer_tree = self.project.layerTreeRoot()
+        self.paddock_power_group = self.layer_tree.findGroup('Paddock Power')
+        self.pdk_node = [l for l in self.paddock_power_group.findLayers() if l.name() == 'Paddocks']
+        if self.pdk_node:
+            self.pdk_lyr = self.pdk_node[0].layer()
+        self.wpt_node = [l for l in self.paddock_power_group.findLayers() if l.name() == 'Waterpoints']
+        if self.wpt_node:
+            self.wpt_lyr = self.wpt_node[0].layer()
+        self.fence_node = [l for l in self.paddock_power_group.findLayers() if l.name() == 'Fences']
+        if self.fence_node:
+            self.fence_lyr = self.fence_node[0].layer()
+        self.pipe_node = [l for l in self.paddock_power_group.findLayers() if l.name() == 'Pipelines']
+        if self.pipe_node:
+            self.pipe_lyr = self.pipe_node[0].layer()
+        self.wa_node = [l for l in self.paddock_power_group.findLayers() if l.name() == 'Watered Areas']
+        if self.wa_node:
+            self.wa_lyr = self.wa_node[0].layer()
+        self.lt_node = [l for l in self.paddock_power_group.findLayers() if l.name() == 'Land Types']
+        if self.lt_node:
+            self.lt_lyr = self.lt_node[0].layer()
+
         
     def getDevelopedPaddocks(self):
         developed_paddocks = []
@@ -43,7 +65,22 @@ class reportUtils():
         return developed_paddocks
         
     
-    def paddockRenderer(self):
+    def paddockRendererNoFill(self):
+        symbol = QgsFillSymbol.createSimple({'border_width_map_unit_scale': '3x:0,0,0,0,0,0',
+                                            'color': '60,179,113,0',
+                                            'joinstyle': 'bevel',
+                                            'offset': '0,0',
+                                            'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                                            'offset_unit': 'MM',
+                                            'outline_color': '35,35,35,178',
+                                            'outline_style': 'solid',
+                                            'outline_width': '0.4',
+                                            'outline_width_unit': 'MM',
+                                            'style': 'no brush'})
+        renderer = QgsSingleSymbolRenderer(symbol)
+        return renderer
+
+    def paddockRendererFill(self):
         symbol = QgsFillSymbol.createSimple({'border_width_map_unit_scale': '3x:0,0,0,0,0,0',
                                             'color': '60,179,113,255',
                                             'joinstyle': 'bevel',
@@ -57,7 +94,7 @@ class reportUtils():
                                             'style': 'solid'})
         renderer = QgsSingleSymbolRenderer(symbol)
         return renderer
-        
+
     def paddockLabels(self):
         settings = QgsPalLayerSettings()
         txt_format = QgsTextFormat()
@@ -74,6 +111,21 @@ class reportUtils():
         settings.drawLabels = True
         labels = QgsVectorLayerSimpleLabeling(settings)
         return labels
+        
+    def wateredAreaRenderer(self):
+        opacity = 0.3
+        fld_name = 'Watered'
+        categories = []
+        cat_vals = {'Near': QColor('#0c5588'), 'Far': QColor('#3da4ed'), 'Unwatered': QColor('#cccccc')}
+        for k, v in cat_vals.items():
+            symbol = QgsFillSymbol()
+            symbol_lyr = QgsSimpleFillSymbolLayer(color=v, strokeColor=v)
+            symbol.changeSymbolLayer(0, symbol_lyr.clone())
+            symbol.setOpacity(opacity)
+            wa_cat = QgsRendererCategory(k, symbol, k)
+            categories.append(wa_cat)
+        renderer = QgsCategorizedSymbolRenderer(fld_name, categories)
+        return renderer
 
     def waterpointRenderer(self):
         fld_name = 'Waterpoint Type'
@@ -81,7 +133,7 @@ class reportUtils():
         base_simple_marker_symbol_layer = QgsSimpleMarkerSymbolLayer.create({'angle': '0', 'cap_style': 'square', 'color': '9,211,251,255', 'horizontal_anchor_point': '1', 'joinstyle': 'bevel', 'name': 'circle', 'offset': '0,0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0', 'offset_unit': 'MM', 'outline_color': '35,35,35,0', 'outline_style': 'solid', 'outline_width': '0', 'outline_width_map_unit_scale': '3x:0,0,0,0,0,0', 'outline_width_unit': 'MM', 'scale_method': 'diameter', 'size': '5', 'size_map_unit_scale': '3x:0,0,0,0,0,0', 'size_unit': 'MM', 'vertical_anchor_point': '1'})
         base_font_marker_symbol_layer = QgsFontMarkerSymbolLayer.create({'angle': '0', 'chr': '', 'color': '0,0,0,255', 'font': 'Calibri', 'font_style': 'Bold', 'horizontal_anchor_point': '1', 'joinstyle': 'bevel', 'offset': '0,-1.59999999999999987', 'offset_map_unit_scale': '3x:0,0,0,0,0,0', 'offset_unit': 'Point', 'outline_color': '0,0,0,255', 'outline_width': '0', 'outline_width_map_unit_scale': '3x:0,0,0,0,0,0', 'outline_width_unit': 'Point', 'size': '8', 'size_map_unit_scale': '3x:0,0,0,0,0,0', 'size_unit': 'Point', 'vertical_anchor_point': '1'})
         ###
-        value_map = {'Bore':'B', 'Dam':'D', 'Trough':'T', 'Turkey Nest':'TN', 'Water Tank':'WT', 'Waterhole':'WH',}
+        value_map = {'Bore':'B', 'Dam':'D', 'Trough':'T', 'Turkey Nest':'TN', 'Water Tank':'WT', 'Waterhole':'WH'}
         for k, v in value_map.items():
             waterpoint_symbol = QgsMarkerSymbol()
             waterpoint_symbol.appendSymbolLayer(base_simple_marker_symbol_layer.clone())
@@ -154,48 +206,182 @@ class reportUtils():
         symbol.deleteSymbolLayer(0)
         renderer = QgsSingleSymbolRenderer(symbol)
         return renderer
-                
-    def scaleBarRenderer(self):
-        symbol_layer = QgsSimpleLineSymbolLayer.create({'line_color': '0,0,0,255', 'line_style': 'solid', 'line_width': '0.35', 'line_width_unit': 'MM',})
-        symbol = QgsLineSymbol()
-        symbol.appendSymbolLayer(symbol_layer.clone())
-        scale_bar_renderer = QgsSingleSymbolRenderer(symbol)
-        return scale_bar_renderer
+
+####**********************SCALE BAR LAYER STUFF*****************************####
+    def scaleBarLayerRenderer(self):
+        symbol_lyr = QgsSimpleFillSymbolLayer.create({'border_width_map_unit_scale': '3x:0,0,0,0,0,0',
+                                            'joinstyle': 'bevel',
+                                            'offset': '0,0',
+                                            'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                                            'offset_unit': 'MM',
+                                            'outline_color': '0, 0, 0, 255',
+                                            'outline_style': 'solid',
+                                            'outline_width': '0.25',
+                                            'outline_width_unit': 'MM',
+                                            'style': 'solid'})
+        prop = QgsProperty()
+        # take data defined colour from "Color" field in temp layer (black or white)
+        prop.setExpressionString("Color")
+        symbol_lyr.setDataDefinedProperty(QgsSymbolLayer.PropertyFillColor, prop)
+        symbol = QgsFillSymbol()
+        symbol.appendSymbolLayer(symbol_lyr.clone())
+        symbol.deleteSymbolLayer(0)
+        renderer = QgsSingleSymbolRenderer(symbol)
         
-    def scaleBarLabels(self):
+        return renderer
+        
+    def scaleBarLabels(self, num_segments):
         settings = QgsPalLayerSettings()
         txt_format = QgsTextFormat()
         txt_format.setFont(QFont('Arial'))
-        txt_format.setSize(10)
+        txt_format.setSize(8)
         txt_format.setColor(QColor('black'))
+        txt_buffer = QgsTextBufferSettings()
+        txt_buffer.setSize(0.8)
+        txt_buffer.setEnabled(True)
+        txt_format.setBuffer(txt_buffer)
         settings.setFormat(txt_format)
-        settings.fieldName = """concat(to_string(to_int($length/1000)), ' km')"""
+        settings.fieldName = f"""CASE\
+                                WHEN Dist = 0 THEN Dist\
+                                WHEN Dist = {num_segments-1} THEN concat({num_segments}, ' km')\
+                                ELSE ''\
+                                END"""
         settings.isExpression = True
         settings.drawLabels = True
-        settings.placement = QgsPalLayerSettings.Line
+        props = QgsPropertyCollection()
+        x_prop = QgsProperty()
+        x_prop.setField("lbl_pos_x")
+        y_prop = QgsProperty()
+        y_prop.setField("lbl_pos_y")
+        props.setProperty(QgsPalLayerSettings.PositionX, x_prop)
+        props.setProperty(QgsPalLayerSettings.PositionY, y_prop)
+        settings.setDataDefinedProperties(props)
         labels = QgsVectorLayerSimpleLabeling(settings)
         return labels
+    
+    def createScaleBarBoxRect(self, bottom_right_pt, box_width, box_height):
+        x = bottom_right_pt.x() - box_width
+        y = bottom_right_pt.y() + box_height
+        top_left_pt = QgsPointXY(x, y)
+        box_rect = QgsRectangle(QgsPointXY(bottom_right_pt), top_left_pt)
+        return box_rect
         
     def scaleBarLayer(self, extent):
-        scale_bar_layer = QgsVectorLayer('LineString?crs=epsg:3857', '', 'memory')
+        scale_bar_layer = QgsVectorLayer('Polygon?crs=epsg:7845', '', 'memory')
+        scale_bar_layer.dataProvider().addAttributes([QgsField('Dist', QVariant.Int),
+                                                        QgsField('Color', QVariant.String),
+                                                        QgsField('lbl_pos_x', QVariant.Double, len=10, prec=5),
+                                                        QgsField('lbl_pos_y', QVariant.Double, len=10, prec=5)])
+        scale_bar_layer.updateFields()
         canvas_width = extent.width()
-        scale_bar_length = round(canvas_width/5, -3)
-        bar_end_point = QgsPoint(extent.xMaximum()-(scale_bar_length/2), extent.yMinimum()+(scale_bar_length/2))
-        bar_start_point = QgsPoint(bar_end_point.x()-scale_bar_length, bar_end_point.y())
-        tick_start_point = QgsPoint(bar_start_point.x(), bar_start_point.y()+(extent.height()/50))
-        tick_end_point = QgsPoint(bar_end_point.x(), bar_end_point.y()+(extent.height()/50))
-        geom = QgsGeometry().fromPolyline([tick_start_point, bar_start_point, bar_end_point, tick_end_point])
-        feat = QgsFeature()
-        feat.setGeometry(geom)
-        scale_bar_layer.dataProvider().addFeature(feat)
+        if canvas_width > 10000:
+            scale_bar_length = 10000
+        elif 6000 < canvas_width < 10000:
+            scale_bar_length = 5000
+        else:
+            scale_bar_length = round(canvas_width/2, -3)
+        #######################################################################
+        smallest_dim = min([extent.width(), extent.height()])
+        # bar_start_point = QgsPoint((extent.xMaximum()-(longest_dim/20))-scale_bar_length, extent.yMinimum()+(longest_dim/20))
+        bar_start_point = QgsPoint(((extent.xMaximum()-(smallest_dim/2))-(scale_bar_length/2))+smallest_dim/20, extent.yMinimum()+(smallest_dim/20))
+        box_width = 1000
+        num_boxes = int(scale_bar_length/box_width)
+        box_height = extent.height()/50
+        for i in range(num_boxes):
+            box_rect = self.createScaleBarBoxRect(bar_start_point, box_width, box_height)
+            feat = QgsFeature(scale_bar_layer.fields())
+            geom = QgsGeometry().fromRect(box_rect)
+            feat.setGeometry(geom)
+            if (i+1) % 2 == 0:
+                box_color = 'white'
+            else:
+                box_color = 'black'
+            if i == num_boxes-1:
+                lbl_pos_x = box_rect.xMaximum()-100
+            else:
+                lbl_pos_x = box_rect.xMinimum()
+            lbl_pos_y = box_rect.yMaximum()+50
+            feat.setAttributes([i, box_color, lbl_pos_x, lbl_pos_y])
+            scale_bar_layer.dataProvider().addFeature(feat)
+            corner_x = bar_start_point.x() + box_width
+            corner_y = bar_start_point.y()
+            bar_start_point = QgsPoint(corner_x, corner_y)
+        ######################################################################
         scale_bar_layer.updateExtents()
-        scale_bar_layer.setRenderer(self.scaleBarRenderer())
-        scale_bar_layer.setLabeling(self.scaleBarLabels())
+        scale_bar_layer.setRenderer(self.scaleBarLayerRenderer())
+        scale_bar_layer.setLabeling(self.scaleBarLabels(num_boxes))
         scale_bar_layer.setLabelsEnabled(True)
         return scale_bar_layer
-        
 
-    def currentMapLayers(self, pdk_name):
+####***************END OF SCALE BAR LAYER STUFF*****************************####
+
+    def landTypesRenderer(self):
+        symbol_lyr_props = {'align_dash_pattern': '0',
+                            'capstyle': 'square',
+                            'customdash': '5;2',
+                            'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
+                            'customdash_unit': 'MM',
+                            'dash_pattern_offset': '0',
+                            'dash_pattern_offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                            'dash_pattern_offset_unit': 'MM',
+                            'draw_inside_polygon': '0',
+                            'joinstyle': 'bevel',
+                            'line_color': '35,35,35,255',
+                            'line_style': 'solid',
+                            'line_width': '0.1',
+                            'line_width_unit': 'MM',
+                            'offset': '0',
+                            'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                            'offset_unit': 'MM',
+                            'ring_filter': '0',
+                            'trim_distance_end': '0',
+                            'trim_distance_end_map_unit_scale': '3x:0,0,0,0,0,0',
+                            'trim_distance_end_unit': 'MM',
+                            'trim_distance_start': '0',
+                            'trim_distance_start_map_unit_scale': '3x:0,0,0,0,0,0',
+                            'trim_distance_start_unit': 'MM',
+                            'tweak_dash_pattern_on_corners': '0',
+                            'use_custom_dash': '0',
+                            'width_map_unit_scale': '3x:0,0,0,0,0,0'}
+        symbol_layer = QgsSimpleLineSymbolLayer.create(symbol_lyr_props)
+        symbol = QgsFillSymbol()
+        symbol.changeSymbolLayer(0, symbol_layer)
+        renderer = QgsSingleSymbolRenderer(symbol)
+        
+        return renderer
+        
+    def landTypesLayer(self, pdk_lyr):
+        if self.lt_lyr:
+            lt_lyr_clipped = processing.run('native:clip', {'INPUT': self.lt_lyr,
+                                                            'OVERLAY': pdk_lyr,
+                                                            'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
+            lt_lyr_clipped.setRenderer(self.landTypesRenderer())
+            lt_lyr_clipped.triggerRepaint()
+            return lt_lyr_clipped
+        return None
+
+    def basemapLayer(self, basemap):
+        if basemap == 'Bing Virtual Earth':
+            basemap_uri = 'type=xyz&url=http://ecn.t3.tiles.virtualearth.net/tiles/a%7Bq%7D.jpeg?g%3D1&zmax=19&zmin=1'
+        if basemap == 'Esri Satellite':
+            basemap_uri = 'type=xyz&url=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D&zmax=17&zmin=0'
+        if basemap == 'Google Satellite':
+            basemap_uri = 'type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+        if basemap == 'OpenTopoMap':
+            basemap_uri = 'type=xyz&url=https://tile.opentopomap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+        basemap_lyr = QgsRasterLayer(basemap_uri, 'Basemap', 'wms')
+        
+        return basemap_lyr
+        
+    def basemapAttribution(self, basemap):
+        year = datetime.datetime.now().year
+        attributions = {'Bing Virtual Earth': f'© {year} Maxar',
+                        'Esri Satellite': '© Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                        'Google Satellite': f'© {year} Airbus, CNES/Airbus, Maxar Technologies, TerraMetrics',
+                        'OpenTopoMap': 'map data: © <a href="https://opentopomap.org">OpenStreetMap</a> contributors, SRTM | map style: © <a href="https://www.openstreetmap.org">OpenTopoMap</a> (CC-BY-SA)'}
+        return attributions[basemap]
+
+    def currentMapLayers(self, pdk_name, basemap):
         map_layers = []
         invalid_layer_names = []
         pdk_feats = [ft for ft in self.pdk_lyr.getFeatures() if ft['Name'] == pdk_name and ft['Timeframe'] == 'Current']
@@ -204,7 +390,10 @@ class reportUtils():
         pdk_feat = pdk_feats[0]
         current_pdk_lyr = self.pdk_lyr.materialize(QgsFeatureRequest([pdk_feat.id()]))
         if current_pdk_lyr.isValid():
-            current_pdk_lyr.setRenderer(self.paddockRenderer())
+            if basemap == 'No Basemap':
+                current_pdk_lyr.setRenderer(self.paddockRendererFill())
+            else:
+                current_pdk_lyr.setRenderer(self.paddockRendererNoFill())
             current_pdk_lyr.setLabeling(self.paddockLabels())
             current_pdk_lyr.setLabelsEnabled(True)
             map_layers.append(current_pdk_lyr)
@@ -214,9 +403,7 @@ class reportUtils():
         if current_wa_feats:
             current_wa_lyr = self.wa_lyr.materialize(QgsFeatureRequest([f.id() for f in current_wa_feats]))
             if current_wa_lyr.isValid():
-                renderer = self.wa_lyr.renderer().clone()
-                renderer.setClassAttribute('Watered')
-                current_wa_lyr.setRenderer(renderer)
+                current_wa_lyr.setRenderer(self.wateredAreaRenderer())
                 current_wa_lyr.triggerRepaint()
                 map_layers.append(current_wa_lyr)
             else:
@@ -240,7 +427,7 @@ class reportUtils():
         return map_layers
         
         
-    def futureMapLayers(self, pdk_name):
+    def futureMapLayers(self, pdk_name, basemap):
         map_layers = []
         invalid_layer_names = []
         # Get current paddock feature (for spatial retrieval of future features)
@@ -250,13 +437,18 @@ class reportUtils():
         current_pdk_feat = current_pdk_feats[0]
         current_pdk_geom = current_pdk_feat.geometry()
         
-        future_pdk_ids = [ft.id() for ft in self.pdk_lyr.getFeatures() if ft['Timeframe'] == 'Future' and (ft.geometry().intersection(current_pdk_geom).area()>1)]
+        # The intersection.area() check is to eliminate neighboring planned paddocks in case there are geometry/ topology
+        # errors in the paddock layer resulting in sliver overlaps.
+        future_pdk_ids = [ft.id() for ft in self.pdk_lyr.getFeatures() if ft['Status'] == 'Planned' and (ft.geometry().intersection(current_pdk_geom).area()>50)]
         # print(future_pdk_ids)
         if not future_pdk_ids:
             future_pdk_ids = [ft.id() for ft in current_pdk_feats]
         future_pdk_lyr = self.pdk_lyr.materialize(QgsFeatureRequest(future_pdk_ids))
         if future_pdk_lyr.isValid():
-            future_pdk_lyr.setRenderer(self.paddockRenderer())
+            if basemap == 'No Basemap':
+                future_pdk_lyr.setRenderer(self.paddockRendererFill())
+            else:
+                future_pdk_lyr.setRenderer(self.paddockRendererNoFill())
             future_pdk_lyr.setLabeling(self.paddockLabels())
             future_pdk_lyr.setLabelsEnabled(True)
             map_layers.append(future_pdk_lyr)
@@ -268,9 +460,7 @@ class reportUtils():
         if future_wa_feats:
             future_wa_lyr = self.wa_lyr.materialize(QgsFeatureRequest([f.id() for f in future_wa_feats]))
             if future_wa_lyr.isValid():
-                renderer = self.wa_lyr.renderer().clone()
-                renderer.setClassAttribute('Watered')
-                future_wa_lyr.setRenderer(renderer)
+                future_wa_lyr.setRenderer(self.wateredAreaRenderer())
                 future_wa_lyr.triggerRepaint()
                 map_layers.append(future_wa_lyr)
             else:

@@ -147,8 +147,8 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         
     def onGenerateReport(self):
         """Open dialog to preview and generate PDF report."""
-        if not self.pdfReportDialog:
-            self.pdfReportDialog = PdfReportDialog()
+        self.pdfReportDialog = PdfReportDialog()
+        self.pdfReportDialog.setModal(True)
         self.pdfReportDialog.show()
 
     def onExtractCsv(self):
