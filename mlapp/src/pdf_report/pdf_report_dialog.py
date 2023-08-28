@@ -2,16 +2,17 @@
 import base64
 import os
 
-from qgis.PyQt.QtCore import Qt, QSize, QByteArray, QBuffer, QIODevice, QTimer
+from qgis.PyQt.QtCore import (Qt, QSize, QByteArray, QBuffer, QIODevice, QTimer,
+                                pyqtSignal)
 from qgis.PyQt.QtWidgets import (qApp, QDialog, QFileDialog, QMessageBox, QStyle, QLabel,
                                  QComboBox, QLineEdit, QRadioButton, QPushButton,
                                  QGridLayout, QVBoxLayout, QHBoxLayout)
-from qgis.PyQt.QtGui import QIcon, QColor, QPageLayout, QPageSize
+from qgis.PyQt.QtGui import QIcon, QColor, QPageLayout, QPageSize, QImage
 from qgis.PyQt.QtPrintSupport import QPrintPreviewDialog, QPrinter
 from qgis.PyQt.QtWebKitWidgets import QWebView
 
 from qgis.core import (QgsMapSettings, QgsMapRendererParallelJob, QgsRasterLayer,
-                        QgsCoordinateReferenceSystem)
+                        QgsCoordinateReferenceSystem, QgsTask, QgsApplication)
 
 from .report_utils import reportUtils
 
@@ -89,6 +90,7 @@ class PdfReportDialog(QDialog):
         self.master_layout.addLayout(self.button_group_layout)
         self.setDefaultHtml()
         self.msgBox = QMessageBox()
+        
 
     def populateComboBox(self):
         self.paddocksComboBox.clear()
@@ -376,13 +378,6 @@ class PdfReportDialog(QDialog):
             else:
                 basemap_lyr = self.utils.basemapLayer(basemap)
             #############################################################
-            advanced_html = "<html>"
-            advanced_html += "<body>"
-            advanced_html += "<h1>"
-            advanced_html += "Paddock Power Investment Calculator Data"
-            advanced_html += "</h1><br>"
-            advanced_html += self.advancedReportTableHtml(paddock_name)
-
             # Create image tag for current layers
             current_layers = self.utils.currentMapLayers(paddock_name, basemap)
             current_layer_names = [l.name() for l in current_layers]
@@ -407,32 +402,8 @@ class PdfReportDialog(QDialog):
             if basemap_lyr:
                 current_layers_ordered.append(basemap_lyr)
 
-            full_extent = current_layers[pdk_lyr_index].extent()
-            longest_dim = max([full_extent.width(), full_extent.height()])
-            grow_factor = longest_dim / 30
-            full_extent.grow(grow_factor)
-            full_extent.setYMinimum(full_extent.yMinimum() - (longest_dim) / 8)
-            scale_bar_lyr = self.utils.scaleBarLayer(full_extent)
-            current_layers_ordered.insert(0, scale_bar_lyr)
-            settings = QgsMapSettings()
-            settings.setDestinationCrs(QgsCoordinateReferenceSystem('EPSG:7845'))
-            settings.setOutputDpi(350)
-            settings.setLayers(current_layers_ordered)
-            settings.setExtent(full_extent)
-            settings.setBackgroundColor(QColor(255, 255, 255))
-            settings.setOutputSize(QSize(1200, 1200))
-            render = QgsMapRendererParallelJob(settings)
-            # Start the rendering
-            render.start()
-            render.waitForFinished()
-            img = render.renderedImage()
-            byte_array = QByteArray()
-            buffer = QBuffer(byte_array)
-            buffer.open(QIODevice.WriteOnly)
-            img.save(buffer, "PNG")
-            img_tag1 = "<img src='data:image/png;base64,{}' width='420' height='420'>".format(base64.b64encode(
-                byte_array).decode())
-
+            current_extent = current_layers[pdk_lyr_index].extent()
+#***************************************************************************
             # Create image tag for future layers
             future_layers = self.utils.futureMapLayers(paddock_name, basemap)
             future_layer_names = [l.name() for l in future_layers]
@@ -456,65 +427,79 @@ class PdfReportDialog(QDialog):
                 future_layers_ordered.append(future_layers[pdk_lyr_index])
             if basemap_lyr:
                 future_layers_ordered.append(basemap_lyr)
-            full_extent = future_layers[pdk_lyr_index].extent()
-            longest_dim = max([full_extent.width(), full_extent.height()])
-            grow_factor = longest_dim / 30
-            full_extent.grow(grow_factor)
-            full_extent.setYMinimum(full_extent.yMinimum() - (longest_dim) / 8)
-            scale_bar_lyr = self.utils.scaleBarLayer(full_extent)
-            future_layers_ordered.insert(0, scale_bar_lyr)
-            settings = QgsMapSettings()
-            settings.setDestinationCrs(QgsCoordinateReferenceSystem('EPSG:7845'))
-            settings.setOutputDpi(350)
-            settings.setLayers(future_layers_ordered)
-            settings.setExtent(full_extent)
-            settings.setBackgroundColor(QColor(255, 255, 255))
-            settings.setOutputSize(QSize(1200, 1200))
-            render = QgsMapRendererParallelJob(settings)
-            # Start the rendering
-            render.start()
-            render.waitForFinished()
-            img = render.renderedImage()
-            byte_array = QByteArray()
-            buffer = QBuffer(byte_array)
-            buffer.open(QIODevice.WriteOnly)
-            img.save(buffer, "PNG")
-            img_tag2 = "<img src='data:image/png;base64,{}' width='420' height='420'>".format(base64.b64encode(
-                byte_array).decode())
-
-            advanced_html += "<div id='image-div'>"
-            advanced_html += "<div id='current-map-img'>"
-            advanced_html += "<h3>Current</h3>"
-            advanced_html += img_tag1
-            advanced_html += "</div>"  # Closing tag for current-map-img div
-            advanced_html += "<div id='planned-map-img'>"
-            advanced_html += "<h3>Planned</h3>"
-            advanced_html += img_tag2
-            advanced_html += "</div>"  # Closing tag for planned-map-img div
-            advanced_html += "</div>"  # Closing tag for image-div
-            if basemap_lyr:
-                attribution_txt = self.utils.basemapAttribution(basemap)
-                advanced_html += f"<p id=attribution-txt>{attribution_txt}</p>"
-                advanced_html += f"<img src='file:///{self.current_dir}/legend-img-basemap.png' alt='Legend' width='750'/>"
+            future_extent = future_layers[pdk_lyr_index].extent()
+#*****************************************
+            ########SET UP TASK TO CREATE RENDERED CANVAS IMAGES##########>>>
+            if basemap == 'No Basemap':
+                task_desc = 'Rendering maps without basemap...'
             else:
-                advanced_html += f"<img src='file:///{self.current_dir}/legend-img-no-basemap.png' alt='Legend' width='750'/>"
-            advanced_html += "</body>"
-            advanced_html += "</html>"
-            advanced_html += "<style>"
-            advanced_html += "h1, h3 {font-family: Arial, sans-serif;}"
-            advanced_html += "img {border: 3px solid #555; margin: 5px;}"
-            advanced_html += "table, th, tr, td"
-            advanced_html += "{border: 1px solid black;"
-            advanced_html += "border-collapse: collapse;"
-            advanced_html += "padding: 5px; font-family: Arial, sans-serif;}"
-            advanced_html += "th {background-color: #bfd9c4;}"
-            advanced_html += "td {background-color: #ffffff;}"
-            advanced_html += "table {margin-left: auto; margin-right: auto; margin-bottom: 50px;}"
-            advanced_html += "body {padding-top: 50; background-color: #fcf5e1; text-align: center;}"
-            advanced_html += "#image-div {display: flex; justify-content: center;}"
-            advanced_html += "#attribution-txt {font-family: Arial, sans-serif; font-size: 12}"
-            advanced_html += "</style>"
-            self.view.setHtml(advanced_html)
+                task_desc = f'Rendering maps with {basemap} basemap'
+            self.render_task = RenderTask(task_desc,
+                                current_layers_ordered,
+                                current_extent,
+                                future_layers_ordered,
+                                future_extent)
+            self.render_task.map_images.connect(lambda images: self.setAdvancedHtml(images, paddock_name, basemap))
+            QgsApplication.taskManager().addTask(self.render_task)
+
+        
+    def setAdvancedHtml(self, map_images, paddock_name, basemap=None):
+        advanced_html = "<html>"
+        advanced_html += "<body>"
+        advanced_html += "<h1>"
+        advanced_html += "Paddock Power Investment Calculator Data"
+        advanced_html += "</h1><br>"
+        advanced_html += self.advancedReportTableHtml(paddock_name)
+
+        byte_array = QByteArray()
+        buffer = QBuffer(byte_array)
+        buffer.open(QIODevice.WriteOnly)
+        map_images[0].save(buffer, "PNG")
+        img_tag1 = "<img src='data:image/png;base64,{}' width='420' height='420'>".format(base64.b64encode(
+            byte_array).decode())
+            
+        byte_array = QByteArray()
+        buffer = QBuffer(byte_array)
+        buffer.open(QIODevice.WriteOnly)
+        map_images[1].save(buffer, "PNG")
+        img_tag2 = "<img src='data:image/png;base64,{}' width='420' height='420'>".format(base64.b64encode(
+            byte_array).decode())
+            
+        advanced_html += "<div id='image-div'>"
+        advanced_html += "<div id='current-map-img'>"
+        advanced_html += "<h3>Current</h3>"
+        advanced_html += img_tag1
+        advanced_html += "</div>"  # Closing tag for current-map-img div
+        advanced_html += "<div id='planned-map-img'>"
+        advanced_html += "<h3>Planned</h3>"
+        advanced_html += img_tag2
+        advanced_html += "</div>"  # Closing tag for planned-map-img div
+        advanced_html += "</div>"  # Closing tag for image-div
+        if basemap and basemap != 'No Basemap':
+            attribution_txt = self.utils.basemapAttribution(basemap)
+            advanced_html += f"<p id=attribution-txt>{attribution_txt}</p>"
+            advanced_html += f"<img src='file:///{self.current_dir}/legend-img-basemap.png' alt='Legend' width='750'/>"
+        else:
+            advanced_html += f"<img src='file:///{self.current_dir}/legend-img-no-basemap.png' alt='Legend' width='750'/>"
+        advanced_html += "</body>"
+        advanced_html += "</html>"
+        advanced_html += "<style>"
+        advanced_html += "h1, h3 {font-family: Arial, sans-serif;}"
+        advanced_html += "img {border: 3px solid #555; margin: 5px;}"
+        advanced_html += "table, th, tr, td"
+        advanced_html += "{border: 1px solid black;"
+        advanced_html += "border-collapse: collapse;"
+        advanced_html += "padding: 5px; font-family: Arial, sans-serif;}"
+        advanced_html += "th {background-color: #bfd9c4;}"
+        advanced_html += "td {background-color: #ffffff;}"
+        advanced_html += "table {margin-left: auto; margin-right: auto; margin-bottom: 50px;}"
+        advanced_html += "body {padding-top: 50; background-color: #fcf5e1; text-align: center;}"
+        advanced_html += "#image-div {display: flex; justify-content: center;}"
+        advanced_html += "#attribution-txt {font-family: Arial, sans-serif; font-size: 12}"
+        advanced_html += "</style>"
+        self.view.setHtml(advanced_html)
+        
+########################################################################################
 
     def exportToPdf(self):
         save_file_name = QFileDialog.getSaveFileName(
@@ -537,3 +522,80 @@ class PdfReportDialog(QDialog):
         preview_dialog = QPrintPreviewDialog()
         preview_dialog.paintRequested.connect(self.view.print_)
         preview_dialog.exec_()
+
+###############QGSTASK TO CREATE RENDERED CANVAS IMAGES################################
+
+class RenderTask(QgsTask):
+    map_images = pyqtSignal(list)
+    
+    def __init__(self, desc, current_layers, current_extent, future_layers, future_extent):
+        self.desc = desc
+        QgsTask.__init__(self, self.desc, QgsTask.CanCancel)
+        self.current_layers = current_layers
+        self.current_extent = current_extent
+        self.future_layers = future_layers
+        self.future_extent = future_extent
+        self.images = []
+        self.utils = reportUtils()
+        # We want to check for network request errors and cancel the task if received
+        self.msg_log = QgsApplication.messageLog()
+        self.msg_log.messageReceived.connect(self.errorChecker)
+                
+    def run(self):
+        # Render Current map image
+        longest_dim = max([self.current_extent.width(), self.current_extent.height()])
+        grow_factor = longest_dim / 30
+        self.current_extent.grow(grow_factor)
+        self.current_extent.setYMinimum(self.current_extent.yMinimum() - (longest_dim) / 8)
+        scale_bar_lyr = self.utils.scaleBarLayer(self.current_extent)
+        self.current_layers.insert(0, scale_bar_lyr)
+        settings = QgsMapSettings()
+        settings.setDestinationCrs(QgsCoordinateReferenceSystem('EPSG:7845'))
+        settings.setOutputDpi(350)
+        settings.setLayers(self.current_layers)
+        settings.setExtent(self.current_extent)
+        settings.setBackgroundColor(QColor(255, 255, 255))
+        settings.setOutputSize(QSize(1200, 1200))
+        render = QgsMapRendererParallelJob(settings)
+        # Start the rendering
+        render.start()
+        render.waitForFinished()
+        current_img = render.renderedImage()
+        self.images.append(current_img)
+        if self.isCanceled():
+            return False
+            
+        # Render Future map image
+        longest_dim = max([self.future_extent.width(), self.future_extent.height()])
+        grow_factor = longest_dim / 30
+        self.future_extent.grow(grow_factor)
+        self.future_extent.setYMinimum(self.future_extent.yMinimum() - (longest_dim) / 8)
+        scale_bar_lyr = self.utils.scaleBarLayer(self.future_extent)
+        self.future_layers.insert(0, scale_bar_lyr)
+        settings = QgsMapSettings()
+        settings.setDestinationCrs(QgsCoordinateReferenceSystem('EPSG:7845'))
+        settings.setOutputDpi(350)
+        settings.setLayers(self.future_layers)
+        settings.setExtent(self.future_extent)
+        settings.setBackgroundColor(QColor(255, 255, 255))
+        settings.setOutputSize(QSize(1200, 1200))
+        render = QgsMapRendererParallelJob(settings)
+        # Start the rendering
+        render.start()
+        render.waitForFinished()
+        future_img = render.renderedImage()
+        self.images.append(future_img)
+        if self.isCanceled():
+            return False
+        return True
+        
+    def finished(self, result):
+        if result:
+            self.map_images.emit(self.images)
+        
+    def errorChecker(self, msg, tag, level):
+        '''Cancel task if network error logged'''
+        if 'Network request' in msg and tag == 'Network' and level == 1:
+            self.cancel()
+                    
+########################################################################################
