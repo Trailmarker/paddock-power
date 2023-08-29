@@ -72,9 +72,9 @@ class reportUtils():
                                             'offset': '0,0',
                                             'offset_map_unit_scale': '3x:0,0,0,0,0,0',
                                             'offset_unit': 'MM',
-                                            'outline_color': '35,35,35,178',
+                                            'outline_color': '35,35,35,255',
                                             'outline_style': 'solid',
-                                            'outline_width': '0.4',
+                                            'outline_width': '0.65',
                                             'outline_width_unit': 'MM',
                                             'style': 'no brush'})
         renderer = QgsSingleSymbolRenderer(symbol)
@@ -367,8 +367,8 @@ class reportUtils():
             basemap_uri = 'type=xyz&url=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D&zmax=17&zmin=0'
         if basemap == 'Google Satellite':
             basemap_uri = 'type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
-        if basemap == 'OpenTopoMap':
-            basemap_uri = 'type=xyz&url=https://tile.opentopomap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+        if basemap == 'Esri Topo World':
+            basemap_uri = 'type=xyz&url=http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D&zmax=20&zmin=0'
         basemap_lyr = QgsRasterLayer(basemap_uri, 'Basemap', 'wms')
         
         return basemap_lyr
@@ -378,7 +378,7 @@ class reportUtils():
         attributions = {'Bing Virtual Earth': f'© {year} Maxar',
                         'Esri Satellite': '© Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
                         'Google Satellite': f'© {year} Airbus, CNES/Airbus, Maxar Technologies, TerraMetrics',
-                        'OpenTopoMap': 'map data: © <a href="https://opentopomap.org">OpenStreetMap</a> contributors, SRTM | map style: © <a href="https://www.openstreetmap.org">OpenTopoMap</a> (CC-BY-SA)'}
+                        'Esri Topo World': 'Esri, Geoscience Australia, NASA, NGA, USGS | Esri Community Maps Contributors, Esri, HERE, Garmin, Foursquare, METI/NASA, USGS'}
         return attributions[basemap]
 
     def currentMapLayers(self, pdk_name, basemap):

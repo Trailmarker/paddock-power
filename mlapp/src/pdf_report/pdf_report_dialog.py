@@ -11,7 +11,7 @@ from qgis.PyQt.QtGui import QIcon, QColor, QPageLayout, QPageSize, QImage
 from qgis.PyQt.QtPrintSupport import QPrintPreviewDialog, QPrinter
 from qgis.PyQt.QtWebKitWidgets import QWebView
 
-from qgis.core import (QgsMapSettings, QgsMapRendererParallelJob, QgsRasterLayer,
+from qgis.core import (Qgis, QgsMapSettings, QgsMapRendererParallelJob, QgsRasterLayer,
                         QgsCoordinateReferenceSystem, QgsTask, QgsApplication)
 
 from .report_utils import reportUtils
@@ -45,7 +45,7 @@ class PdfReportDialog(QDialog):
         self.basemapLabel = QLabel('Basemap:')
         self.basemapComboBox = QComboBox(self)
         self.basemapComboBox.setMinimumWidth(200)
-        self.basemapComboBox.addItems(['Bing Virtual Earth', 'Esri Satellite', 'Google Satellite', 'OpenTopoMap', 'No Basemap'])
+        self.basemapComboBox.addItems(['Bing Virtual Earth', 'Esri Satellite', 'Google Satellite', 'Esri Topo World', 'No Basemap'])
         self.basemapComboBox.setEnabled(False)
         self.previewButton = QPushButton('Preview', self)
         self.previewButton.setToolTip('Show Selected Report Preview')
@@ -91,6 +91,8 @@ class PdfReportDialog(QDialog):
         self.setDefaultHtml()
         self.msgBox = QMessageBox()
         
+        self.render_task = None
+        
 
     def populateComboBox(self):
         self.paddocksComboBox.clear()
@@ -129,7 +131,8 @@ class PdfReportDialog(QDialog):
         self.view.setHtml(html_text)
         
     def setStandbyHtml(self):
-        # Show 'Generating preview...' screen while maps are rendering (bottleneck)
+        # Show 'Generating preview...' screen while maps are rendering in background thread.
+        # Creating a new preview will cancel the current task and cause it to gracefully fail.
         standby_html = "<html>"
         standby_html += "<body>"
         standby_html += "<h1>"
@@ -145,7 +148,6 @@ class PdfReportDialog(QDialog):
         QTimer.singleShot(250, self.showPreview)
 
 ##### **************METHODS TO GENERATE HTML CONTENT**********************#####
-
 
     def basicReportHtml(self, paddock_name, development_name):
         html_text = "<html>"
@@ -262,10 +264,10 @@ class PdfReportDialog(QDialog):
             current_avg_AE_per_wpt = 0
         current_wa_3km = round(current_pdk_details[3] / 1000000, 1)
         current_wa_3km_pcnt = round(current_pdk_details[4], 1)
-        current_wa_3km_info = f'{current_wa_3km}km² | {current_wa_3km_pcnt}%'
+        current_wa_3km_info = f'{current_wa_3km} km² | {current_wa_3km_pcnt}%'
         current_wa_5km = round(current_pdk_details[5] / 1000000, 1)
         current_wa_5km_pcnt = round(current_pdk_details[6], 1)
-        current_wa_5km_info = f'{current_wa_5km}km² | {current_wa_5km_pcnt}%'
+        current_wa_5km_info = f'{current_wa_5km} km² | {current_wa_5km_pcnt}%'
         current_wa_stocking_rate = 'TODO'
         current_fencing = round(current_pdk_details[7] / 1000, 1)
         current_pipeline = round(current_pdk_details[9] / 1000, 1)
@@ -300,10 +302,10 @@ class PdfReportDialog(QDialog):
                 future_avg_AE_per_wpt = round(future_recommended_cc / future_num_wpts, 1)
                 future_wa_3km = round(sum(all_3km_wa) / 1000000, 1)
                 future_wa_3km_pcnt = round((future_wa_3km / future_area) * 100, 1)
-                future_wa_3km_info = f'{future_wa_3km}km² | {future_wa_3km_pcnt}%'
+                future_wa_3km_info = f'{future_wa_3km} km² | {future_wa_3km_pcnt}%'
                 future_wa_5km = round(sum(all_5km_wa) / 1000000, 1)
                 future_wa_5km_pcnt = round((future_wa_5km / future_area) * 100, 1)
-                future_wa_5km_info = f'{future_wa_5km}km² | {future_wa_5km_pcnt}%'
+                future_wa_5km_info = f'{future_wa_5km} km² | {future_wa_5km_pcnt}%'
             else:
                 # Paddock has not been split, so we just get the additional waterpoints, watered area etc.
                 future_pdk_details = self.utils.paddockDetails(paddock_name, 'Future')
@@ -315,10 +317,10 @@ class PdfReportDialog(QDialog):
                 future_avg_AE_per_wpt = round(future_recommended_cc / future_num_wpts)
                 future_wa_3km = round(future_pdk_details[3] / 1000000, 1)
                 future_wa_3km_pcnt = round(future_pdk_details[4], 1)
-                future_wa_3km_info = f'{future_wa_3km}km² | {future_wa_3km_pcnt}%'
+                future_wa_3km_info = f'{future_wa_3km} km² | {future_wa_3km_pcnt}%'
                 future_wa_5km = round(future_pdk_details[5] / 1000000, 1)
                 future_wa_5km_pcnt = round(future_pdk_details[6], 1)
-                future_wa_5km_info = f'{future_wa_5km}km² | {future_wa_5km_pcnt}%'
+                future_wa_5km_info = f'{future_wa_5km} km² | {future_wa_5km_pcnt}%'
                 future_wa_stocking_rate = 'TODO'
             # planned_fencing = round(current_pdk_details[8]/1000, 3)
             total_future_fencing = round((current_pdk_details[7] + current_pdk_details[8]) / 1000, 1)
@@ -338,25 +340,25 @@ class PdfReportDialog(QDialog):
         avg_AE_per_wpt_sign = self.utils.sign(current_avg_AE_per_wpt, future_avg_AE_per_wpt)
         wa_3km_diff = round(future_wa_3km - current_wa_3km, 1)
         wa_3km_pcnt_diff = round(future_wa_3km_pcnt - current_wa_3km_pcnt, 1)
-        wa_3km_diff_info = f'{wa_3km_diff}km² | {wa_3km_pcnt_diff}%'
+        wa_3km_diff_info = f'{wa_3km_diff} km² | {wa_3km_pcnt_diff}%'
         wa_3km_sign = self.utils.sign(current_wa_3km, future_wa_3km)
         wa_5km_diff = round(future_wa_5km - current_wa_5km)
         wa_5km_pcnt_diff = round(future_wa_5km_pcnt - current_wa_5km_pcnt, 1)
-        wa_5km_diff_info = f'{wa_5km_diff}km² | {wa_5km_pcnt_diff}%'
+        wa_5km_diff_info = f'{wa_5km_diff} km² | {wa_5km_pcnt_diff}%'
         wa_5km_sign = self.utils.sign(current_wa_5km, future_wa_5km)
 
         html_text = "<table>"
         html_text += "<tr><th>Paddock Development Proposal</th><th>Current</th><th>Proposed</th><th>Difference +/-</th></tr>"
-        html_text += f"<tr><td>Total paddock area</td><td>{current_area}km²</td><td>{future_area}km²</td><td>{area_sign}{area_diff}km²</td></tr>"
-        html_text += f"<tr><td>Recommended carrying capacity</td><td>{current_recommended_cc}AE/yr</td><td>{future_recommended_cc}AE/yr</td><td>{cc_sign}{cc_diff}AE/yr</td></tr>"
+        html_text += f"<tr><td>Total paddock area</td><td>{current_area} km²</td><td>{future_area} km²</td><td>{area_sign}{area_diff} km²</td></tr>"
+        html_text += f"<tr><td>Recommended carrying capacity</td><td>{current_recommended_cc} AE/yr</td><td>{future_recommended_cc} AE/yr</td><td>{cc_sign}{cc_diff} AE/yr</td></tr>"
         # html_text+=f"<tr><td>Average adult equivalents carried now and planned for proposed development</td><td>{current_avg_AE}</td><td>B</td><td>C</td></tr>"
         html_text += f"<tr><td>Number of water points in paddock</td><td>{current_num_wpts}</td><td>{future_num_wpts}</td><td>{wpt_sign}{wpt_diff}</td></tr>"
         html_text += f"<tr><td>Average number of AE/water point</td><td>{current_avg_AE_per_wpt}</td><td>{future_avg_AE_per_wpt}</td><td>{avg_AE_per_wpt_sign}{avg_AE_per_wpt_diff}</td></tr>"
         html_text += f"<tr><td>3km watered area</td><td>{current_wa_3km_info}</td><td>{future_wa_3km_info}</td><td>{wa_3km_sign}{wa_3km_diff_info}</td></tr>"
         html_text += f"<tr><td>5km watered area</td><td>{current_wa_5km_info}</td><td>{future_wa_5km_info}</td><td>{wa_5km_sign}{wa_5km_diff_info}</td></tr>"
         # html_text+=f"<tr><td>Watered area stocking rate</td><td>{current_wa_stocking_rate} AE/km²</td><td>B</td><td>C</td></tr>"
-        html_text += f"<tr><td>Minimum length of fencing (including terrain)</td><td>{current_fencing}km</td><td>{total_future_fencing}km</td><td>{self.utils.sign(current_fencing, total_future_fencing)}{planned_fencing}km</td></tr>"
-        html_text += f"<tr><td>Minimum length of pipeline (including terrain)</td><td>{current_pipeline}km</td><td>{total_future_pipeline}km</td><td>{self.utils.sign(current_pipeline, total_future_pipeline)}{future_pipeline}km</td></tr>"
+        html_text += f"<tr><td>Minimum length of fencing (including terrain)</td><td>{current_fencing} km</td><td>{total_future_fencing} km</td><td>{self.utils.sign(current_fencing, total_future_fencing)}{planned_fencing} km</td></tr>"
+        html_text += f"<tr><td>Minimum length of pipeline (including terrain)</td><td>{current_pipeline} km</td><td>{total_future_pipeline} km</td><td>{self.utils.sign(current_pipeline, total_future_pipeline)}{future_pipeline} km</td></tr>"
         html_text += "</table>"
         html_text += "</body></html>"
         return html_text
@@ -368,6 +370,8 @@ class PdfReportDialog(QDialog):
         development_name = self.titleEdit.text()
         paddock_name = self.paddocksComboBox.currentText()
         if self.basicReportRadioButton.isChecked():
+            if self.render_task and self.render_task.alive:
+                self.render_task.cancel()
             basic_html = self.basicReportHtml(paddock_name, development_name)
             self.view.setHtml(basic_html)
         ##### ADVANCED REPORT TEMPLATE#####
@@ -434,14 +438,20 @@ class PdfReportDialog(QDialog):
                 task_desc = 'Rendering maps without basemap...'
             else:
                 task_desc = f'Rendering maps with {basemap} basemap'
+            if self.render_task and self.render_task.alive:
+                self.render_task.cancel()
             self.render_task = RenderTask(task_desc,
                                 current_layers_ordered,
                                 current_extent,
                                 future_layers_ordered,
                                 future_extent)
             self.render_task.map_images.connect(lambda images: self.setAdvancedHtml(images, paddock_name, basemap))
+            self.render_task.taskCompleted.connect(self.resetTask)
+            self.render_task.taskTerminated.connect(self.resetTask)
             QgsApplication.taskManager().addTask(self.render_task)
 
+    def resetTask(self):
+        self.render_task = None
         
     def setAdvancedHtml(self, map_images, paddock_name, basemap=None):
         advanced_html = "<html>"
@@ -540,6 +550,14 @@ class RenderTask(QgsTask):
         # We want to check for network request errors and cancel the task if received
         self.msg_log = QgsApplication.messageLog()
         self.msg_log.messageReceived.connect(self.errorChecker)
+        
+        self.alive = True
+        
+        self.taskCompleted.connect(self.killed)
+        self.taskTerminated.connect(self.killed)
+        
+    def killed(self):
+        self.alive = False
                 
     def run(self):
         # Render Current map image
@@ -563,6 +581,7 @@ class RenderTask(QgsTask):
         current_img = render.renderedImage()
         self.images.append(current_img)
         if self.isCanceled():
+            self.alive = False
             return False
             
         # Render Future map image
@@ -586,6 +605,7 @@ class RenderTask(QgsTask):
         future_img = render.renderedImage()
         self.images.append(future_img)
         if self.isCanceled():
+            self.alive = False
             return False
         return True
         
@@ -594,8 +614,11 @@ class RenderTask(QgsTask):
             self.map_images.emit(self.images)
         
     def errorChecker(self, msg, tag, level):
-        '''Cancel task if network error logged'''
-        if 'Network request' in msg and tag == 'Network' and level == 1:
+        '''Cancel task if network error logged (and task has not already been canceled)
+        e.g. by user generating a new preview which cancels the current task'''
+        if not self.alive:
+            return
+        if 'Network request' in msg and tag == 'Network' and level == Qgis.Warning:
             self.cancel()
                     
 ########################################################################################
