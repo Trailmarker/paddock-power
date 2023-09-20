@@ -74,7 +74,7 @@ with {_IN_PADDOCKS} as
 		 "{NEAR_GRAZING_RADIUS}" as {_NEAR_BUFFER},
 		 "{FAR_GRAZING_RADIUS}" as {_FAR_BUFFER}
 	  from "{waterpoints}"
-      where {ACTIVE}
+      where ({ACTIVE} or upper({ACTIVE})='TRUE')
       and {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
       {renamedWaterpointsClause}),
     {_BUFFERS} as

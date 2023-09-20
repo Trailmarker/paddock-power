@@ -144,12 +144,17 @@ class Field(QgsField):
         return _getter
 
     def __makeBooleanGetter(self):
-        """Make a getter for the value of a string-valued field. Handle 'NULL' correctly. Should not be called directly."""
+        """Make a getter for the value of a boolean-valued field. Handle 'NULL', 'true' and 'false' correctly. Should not be called directly."""
         def _getter(feature: QgsFeature):
             val = feature[self.name()]
             if isinstance(val, QVariant):
                 if val.isNull():
                     return True
+            elif isinstance(val, str):
+                if val.upper() == "TRUE":
+                    return True
+                elif val.upper() == "FALSE":
+                    return False
             elif val is None:
                 return True
             return bool(val)

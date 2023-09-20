@@ -120,4 +120,4 @@ class Details(QWidget):
 
         self.adjustSize()
         rowHeight = self.gridLayout.geometry().height() / detailsCount if detailsCount > 0 else 0
-        self.toolBar.setIconSize(QSize(rowHeight, rowHeight))
+        self.toolBar.setIconSize(QSize(int(rowHeight), int(rowHeight)))
