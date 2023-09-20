@@ -63,7 +63,7 @@ with
 	from "{_FILTERED_PADDOCKS}"
 	inner join "{wateredAreas}"
 		on "{_FILTERED_PADDOCKS}".{FID} = "{wateredAreas}".{PADDOCK}
-		and {Timeframe.timeframesIncludeStatuses(f'"{wateredAreas}".{TIMEFRAME}', f'"{_FILTERED_PADDOCKS}".{STATUS}')}
+		and {Timeframe.timeframesMatchStatuses(f'"{wateredAreas}".{TIMEFRAME}', f'"{_FILTERED_PADDOCKS}".{STATUS}')}
 	)
 , {_PADDOCK_LAND_TYPES} as
 	(select

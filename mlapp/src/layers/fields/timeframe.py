@@ -58,36 +58,58 @@ class Timeframe(FieldDomain):
 
     def displayFeatureStatus(self, featureStatus):
         """Check if a Feature Status corresponds to this Timeframe."""
-        return bool([fs for fs in self.displayedFeatureStatuses()
-                     if FeatureStatus[featureStatus.name] == FeatureStatus[fs.name]])
+        matches = [fs for fs in self.displayedFeatureStatuses()
+                   if FeatureStatus[featureStatus.name] == FeatureStatus[fs.name]]
+        return bool(matches)
 
     def matchTimeframe(self, timeframe):
         """Check if a Timeframe corresponds to this Timeframe."""
         return (Timeframe[self.name] == Timeframe[timeframe.name])
 
-    def includesStatus(self, statusTerm):
-        """Return a SQLite IN clause matching a Feature Status term against this Timeframe."""
+    def matchesStatus(self, statusTerm):
+        """Return a SQLite IN clause logically matching a Feature Status term against this Timeframe."""
         matchTerms = ", ".join([f"'{status.name}'" for status in self.matchingFeatureStatuses()])
         return f"{statusTerm} in ({matchTerms})"
 
-    def includesStatuses(self, *statusTerms):
-        """Return a SQLite IN … AND … IN … compound clause matching several interacting Feature Status terms against this Timeframe."""
-        includesStatusTerms = " and ".join([self.includesStatus(statusTerm) for statusTerm in statusTerms])
+    def displaysStatus(self, statusTerm):
+        """Return a SQLite IN clause matching a Feature Status term against this Timeframe for display purposes."""
+        matchTerms = ", ".join([f"'{status.name}'" for status in self.displayedFeatureStatuses()])
+        return f"{statusTerm} in ({matchTerms})"
+
+    def matchesStatuses(self, *statusTerms):
+        """Return a SQLite IN … AND … IN … compound clause logically matching several interacting Feature Status terms against this Timeframe."""
+        includesStatusTerms = " and ".join([self.matchesStatus(statusTerm) for statusTerm in statusTerms])
         return f"({includesStatusTerms})"
 
-    def timeframeIncludesStatuses(self, timeframeTerm, *statusTerms):
-        """Return a SQLite IN clause matching a Timeframe term against this Timeframe."""
-        return f"({timeframeTerm} = '{self.name}') and {self.includesStatuses(*statusTerms)}"
+    def displaysStatuses(self, *statusTerms):
+        """Return a SQLite IN … AND … IN … compound clause matching several interacting Feature Status terms against this Timeframe for display purposes."""
+        includesStatusTerms = " and ".join([self.displaysStatus(statusTerm) for statusTerm in statusTerms])
+        return f"({includesStatusTerms})"
+
+    def timeframeMatchesStatuses(self, timeframeTerm, *statusTerms):
+        """Return a SQLite IN clause logically matching a Timeframe term against this Timeframe."""
+        return f"({timeframeTerm} = '{self.name}') and {self.matchesStatuses(*statusTerms)}"
 
         # matchTerms = ", ".join([f"'{timeframe.name}'" for timeframe in Timeframe.matchingTimeframes(self)])
         # return f"{timeframeTerm} in ({matchTerms})"
 
+    def timeframeDisplaysStatuses(self, timeframeTerm, *statusTerms):
+        """Return a SQLite IN clause matching a Timeframe term against this Timeframe for display purposes."""
+        return f"({timeframeTerm} = '{self.name}') and {self.displaysStatuses(*statusTerms)}"
+
     @classmethod
-    def timeframesIncludeStatuses(cls, timeframeTerm, *statusTerms):
-        """Return a SQLite IN … AND … IN … compound clause matching several interacting Feature Status terms against a Timeframe term."""
-        allTimeframeIncludeStatusesTerms = " or ".join(
-            [timeframe.timeframeIncludesStatuses(timeframeTerm, *statusTerms) for timeframe in cls])
-        return f"({allTimeframeIncludeStatusesTerms})"
+    def timeframesMatchStatuses(cls, timeframeTerm, *statusTerms):
+        """Return a SQLite IN … AND … IN … compound clause logically matching several interacting Feature Status terms against a Timeframe term."""
+        allTimeframeMatchesStatusesTerms = " or ".join(
+            [timeframe.timeframeMatchesStatuses(timeframeTerm, *statusTerms) for timeframe in cls])
+        return f"({allTimeframeMatchesStatusesTerms})"
+
+    @classmethod
+    def timeframesDisplayStatuses(cls, timeframeTerm, *statusTerms):
+        """Return a SQLite IN … AND … IN … compound clause matching several interacting Feature Status terms against a Timeframe term for display purposes."""
+        allTimeframeDisplaysStatusesTerms = " or ".join(
+            [timeframe.timeframeDisplaysStatuses(timeframeTerm, *statusTerms) for timeframe in cls])
+        return f"({allTimeframeDisplaysStatusesTerms})"
 
     # @classmethod
     # def matchingTimeframes(cls, featureStatus):

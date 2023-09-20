@@ -31,6 +31,9 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         WorkspaceMixin.__init__(self)
         QgsAttributeTableView.__init__(self, parent)
 
+        # Used to configure the filter model 'display mode'
+        self.displayMode = False
+
         # Used to configure the table model in line with the plugin's domain
         self._schema = schema
         self._detailsWidgetFactory = detailsWidgetFactory
@@ -116,6 +119,9 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         self._tableModel.loadLayer()
         self._tableFilterModel = FeatureTableFilterModel(
             self.timeframe, self.plugin.iface.mapCanvas(), self._tableModel, self)
+
+        # Apply the 'display mode' to the filter model if set
+        self._tableFilterModel.displayMode = self.displayMode
 
         self.setSortingEnabled(True)
         self.sortByColumn(self._tableModel.sortColumn, Qt.AscendingOrder)

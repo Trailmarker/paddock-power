@@ -14,7 +14,11 @@ class PaddocksWidget(WorkspaceMixin, SplitFeatureTablesWidget):
         WorkspaceMixin.__init__(self)
         SplitFeatureTablesWidget.__init__(self, parent)
 
-        self.addFeatureTable("Paddocks", PaddockTable)
+        def paddockTableFactory(parent=None):
+            """Custom factory for PaddockTable objects that also sets the 'displayMode' property to True."""
+            return PaddockTable(displayMode=True, parent=parent)
+
+        self.addFeatureTable("Paddocks", paddockTableFactory)
 
         currentPaddockLandTypesGroupBox = PaddockLandTypesGroupBox()
         currentPaddockLandTypesGroupBox.featureTableFactory = CurrentPaddockLandTypesTable

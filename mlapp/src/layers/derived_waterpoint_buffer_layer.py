@@ -48,7 +48,7 @@ with {_IN_PADDOCKS} as
         '{Timeframe.Current.name}' as "{TIMEFRAME}"
 	 from "{waterpoints}"
 	 inner join "{basePaddocks}"
-     on {Timeframe.Current.includesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
+     on {Timeframe.Current.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
 	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
      union
@@ -61,7 +61,7 @@ with {_IN_PADDOCKS} as
         '{Timeframe.Future.name}' as "{TIMEFRAME}"
 	 from "{waterpoints}"
 	 inner join "{basePaddocks}"
-     on {Timeframe.Future.includesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
+     on {Timeframe.Future.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
 	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
      {inPaddocksClause}),
@@ -111,7 +111,7 @@ from {_BUFFERS}
 inner join {_IN_PADDOCKS}
 on {_BUFFERS}."{WATERPOINT}" = {_IN_PADDOCKS}."{WATERPOINT}"
 and st_area(st_intersection({_BUFFERS}.geometry, {_IN_PADDOCKS}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
-and {Timeframe.timeframesIncludeStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BUFFERS}."{STATUS}"')}
+and {Timeframe.timeframesMatchStatuses(f'{_IN_PADDOCKS}."{TIMEFRAME}"', f'{_BUFFERS}."{STATUS}"')}
 """
         return super().prepareQuery(query, dependentLayers)
 
