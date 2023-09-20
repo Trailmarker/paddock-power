@@ -62,6 +62,20 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
 
         processing.run(
             'native:package', params)
+        
+        # options = QgsVectorFileWriter.SaveVectorOptions()
+        # options.driverName = "GPKG"
+        # options.fileEncoding = 'cp1251'
+        # options.layerName = layerName
+
+        # fileWriter = QgsVectorFileWriter.create(
+        #     fileName=workspaceFile,
+        #     fields=schema.toQgsFields(),
+        #     geometryType=wkbType,
+        #     srs=QgsCoordinateReferenceSystem(f"EPSG:{PADDOCK_POWER_EPSG}"),
+        #     transformContext=QgsProject.instance().transformContext(),
+        #     options=options)
+        # del fileWriter 
 
     def deleteFromStore(self, workspaceFile, layerName):
         """Delete this FeatureLayer from the GeoPackage file."""
