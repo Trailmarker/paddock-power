@@ -7,6 +7,11 @@ from .persisted_feature_layer import PersistedFeatureLayer
 class ImportableFeatureLayer(ImportableLayer, PersistedFeatureLayer):
 
     @abstractmethod
+    def makeImportFeatureRequest(self):
+        """Return a QgsFeatureRequest with this layer as destination."""
+        pass
+
+    @abstractmethod
     def mapFeature(self, importFeature, fieldMap):
         f"""Map a QgsFeature to a Feature."""
         pass
