@@ -62,10 +62,6 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
             return
 
         if self.feature is not None:
-
-            if self.feature.profile() is None:
-                self.feature.recalculate()
-
             profile = self.feature.profile()
 
             useMetres = (profile.maximumDistance < 1000)

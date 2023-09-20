@@ -32,7 +32,6 @@ class Workspace(QObject):
 
         super().__init__(iface.mainWindow())
 
-
         self._locked = False
 
         self.loadWorkspaceTask = TaskHandle(LoadWorkspaceTask, self)

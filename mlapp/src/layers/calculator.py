@@ -79,7 +79,10 @@ class Calculator:
         distances = [0.0]
         elevations = []
 
+        elevationCoverageWarning = False
+
         if elevationLayer is None:
+            elevationCoverageWarning = True
             calculator = QgsDistanceArea()
             points = line.asPolyline()
 
@@ -122,6 +125,10 @@ class Calculator:
                 elevation = 0.0
                 try:
                     elevation = dataProvider.identify(point, QgsRaster.IdentifyFormatValue).results()[1]
+                    # PP-157 prevent elevation from being None
+                    if elevation is None:
+                        elevationCoverageWarning = True
+                        elevation = 0.0
                     pointsWithZ.append(QgsPoint(point.x(), point.y(), elevation))
                 except Exception:
                     pass
@@ -161,7 +168,8 @@ class Calculator:
                                 elevations=elevations,
                                 minimumElevation=minimumElevation,
                                 maximumElevation=maximumElevation,
-                                meanElevation=meanElevation)
+                                meanElevation=meanElevation,
+                                elevationCoverageWarning=elevationCoverageWarning)
 
     @staticmethod
     def calculateArea(polygon):
