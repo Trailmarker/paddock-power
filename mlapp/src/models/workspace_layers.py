@@ -67,7 +67,7 @@ class WorkspaceLayers(TypeDict):
 
     def unloadLayer(self, layerType):
         """Unload the layer of the given type."""
-        layer = self.valueToObject(self.pop(self.__layerKey(layerType), None))
+        layer = self.valueToObject(self.pop(self._layerKey(layerType), None))
         if isinstance(layer, QgsMapLayer):
             QgsProject.instance().removeMapLayer(layer.id())
 
@@ -76,7 +76,7 @@ class WorkspaceLayers(TypeDict):
         for layerType in list(self.keys()):
             self.unloadLayer(layerType)
 
-    def __layerKey(self, layerType):
+    def _layerKey(self, layerType):
         if isinstance(layerType, type):
             return layerType.__name__
         elif isinstance(layerType, str):

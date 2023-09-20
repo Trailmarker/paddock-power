@@ -41,7 +41,7 @@ class ImportDialog(Dialog, FORM_CLASS):
 
         else:
             exceptedTargetLayers = [layer for layer in QgsProject.instance().mapLayers().values()
-                                    if layer.id() != self.workspace.basePaddockLayer.id()]
+                                    if layer.id() not in [self.workspace.basePaddockLayer.id(), self.workspace.elevationLayer.id()]]
 
         self.targetLayerComboBox.setExceptedLayerList(exceptedTargetLayers)
         self.targetLayerComboBox.setAllowEmptyLayer(True)
