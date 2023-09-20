@@ -7,11 +7,12 @@ from .feature_table import FeatureTable
 
 class PaddockTable(FeatureTable):
 
-    def __init__(self, parent=None):
+    def __init__(self, displayMode=False, parent=None):
         """Constructor."""
 
         super().__init__(MetricPaddockSchema, PaddockDetails, PaddockDetailsEdit, parent)
 
+        self.displayMode = displayMode
         self.featureLayer = self.workspace.paddockLayer
 
     @property
