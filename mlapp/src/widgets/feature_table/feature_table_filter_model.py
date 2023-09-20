@@ -32,11 +32,11 @@ class FeatureTableFilterModel(QgsAttributeTableFilterModel):
                         self._statusColumn,
                         sourceParent),
                     Qt.DisplayRole))
-            
+
             valid = statusData not in [None, 'NULL', '(NULL)' '']
             if valid and not self._timeframe.displayFeatureStatus(FeatureStatus(statusData)):
                 return False
-            
+
         # The result when there is no 'Timeframe' column at all
         if self._timeframeColumn < 0:
             return True

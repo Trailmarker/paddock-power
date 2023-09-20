@@ -24,6 +24,22 @@ class PersistedFeature(Feature, IPersistedFeature):
         """Set the PersistedFeature's geometry."""
         self.setGeometry(g)
 
+    def recalculateELevation(self):
+        """Recalculate the PersistedFeature's elevation, if applicable."""
+        if self.GEOMETRY and self.hasElevation:
+            elevationLayer = self.featureLayer.workspace.elevationLayer
+            if elevationLayer and elevationLayer.isValid():
+                self.ELEVATION = Calculator.calculateElevationAtPoint(self.GEOMETRY, elevationLayer)
+
+    def recalculateElevationProfile(self):
+        """Recalculate the PersistedFeature's elevation profile, if applicable."""
+        if self.GEOMETRY and self.hasLength:
+            elevationLayer = self.featureLayer.workspace.elevationLayer
+            if elevationLayer and elevationLayer.isValid():
+                self._profile = Calculator.calculateProfile(self.GEOMETRY, elevationLayer)
+                length = round(self._profile.maximumDistance / 1000, 2)
+                self.LENGTH = length
+
     def recalculate(self):
         """Recalculate everything that can be recalculated based on the Feature schema."""
 
@@ -42,15 +58,9 @@ class PersistedFeature(Feature, IPersistedFeature):
                     self.LONGITUDE = longitude
                 if self.hasLatitude:
                     self.LATITUDE = latitude
-            if self.hasElevation or self.hasLength:
-                elevationLayer = self.featureLayer.workspace.elevationLayer
-                if elevationLayer and elevationLayer.isValid():
-                    if self.hasElevation:
-                        self.ELEVATION = Calculator.calculateElevationAtPoint(self.GEOMETRY, elevationLayer)
-                    if self.hasLength:
-                        self._profile = Calculator.calculateProfile(self.GEOMETRY, elevationLayer)
-                        length = round(self._profile.maximumDistance / 1000, 2)
-                        self.LENGTH = length
+
+        self.recalculateELevation()
+        self.recalculateElevationProfile()
 
     def __toProviderFeature(self):
         """Map the PersistedFeature's fields to the provider's fields."""

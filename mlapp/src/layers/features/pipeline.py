@@ -26,7 +26,7 @@ class Pipeline(PersistedFeature, StatusFeatureMixin):
     def profile(self):
         """Return this Pipeline's profile."""
         if not self._profile:
-            self.recalculate()
+            self.recalculateElevationProfile()
         return self._profile
 
     @FeatureAction.draft.handleWithSave()
