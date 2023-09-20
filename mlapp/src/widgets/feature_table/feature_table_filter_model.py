@@ -24,7 +24,6 @@ class FeatureTableFilterModel(QgsAttributeTableFilterModel):
         if self.filterMode() == QgsAttributeTableFilterModel.ShowFilteredList:
             return super().filterAcceptsRow(sourceModelRow, sourceParent)
 
-        display = True
         if self.displayMode and self._statusColumn >= 0:
             statusData = str(
                 self.sourceModel().data(
@@ -33,12 +32,14 @@ class FeatureTableFilterModel(QgsAttributeTableFilterModel):
                         self._statusColumn,
                         sourceParent),
                     Qt.DisplayRole))
-
-            display = self._timeframe.displayFeatureStatus(FeatureStatus(statusData))
-
+            
+            valid = statusData not in [None, 'NULL', '(NULL)' '']
+            if valid and not self._timeframe.displayFeatureStatus(FeatureStatus(statusData)):
+                return False
+            
         # The result when there is no 'Timeframe' column at all
         if self._timeframeColumn < 0:
-            return display
+            return True
 
         timeframeData = str(
             self.sourceModel().data(
@@ -48,7 +49,7 @@ class FeatureTableFilterModel(QgsAttributeTableFilterModel):
                     sourceParent),
                 Qt.DisplayRole))
 
-        return display and (Timeframe[timeframeData] == Timeframe[self._timeframe.name])
+        return Timeframe[timeframeData] == Timeframe[self._timeframe.name]
 
     def lessThan(self, left, right):
         """Override the lessThan method to take the featureTableActionCount into account."""
