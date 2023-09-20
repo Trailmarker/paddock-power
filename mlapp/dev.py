@@ -46,6 +46,11 @@ def byType(layerType):
     return workspace().workspaceLayers.layer(layerType)
 
 
+def byName(layerName):
+    f"""Get all layers with the given name in the current workspace."""
+    return list(l for l in QgsProject.instance().mapLayers().values() if l.name() == layerName)
+
+
 def show(layer):
     f"""Show the given layer."""
     QgsProject.instance().layerTreeRoot().addLayer(layer)
@@ -101,7 +106,7 @@ def checkLayers():
 if workspace():
     [landTypeConditionTable, propertyLayer, paddockLayer,
      elevationLayer, fenceLayer, landTypeLayer,
-     paddockLayer, paddockLandTypeLayer, pipelineLayer,
+     basePaddockLayer, paddockLandTypeLayer, pipelineLayer,
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
 
 

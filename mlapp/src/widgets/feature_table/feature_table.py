@@ -7,7 +7,7 @@ from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 from qgis.core import QgsVectorLayerCache
 from qgis.gui import QgsAttributeTableView
 
-from ...layers.fields import CONDITION_TYPE, STATUS, ConditionType, FeatureStatus
+from ...layers.fields import ANALYSIS_TYPE, CONDITION_TYPE, STATUS, AnalysisType, ConditionType, FeatureStatus
 from ...models import WorkspaceMixin
 from ...utils import PLUGIN_NAME, getComponentStyleSheet, guiWarning
 
@@ -214,9 +214,10 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
                 featureTableActionModel.featureTableAction.value,
                 FeatureTableActionDelegate(featureTableActionModel, self))
 
-        # Set up a column item delegate for the "Status" and "Condition Type" fields
-        self.setFeatureFieldDomainDelegate(STATUS, FeatureStatus)
+        # Set up a column item delegate for the "Analysis Type", "Condition Type" and "Status" fields
+        self.setFeatureFieldDomainDelegate(ANALYSIS_TYPE, AnalysisType)
         self.setFeatureFieldDomainDelegate(CONDITION_TYPE, ConditionType)
+        self.setFeatureFieldDomainDelegate(STATUS, FeatureStatus)
 
         for column in self._tableModel.hiddenColumns:
             self.hideColumn(column)

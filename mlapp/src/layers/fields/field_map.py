@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from functools import cached_property
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsFields, QgsGeometry, QgsProject
 
 from ...models import Glitch
 from ...utils import PADDOCK_POWER_EPSG, qgsDebug
@@ -77,16 +76,9 @@ class FieldMap(list):
     def mapFeature(self, feature, targetFeature):
         """Map a QgsFeature to another QgsFeature via this FieldMap."""
 
-        # Transform the imported geometry, if applicable
-        if feature.hasGeometry():
-            # Copy incoming
-            destGeom = QgsGeometry(feature.geometry())
-            sourceCrs = self.importLayer.crs()
-            destCrs = QgsCoordinateReferenceSystem(f"epsg:{PADDOCK_POWER_EPSG}")
-            tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-            # Stateful
-            destGeom.transform(tr)
-            targetFeature.setGeometry(destGeom)
+        # No longer necessary to manually reproject, because the QgsFeatureRequest
+        # used to get the import features already handles the destination coordinate system
+        targetFeature.setGeometry(feature.geometry())
 
         # Suck the mapped import fields into the target feature fields
         for targetField in targetFeature.getSchema().targetFields:

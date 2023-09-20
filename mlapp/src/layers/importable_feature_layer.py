@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from qgis.core import QgsFeatureRequest, QgsProject
+
 from ..utils import PLUGIN_NAME, qgsInfo
 from .features import Edits
 from .fields import FeatureStatus
@@ -12,6 +14,10 @@ class ImportableFeatureLayer(PersistedFeatureLayer, IImportableFeatureLayer):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""
 
         super().__init__(workspaceFile, layerName, styleName)
+
+    def makeImportFeatureRequest(self):
+        """Return a QgsFeatureRequest with this layer as destination."""
+        return QgsFeatureRequest().setDestinationCrs(self.crs(), QgsProject.instance().transformContext())
 
     def mapFeature(self, importFeature, fieldMap):
         f"""Map a QgsFeature to a {PLUGIN_NAME} Feature."""
@@ -31,11 +37,14 @@ class ImportableFeatureLayer(PersistedFeatureLayer, IImportableFeatureLayer):
         edits = Edits.truncate(self)
 
         features = []
-        importQgsFeatures = [importFeature for importFeature in importLayer.getFeatures(importFilter)]
+        unfilteredImportFeatures = [feature for feature in importLayer.getFeatures()]
+        importFeatures = [feature for feature in importLayer.getFeatures(importFilter)]
 
-        qgsInfo(f"Importing {len(importQgsFeatures)} features into layer {self.name()} via field map {fieldMap} …")
+        filteredCount = len(unfilteredImportFeatures) - len(importFeatures)
+        qgsInfo(f"Filtering {filteredCount} features based on rules (for example if outside Property neighbourhood).")
+        qgsInfo(f"Importing {len(importFeatures)} features into layer {self.name()} via field map {fieldMap} …")
 
-        for importQgsFeature in importQgsFeatures:
+        for importQgsFeature in importFeatures:
             raiseErrorIfTaskHasBeenCancelled()
             targetFeature = self.mapFeature(importQgsFeature, fieldMap)
             features.append(targetFeature)

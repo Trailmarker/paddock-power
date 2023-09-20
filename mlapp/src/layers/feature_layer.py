@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsFeatureRequest, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import PLUGIN_NAME, guiInformation, resolveProjectPath
@@ -152,6 +152,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         """Handle a batch of edits being persisted on the underyling layer."""
         # At the moment, we just invalidate the cache and reload the layer
         # self.plugin.iface.mapCanvas().refreshAllLayers()
+        self.updateExtents()
         self.triggerRepaint(True)
 
     def onSelectFeature(self, feature):
