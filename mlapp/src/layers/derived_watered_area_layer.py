@@ -20,18 +20,18 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
         if not self.changeset:
             return None
 
-        [basePaddockLayer, waterpointBufferLayer] = self.dependentLayers
+        [analyticPaddockLayer, waterpointBufferLayer] = self.dependentLayers
         return self.prepareRederiveFeaturesRequest(
-            basePaddockLayer, PADDOCK, FID, waterpointBufferLayer, PADDOCK, PADDOCK)
+            analyticPaddockLayer, PADDOCK, FID, waterpointBufferLayer, PADDOCK, PADDOCK)
 
     def prepareQuery(self, query, dependentLayers):
-        [basePaddockLayer, waterpointBufferLayer] = dependentLayers
-        [basePaddocks, waterpointBuffers] = self.names(dependentLayers)
+        [analyticPaddockLayer, waterpointBufferLayer] = dependentLayers
+        [analyticPaddocks, waterpointBuffers] = self.names(dependentLayers)
 
         # Set up clauses
         filterWaterpointBuffers = self.andAllKeyClauses(
             self.changeset,
-            basePaddockLayer,
+            analyticPaddockLayer,
             PADDOCK,
             FID,
             waterpointBufferLayer,
@@ -39,7 +39,7 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
             PADDOCK)
         filterPaddocks = self.andAllKeyClauses(
             self.changeset,
-            basePaddockLayer,
+            analyticPaddockLayer,
             FID,
             FID,
             waterpointBufferLayer,
@@ -55,12 +55,12 @@ class DerivedWateredAreaLayer(DerivedFeatureLayer):
             _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
             withFilteredPaddocks = f"""
   {_FILTERED_PADDOCKS} as
-    (select * from "{basePaddocks}"
+    (select * from "{analyticPaddocks}"
      where 1=1
      {filterPaddocks}),
 """
         else:
-            _FILTERED_PADDOCKS = basePaddocks
+            _FILTERED_PADDOCKS = analyticPaddocks
             withFilteredPaddocks = ""
         query = f"""
 with

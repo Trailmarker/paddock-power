@@ -19,16 +19,16 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
         if not self.changeset:
             return None
 
-        [basePaddockLayer, waterpointLayer] = self.dependentLayers
-        return self.prepareRederiveFeaturesRequest(basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
+        [analyticPaddockLayer, waterpointLayer] = self.dependentLayers
+        return self.prepareRederiveFeaturesRequest(analyticPaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
 
     def prepareQuery(self, query, dependentLayers):
-        [basePaddockLayer, waterpointLayer] = dependentLayers
-        [basePaddocks, waterpoints] = self.names(dependentLayers)
+        [analyticPaddockLayer, waterpointLayer] = dependentLayers
+        [analyticPaddocks, waterpoints] = self.names(dependentLayers)
 
         # Set up clauses
         inPaddocksClause = self.andAllKeyClauses(
-            self.changeset, basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
+            self.changeset, analyticPaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
         renamedWaterpointsClause = self.andAllKeyClauses(self.changeset, waterpointLayer, FID, FID)
 
         _BUFFERS = "Buffers"
@@ -40,29 +40,29 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
         query = f"""
 with {_IN_PADDOCKS} as
     (select
-        "{basePaddocks}".geometry,
-        "{basePaddocks}".{FID} as "{PADDOCK}",
-        "{basePaddocks}"."{NAME}" as "{PADDOCK_NAME}",
+        "{analyticPaddocks}".geometry,
+        "{analyticPaddocks}".{FID} as "{PADDOCK}",
+        "{analyticPaddocks}"."{NAME}" as "{PADDOCK_NAME}",
         "{waterpoints}".{FID} as "{WATERPOINT}",
         "{waterpoints}"."{NAME}" as "{WATERPOINT_NAME}",
         '{Timeframe.Current.name}' as "{TIMEFRAME}"
 	 from "{waterpoints}"
-	 inner join "{basePaddocks}"
-     on {Timeframe.Current.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
-	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
+	 inner join "{analyticPaddocks}"
+     on {Timeframe.Current.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{analyticPaddocks}"."{STATUS}"')}
+	 and st_contains("{analyticPaddocks}".geometry, "{waterpoints}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
      union
      select
-        "{basePaddocks}".geometry,
-        "{basePaddocks}".{FID} as "{PADDOCK}",
-        "{basePaddocks}"."{NAME}" as "{PADDOCK_NAME}",
+        "{analyticPaddocks}".geometry,
+        "{analyticPaddocks}".{FID} as "{PADDOCK}",
+        "{analyticPaddocks}"."{NAME}" as "{PADDOCK_NAME}",
         "{waterpoints}".{FID} as "{WATERPOINT}",
         "{waterpoints}"."{NAME}" as "{WATERPOINT_NAME}",
         '{Timeframe.Future.name}' as "{TIMEFRAME}"
 	 from "{waterpoints}"
-	 inner join "{basePaddocks}"
-     on {Timeframe.Future.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
-	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
+	 inner join "{analyticPaddocks}"
+     on {Timeframe.Future.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{analyticPaddocks}"."{STATUS}"')}
+	 and st_contains("{analyticPaddocks}".geometry, "{waterpoints}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
      {inPaddocksClause}),
 {_RENAMED_WATERPOINTS} as
