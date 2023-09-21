@@ -41,7 +41,7 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 with {_IN_PADDOCKS} as
     (select
         "{analyticPaddocks}".geometry,
-        "{analyticPaddocks}".{FID} as "{PADDOCK}",
+        "{analyticPaddocks}".{PADDOCK} as "{PADDOCK}",
         "{analyticPaddocks}"."{NAME}" as "{PADDOCK_NAME}",
         "{waterpoints}".{FID} as "{WATERPOINT}",
         "{waterpoints}"."{NAME}" as "{WATERPOINT_NAME}",
@@ -54,7 +54,7 @@ with {_IN_PADDOCKS} as
      union
      select
         "{analyticPaddocks}".geometry,
-        "{analyticPaddocks}".{FID} as "{PADDOCK}",
+        "{analyticPaddocks}".{PADDOCK} as "{PADDOCK}",
         "{analyticPaddocks}"."{NAME}" as "{PADDOCK_NAME}",
         "{waterpoints}".{FID} as "{WATERPOINT}",
         "{waterpoints}"."{NAME}" as "{WATERPOINT_NAME}",

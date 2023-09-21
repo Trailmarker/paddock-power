@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsVectorLayer
 
 from ..models import QtAbstractMeta, WorkspaceMixin
 from ..utils import PLUGIN_NAME, guiInformation, resolveProjectPath
 from .csv import makeCsvWriter, timestampedCsvFilename, writeFeatureLayer
-from .fields import TIMEFRAME
+from .fields import TIMEFRAME, Timeframe
 from .interfaces import IFeatureLayer
 from .map_layer_mixin import MapLayerMixin
 
@@ -62,7 +62,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         super().connectWorkspace(workspace)
 
         self.selectionChanged.connect(lambda selection, *_: self.onSelectionChanged(selection, *_))
-        self.workspace.timeframeChanged.connect(lambda timeframe: self.onTimeframeChanged(timeframe))
+        self.workspace.timeframeChanged.connect(lambda: self.onTimeframeChanged())
         self.editsPersisted.connect(self.onEditsPersisted)
 
     @property
@@ -144,7 +144,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
             writeFeatureLayer(csvWriter, self)
             guiInformation(f"Features extracted to:\n{csvFilename}.")
 
-    def onTimeframeChanged(self, timeframe):
+    def onTimeframeChanged(self):
         """Handle workspace timeframe changes."""
         self.triggerRepaint(True)
 
