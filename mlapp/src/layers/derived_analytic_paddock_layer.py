@@ -31,10 +31,15 @@ class DerivedAnalyticPaddockLayer(DerivedFeatureLayer):
         [basePaddockLayer] = self.dependentLayers
         [basePaddocks] = self.names(dependentLayers)
 
+        _ANALYTIC_PADDOCK_BOUNDARIES = f"AnalyticPaddocksBoundary{randomString()}"
+        _INCLUDED_PADDOCKS = f"IncludedPaddocks{randomString()}"
+
         query = f"""
 
-select
-    "{basePaddocks}".geometry as geometry,
+with
+{_ANALYTIC_PADDOCK_BOUNDARIES} as
+(select
+    st_makepolygon(st_boundary("{basePaddocks}".geometry)) as geometry,
     "{basePaddocks}".{FID} as {FID},
     "{basePaddocks}".{FID} as {PADDOCK},
     "{basePaddocks}".{NAME} as {NAME},
@@ -44,8 +49,42 @@ select
     "{basePaddocks}"."{PERIMETER}" as "{PERIMETER}",
     "{basePaddocks}"."{AREA}" as "{AREA}"
 from "{basePaddocks}"
-where "{basePaddocks}"."{ANALYSIS_TYPE}" != '{AnalysisType.ExcludePaddock.name}'
+where "{basePaddocks}"."{ANALYSIS_TYPE}" = '{AnalysisType.Default.name}'),
+{_INCLUDED_PADDOCKS} as
+(select
+	"{basePaddocks}".geometry as geometry,
+    "{basePaddocks}".{FID} as {FID},
+    "{basePaddocks}"."{ANALYSIS_TYPE}" as "{ANALYSIS_TYPE}"
+from "{basePaddocks}"
+where "{basePaddocks}"."{ANALYSIS_TYPE}" != '{AnalysisType.ExcludePaddock.name}')
+select
+	st_union({_INCLUDED_PADDOCKS}.geometry) as geometry,
+    {_ANALYTIC_PADDOCK_BOUNDARIES}.{FID} as {FID},
+    {_ANALYTIC_PADDOCK_BOUNDARIES}.{FID} as {PADDOCK},
+    {_ANALYTIC_PADDOCK_BOUNDARIES}.{NAME} as {NAME},
+    {_ANALYTIC_PADDOCK_BOUNDARIES}."{ANALYSIS_TYPE}" as "{ANALYSIS_TYPE}",
+    {_ANALYTIC_PADDOCK_BOUNDARIES}."{BUILD_FENCE}" as "{BUILD_FENCE}",
+    {_ANALYTIC_PADDOCK_BOUNDARIES}.{STATUS} as {STATUS},
+    {_ANALYTIC_PADDOCK_BOUNDARIES}."{PERIMETER}" as "{PERIMETER}",
+    {_ANALYTIC_PADDOCK_BOUNDARIES}."{AREA}" as "{AREA}"
+	from {_ANALYTIC_PADDOCK_BOUNDARIES}
+	inner join {_INCLUDED_PADDOCKS}
+	on st_contains({_ANALYTIC_PADDOCK_BOUNDARIES}.geometry, {_INCLUDED_PADDOCKS}.geometry)
+group by {_ANALYTIC_PADDOCK_BOUNDARIES}.{FID}
 """
+# select
+#     "{basePaddocks}".geometry as geometry,
+#     "{basePaddocks}".{FID} as {FID},
+#     "{basePaddocks}".{FID} as {PADDOCK},
+#     "{basePaddocks}".{NAME} as {NAME},
+#     "{basePaddocks}"."{ANALYSIS_TYPE}" as "{ANALYSIS_TYPE}",
+#     "{basePaddocks}"."{BUILD_FENCE}" as "{BUILD_FENCE}",
+#     "{basePaddocks}".{STATUS} as {STATUS},
+#     "{basePaddocks}"."{PERIMETER}" as "{PERIMETER}",
+#     "{basePaddocks}"."{AREA}" as "{AREA}"
+# from "{basePaddocks}"
+# where "{basePaddocks}"."{ANALYSIS_TYPE}" != '{AnalysisType.ExcludePaddock.name}'
+
         return super().prepareQuery(query, dependentLayers)
 
     def __init__(self,
