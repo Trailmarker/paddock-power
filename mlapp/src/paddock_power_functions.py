@@ -87,42 +87,6 @@ def ifCurrentTimeframe(vals, *_):
         return vals[2]
 
 
-@qgsfunction(args=0, group=PLUGIN_NAME)
-def timeframeWaterpointColour(vals, *_):
-    """Convert a Timeframe to a colour for a Waterpoint."""
-    try:
-        timeframe = getWorkspace().timeframe
-
-        if timeframe.matchTimeframe(Timeframe.Current):
-            return "#026b7f"
-        elif timeframe.matchTimeframe(Timeframe.Future):
-            return "#83e9fd"
-        elif timeframe.matchTimeframe(Timeframe.Undefined):
-            return "#00000000"
-        else:
-            return None
-    except BaseException:
-        return None
-
-
-@qgsfunction(args=0, group=PLUGIN_NAME)
-def timeframeWaterpointForegroundColour(vals, *_):
-    """Convert a Timeframe to a foreground colour for a Waterpoint."""
-    try:
-        timeframe = getWorkspace().timeframe
-
-        if timeframe.matchTimeframe(Timeframe.Current):
-            return "#ffffff"
-        elif timeframe.matchTimeframe(Timeframe.Future):
-            return "#000000"
-        elif timeframe.matchTimeframe(Timeframe.Undefined):
-            return "#00000000"
-        else:
-            return None
-    except BaseException:
-        return None
-
-
 @qgsfunction(args=1, group=PLUGIN_NAME)
 def waterpointInitials(vals, *_):
     """Convert a Waterpoint Type to initials for a Font Marker."""
@@ -152,7 +116,5 @@ PaddockPowerFunctions = {
     "matchCurrentTimeframe": matchCurrentTimeframe,
     "ifCurrentFeatureStatus": ifCurrentFeatureStatus,
     "ifCurrentTimeframe": ifCurrentTimeframe,
-    "timeframeWaterpointColour": timeframeWaterpointColour,
-    "timeframeWaterpointForegroundColour": timeframeWaterpointForegroundColour,
     "waterpointInitials": waterpointInitials
 }

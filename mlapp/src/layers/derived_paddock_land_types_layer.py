@@ -56,7 +56,7 @@ with
  {_PADDOCK_WATERED_AREAS} as
 	(select
 		"{wateredAreas}".geometry as geometry,
-		"{_FILTERED_PADDOCKS}".{FID} as {PADDOCK},
+		"{_FILTERED_PADDOCKS}".{PADDOCK} as {PADDOCK},
 		"{_FILTERED_PADDOCKS}".{NAME},
 		"{wateredAreas}"."{WATERED_TYPE}",
 		"{wateredAreas}".{TIMEFRAME}
