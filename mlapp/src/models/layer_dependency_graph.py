@@ -75,6 +75,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
                 WaterpointBufferLayer,
                 DerivedWaterpointBufferLayer,
                 WaterpointLayer,
+                AnalyticPaddockLayer,
                 BasePaddockLayer,
                 LandTypeLayer,
                 ElevationLayer]
