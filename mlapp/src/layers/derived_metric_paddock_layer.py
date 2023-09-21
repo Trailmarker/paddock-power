@@ -20,18 +20,18 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer):
             return None
 
         # TODO Land Type condition table?
-        [basePaddockLayer, paddockLandTypesLayer] = self.dependentLayers
+        [analyticPaddockLayer, paddockLandTypesLayer] = self.dependentLayers
         return self.prepareRederiveFeaturesRequest(
-            basePaddockLayer, PADDOCK, FID,
+            analyticPaddockLayer, PADDOCK, FID,
             paddockLandTypesLayer, PADDOCK, PADDOCK)
 
     def prepareQuery(self, query, dependentLayers):
-        [basePaddockLayer, paddockLandTypesLayer] = self.dependentLayers
-        [basePaddocks, paddockLandTypes] = self.names(dependentLayers)
+        [analyticPaddockLayer, paddockLandTypesLayer] = self.dependentLayers
+        [analyticPaddocks, paddockLandTypes] = self.names(dependentLayers)
 
         filterPaddocks = self.andAllKeyClauses(
             self.changeset,
-            basePaddockLayer,
+            analyticPaddockLayer,
             FID,
             FID,
             paddockLandTypesLayer,
@@ -42,12 +42,12 @@ class DerivedMetricPaddockLayer(DerivedFeatureLayer):
             _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
             withFilteredPaddocks = f"""
 with {_FILTERED_PADDOCKS} as
-    (select * from "{basePaddocks}"
+    (select * from "{analyticPaddocks}"
      where 1=1
      {filterPaddocks})
 """
         else:
-            _FILTERED_PADDOCKS = basePaddocks
+            _FILTERED_PADDOCKS = analyticPaddocks
             withFilteredPaddocks = ""
         query = f"""
 {withFilteredPaddocks}

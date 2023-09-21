@@ -92,6 +92,7 @@ layerTypes = [
     FenceLayer,
     LandTypeLayer,
     BasePaddockLayer,
+    AnalyticPaddockLayer,
     PaddockLandTypesLayer,
     PipelineLayer,
     WateredAreaLayer,
@@ -106,7 +107,7 @@ def checkLayers():
 if workspace():
     [landTypeConditionTable, propertyLayer, paddockLayer,
      elevationLayer, fenceLayer, landTypeLayer,
-     basePaddockLayer, paddockLandTypeLayer, pipelineLayer,
+     basePaddockLayer, analyticPaddockLayer, paddockLandTypeLayer, pipelineLayer,
      wateredAreaLayer, waterpointBufferLayer, waterpointLayer] = checkLayers()
 
 

@@ -6,7 +6,6 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsProject, QgsSnappingConfig
 
-from ..layers import BasePaddockLayer
 from ..layers.fields import Timeframe
 from ..layers.tasks import AnalyseWorkspaceTask, ImportElevationLayerTask, ImportFeatureLayerTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..utils import PLUGIN_NAME, getSetting, guiStatusBarAndInfo, qgsInfo

@@ -21,33 +21,33 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
             return None
 
         # TODO Land Type condition table?
-        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = self.dependentLayers
+        [landTypeConditionTable, analyticPaddockLayer, landTypeLayer, wateredAreaLayer] = self.dependentLayers
         return self.prepareRederiveFeaturesRequest(
-            basePaddockLayer, PADDOCK, FID,
+            analyticPaddockLayer, PADDOCK, FID,
             wateredAreaLayer, PADDOCK, PADDOCK,
             landTypeLayer, LAND_TYPE, FID)
 
     def prepareQuery(self, query, dependentLayers):
-        [landTypeConditionTable, basePaddockLayer, landTypeLayer, wateredAreaLayer] = dependentLayers
-        [landTypeConditions, basePaddocks, landTypes, wateredAreas] = self.names(dependentLayers)
+        [landTypeConditionTable, analyticPaddockLayer, landTypeLayer, wateredAreaLayer] = dependentLayers
+        [landTypeConditions, analyticPaddocks, landTypes, wateredAreas] = self.names(dependentLayers)
 
         _PADDOCK_LAND_TYPES = f"PaddockLandTypes{randomString()}"
         _PADDOCK_WATERED_AREAS = f"PaddockWateredAreas{randomString()}"
         _WATERED_FACTOR = "WateredFactor"
 
-        filterPaddocks = self.andAllKeyClauses(self.changeset, basePaddockLayer,
+        filterPaddocks = self.andAllKeyClauses(self.changeset, analyticPaddockLayer,
                                                FID, FID, wateredAreaLayer, FID, PADDOCK)
 
         if filterPaddocks:
             _FILTERED_PADDOCKS = f"FilteredPaddocks{randomString()}"
             withFilteredPaddocks = f"""
   {_FILTERED_PADDOCKS} as
-    (select * from "{basePaddocks}"
+    (select * from "{analyticPaddocks}"
      where 1=1
      {filterPaddocks}),
 """
         else:
-            _FILTERED_PADDOCKS = basePaddocks
+            _FILTERED_PADDOCKS = analyticPaddocks
             withFilteredPaddocks = ""
 
         query = f"""

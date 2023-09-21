@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .analytic_paddock_layer import AnalyticPaddockLayer
 from .base_paddock_layer import BasePaddockLayer
 from .derived_feature_layer import DerivedFeatureLayer
 from .derived_metric_paddock_layer import DerivedMetricPaddockLayer
