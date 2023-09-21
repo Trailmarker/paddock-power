@@ -275,9 +275,9 @@ class FeatureTable(RelayoutMixin, WorkspaceMixin, QgsAttributeTableView):
         fid = self._tableModel.rowToId(index.row())
         return self._tableModel.layer().getFeature(fid)
 
-    def onTimeframeChanged(self, timeframe):
+    def onTimeframeChanged(self):
         """Handle the timeframe being changed."""
-        self._tableFilterModel.onTimeframeChanged(timeframe)
+        self._tableFilterModel.onTimeframeChanged()
 
     # def onEditsPersisted(self):
     #     """Handle a batch of edits being persisted on the underyling layer."""

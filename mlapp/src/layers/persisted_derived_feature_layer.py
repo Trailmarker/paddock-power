@@ -19,7 +19,7 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
 
         self.setReadOnly(True)
 
-    def getDerivedLayerInstance(self, changeset=None):
+    def getDerivedLayer(self, changeset=None):
         """Return the derived layer for this layer."""
         # Clean up any instances of the virtual source …
         self.derivedLayerType.removeAllOfType()
@@ -27,16 +27,16 @@ class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatu
         # Create the new instance and return
         return self.derivedLayerType(self.dependentLayers, changeset)
 
-    def showDerivedLayerInstance(self, changeset=None):
+    def showDerivedLayer(self, changeset=None):
         """Add an instance of the derived layer for this layer to the map."""
-        self.getDerivedLayerInstance(changeset).addToMap()
+        self.getDerivedLayer(changeset).addToMap()
 
     def deriveFeatures(self, changeset=None, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Retrieve the features in the derived layer and copy them to this layer."""
 
         # RESPECT_CHANGESETS determines whether we try to home in just on dependent data
-        derivedLayer = self.getDerivedLayerInstance(
-            changeset) if self.RESPECT_CHANGESETS else self.getDerivedLayerInstance(None)
+        derivedLayer = self.getDerivedLayer(
+            changeset) if self.RESPECT_CHANGESETS else self.getDerivedLayer(None)
         if not derivedLayer:
             raise Glitch(f"{type(self).__name__}.deriveFeatures(): no derived layer to analyse …")
 

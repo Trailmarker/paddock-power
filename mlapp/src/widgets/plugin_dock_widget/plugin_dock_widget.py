@@ -6,6 +6,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
 
+from ...layers.fields import Timeframe
 from ...models import WorkspaceMixin
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from .fences_widget import FencesWidget
@@ -60,9 +61,10 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.timeframeButtonGroup.addButton(self.futureTimeframeButton)
 
     def refreshUi(self):
+        # Update the timeframe checked thing
         if self.workspace:
-            self.currentTimeframeButton.setChecked(self.workspace.timeframe.name == 'Current')
-            self.futureTimeframeButton.setChecked(self.workspace.timeframe.name == 'Future')
+            self.currentTimeframeButton.setChecked(Timeframe[self.workspace.timeframe.name] == Timeframe.Current)
+            self.futureTimeframeButton.setChecked(Timeframe[self.workspace.timeframe.name] == Timeframe.Future)
 
     def buildUi(self):
         if self._uiBuilt:
@@ -100,12 +102,14 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
 
         self.extractCsvButton.clicked.connect(self.onExtractCsv)
 
-        self.workspace.timeframeChanged.connect(lambda _: self.refreshUi())
+        self.workspace.timeframeChanged.connect(self.refreshUi)
         self.workspace.featureSelected.connect(lambda layerId: self.onFeatureSelected(layerId))
         self.workspace.lockChanged.connect(self.onLockChanged)
 
         self._uiBuilt = True
         qgsInfo(f"{PLUGIN_NAME} rebuilt PluginDockWidget.")
+
+        self.refreshUi()
 
     def clearUi(self):
         if not self._uiBuilt:

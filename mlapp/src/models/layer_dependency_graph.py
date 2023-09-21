@@ -21,7 +21,7 @@ class LayerDependencyGraph(TypeDependencyGraph):
         self.addDependencies(WateredAreaLayer, [AnalyticPaddockLayer, WaterpointBufferLayer])
         self.addDependencies(PaddockLandTypesLayer, [LandTypeConditionTable,
                              AnalyticPaddockLayer, LandTypeLayer, WateredAreaLayer])
-        self.addDependencies(PaddockLayer, [AnalyticPaddockLayer, PaddockLandTypesLayer])
+        self.addDependencies(PaddockLayer, [BasePaddockLayer, AnalyticPaddockLayer, PaddockLandTypesLayer])
         self.addDependencies(FenceLayer, [ElevationLayer, AnalyticPaddockLayer, PaddockLayer])
         self.addDependencies(PipelineLayer, [ElevationLayer])
         self.addDependencies(PropertyLayer, [PaddockLayer])

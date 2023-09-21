@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ...layers import PipelineLayer
 from ...models import WorkspaceTask
 from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
 

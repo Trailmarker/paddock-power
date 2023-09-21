@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest
-
-from .fields import PADDOCK, TIMEFRAME
 from ..utils import PLUGIN_NAME
-from .features import BasePaddock
+from .features import AnalyticPaddock
 from .derived_analytic_paddock_layer import DerivedAnalyticPaddockLayer
 from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 
@@ -11,11 +8,11 @@ from .persisted_derived_feature_layer import PersistedDerivedFeatureLayer
 class AnalyticPaddockLayer(PersistedDerivedFeatureLayer):
 
     LAYER_NAME = "Analytic Paddocks"
-    STYLE = "paddock"
+    STYLE = "base_paddock"
 
     @classmethod
     def getFeatureType(cls):
-        return BasePaddock
+        return AnalyticPaddock
 
     def __init__(self,
                  workspaceFile,

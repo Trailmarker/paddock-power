@@ -28,7 +28,7 @@ class CurrentPaddockLandTypesTable(PaddockLandTypesTable):
     def timeframe(self):
         return Timeframe.Current
 
-    def onTimeframeChanged(self, timeframe):
+    def onTimeframeChanged(self):
         pass
 
 
@@ -43,5 +43,5 @@ class FuturePaddockLandTypesTable(PaddockLandTypesTable):
     def timeframe(self):
         return Timeframe.Future
 
-    def onTimeframeChanged(self, timeframe):
+    def onTimeframeChanged(self):
         pass
