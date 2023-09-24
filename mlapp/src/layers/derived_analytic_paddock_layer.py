@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..utils import randomString
+from ..utils import getSetting, randomString
 from .features import AnalyticPaddock
 from .fields import ANALYSIS_TYPE, AREA, BUILD_FENCE, FID, NAME, PADDOCK, PERIMETER, STATUS, AnalysisType
 from .derived_feature_layer import DerivedFeatureLayer
@@ -9,6 +9,8 @@ class DerivedAnalyticPaddockLayer(DerivedFeatureLayer):
 
     LAYER_NAME = "Derived Analytic Paddocks"
     STYLE = "base_paddock"
+
+    GLITCH_BUFFER = getSetting("glitchBuffer", default=1.0)
 
     @classmethod
     def getFeatureType(cls):
@@ -39,7 +41,7 @@ class DerivedAnalyticPaddockLayer(DerivedFeatureLayer):
 with
 {_ANALYTIC_PADDOCK_BOUNDARIES} as
 (select
-    st_makepolygon(st_boundary("{basePaddocks}".geometry)) as geometry,
+    st_makepolygon(st_exteriorring("{basePaddocks}".geometry)) as geometry,
     "{basePaddocks}".{FID} as {FID},
     "{basePaddocks}".{FID} as {PADDOCK},
     "{basePaddocks}".{NAME} as {NAME},
@@ -58,7 +60,7 @@ where "{basePaddocks}"."{ANALYSIS_TYPE}" = '{AnalysisType.Default.name}'),
 from "{basePaddocks}"
 where "{basePaddocks}"."{ANALYSIS_TYPE}" != '{AnalysisType.ExcludePaddock.name}')
 select
-	st_union({_INCLUDED_PADDOCKS}.geometry) as geometry,
+	st_buffer(st_buffer(st_union({_INCLUDED_PADDOCKS}.geometry), {self.GLITCH_BUFFER}), -{self.GLITCH_BUFFER}) as geometry,
     {_ANALYTIC_PADDOCK_BOUNDARIES}.{FID} as {FID},
     {_ANALYTIC_PADDOCK_BOUNDARIES}.{FID} as {PADDOCK},
     {_ANALYTIC_PADDOCK_BOUNDARIES}.{NAME} as {NAME},
