@@ -4,14 +4,16 @@ from qgis.PyQt.QtCore import Qt
 from qgis.gui import QgsAttributeTableFilterModel
 
 from ...layers.fields import FeatureStatus, Timeframe, STATUS, TIMEFRAME
+from ...models import WorkspaceMixin
 
 
-class FeatureTableFilterModel(QgsAttributeTableFilterModel):
+class FeatureTableFilterModel(QgsAttributeTableFilterModel, WorkspaceMixin):
     """A customisation of the QGIS attribute table filter model to filter features
     by their timeframe, if present."""
 
     def __init__(self, timeframe, canvas, sourceModel, parent=None):
         QgsAttributeTableFilterModel.__init__(self, canvas, sourceModel, parent)
+        WorkspaceMixin.__init__(self)
 
         self.displayMode = False
 
@@ -32,11 +34,11 @@ class FeatureTableFilterModel(QgsAttributeTableFilterModel):
                         self._statusColumn,
                         sourceParent),
                     Qt.DisplayRole))
-            
+
             valid = statusData not in [None, 'NULL', '(NULL)' '']
             if valid and not self._timeframe.displayFeatureStatus(FeatureStatus(statusData)):
                 return False
-            
+
         # The result when there is no 'Timeframe' column at all
         if self._timeframeColumn < 0:
             return True
@@ -59,7 +61,7 @@ class FeatureTableFilterModel(QgsAttributeTableFilterModel):
         # didn't help …
         return self.sourceModel().data(left, Qt.DisplayRole) < self.sourceModel().data(right, Qt.DisplayRole)
 
-    def onTimeframeChanged(self, timeframe):
+    def onTimeframeChanged(self):
         """Handle the timeframe changing."""
-        self._timeframe = timeframe
+        self._timeframe = self.workspace.timeframe
         self.invalidateFilter()

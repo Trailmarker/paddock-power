@@ -6,7 +6,6 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from qgis.core import QgsProject, QgsSnappingConfig
 
-from ..layers import BasePaddockLayer
 from ..layers.fields import Timeframe
 from ..layers.tasks import AnalyseWorkspaceTask, ImportElevationLayerTask, ImportFeatureLayerTask, SaveEditsAndDeriveTask, LoadWorkspaceTask
 from ..utils import PLUGIN_NAME, getSetting, guiStatusBarAndInfo, qgsInfo
@@ -25,13 +24,12 @@ class Workspace(QObject):
     featureSelected = pyqtSignal(str)
     featureDeselected = pyqtSignal(str)
     lockChanged = pyqtSignal(bool)
-    timeframeChanged = pyqtSignal(Timeframe)
+    timeframeChanged = pyqtSignal()
     workspaceLoaded = pyqtSignal()
 
     def __init__(self, iface, workspaceFile):
 
         super().__init__(iface.mainWindow())
-
 
         self._locked = False
 
@@ -52,6 +50,8 @@ class Workspace(QObject):
         self.workspaceName = basename(workspaceFile)
 
         self.currentTool = None
+
+        # Default to 'Future' to confuse users less
         self.timeframe = Timeframe.Future
 
         self.timeframeChanged.connect(self.deselectLayers)
@@ -151,7 +151,7 @@ class Workspace(QObject):
 
         if self.timeframe != timeframe:
             self.timeframe = timeframe
-            self.timeframeChanged.emit(timeframe)
+            self.timeframeChanged.emit()
 
     def deselectLayers(self, selectedLayerId=None):
         """Deselect any currently selected Feature."""
@@ -180,7 +180,7 @@ class Workspace(QObject):
 
     @pyqtSlot()
     def unload(self):
-        """Removes the plugin menu item and icon from QGIS interface."""
+        """Removes the workspace tools and layers from QGIS."""
         self.unsetTool()
         self.removeFromMap()
 
@@ -214,7 +214,7 @@ class Workspace(QObject):
 
         # Save project file when workspace is loaded - TODO comment this out for now
         # QgsProject.instance().write(QgsProject.instance().fileName())
-
+        self.timeframeChanged.emit()
         self.workspaceLoaded.emit()
 
     def analyseWorkspace(self):

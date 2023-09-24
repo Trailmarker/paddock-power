@@ -14,17 +14,17 @@ class TypeDict(dict):
         if not isinstance(layerType, type):
             raise Glitch(f"Invalid TypeDict key: must be a type")
 
-        self[self.__layerKey(layerType)] = self.objectToValue(layer)
+        self[self._layerKey(layerType)] = self.objectToValue(layer)
 
     def getObject(self, layerType):
-        val = self.valueToObject(self.get(self.__layerKey(layerType), None))
+        val = self.valueToObject(self.get(self._layerKey(layerType), None))
         return val
 
     def allObjects(self):
         """Get all layers in the registry."""
         return list(map(self.valueToObject, self.values()))
 
-    def __layerKey(self, layerType):
+    def _layerKey(self, layerType):
         if isinstance(layerType, type):
             return layerType.__name__
         elif isinstance(layerType, str):

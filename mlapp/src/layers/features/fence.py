@@ -47,7 +47,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
     def profile(self):
         """Return this Fence's profile."""
         if not self._profile:
-            self.recalculate()
+            self.recalculateElevationProfile()
         return self._profile
 
     def getPropertyGeometry(self, glitchBuffer=GLITCH_BUFFER):

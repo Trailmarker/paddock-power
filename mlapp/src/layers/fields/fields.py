@@ -4,6 +4,7 @@ from .names import *
 from .condition_type import ConditionType
 from .feature_status import FeatureStatus
 from .field import BooleanField, CalculatedField, DomainField, IdField, MeasureField, StringField
+from .analysis_type import AnalysisType
 from .timeframe import Timeframe
 from .watered_type import WateredType
 from .grazing_radius_type import GrazingRadiusType
@@ -11,6 +12,11 @@ from .waterpoint_type import WaterpointType
 
 
 Active = BooleanField(propertyName="ACTIVE", name=ACTIVE, defaultValue='true')
+AnalysisTypeField = DomainField(
+    propertyName="ANALYSIS_TYPE",
+    name=ANALYSIS_TYPE,
+    domainType=AnalysisType,
+    defaultValue=AnalysisType.Default)
 Area = CalculatedField(propertyName="AREA", name=AREA, dps=2)
 BoreReportUrl = StringField(propertyName="BORE_REPORT_URL", name=BORE_REPORT_URL)
 BoreYield = MeasureField(propertyName="BORE_YIELD", name=BORE_YIELD)

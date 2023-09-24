@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ..utils import randomString
 from .calculator import Calculator
 from .features import WaterpointBuffer
 from .fields import ACTIVE, AREA, FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NAME, NEAR_GRAZING_RADIUS, PADDOCK, PADDOCK_NAME, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_NAME, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
@@ -19,50 +20,50 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
         if not self.changeset:
             return None
 
-        [basePaddockLayer, waterpointLayer] = self.dependentLayers
-        return self.prepareRederiveFeaturesRequest(basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
+        [analyticPaddockLayer, waterpointLayer] = self.dependentLayers
+        return self.prepareRederiveFeaturesRequest(analyticPaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
 
     def prepareQuery(self, query, dependentLayers):
-        [basePaddockLayer, waterpointLayer] = dependentLayers
-        [basePaddocks, waterpoints] = self.names(dependentLayers)
+        [analyticPaddockLayer, waterpointLayer] = dependentLayers
+        [analyticPaddocks, waterpoints] = self.names(dependentLayers)
 
         # Set up clauses
         inPaddocksClause = self.andAllKeyClauses(
-            self.changeset, basePaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
+            self.changeset, analyticPaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
         renamedWaterpointsClause = self.andAllKeyClauses(self.changeset, waterpointLayer, FID, FID)
 
-        _BUFFERS = "Buffers"
-        _FAR_BUFFER = "FarBuffer"
-        _NEAR_BUFFER = "NearBuffer"
-        _IN_PADDOCKS = "InPaddocks"
-        _RENAMED_WATERPOINTS = "RenamedWaterpoints"
+        _BUFFERS = f"Buffers{randomString()}"
+        _FAR_BUFFER = f"FarBuffer{randomString()}"
+        _NEAR_BUFFER = f"NearBuffer{randomString()}"
+        _IN_PADDOCKS = f"InPaddocks{randomString()}"
+        _RENAMED_WATERPOINTS = f"RenamedWaterpoints{randomString()}"
 
         query = f"""
 with {_IN_PADDOCKS} as
     (select
-        "{basePaddocks}".geometry,
-        "{basePaddocks}".{FID} as "{PADDOCK}",
-        "{basePaddocks}"."{NAME}" as "{PADDOCK_NAME}",
+        "{analyticPaddocks}".geometry,
+        "{analyticPaddocks}".{PADDOCK} as "{PADDOCK}",
+        "{analyticPaddocks}"."{NAME}" as "{PADDOCK_NAME}",
         "{waterpoints}".{FID} as "{WATERPOINT}",
         "{waterpoints}"."{NAME}" as "{WATERPOINT_NAME}",
         '{Timeframe.Current.name}' as "{TIMEFRAME}"
 	 from "{waterpoints}"
-	 inner join "{basePaddocks}"
-     on {Timeframe.Current.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
-	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
+	 inner join "{analyticPaddocks}"
+     on {Timeframe.Current.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{analyticPaddocks}"."{STATUS}"')}
+	 and st_contains("{analyticPaddocks}".geometry, "{waterpoints}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
      union
      select
-        "{basePaddocks}".geometry,
-        "{basePaddocks}".{FID} as "{PADDOCK}",
-        "{basePaddocks}"."{NAME}" as "{PADDOCK_NAME}",
+        "{analyticPaddocks}".geometry,
+        "{analyticPaddocks}".{PADDOCK} as "{PADDOCK}",
+        "{analyticPaddocks}"."{NAME}" as "{PADDOCK_NAME}",
         "{waterpoints}".{FID} as "{WATERPOINT}",
         "{waterpoints}"."{NAME}" as "{WATERPOINT_NAME}",
         '{Timeframe.Future.name}' as "{TIMEFRAME}"
 	 from "{waterpoints}"
-	 inner join "{basePaddocks}"
-     on {Timeframe.Future.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{basePaddocks}"."{STATUS}"')}
-	 and st_contains("{basePaddocks}".geometry, "{waterpoints}".geometry)
+	 inner join "{analyticPaddocks}"
+     on {Timeframe.Future.matchesStatuses(f'"{waterpoints}"."{STATUS}"', f'"{analyticPaddocks}"."{STATUS}"')}
+	 and st_contains("{analyticPaddocks}".geometry, "{waterpoints}".geometry)
      where {WaterpointType.givesWaterSql(f'"{waterpoints}"."{WATERPOINT_TYPE}"')}
      {inPaddocksClause}),
 {_RENAMED_WATERPOINTS} as

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from .analytic_paddock import AnalyticPaddock
 from .base_paddock import BasePaddock
 from .property import Property
 from .edits import Edits
