@@ -4,9 +4,10 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar
+from qgis.PyQt.QtWidgets import QButtonGroup, QDockWidget, QToolBar, QPushButton
 
 from ...models import WorkspaceMixin
+from ...pdf_report.pdf_report_dialog import PdfReportDialog
 from ...utils import getComponentStyleSheet, qgsInfo, PLUGIN_FOLDER, PLUGIN_NAME
 from .fences_widget import FencesWidget
 from .land_types_widget import LandTypesWidget
@@ -41,6 +42,11 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.pipelinesWidget = None
         self.waterpointsWidget = None
 
+        self.pdfReportDialog = None
+        self.pdfReportButton = QPushButton(QIcon(f":/plugins/{PLUGIN_FOLDER}/images/pdf-icon.png"), '', self)
+        self.pdfReportButton.setToolTip("Generate Paddock Report …")
+        self.pdfReportButton.clicked.connect(self.onGenerateReport)
+
         self.toolBar = QToolBar()
         self.toolBar.setMovable(False)
         self.toolBar.setFloatable(False)
@@ -50,6 +56,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.toolBar.addWidget(self.sketchFenceButton)
         self.toolBar.addWidget(self.sketchPipelineButton)
         self.toolBar.addWidget(self.sketchWaterpointButton)
+        self.toolBar.addWidget(self.pdfReportButton)
         self.toolBar.addWidget(self.extractCsvButton)
 
         self.tabWidget.setCornerWidget(self.toolBar)
@@ -137,6 +144,12 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         qgsInfo(f"{PLUGIN_NAME} torn down.")
 
         # self.update()
+        
+    def onGenerateReport(self):
+        """Open dialog to preview and generate PDF report."""
+        self.pdfReportDialog = PdfReportDialog()
+        self.pdfReportDialog.setModal(True)
+        self.pdfReportDialog.show()
 
     def onExtractCsv(self):
         """Extract the current Feature Table as CSV."""
@@ -166,3 +179,6 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchFenceButton.setEnabled(not locked)
         self.sketchPipelineButton.setEnabled(not locked)
         self.sketchWaterpointButton.setEnabled(not locked)
+        
+    def closeEvent(self, e):
+        self.pdfReportDialog = None
