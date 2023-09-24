@@ -89,7 +89,7 @@ with
     (select
 		st_multi("{_FILTERED_PADDOCKS}".geometry) as geometry,
 		0 as {FID},
-		"{_FILTERED_PADDOCKS}".{FID} as {PADDOCK},
+		"{_FILTERED_PADDOCKS}".{PADDOCK} as {PADDOCK},
         "{_FILTERED_PADDOCKS}".{NAME} as "{PADDOCK_NAME}",
 		'{WateredType.Unwatered.name}' as {WATERED_TYPE},
 		'{Timeframe.Current.name}' as {TIMEFRAME}
@@ -103,7 +103,7 @@ with
 	 select
 		st_multi("{_FILTERED_PADDOCKS}".geometry) as geometry,
 		0 as {FID},
-		"{_FILTERED_PADDOCKS}".{FID} as {PADDOCK},
+		"{_FILTERED_PADDOCKS}".{PADDOCK} as {PADDOCK},
         "{_FILTERED_PADDOCKS}".{NAME} as "{PADDOCK_NAME}",
 		'{WateredType.Unwatered.name}' as {WATERED_TYPE},
 		'{Timeframe.Future.name}' as {TIMEFRAME}

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ..utils import randomString
 from .calculator import Calculator
 from .features import WaterpointBuffer
 from .fields import ACTIVE, AREA, FAR_GRAZING_RADIUS, FID, GRAZING_RADIUS, GRAZING_RADIUS_TYPE, NAME, NEAR_GRAZING_RADIUS, PADDOCK, PADDOCK_NAME, STATUS, TIMEFRAME, WATERPOINT, WATERPOINT_NAME, WATERPOINT_TYPE, GrazingRadiusType, Timeframe, WaterpointType
@@ -31,11 +32,11 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
             self.changeset, analyticPaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
         renamedWaterpointsClause = self.andAllKeyClauses(self.changeset, waterpointLayer, FID, FID)
 
-        _BUFFERS = "Buffers"
-        _FAR_BUFFER = "FarBuffer"
-        _NEAR_BUFFER = "NearBuffer"
-        _IN_PADDOCKS = "InPaddocks"
-        _RENAMED_WATERPOINTS = "RenamedWaterpoints"
+        _BUFFERS = f"Buffers{randomString()}"
+        _FAR_BUFFER = f"FarBuffer{randomString()}"
+        _NEAR_BUFFER = f"NearBuffer{randomString()}"
+        _IN_PADDOCKS = f"InPaddocks{randomString()}"
+        _RENAMED_WATERPOINTS = f"RenamedWaterpoints{randomString()}"
 
         query = f"""
 with {_IN_PADDOCKS} as
