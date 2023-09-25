@@ -85,6 +85,12 @@ class Workspace(QObject):
         """Return True if this workspace can be analysed."""
         return self.workspaceLayers.isAnalytic
 
+    @property
+    def isVisible(self):
+        """Return True if this workspace is visible in the Layers panel."""
+        group = self.findGroup()
+        return group and group.itemVisibilityChecked()
+
     def locked(self):
         """Return True if the workspace is locked."""
         return self._locked
@@ -112,6 +118,11 @@ class Workspace(QObject):
         if group is None:
             group = QgsProject.instance().layerTreeRoot().insertGroup(0, PLUGIN_NAME)
         return group
+
+    def setVisible(self, visible):
+        """Set the visibility of this workspace's group in the Layers panel."""
+        group = self.findGroup()
+        group.setItemVisibilityChecked(visible)
 
     def addToMap(self, group=None):
         """Add the visible layers of the given type to the QGIS map."""
