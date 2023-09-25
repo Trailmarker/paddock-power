@@ -2,7 +2,7 @@
 name=Paddock Power
 qgisMinimumVersion=3.22
 description=Set of tools for cattle property planning and development modelling.
-version=0.88
+version=0.89
 author=Trailmarker
 email=tom@trailmarker.io
 
