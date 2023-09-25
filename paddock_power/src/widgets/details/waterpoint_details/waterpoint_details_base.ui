@@ -144,7 +144,7 @@
   <customwidget>
    <class>FormattedValues</class>
    <extends>QLabel</extends>
-   <header>mlapp/src/widgets/details/formatted_values</header>
+   <header>paddock_power/src/widgets/details/formatted_values</header>
   </customwidget>
  </customwidgets>
  <resources/>

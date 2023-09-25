@@ -19,7 +19,7 @@ from qgis.utils import iface
 PADDOCK_POWER_EPSG = 7845
 
 PLUGIN_NAME = "Paddock Power"
-PLUGIN_FOLDER = "mlapp"
+PLUGIN_FOLDER = "paddock_power"
 
 # 16777215
 MAX_QT_DIMENSION = (2 * 24 - 1)
