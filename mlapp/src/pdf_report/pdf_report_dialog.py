@@ -14,14 +14,14 @@ from qgis.PyQt.QtWebKitWidgets import QWebView
 from qgis.core import (Qgis, QgsMapSettings, QgsMapRendererParallelJob, QgsRasterLayer,
                         QgsCoordinateReferenceSystem, QgsTask, QgsApplication)
 
-from .report_utils import reportUtils
+from .report_utils import ReportUtils
 
 
 class PdfReportDialog(QDialog):
     def __init__(self):
         super(PdfReportDialog, self).__init__()
 
-        self.utils = reportUtils()
+        self.utils = ReportUtils()
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
 
         self.setWindowTitle('Paddock Development Report')
@@ -546,7 +546,7 @@ class RenderTask(QgsTask):
         self.future_layers = future_layers
         self.future_extent = future_extent
         self.images = []
-        self.utils = reportUtils()
+        self.utils = ReportUtils()
         # We want to check for network request errors and cancel the task if received
         self.msg_log = QgsApplication.messageLog()
         self.msg_log.messageReceived.connect(self.errorChecker)
