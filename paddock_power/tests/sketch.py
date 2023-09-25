@@ -4,7 +4,7 @@ from qgis.core import QgsGeometry
 
 
 from ..dev import *
-from mlapp.src.widgets import SketchLineTool
+from paddock_power.src.widgets import SketchLineTool
 
 p1 = workspace().pipelineLayer.makeFeature()
 p2 = workspace().pipelineLayer.makeFeature()

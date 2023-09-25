@@ -3,7 +3,7 @@
 
 # # from qgis.core import QgsApplication
 
-# from mlapp.dev import *
+# from paddock_power.dev import *
 
 # # from .src.layers.features.persist_edits_task import PersistEditsTask
 

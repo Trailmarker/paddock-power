@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/mlapp">
+    <qresource prefix="/plugins/paddock_power">
         <file>images/analyse-paddock-power.png</file>
         <file>images/build-feature.png</file>
         <file>images/cancel-edit-item.png</file>

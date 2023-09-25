@@ -1,7 +1,7 @@
 # # -*- coding: utf-8 -*-
 
 # from .dev import *
-# from mlapp.src.layers.waterpoint_layer import WaterpointLayer
+# from paddock_power.src.layers.waterpoint_layer import WaterpointLayer
 
 
 # def testSelectChange():

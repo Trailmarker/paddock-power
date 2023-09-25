@@ -54,7 +54,7 @@
   <customwidget>
    <class>ProfileDetails</class>
    <extends>QWidget</extends>
-   <header>mlapp/src/widgets/details/profile_details/profile_details</header>
+   <header>paddock_power/src/widgets/details/profile_details/profile_details</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
