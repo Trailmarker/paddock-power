@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..fields import FeatureStatus
+from ..fields import AnalysisType, FeatureStatus
 from .metric_paddock import MetricPaddock
 
 
@@ -14,3 +14,8 @@ class Paddock(MetricPaddock):
         """Get the status of the Base Paddock that this Paddock relies on."""
         basePaddock = self.getBasePaddock()
         return basePaddock.STATUS if basePaddock else FeatureStatus.Undefined
+    
+    @property
+    def isAnalytic(self):
+        """Check if the Paddock is analytic."""
+        return self.ANALYSIS_TYPE in [AnalysisType.Default]

@@ -26,7 +26,7 @@ class ReportUtils(WorkspaceMixin):
     def __init__(self):
 
         WorkspaceMixin.__init__(self)
-        self.pdk_lyr = self.workspace.analyticPaddockLayer
+        self.pdk_lyr = self.workspace.paddockLayer
         self.wpt_lyr = self.workspace.waterpointLayer
         self.fence_lyr = self.workspace.fenceLayer
         self.pipe_lyr = self.workspace.pipelineLayer
@@ -36,19 +36,20 @@ class ReportUtils(WorkspaceMixin):
     def getDevelopedPaddocks(self):
         developed_paddocks = []
         planned_waterpoints = [wp for wp in self.wpt_lyr.getFeatures() if wp['Status'] == 'Planned']
+        analytic_paddocks = self.pdk_lyr.getAnalyticPaddocks()
         for wpt in planned_waterpoints:
-            paddock = [pdk for pdk in self.pdk_lyr.getFeatures() if wpt.geometry().within(pdk.geometry())][0]
+            paddock = [pdk for pdk in analytic_paddocks if wpt.geometry().within(pdk.geometry())][0]
             if not paddock['Name'] in developed_paddocks:
                 developed_paddocks.append(paddock['Name'])
         planned_fences = [f for f in self.fence_lyr.getFeatures() if f['Status'] == 'Planned']
         for f in planned_fences:
-            paddock = [pdk for pdk in self.pdk_lyr.getFeatures()
+            paddock = [pdk for pdk in analytic_paddocks
                        if f.geometry().intersection(pdk.geometry()).length() > 5][0]
             if not paddock['Name'] in developed_paddocks:
                 developed_paddocks.append(paddock['Name'])
         planned_pipelines = [pl for pl in self.pipe_lyr.getFeatures() if pl['Status'] == 'Planned']
         for pl in planned_pipelines:
-            paddock = [pdk for pdk in self.pdk_lyr.getFeatures()
+            paddock = [pdk for pdk in analytic_paddocks
                        if pl.geometry().intersection(pdk.geometry()).length() > 5][0]
             if not paddock['Name'] in developed_paddocks:
                 developed_paddocks.append(paddock['Name'])
@@ -385,7 +386,7 @@ class ReportUtils(WorkspaceMixin):
     def currentMapLayers(self, pdk_name, basemap):
         map_layers = []
         invalid_layer_names = []
-        pdk_feats = [ft for ft in self.pdk_lyr.getFeatures() if ft['Name'] == pdk_name and ft['Timeframe'] == 'Current']
+        pdk_feats = [ft for ft in self.pdk_lyr.getAnalyticPaddocks() if ft['Name'] == pdk_name and ft['Timeframe'] == 'Current']
         if not pdk_feats:
             return False
         pdk_feat = pdk_feats[0]
@@ -436,7 +437,7 @@ class ReportUtils(WorkspaceMixin):
         map_layers = []
         invalid_layer_names = []
         # Get current paddock feature (for spatial retrieval of future features)
-        current_pdk_feats = [ft for ft in self.pdk_lyr.getFeatures()
+        current_pdk_feats = [ft for ft in self.pdk_lyr.getAnalyticPaddocks()
                              if ft['Name'] == pdk_name and ft['Timeframe'] == 'Current']
         if not current_pdk_feats:
             return False
@@ -445,7 +446,7 @@ class ReportUtils(WorkspaceMixin):
 
         # The intersection.area() check is to eliminate neighboring planned paddocks in case there are geometry/ topology
         # errors in the paddock layer resulting in sliver overlaps.
-        future_pdk_ids = [ft.id() for ft in self.pdk_lyr.getFeatures() if ft['Status'] ==
+        future_pdk_ids = [ft.id() for ft in self.pdk_lyr.getAnalyticPaddocks() if ft['Status'] ==
                           'Planned' and (ft.geometry().intersection(current_pdk_geom).area() > 50)]
         # print(future_pdk_ids)
         if not future_pdk_ids:
@@ -497,7 +498,7 @@ class ReportUtils(WorkspaceMixin):
         return map_layers
 
     def paddockDetails(self, paddock_name, timeframe):
-        pdks = [ft for ft in self.pdk_lyr.getFeatures() if ft['Name'] == paddock_name and ft['Timeframe'] == timeframe]
+        pdks = [ft for ft in self.pdk_lyr.getAnalyticPaddocks() if ft['Name'] == paddock_name and ft['Timeframe'] == timeframe]
         if pdks:
             pdk = pdks[0]
             pdk_geom = pdk.geometry()

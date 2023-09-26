@@ -37,6 +37,10 @@ class PaddockLayer(PersistedDerivedFeatureLayer, PopupLayerSourceMixin):
         return next(self.getFeatures(QgsFeatureRequest().setFilterExpression(
             f'"{PADDOCK}" = {paddockId} and "{TIMEFRAME}" = \'{timeframe.name}\'')), None)
 
+    def getAnalyticPaddocks(self):
+        """Get all Paddock features which are not excluded from analysis."""
+        return [f for f in self.getFeatures() if f.isAnalytic]
+
     @property
     def hasPopups(self):
         return True
