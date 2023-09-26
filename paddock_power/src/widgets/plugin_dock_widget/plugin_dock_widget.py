@@ -148,7 +148,7 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         qgsInfo(f"{PLUGIN_NAME} torn down.")
 
         # self.update()
-        
+
     def onGenerateReport(self):
         """Open dialog to preview and generate PDF report."""
         self.pdfReportDialog = PdfReportDialog()
@@ -183,6 +183,6 @@ class PluginDockWidget(QDockWidget, FORM_CLASS, WorkspaceMixin):
         self.sketchFenceButton.setEnabled(not locked)
         self.sketchPipelineButton.setEnabled(not locked)
         self.sketchWaterpointButton.setEnabled(not locked)
-        
+
     def closeEvent(self, e):
         self.pdfReportDialog = None

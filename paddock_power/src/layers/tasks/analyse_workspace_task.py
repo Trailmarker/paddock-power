@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from time import sleep
+
 from ...models import WorkspaceTask
-from ...utils import PLUGIN_NAME, guiStatusBarAndInfo, qgsException
+from ...utils import PLUGIN_NAME, getSetting, guiStatusBarAndInfo, qgsException, qgsInfo
 from ..interfaces import IPersistedDerivedFeatureLayer, IPersistedFeatureLayer
 
 
 class AnalyseWorkspaceTask(WorkspaceTask):
+
+    ANALYSE_DELAY = getSetting("analyseDelay", default=1.0)
 
     def __init__(self, workspace):
         """Input is a batch of layers (order not important)."""
@@ -37,6 +41,7 @@ class AnalyseWorkspaceTask(WorkspaceTask):
             deriveOrder = self.workspace.layerDependencyGraph.deriveOrder()
             deriveLayers = [self.workspace.workspaceLayers.layer(layerType) for layerType in deriveOrder]
             deriveLayerNames = ", ".join(layer.name() for layer in deriveLayers)
+            qgsInfo(f"{PLUGIN_NAME} deriving {deriveLayerNames}")
             guiStatusBarAndInfo(f"{PLUGIN_NAME} deriving {deriveLayerNames}")
 
             for layer in deriveLayers:
@@ -51,6 +56,7 @@ class AnalyseWorkspaceTask(WorkspaceTask):
                     return False
 
                 layer.editsPersisted.emit()
+                sleep(self.ANALYSE_DELAY)
                 guiStatusBarAndInfo(f"{PLUGIN_NAME} derived {layer.name()}.")
 
             guiStatusBarAndInfo(f"{PLUGIN_NAME} analysed the '{self.workspace.workspaceName}' workspace.")

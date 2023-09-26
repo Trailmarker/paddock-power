@@ -75,10 +75,10 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         """Return True if this layer has popup layers for each feature."""
         return False
 
-    @property
-    def neighbourhood(self):
+    def getNeighbourhood(self):
         """Return a 50% scaled version of the layer's extent."""
         if self.hasFeatures:
+            self.updateExtents()
             extent = self.extent()
             extent.scale(0.5)
             return extent

@@ -3,7 +3,7 @@ import base64
 import os
 
 from qgis.PyQt.QtCore import (Qt, QSize, QByteArray, QBuffer, QIODevice, QTimer,
-                                pyqtSignal)
+                              pyqtSignal)
 from qgis.PyQt.QtWidgets import (qApp, QDialog, QFileDialog, QMessageBox, QStyle, QLabel,
                                  QComboBox, QLineEdit, QRadioButton, QPushButton,
                                  QGridLayout, QVBoxLayout, QHBoxLayout)
@@ -12,7 +12,7 @@ from qgis.PyQt.QtPrintSupport import QPrintPreviewDialog, QPrinter
 from qgis.PyQt.QtWebKitWidgets import QWebView
 
 from qgis.core import (Qgis, QgsMapSettings, QgsMapRendererParallelJob, QgsRasterLayer,
-                        QgsCoordinateReferenceSystem, QgsTask, QgsApplication)
+                       QgsCoordinateReferenceSystem, QgsTask, QgsApplication)
 
 from .report_utils import ReportUtils
 
@@ -45,7 +45,8 @@ class PdfReportDialog(QDialog):
         self.basemapLabel = QLabel('Basemap:')
         self.basemapComboBox = QComboBox(self)
         self.basemapComboBox.setMinimumWidth(200)
-        self.basemapComboBox.addItems(['Bing Virtual Earth', 'Esri Satellite', 'Google Satellite', 'Esri Topo World', 'No Basemap'])
+        self.basemapComboBox.addItems(['Bing Virtual Earth', 'Esri Satellite',
+                                      'Google Satellite', 'Esri Topo World', 'No Basemap'])
         self.basemapComboBox.setEnabled(False)
         self.previewButton = QPushButton('Preview', self)
         self.previewButton.setToolTip('Show Selected Report Preview')
@@ -90,9 +91,8 @@ class PdfReportDialog(QDialog):
         self.master_layout.addLayout(self.button_group_layout)
         self.setDefaultHtml()
         self.msgBox = QMessageBox()
-        
+
         self.render_task = None
-        
 
     def populateComboBox(self):
         self.paddocksComboBox.clear()
@@ -107,7 +107,7 @@ class PdfReportDialog(QDialog):
             if self.paddocksComboBox.isEnabled():
                 self.paddocksComboBox.setEnabled(False)
             self.manageWidgets(False)
-            
+
     def radioButtonToggled(self, is_checked):
         if is_checked:
             if not self.basemapComboBox.isEnabled():
@@ -129,7 +129,7 @@ class PdfReportDialog(QDialog):
         html_text += "</body>"
         html_text += "</html>"
         self.view.setHtml(html_text)
-        
+
     def setStandbyHtml(self):
         # Show 'Generating preview...' screen while maps are rendering in background thread.
         # Creating a new preview will cancel the current task and cause it to gracefully fail.
@@ -144,7 +144,7 @@ class PdfReportDialog(QDialog):
         standby_html += "body {display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif; background-color: #D3D3D3;}"
         standby_html += "</style>"
         self.view.setHtml(standby_html)
-        
+
         QTimer.singleShot(250, self.showPreview)
 
 ##### **************METHODS TO GENERATE HTML CONTENT**********************#####
@@ -407,7 +407,7 @@ class PdfReportDialog(QDialog):
                 current_layers_ordered.append(basemap_lyr)
 
             current_extent = current_layers[pdk_lyr_index].extent()
-#***************************************************************************
+# ***************************************************************************
             # Create image tag for future layers
             future_layers = self.utils.futureMapLayers(paddock_name, basemap)
             future_layer_names = [l.name() for l in future_layers]
@@ -432,8 +432,8 @@ class PdfReportDialog(QDialog):
             if basemap_lyr:
                 future_layers_ordered.append(basemap_lyr)
             future_extent = future_layers[pdk_lyr_index].extent()
-#*****************************************
-            ########SET UP TASK TO CREATE RENDERED CANVAS IMAGES##########>>>
+# *****************************************
+            # SET UP TASK TO CREATE RENDERED CANVAS IMAGES##########>>>
             if basemap == 'No Basemap':
                 task_desc = 'Rendering maps without basemap...'
             else:
@@ -441,10 +441,10 @@ class PdfReportDialog(QDialog):
             if self.render_task and self.render_task.alive:
                 self.render_task.cancel()
             self.render_task = RenderTask(task_desc,
-                                current_layers_ordered,
-                                current_extent,
-                                future_layers_ordered,
-                                future_extent)
+                                          current_layers_ordered,
+                                          current_extent,
+                                          future_layers_ordered,
+                                          future_extent)
             self.render_task.map_images.connect(lambda images: self.setAdvancedHtml(images, paddock_name, basemap))
             self.render_task.taskCompleted.connect(self.resetTask)
             self.render_task.taskTerminated.connect(self.resetTask)
@@ -452,7 +452,7 @@ class PdfReportDialog(QDialog):
 
     def resetTask(self):
         self.render_task = None
-        
+
     def setAdvancedHtml(self, map_images, paddock_name, basemap=None):
         advanced_html = "<html>"
         advanced_html += "<body>"
@@ -467,14 +467,14 @@ class PdfReportDialog(QDialog):
         map_images[0].save(buffer, "PNG")
         img_tag1 = "<img src='data:image/png;base64,{}' width='420' height='420'>".format(base64.b64encode(
             byte_array).decode())
-            
+
         byte_array = QByteArray()
         buffer = QBuffer(byte_array)
         buffer.open(QIODevice.WriteOnly)
         map_images[1].save(buffer, "PNG")
         img_tag2 = "<img src='data:image/png;base64,{}' width='420' height='420'>".format(base64.b64encode(
             byte_array).decode())
-            
+
         advanced_html += "<div id='image-div'>"
         advanced_html += "<div id='current-map-img'>"
         advanced_html += "<h3>Current</h3>"
@@ -508,7 +508,7 @@ class PdfReportDialog(QDialog):
         advanced_html += "#attribution-txt {font-family: Arial, sans-serif; font-size: 12}"
         advanced_html += "</style>"
         self.view.setHtml(advanced_html)
-        
+
 ########################################################################################
 
     def exportToPdf(self):
@@ -533,11 +533,12 @@ class PdfReportDialog(QDialog):
         preview_dialog.paintRequested.connect(self.view.print_)
         preview_dialog.exec_()
 
-###############QGSTASK TO CREATE RENDERED CANVAS IMAGES################################
+############### QGSTASK TO CREATE RENDERED CANVAS IMAGES################################
+
 
 class RenderTask(QgsTask):
     map_images = pyqtSignal(list)
-    
+
     def __init__(self, desc, current_layers, current_extent, future_layers, future_extent):
         self.desc = desc
         QgsTask.__init__(self, self.desc, QgsTask.CanCancel)
@@ -550,15 +551,15 @@ class RenderTask(QgsTask):
         # We want to check for network request errors and cancel the task if received
         self.msg_log = QgsApplication.messageLog()
         self.msg_log.messageReceived.connect(self.errorChecker)
-        
+
         self.alive = True
-        
+
         self.taskCompleted.connect(self.killed)
         self.taskTerminated.connect(self.killed)
-        
+
     def killed(self):
         self.alive = False
-                
+
     def run(self):
         # Render Current map image
         longest_dim = max([self.current_extent.width(), self.current_extent.height()])
@@ -583,7 +584,7 @@ class RenderTask(QgsTask):
         if self.isCanceled():
             self.alive = False
             return False
-            
+
         # Render Future map image
         longest_dim = max([self.future_extent.width(), self.future_extent.height()])
         grow_factor = longest_dim / 30
@@ -608,11 +609,11 @@ class RenderTask(QgsTask):
             self.alive = False
             return False
         return True
-        
+
     def finished(self, result):
         if result:
             self.map_images.emit(self.images)
-        
+
     def errorChecker(self, msg, tag, level):
         '''Cancel task if network error logged (and task has not already been canceled)
         e.g. by user generating a new preview which cancels the current task'''
@@ -620,5 +621,5 @@ class RenderTask(QgsTask):
             return
         if 'Network request' in msg and tag == 'Network' and level == Qgis.Warning:
             self.cancel()
-                    
+
 ########################################################################################

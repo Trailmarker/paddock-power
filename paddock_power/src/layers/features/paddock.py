@@ -14,7 +14,7 @@ class Paddock(MetricPaddock):
         """Get the status of the Base Paddock that this Paddock relies on."""
         basePaddock = self.getBasePaddock()
         return basePaddock.STATUS if basePaddock else FeatureStatus.Undefined
-    
+
     @property
     def isAnalytic(self):
         """Check if the Paddock is analytic."""

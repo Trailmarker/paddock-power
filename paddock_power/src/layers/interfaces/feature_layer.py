@@ -25,6 +25,16 @@ class FeatureLayer(MapLayer):
         return self.getFeatureType().focusOnSelect()
 
     @abstractmethod
+    def getNeighbourhood(self):
+        """Return a 50% scaled version of the layer's extent."""
+        pass
+
+    @abstractmethod
+    def sameId(self, layerId):
+        """Return True if this layer has the same ID as the given layer ID."""
+        pass
+
+    @abstractmethod
     def extractCsv(self):
         "Extract this feature layer to CSV."
         pass

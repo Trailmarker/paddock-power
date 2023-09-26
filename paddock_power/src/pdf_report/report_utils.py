@@ -386,7 +386,8 @@ class ReportUtils(WorkspaceMixin):
     def currentMapLayers(self, pdk_name, basemap):
         map_layers = []
         invalid_layer_names = []
-        pdk_feats = [ft for ft in self.pdk_lyr.getAnalyticPaddocks() if ft['Name'] == pdk_name and ft['Timeframe'] == 'Current']
+        pdk_feats = [ft for ft in self.pdk_lyr.getAnalyticPaddocks()
+                     if ft['Name'] == pdk_name and ft['Timeframe'] == 'Current']
         if not pdk_feats:
             return False
         pdk_feat = pdk_feats[0]
@@ -498,7 +499,8 @@ class ReportUtils(WorkspaceMixin):
         return map_layers
 
     def paddockDetails(self, paddock_name, timeframe):
-        pdks = [ft for ft in self.pdk_lyr.getAnalyticPaddocks() if ft['Name'] == paddock_name and ft['Timeframe'] == timeframe]
+        pdks = [ft for ft in self.pdk_lyr.getAnalyticPaddocks()
+                if ft['Name'] == paddock_name and ft['Timeframe'] == timeframe]
         if pdks:
             pdk = pdks[0]
             pdk_geom = pdk.geometry()

@@ -1,4 +1,5 @@
 *__pycache__*
 *.zip
 
+.mypy_cache
 paddock_power/lib

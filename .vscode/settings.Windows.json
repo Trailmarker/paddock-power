@@ -1,7 +1,9 @@
 {
     "python.analysis.extraPaths": [
         "C:\\Program Files\\QGIS 3.22.14\\apps\\Python39\\Lib\\site-packages",
-        "C:\\Program Files\\QGIS 3.22.14\\apps\\qgis-ltr\\python"
+        "C:\\Program Files\\QGIS 3.22.14\\apps\\qgis-ltr\\python",
+        "C:\\Program Files\\QGIS 3.28.11\\apps\\Python39\\Lib\\site-packages",
+        "C:\\Program Files\\QGIS 3.28.11\\apps\\qgis-ltr\\python"
     ],
     "xml.validation.enabled": false
 }

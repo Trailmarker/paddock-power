@@ -39,7 +39,7 @@ class ImportFeatureLayerTask(WorkspaceTask):
             importFeatureRequest = self.targetLayer.makeImportFeatureRequest()
             if notImportingPaddocks:
                 # Sets spatial filter on import
-                importFeatureRequest.setFilterRect(self.workspace.basePaddockLayer.neighbourhood)
+                importFeatureRequest.setFilterRect(self.workspace.basePaddockLayer.getNeighbourhood())
 
             edits = self.targetLayer.importFeatures(
                 self.importLayer, self.fieldMap, importFilter=importFeatureRequest,
