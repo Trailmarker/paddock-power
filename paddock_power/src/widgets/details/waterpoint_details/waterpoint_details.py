@@ -15,8 +15,8 @@ class WaterpointDetails(Details):
     @property
     def descriptors(self):
         return [
-            (lambda m: [m.NEAR_GRAZING_RADIUS], "Near Grazing Radius (m)", "{0:0f}"),
-            (lambda m: [m.FAR_GRAZING_RADIUS], "Far Grazing Radius (m)", "{0:0f}"),
+            (lambda m: [m.NEAR_GRAZING_RADIUS], "Near Grazing Radius (m)", "{0:.0f}"),
+            (lambda m: [m.FAR_GRAZING_RADIUS], "Far Grazing Radius (m)", "{0:.0f}"),
             (lambda m: [m.WATERPOINT_TYPE], "Waterpoint Type", "{0}"),
             (lambda m: [m.ACTIVE], "Active", "{0}")
         ]

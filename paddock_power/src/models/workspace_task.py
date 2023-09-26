@@ -56,7 +56,7 @@ class WorkspaceTask(QgsTask):
         try:
             sleep(self.TASK_DELAY)
             self.safeFinished(result)
-            qgsInfo(f"{PLUGIN_NAME} '{self.description()}' completed in {time() - self.startTime:2f}s")
+            qgsInfo(f"{PLUGIN_NAME} '{self.description()}' completed in {(time() - self.startTime):.2f}s")
             self.workspace.unlock()
         except Exception:
             qgsException()
