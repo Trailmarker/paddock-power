@@ -1,15 +1,15 @@
 [general]
 name=Paddock Power
 qgisMinimumVersion=3.22
-description=Set of tools for cattle property planning and development modelling.
-version=0.90
-author=Trailmarker
+description=A tool for planning infrastructure development on extensively-managed livestock properties in Australia
+version=0.91
+author=Trailmarker, Range IQ
 email=tom@trailmarker.io
+about=Paddock Power is a property planning tool developed by Trailmarker and Range IQ on behalf of the Northern Territory Government, with funding support from Meat & Livestock Australia. The features include property mapping, carrying capacity modelling, calculation of infrastructure metrics and printable reports.
 
-about=Paddock Power is a property planning tool developed by Trailmarker and RangeIQ with funding from Meat & Livestock Australia, features include property mapping, carrying capacity modelling, etc.
+tracker=https://github.com/Trailmarker/paddock-power
+repository=https://github.com/Trailmarker/paddock-power
 
-tracker=https://github.com/Trailmarker
-repository=https://github.com/Trailmarker
 # End of mandatory metadata
 
 # Recommended items:
@@ -19,7 +19,7 @@ hasProcessingProvider=yes
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=https://github.com/Trailmarker
+homepage=https://github.com/Trailmarker/paddock-power
 category=Plugins
 icon=icon.png
 # experimental flag
