@@ -62,6 +62,14 @@ class MapLayerMixin(IMapLayer):
 
         assert isinstance(self, QgsMapLayer)
 
+    @property
+    def isVisible(self):
+        """Return True if this layer is visible in the Layers panel."""
+        group = group or self.findGroup() or QgsProject.instance().layerTreeRoot()
+        node = group.findLayer(self.id())
+        if node:
+            node.itemVisibilityChecked()
+
     def findGroup(self, name=None):
         """Find the group for this layer in the layer stack."""
         return QgsProject.instance().layerTreeRoot().findGroup(name) if name else None

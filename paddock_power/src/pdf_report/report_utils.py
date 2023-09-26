@@ -26,7 +26,7 @@ class ReportUtils(WorkspaceMixin):
     def __init__(self):
 
         WorkspaceMixin.__init__(self)
-        self.pdk_lyr = self.workspace.paddockLayer
+        self.pdk_lyr = self.workspace.analyticPaddockLayer
         self.wpt_lyr = self.workspace.waterpointLayer
         self.fence_lyr = self.workspace.fenceLayer
         self.pipe_lyr = self.workspace.pipelineLayer

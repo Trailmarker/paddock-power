@@ -21,6 +21,7 @@ class WorkspaceTask(QgsTask):
         self.workspace = workspace
         self.startTime = time()
         self._tasks = []
+        self._workspaceVisible = self.workspace.isVisible
 
     # Keeping things simple for now - we don't need subtasks (yet, maybe)
     # def safeAddSubTask(self, task):
@@ -36,6 +37,7 @@ class WorkspaceTask(QgsTask):
         result = False
         try:
             self.workspace.lock()
+            self.workspace.setVisible(False)
             result = self.safeRun()
         except WorkspaceTaskCancelledException:
             qgsInfo(f"{PLUGIN_NAME} User successfully cancelled '{self.description()}'")
@@ -62,6 +64,8 @@ class WorkspaceTask(QgsTask):
             qgsException()
         finally:
             sleep(self.TASK_DELAY)
+            self.workspace.setVisible(self._workspaceVisible)
+            self.workspace.unlock()
 
     def safeFinished(self, result):
         pass
