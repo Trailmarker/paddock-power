@@ -1,5 +1,6 @@
 *__pycache__*
 *.zip
 
+.DS_Store
 .mypy_cache
 paddock_power/lib
