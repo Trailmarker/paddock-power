@@ -1,6 +1,6 @@
 # Paddock Power
 
-Paddock Power is a property planning tool developed by Trailmarker and RangeIQ with funding and support from the Department of Industry, Tourism and Trade (DITT) and from Meat & Livestock Australia. Its features include property mapping, carrying capacity modelling, etc.
+Paddock Power is a cattle property planning tool developed by Trailmarker and Range IQ on behalf of the Northern Territory Government, with funding support from Meat & Livestock Australia. The features include property mapping, carrying capacity modelling, calculation of infrastructure metrics and printable reports.
 
 Paddock Power is a [QGIS](https://www.qgis.org) plug-in compatible with the latest QGIS LTR (3.28 at the time of release) and after.
 
