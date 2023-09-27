@@ -6,5 +6,5 @@ Paddock Power is a [QGIS](https://www.qgis.org) plug-in compatible with the late
 
 ## Contributors
 
-Tom Lynch (Trailmarker)
+Tom Lynch (Trailmarker)\
 Ben Wirf (DITT)
