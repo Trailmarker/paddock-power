@@ -17,13 +17,13 @@ class DerivedPaddockLandTypesLayer(DerivedFeatureLayer):
 
     def getRederiveFeaturesRequest(self):
         """Define which features must be removed from a target layer to be re-derived."""
-        if not self.changeset:
+        if self.changeset.isEmpty:
             return None
 
         # TODO Land Type condition table?
         [landTypeConditionTable, analyticPaddockLayer, landTypeLayer, wateredAreaLayer] = self.dependentLayers
         return self.prepareRederiveFeaturesRequest(
-            analyticPaddockLayer, PADDOCK, FID,
+            analyticPaddockLayer, PADDOCK, PADDOCK,
             wateredAreaLayer, PADDOCK, PADDOCK,
             landTypeLayer, LAND_TYPE, FID)
 

@@ -17,11 +17,12 @@ class DerivedWaterpointBufferLayer(DerivedFeatureLayer):
 
     def getRederiveFeaturesRequest(self):
         """Define which features must be removed from a target layer to be re-derived."""
-        if not self.changeset:
+        if self.changeset.isEmpty:
             return None
 
         [analyticPaddockLayer, waterpointLayer] = self.dependentLayers
-        return self.prepareRederiveFeaturesRequest(analyticPaddockLayer, PADDOCK, FID, waterpointLayer, WATERPOINT, FID)
+        return self.prepareRederiveFeaturesRequest(
+            analyticPaddockLayer, PADDOCK, PADDOCK, waterpointLayer, WATERPOINT, FID)
 
     def prepareQuery(self, query, dependentLayers):
         [analyticPaddockLayer, waterpointLayer] = dependentLayers

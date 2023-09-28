@@ -7,7 +7,7 @@ from collections import defaultdict
 from qgis.core import QgsFeatureRequest, QgsGeometry
 
 from ...models import Glitch
-from ...utils import PLUGIN_NAME, getSetting, qgsInfo
+from ...utils import PLUGIN_NAME, getSetting, guiWarning, qgsInfo
 from ..fields import BUILD_FENCE, FeatureStatus, Timeframe, FenceSchema
 from .edits import Edits
 from .feature_action import FeatureAction
@@ -55,6 +55,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
         # Get the whole area around the property
         # We are only interested in Paddocks that are going to be there if we Plan this Fence (so Future, not Current)
         # We use the PaddockLayer because it is the reference for Paddock timeframe data
+        self.paddockLayer.updateExtents()
         currentPaddocks = self.paddockLayer.getFeaturesByTimeframe(Timeframe.Future)
 
         # Get the whole current Paddock area - note the buffering here to reduce glitches
@@ -250,6 +251,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
 
         if (not newPaddocks and not supersededPaddocks) or not fenceLines:
             qgsInfo("The sketched Fence did not cross or touch any Built or Planned Paddocks, or enclose any new Paddocks.")
+            guiWarning("The sketched Fence did not cross or touch any Built or Planned Paddocks, or enclose any new Paddocks.")
             return Edits.delete(self)
 
         self.GEOMETRY, *fenceLines = fenceLines

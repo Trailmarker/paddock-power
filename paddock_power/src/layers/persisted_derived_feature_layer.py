@@ -8,7 +8,7 @@ from .persisted_feature_layer import PersistedFeatureLayer
 
 class PersistedDerivedFeatureLayer(PersistedFeatureLayer, IPersistedDerivedFeatureLayer):
 
-    RESPECT_CHANGESETS = getSetting("respectChangesets", default=True)
+    RESPECT_CHANGESETS = getSetting("respectChangesets", default=False)
 
     def __init__(self, workspaceFile, layerName, styleName, derivedLayerType, dependentLayers):
         f"""Create a new {PLUGIN_NAME} derived persisted feature layer."""

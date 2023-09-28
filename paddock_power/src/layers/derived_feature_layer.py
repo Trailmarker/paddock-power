@@ -29,10 +29,11 @@ class DerivedFeatureLayer(FeatureLayer, IDerivedFeatureLayer):
 
     def prepareRederiveFeaturesRequest(self, *args):
         """Return a QgsFeatureRequest to figure out which featurs to rederive based on some edits."""
-        if not self.changeset:
+        if self.changeset.isEmpty:
             return None
 
         orClauses = self.allKeyClauses(self.changeset, *args)
+        qgsDebug(f"{type(self).__name__}.prepareRederiveFeaturesRequest(…): orClauses={orClauses}")
         return QgsFeatureRequest().setFilterExpression(orClauses) if orClauses else None
 
         # return QgsFeatureRequest().setNoAttributes().setFlags(

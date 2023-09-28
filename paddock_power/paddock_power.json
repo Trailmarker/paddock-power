@@ -2,7 +2,7 @@
     "freezeMapCanvas": true,
     "analyseDelay": 0.1,
     "removeAllOfTypeDelay": 0.1,
-    "respectChangesets": true,
+    "respectChangesets": false,
     "taskDelay": 0.1,
     "workspaceUnlockDelay": 2.0
 }

@@ -229,6 +229,11 @@ class Edits(WorkspaceMixin):
     def layers(self):
         return [self.workspace.mapLayer(layerId) for layerId in self.edits.keys()]
 
+    @property
+    def isEmpty(self):
+        """Return True if there are no edits in this structure."""
+        return not any(self.edits.values())
+
     def layerFeatures(self, layer):
         return self.getFeatures(self.edits[layer.id()])
 
