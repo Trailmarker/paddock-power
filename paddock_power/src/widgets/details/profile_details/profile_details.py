@@ -61,7 +61,7 @@ class ProfileDetails(QWidget, FORM_CLASS, WorkspaceMixin):
             self.cleanupProfileCanvas()
             return
 
-        if self.feature is not None:
+        if self.feature is not None and self.workspace.hasElevation:
             profile = self.feature.profile()
 
             useMetres = (profile.maximumDistance < 1000)

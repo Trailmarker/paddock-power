@@ -76,6 +76,11 @@ class Workspace(QObject):
         return self.workspaceLayers.hasBasePaddocks
 
     @property
+    def hasElevation(self):
+        """Return True if this workspace has an elevation layer."""
+        return self.workspaceLayers.hasElevation
+
+    @property
     def hasPropertyMetrics(self):
         """Return True if this workspace has property metrics."""
         return self.workspaceLayers.hasPropertyMetrics
