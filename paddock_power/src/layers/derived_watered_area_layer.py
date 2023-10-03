@@ -97,7 +97,7 @@ with
 	 where not exists (
 		select 1
 		from "{waterpointBuffers}"
-		where "{waterpointBuffers}".{PADDOCK} = "{_FILTERED_PADDOCKS}".{FID}
+		where "{waterpointBuffers}".{PADDOCK} = "{_FILTERED_PADDOCKS}".{PADDOCK}
 		and {Timeframe.Current.timeframeMatchesStatuses(f'"{waterpointBuffers}".{TIMEFRAME}', f'"{_FILTERED_PADDOCKS}".{STATUS}')})
 	 union
 	 select
@@ -111,7 +111,7 @@ with
 	 where not exists (
 		select 1
 		from "{waterpointBuffers}"
-		where "{waterpointBuffers}".{PADDOCK} = "{_FILTERED_PADDOCKS}".{FID}
+		where "{waterpointBuffers}".{PADDOCK} = "{_FILTERED_PADDOCKS}".{PADDOCK}
 		and {Timeframe.Future.timeframeMatchesStatuses(f'"{waterpointBuffers}".{TIMEFRAME}', f'"{_FILTERED_PADDOCKS}".{STATUS}')}))
 select
 	st_multi(geometry) as geometry,
@@ -145,7 +145,7 @@ select
 	{_FAR_WATERED_AREA}.{TIMEFRAME}
 from "{_FILTERED_PADDOCKS}"
 inner join {_FAR_WATERED_AREA}
-	on "{_FILTERED_PADDOCKS}".{FID} = {_FAR_WATERED_AREA}.{PADDOCK}
+	on "{_FILTERED_PADDOCKS}".{PADDOCK} = {_FAR_WATERED_AREA}.{PADDOCK}
 	and st_difference("{_FILTERED_PADDOCKS}".geometry, {_FAR_WATERED_AREA}.geometry) is not null
 	and st_area(st_difference("{_FILTERED_PADDOCKS}".geometry, {_FAR_WATERED_AREA}.geometry)) >= {Calculator.MINIMUM_PLANAR_AREA_M2}
 	and {Timeframe.timeframesMatchStatuses(f'"{_FAR_WATERED_AREA}"."{TIMEFRAME}"', f'"{_FILTERED_PADDOCKS}"."{STATUS}"')}

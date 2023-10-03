@@ -149,7 +149,10 @@ class PersistedFeatureLayer(FeatureLayer, IPersistedFeatureLayer):
 
     def deleteFeature(self, feature):
         """Delete a PersistedFeature from the layer."""
-        super().deleteFeature(feature.FID)
+        if hasattr(feature, "FID"):
+            super().deleteFeature(feature.FID)
+        else:
+            super().deleteFeature(feature)
 
     def recalculateFeatures(self, raiseErrorIfTaskHasBeenCancelled=lambda: None):
         """Recalculate features in this layer."""

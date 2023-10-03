@@ -80,7 +80,7 @@ class FeatureLayer(QgsVectorLayer, WorkspaceMixin, MapLayerMixin, IFeatureLayer,
         if self.hasFeatures:
             self.updateExtents()
             extent = self.extent()
-            extent.scale(0.5)
+            extent.scale(1.5)
             return extent
         else:
             return None

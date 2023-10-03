@@ -79,7 +79,7 @@ select
 from "{_ANALYTIC_PADDOCKS}"
 inner join "{paddockLandTypes}"
 	on "{_ANALYTIC_PADDOCKS}".{PADDOCK} = "{paddockLandTypes}".{PADDOCK}
-group by "{_ANALYTIC_PADDOCKS}".{FID}, "{paddockLandTypes}".{TIMEFRAME}
+group by "{_ANALYTIC_PADDOCKS}".{PADDOCK}, "{paddockLandTypes}".{TIMEFRAME}
 union
 select
 	"{_OTHER_PADDOCKS}".geometry as geometry,
