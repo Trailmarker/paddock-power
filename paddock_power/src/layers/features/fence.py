@@ -288,7 +288,7 @@ class Fence(PersistedFeature, StatusFeatureMixin):
             crossedPaddockGeometry = shape(crossedBasePaddock.GEOMETRY.__geo_interface__)
             splits = split(crossedPaddockGeometry, blade)
 
-            for i, splitGeometry in enumerate(splits):
+            for i, splitGeometry in enumerate(splits.geoms):
                 splitPaddock = self.basePaddockLayer.makeFeature()
 
                 splitPaddock.draftFeature(
